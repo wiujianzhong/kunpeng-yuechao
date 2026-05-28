@@ -88,6 +88,47 @@
       background: rgba(255,43,214,0.09);
     }
 
+    .hide-panel {
+      width: auto;
+      min-height: 28px;
+      margin-top: 8px;
+      padding: 0 10px;
+      border: 1px solid rgba(0,245,255,0.28);
+      border-radius: 999px;
+      color: #dfffff;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(0,245,255,0.08);
+      box-shadow: none;
+    }
+
+    .show-panel {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 5;
+      display: none;
+      width: auto;
+      min-height: 34px;
+      margin: 0;
+      padding: 0 13px;
+      border: 1px solid rgba(0,245,255,0.36);
+      border-radius: 999px;
+      color: #eaffff;
+      font-size: 13px;
+      background: rgba(5, 10, 18, 0.78);
+      box-shadow: 0 0 18px rgba(0,245,255,0.22);
+      backdrop-filter: blur(12px);
+    }
+
+    body.panel-hidden #panel {
+      display: none;
+    }
+
+    body.panel-hidden .show-panel {
+      display: block;
+    }
+
     textarea,
     select,
     input[type="color"] {
@@ -202,7 +243,10 @@
         <h1>小伍工坊 出品</h1>
         <div class="phone">19009925522</div>
       </div>
-      <div class="badge">不卡 CDN 版</div>
+      <div>
+        <div class="badge">不卡 CDN 版</div>
+        <button class="hide-panel" id="hidePanelBtn" type="button">隐藏设置</button>
+      </div>
     </div>
 
     <textarea id="textInput" maxlength="36">小伍工坊
@@ -248,6 +292,7 @@
     </div>
   </section>
 
+  <button class="show-panel" id="showPanelBtn" type="button">设置</button>
   <div class="watermark">小伍工坊 出品 · 19009925522</div>
 
   <script>
@@ -264,7 +309,9 @@
       font: document.getElementById("fontRange"),
       fontText: document.getElementById("fontText"),
       family: document.getElementById("fontSelect"),
-      launch: document.getElementById("launchBtn")
+      launch: document.getElementById("launchBtn"),
+      hidePanel: document.getElementById("hidePanelBtn"),
+      showPanel: document.getElementById("showPanelBtn")
     };
 
     let w = 0;
@@ -429,6 +476,8 @@
     }
 
     ui.launch.addEventListener("click", () => buildTargets(true));
+    ui.hidePanel.addEventListener("click", () => document.body.classList.add("panel-hidden"));
+    ui.showPanel.addEventListener("click", () => document.body.classList.remove("panel-hidden"));
     ui.text.addEventListener("input", () => buildTargets(false));
     ui.colorA.addEventListener("input", () => buildTargets(false));
     ui.colorB.addEventListener("input", () => buildTargets(false));
