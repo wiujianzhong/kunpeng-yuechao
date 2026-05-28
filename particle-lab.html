@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小伍工坊出品 | 手势文字粒子</title>
+  <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --accent: #00f5ff;
+      --accent2: #ff2bd6;
+      --panel: rgba(7, 10, 18, 0.72);
+      --line: rgba(0, 245, 255, 0.28);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      color: #fff;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(0, 245, 255, 0.2), transparent 28%),
+        radial-gradient(circle at 82% 22%, rgba(255, 43, 214, 0.16), transparent 26%),
+        linear-gradient(135deg, #03040a 0%, #081122 48%, #05050b 100%);
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      user-select: none;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .grid-light {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, rgba(0,0,0,0.85), transparent 74%);
+      z-index: 1;
+    }
+
+    #ui-container {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 10;
+      width: min(360px, calc(100vw - 36px));
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 0 32px rgba(0, 245, 255, 0.14), inset 0 0 24px rgba(255,255,255,0.035);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0;
+      color: #f7ffff;
+      text-shadow: 0 0 14px rgba(0, 245, 255, 0.7);
+    }
+
+    .phone {
+      margin-top: 4px;
+      color: #9befff;
+      font-size: 12px;
+    }
+
+    .badge {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      border: 1px solid rgba(255,43,214,0.35);
+      border-radius: 999px;
+      color: #ffd6fb;
+      font-size: 12px;
+      background: rgba(255,43,214,0.08);
+    }
+
+    textarea,
+    select,
+    input[type="color"] {
+      width: 100%;
+      color: #eaffff;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(0, 245, 255, 0.34);
+      border-radius: 7px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 84px;
+      resize: vertical;
+      padding: 10px;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    select {
+      height: 36px;
+      padding: 0 9px;
+    }
+
+    input[type="color"] {
+      height: 36px;
+      padding: 3px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .control {
+      display: grid;
+      gap: 6px;
+      color: #a9c8d0;
+      font-size: 12px;
+    }
+
+    .control-wide {
+      grid-column: 1 / -1;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    button {
+      width: 100%;
+      min-height: 40px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 7px;
+      color: #001217;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(90deg, var(--accent), #78ffb8 48%, var(--accent2));
+      box-shadow: 0 0 18px rgba(0, 245, 255, 0.28);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 24px rgba(255, 43, 214, 0.35);
+    }
+
+    #hud {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      color: #8cefff;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .highlight {
+      color: #ffe970;
+      font-weight: 700;
+    }
+
+    #loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 8;
+      transform: translate(-50%, -50%);
+      color: #bfffff;
+      font-size: 20px;
+      font-weight: 800;
+      text-align: center;
+      text-shadow: 0 0 18px var(--accent);
+      pointer-events: none;
+    }
+
+    .video-feed {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 9;
+      width: 190px;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      transform: scaleX(-1);
+      border: 1px solid rgba(0,245,255,0.42);
+      border-radius: 8px;
+      opacity: 0.72;
+      box-shadow: 0 0 20px rgba(0, 245, 255, 0.18);
+    }
+
+    .watermark {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      z-index: 9;
+      transform: translateX(-50%);
+      color: rgba(230,255,255,0.9);
+      font-size: 13px;
+      letter-spacing: 0;
+      text-shadow: 0 0 12px rgba(0,245,255,0.7);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 720px) {
+      #ui-container {
+        top: 10px;
+        left: 10px;
+        width: calc(100vw - 20px);
+        padding: 12px;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .video-feed {
+        width: 120px;
+        right: 10px;
+        bottom: 38px;
+      }
+
+      .watermark {
+        bottom: 10px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-light"></div>
+
+  <div id="ui-container">
+    <div class="brand">
+      <div>
+        <h1>小伍工坊 出品</h1>
+        <div class="phone">19009925522</div>
+      </div>
+      <div class="badge">文字粒子秀</div>
+    </div>
+
+    <textarea id="textInput" maxlength="36">小伍工坊
+出品
+19009925522</textarea>
+
+    <div class="row">
+      <label class="control">
+        粒子颜色
+        <input id="particleColor" type="color" value="#00f5ff">
+      </label>
+      <label class="control">
+        辅助颜色
+        <input id="secondColor" type="color" value="#ff2bd6">
+      </label>
+      <label class="control">
+        粒子大小 <span id="sizeValue">1.10</span>
+        <input id="particleSize" type="range" min="0.35" max="3.2" step="0.05" value="1.10">
+      </label>
+      <label class="control">
+        字体大小 <span id="fontSizeValue">62</span>
+        <input id="fontSize" type="range" min="34" max="92" step="2" value="62">
+      </label>
+      <label class="control control-wide">
+        字体
+        <select id="fontFamily">
+          <option value="'PingFang SC','Microsoft YaHei',Arial,sans-serif">现代黑体</option>
+          <option value="'STHeiti','Heiti SC','Microsoft YaHei',sans-serif">厚重科技</option>
+          <option value="'Songti SC','SimSun',serif">宋体招牌</option>
+          <option value="'Kaiti SC','KaiTi',serif">楷体手写</option>
+          <option value="Impact,'Arial Black',sans-serif">英文冲击</option>
+        </select>
+      </label>
+    </div>
+
+    <button id="launchBtn" type="button">发射粒子</button>
+
+    <div id="hud">
+      状态：<span id="gestureStatus" class="highlight">正在初始化 AI...</span><br>
+      <span class="highlight">食指靠近</span>：划开粒子涟漪<br>
+      <span class="highlight">握拳</span>：黑洞吸附<br>
+      <span class="highlight">张开手掌</span>：爆炸消散<br>
+      <span class="highlight">比个二</span>：切换预设文字
+    </div>
+  </div>
+
+  <div id="loading">正在唤醒粒子系统，请允许摄像头权限</div>
+  <video class="video-feed" id="videoElement" autoplay playsinline muted></video>
+  <div class="watermark">小伍工坊 出品 · 19009925522</div>
+
+  <script>
+    const textLibrary = [
+      "小伍工坊\n出品\n19009925522",
+      "兄弟欢迎你",
+      "大展宏图",
+      "炫酷粒子",
+      "科技未来"
+    ];
+
+    let libraryIndex = 0;
+    const particleCount = 7600;
+    const textCanvas = document.createElement("canvas");
+    textCanvas.width = 760;
+    textCanvas.height = 280;
+    const textCtx = textCanvas.getContext("2d", { willReadFrequently: true });
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x05050b, 0.0035);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1200);
+    camera.position.z = 220;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const positions = new Float32Array(particleCount * 3);
+    const targetPositions = new Float32Array(particleCount * 3);
+    const velocities = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+      size: 1.1,
+      transparent: true,
+      opacity: 0.88,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+      map: createGlowTexture()
+    });
+
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+
+    const ringGeo = new THREE.TorusGeometry(72, 0.25, 8, 140);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f5ff, transparent: true, opacity: 0.28 });
+    const neonRing = new THREE.Mesh(ringGeo, ringMat);
+    neonRing.rotation.x = 1.18;
+    scene.add(neonRing);
+
+    const sphereGeo = new THREE.SphereGeometry(3.2, 24, 24);
+    const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffe970, wireframe: true });
+    const fingerSphere = new THREE.Mesh(sphereGeo, sphereMat);
+    scene.add(fingerSphere);
+
+    const ui = {
+      text: document.getElementById("textInput"),
+      color: document.getElementById("particleColor"),
+      secondColor: document.getElementById("secondColor"),
+      size: document.getElementById("particleSize"),
+      sizeValue: document.getElementById("sizeValue"),
+      fontSize: document.getElementById("fontSize"),
+      fontSizeValue: document.getElementById("fontSizeValue"),
+      fontFamily: document.getElementById("fontFamily"),
+      status: document.getElementById("gestureStatus"),
+      loading: document.getElementById("loading"),
+      launch: document.getElementById("launchBtn")
+    };
+
+    let handPos = new THREE.Vector3(999, 999, 0);
+    let currentGesture = "无手势";
+    let gestureCooldown = false;
+    let time = 0;
+
+    function createGlowTexture() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 48;
+      canvas.height = 48;
+      const ctx = canvas.getContext("2d");
+      const gradient = ctx.createRadialGradient(24, 24, 0, 24, 24, 24);
+      gradient.addColorStop(0, "rgba(255,255,255,1)");
+      gradient.addColorStop(0.22, "rgba(255,255,255,0.92)");
+      gradient.addColorStop(0.58, "rgba(255,255,255,0.28)");
+      gradient.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 48, 48);
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    function hexToColor(hex) {
+      return new THREE.Color(hex);
+    }
+
+    function updateParticleColors() {
+      const c1 = hexToColor(ui.color.value);
+      const c2 = hexToColor(ui.secondColor.value);
+      const color = new THREE.Color();
+
+      for (let i = 0; i < particleCount; i++) {
+        const mix = (Math.sin(i * 0.017) + 1) * 0.5;
+        color.copy(c1).lerp(c2, mix * 0.72);
+        const pulse = 0.76 + Math.random() * 0.24;
+        colors[i * 3] = color.r * pulse;
+        colors[i * 3 + 1] = color.g * pulse;
+        colors[i * 3 + 2] = color.b * pulse;
+      }
+
+      ringMat.color.set(ui.color.value);
+      geometry.attributes.color.needsUpdate = true;
+    }
+
+    function generateTextParticles(text) {
+      textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+      textCtx.fillStyle = "#fff";
+      textCtx.textAlign = "center";
+      textCtx.textBaseline = "middle";
+      textCtx.font = `900 ${Number(ui.fontSize.value)}px ${ui.fontFamily.value}`;
+
+      const lines = text.split("\n").filter(Boolean).slice(0, 4);
+      const lineHeight = Number(ui.fontSize.value) * 1.08;
+      const startY = textCanvas.height / 2 - ((lines.length - 1) * lineHeight) / 2;
+
+      lines.forEach((line, index) => {
+        textCtx.fillText(line, textCanvas.width / 2, startY + index * lineHeight);
+      });
+
+      const imgData = textCtx.getImageData(0, 0, textCanvas.width, textCanvas.height).data;
+      const pixelCoords = [];
+      const step = Number(ui.fontSize.value) > 74 ? 3 : 2;
+
+      for (let y = 0; y < textCanvas.height; y += step) {
+        for (let x = 0; x < textCanvas.width; x += step) {
+          if (imgData[(y * textCanvas.width + x) * 4 + 3] > 128) {
+            pixelCoords.push({
+              x: (x - textCanvas.width / 2) * 0.58,
+              y: -(y - textCanvas.height / 2) * 0.58,
+              z: (Math.random() - 0.5) * 14
+            });
+          }
+        }
+      }
+
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        const target = pixelCoords.length ? pixelCoords[i % pixelCoords.length] : { x: 0, y: 0, z: 0 };
+        targetPositions[i3] = target.x + (Math.random() - 0.5) * 1.4;
+        targetPositions[i3 + 1] = target.y + (Math.random() - 0.5) * 1.4;
+        targetPositions[i3 + 2] = target.z;
+      }
+
+      updateParticleColors();
+    }
+
+    function scatterParticles() {
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        positions[i3] = (Math.random() - 0.5) * 540;
+        positions[i3 + 1] = (Math.random() - 0.5) * 320;
+        positions[i3 + 2] = (Math.random() - 0.5) * 220;
+        velocities[i3] = (Math.random() - 0.5) * 8;
+        velocities[i3 + 1] = (Math.random() - 0.5) * 8;
+        velocities[i3 + 2] = (Math.random() - 0.5) * 8;
+      }
+      geometry.attributes.position.needsUpdate = true;
+    }
+
+    function getDistance(p1, p2) {
+      return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+    }
+
+    function manualUpdate() {
+      material.size = Number(ui.size.value);
+      ui.sizeValue.textContent = Number(ui.size.value).toFixed(2);
+      ui.fontSizeValue.textContent = ui.fontSize.value;
+      generateTextParticles(ui.text.value.trim() || "小伍工坊");
+      scatterParticles();
+    }
+
+    ui.launch.addEventListener("click", manualUpdate);
+    [ui.color, ui.secondColor].forEach((input) => input.addEventListener("input", updateParticleColors));
+    ui.size.addEventListener("input", () => {
+      material.size = Number(ui.size.value);
+      ui.sizeValue.textContent = Number(ui.size.value).toFixed(2);
+    });
+    [ui.fontSize, ui.fontFamily].forEach((input) => input.addEventListener("input", () => {
+      ui.fontSizeValue.textContent = ui.fontSize.value;
+      generateTextParticles(ui.text.value.trim() || "小伍工坊");
+    }));
+
+    generateTextParticles(ui.text.value);
+    scatterParticles();
+
+    const videoElement = document.getElementById("videoElement");
+    const hands = new Hands({ locateFile: (file) => `https://unpkg.com/@mediapipe/hands/${file}` });
+    hands.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.72,
+      minTrackingConfidence: 0.72
+    });
+
+    hands.onResults((results) => {
+      ui.loading.style.display = "none";
+
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        const lm = results.multiHandLandmarks[0];
+        const indexFinger = lm[8];
+        handPos.x = -(indexFinger.x - 0.5) * window.innerWidth * 0.16;
+        handPos.y = -(indexFinger.y - 0.5) * window.innerHeight * 0.16;
+        handPos.z = 18;
+        fingerSphere.position.copy(handPos);
+
+        const isIndexUp = lm[8].y < lm[6].y;
+        const isMiddleUp = lm[12].y < lm[10].y;
+        const isRingUp = lm[16].y < lm[14].y;
+        const isPinkyUp = lm[20].y < lm[18].y;
+        const palmWide = (getDistance(lm[8], lm[0]) + getDistance(lm[12], lm[0]) + getDistance(lm[16], lm[0]) + getDistance(lm[20], lm[0])) / 4;
+
+        if (!isIndexUp && !isMiddleUp && !isRingUp && !isPinkyUp) {
+          currentGesture = "抓取";
+          ui.status.textContent = "纳米黑洞吸引中...";
+          ui.status.style.color = "#ff2bd6";
+        } else if (isIndexUp && isMiddleUp && !isRingUp && !isPinkyUp) {
+          currentGesture = "比个二";
+          ui.status.textContent = "识别到切换指令";
+          ui.status.style.color = "#ffe970";
+          if (!gestureCooldown) {
+            gestureCooldown = true;
+            libraryIndex = (libraryIndex + 1) % textLibrary.length;
+            ui.text.value = textLibrary[libraryIndex];
+            manualUpdate();
+            setTimeout(() => { gestureCooldown = false; }, 1500);
+          }
+        } else if (palmWide > 0.35 && isIndexUp && isMiddleUp && isRingUp && isPinkyUp) {
+          currentGesture = "张开";
+          ui.status.textContent = "冲击波释放";
+          ui.status.style.color = "#00f5ff";
+        } else {
+          currentGesture = "自由控制";
+          ui.status.textContent = "食指能量引导中...";
+          ui.status.style.color = "#78ffb8";
+        }
+      } else {
+        handPos.set(999, 999, 0);
+        fingerSphere.position.copy(handPos);
+        currentGesture = "无手势";
+        ui.status.textContent = "等待右手入镜...";
+        ui.status.style.color = "#a8b9c0";
+      }
+    });
+
+    const cameraFeed = new Camera(videoElement, {
+      onFrame: async () => {
+        await hands.send({ image: videoElement });
+      },
+      width: 640,
+      height: 480
+    });
+
+    cameraFeed.start().catch((err) => {
+      console.warn("摄像头未开启，页面仍可手动调节和展示粒子。", err);
+      ui.loading.style.display = "none";
+      ui.status.textContent = "摄像头未开启，可手动发射";
+      ui.status.style.color = "#ffe970";
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      time += 0.01;
+
+      const posAttr = geometry.attributes.position.array;
+      const attract = currentGesture === "抓取" ? 0.0 : 0.032;
+
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        const px = posAttr[i3];
+        const py = posAttr[i3 + 1];
+        const pz = posAttr[i3 + 2];
+        const tx = targetPositions[i3];
+        const ty = targetPositions[i3 + 1];
+        const tz = targetPositions[i3 + 2] + Math.sin(time + i * 0.01) * 2.2;
+
+        let vx = velocities[i3];
+        let vy = velocities[i3 + 1];
+        let vz = velocities[i3 + 2];
+        const dx = px - handPos.x;
+        const dy = py - handPos.y;
+        const dist = Math.hypot(dx, dy) + 0.1;
+
+        if (currentGesture === "抓取") {
+          vx += (-dx / dist) * 1.55;
+          vy += (-dy / dist) * 1.55;
+          vz += (Math.random() - 0.5) * 3.8;
+        } else if (currentGesture === "张开" && dist < 95) {
+          const blast = (95 - dist) / 95;
+          vx += (dx / dist) * blast * 10;
+          vy += (dy / dist) * blast * 10;
+          vz += (Math.random() - 0.5) * blast * 9;
+        } else if (handPos.x < 500 && dist < 30) {
+          const push = (30 - dist) / 30;
+          vx += (dx / dist) * push * 3.6;
+          vy += (dy / dist) * push * 3.6;
+        }
+
+        vx += (tx - px) * attract;
+        vy += (ty - py) * attract;
+        vz += (tz - pz) * attract;
+
+        const friction = currentGesture === "抓取" ? 0.94 : 0.84;
+        vx *= friction;
+        vy *= friction;
+        vz *= friction;
+
+        posAttr[i3] += vx;
+        posAttr[i3 + 1] += vy;
+        posAttr[i3 + 2] += vz;
+        velocities[i3] = vx;
+        velocities[i3 + 1] = vy;
+        velocities[i3 + 2] = vz;
+      }
+
+      particles.rotation.y = Math.sin(time * 0.35) * 0.08;
+      particles.rotation.x = Math.sin(time * 0.22) * 0.035;
+      neonRing.rotation.z += 0.003;
+      fingerSphere.rotation.x += 0.035;
+      fingerSphere.rotation.y += 0.02;
+
+      geometry.attributes.position.needsUpdate = true;
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
