@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>粒子手势互动终极版 v3.0</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #050505; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        canvas { display: block; }
+        
+        /* 隐藏/显示按钮 */
+        #toggle-btn { position: absolute; top: 20px; left: 20px; z-index: 20; background: rgba(0,255,255,0.2); border: 1px solid #00ffff; color: #00ffff; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; backdrop-filter: blur(5px); transition: 0.3s;}
+        #toggle-btn:hover { background: rgba(0,255,255,0.4); }
+
+        /* 主控制面板 */
+        #ui-container { position: absolute; top: 65px; left: 20px; z-index: 10; background: rgba(10, 10, 10, 0.85); padding: 20px; border-radius: 12px; border: 1px solid #00ffff; box-shadow: 0 0 20px rgba(0,255,255,0.2); transition: opacity 0.3s, transform 0.3s; transform-origin: top left;}
+        .ui-hidden { opacity: 0; transform: scale(0.9); pointer-events: none; }
+        
+        .control-group { margin-bottom: 15px; display: flex; align-items: center;}
+        .control-group label { width: 80px; color: #00ffff; font-size: 14px;}
+        input[type="text"] { background: #111; border: 1px solid #00ffff; color: #00ffff; padding: 6px 10px; font-size: 14px; border-radius: 4px; outline: none; width: 140px;}
+        input[type="range"] { flex: 1; cursor: pointer; accent-color: #00ffff;}
+        input[type="color"] { background: none; border: none; cursor: pointer; width: 40px; height: 30px; padding: 0;}
+        button { background: linear-gradient(45deg, #00ffff, #0088ff); color: #000; border: none; padding: 6px 12px; font-size: 14px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 10px;}
+        
+        #hud { color: #00ffff; font-size: 13px; margin-top: 15px; line-height: 1.8; border-top: 1px dashed #333; padding-top: 15px;}
+        .highlight { color: #ffaa00; font-weight: bold; }
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; color: #00ffff; pointer-events: none; text-shadow: 0 0 10px #00ffff;}
+        .video-feed { position: absolute; bottom: 20px; right: 20px; width: 160px; transform: scaleX(-1); border: 2px solid #00ffff; border-radius: 10px; opacity: 0.5;}
+    </style>
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div id="toggle-btn" onclick="toggleUI()">👁️ 隐藏面板</div>
+
+    <div id="ui-container">
+        <div class="control-group">
+            <label>输入文字</label>
+            <input type="text" id="textInput" value="兄弟欢迎你,大展宏图" placeholder="用逗号隔开换行">
+            <button onclick="manualUpdate()">刷新</button>
+        </div>
+        <div class="control-group">
+            <label>粒子大小</label>
+            <input type="range" id="sizeInput" min="0.5" max="6" step="0.1" value="2.2">
+        </div>
+        <div class="control-group">
+            <label>粒子颜色</label>
+            <input type="color" id="colorInput" value="#00ffff">
+        </div>
+        
+        <div id="hud">
+            状态: <span id="gestureStatus" class="highlight">初始化AI...</span><br>
+            ✨ <span class="highlight">食指滑动</span>：水波推散效果<br>
+            ✊ <span class="highlight">单手握拳</span>：黑洞吸附跟随<br>
+            🖐️ <span class="highlight">五指张开</span>：宇宙大爆炸<br>
+            ↔️ <span class="highlight">手掌左右滑</span>：切换预设文本
+        </div>
+    </div>
+    
+    <div id="loading">🔮 正在唤醒量子AI...请允许摄像头</div>
+    <video class="video-feed" id="videoElement" autoplay playsinline></video>
+
+    <script>
+        // --- UI 控制逻辑 ---
+        let isUIHidden = false;
+        function toggleUI() {
+            const ui = document.getElementById('ui-container');
+            isUIHidden = !isUIHidden;
+            if (isUIHidden) {
+                ui.classList.add('ui-hidden');
+                document.getElementById('toggle-btn').innerText = "👁️ 显示面板";
+            } else {
+                ui.classList.remove('ui-hidden');
+                document.getElementById('toggle-btn').innerText = "👁️ 隐藏面板";
+            }
+        }
+
+        // --- 文本库与环境初始化 ---
+        const textLibrary = ["兄弟欢迎你,大展宏图", "炫酷粒子,左右滑动", "科技未来,星辰大海"];
+        let libraryIndex = 0;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 180;
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // --- 粒子系统构建 ---
+        const particleCount = 7000; 
+        const positions = new Float32Array(particleCount * 3);
+        const targetPositions = new Float32Array(particleCount * 3);
+        const velocities = new Float32Array(particleCount * 3);
+        
+        // 记录每个粒子的基础随机相位（用于待机晃动）
+        const randomPhases = new Float32Array(particleCount);
+        for(let i=0; i<particleCount; i++) randomPhases[i] = Math.random() * Math.PI * 2;
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const material = new THREE.PointsMaterial({
+            color: 0x00ffff, size: 2.2, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending
+        });
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+
+        // --- 监听 UI 控件变化 ---
+        document.getElementById('sizeInput').addEventListener('input', (e) => {
+            material.size = parseFloat(e.target.value);
+        });
+        document.getElementById('colorInput').addEventListener('input', (e) => {
+            material.color.set(e.target.value);
+        });
+
+        // --- 动态扫描多行汉字 ---
+        const textCanvas = document.createElement('canvas');
+        textCanvas.width = 600; textCanvas.height = 400;
+        const ctx = textCanvas.getContext('2d', { willReadFrequently: true });
+
+        function generateTextParticles(text) {
+            ctx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+            ctx.fillStyle = "white";
+            ctx.font = "bold 65px 'Microsoft YaHei', sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            // 处理多行文本 (按中英文逗号分割)
+            const lines = text.split(/[,，]/);
+            const lineHeight = 80;
+            const startY = (textCanvas.height / 2) - ((lines.length - 1) * lineHeight) / 2;
+
+            lines.forEach((line, index) => {
+                ctx.fillText(line, textCanvas.width / 2, startY + index * lineHeight);
+            });
+
+            const imgData = ctx.getImageData(0, 0, textCanvas.width, textCanvas.height).data;
+            let pixelCoords = [];
+
+            for (let y = 0; y < textCanvas.height; y += 2) {
+                for (let x = 0; x < textCanvas.width; x += 2) {
+                    if (imgData[(y * textCanvas.width + x) * 4 + 3] > 128) {
+                        pixelCoords.push({
+                            x: (x - textCanvas.width / 2) * 0.7,
+                            y: -(y - textCanvas.height / 2) * 0.7,
+                            z: (Math.random() - 0.5) * 8
+                        });
+                    }
+                }
+            }
+
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                if (pixelCoords.length > 0) {
+                    const target = pixelCoords[i % pixelCoords.length];
+                    targetPositions[i3] = target.x;
+                    targetPositions[i3 + 1] = target.y;
+                    targetPositions[i3 + 2] = target.z;
+                }
+            }
+        }
+        
+        function manualUpdate() {
+            generateTextParticles(document.getElementById('textInput').value);
+        }
+        manualUpdate();
+
+        // 打散初始化
+        const posAttr = geometry.attributes.position.array;
+        for(let i=0; i<particleCount*3; i++) { posAttr[i] = (Math.random()-0.5)*600; }
+
+        const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffaa00, wireframe: true });
+        const fingerSphere = new THREE.Mesh(new THREE.SphereGeometry(3.5, 16, 16), sphereMat);
+        scene.add(fingerSphere);
+
+        // --- AI 手势与轨迹计算 ---
+        let handPos = new THREE.Vector3(999, 999, 0);
+        let currentGesture = "无手势";
+        
+        // 左右滑动检测队列
+        const swipeHistory = [];
+        let gestureCooldown = false;
+
+        function getDistance(p1, p2) { return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2)); }
+
+        const videoElement = document.getElementById('videoElement');
+        const hands = new Hands({locateFile: (file) => `https://unpkg.com/@mediapipe/hands/${file}`});
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+
+        hands.onResults((results) => {
+            document.getElementById('loading').style.display = 'none';
+            const statusData = document.getElementById('gestureStatus');
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const lm = results.multiHandLandmarks[0];
+                const indexFinger = lm[8];
+                const palmCenter = lm[0]; // 掌心坐标，用于稳定判断滑动
+
+                // 映射手指坐标
+                handPos.x = (-(indexFinger.x - 0.5) * window.innerWidth * 0.15);
+                handPos.y = (-(indexFinger.y - 0.5) * window.innerHeight * 0.15);
+                fingerSphere.position.copy(handPos);
+
+                // 判断弯曲
+                const isIndexUp = lm[8].y < lm[6].y;
+                const isMiddleUp = lm[12].y < lm[10].y;
+                const isRingUp = lm[16].y < lm[14].y;
+                const isPinkyUp = lm[20].y < lm[18].y;
+
+                if (!isIndexUp && !isMiddleUp && !isRingUp && !isPinkyUp) {
+                    currentGesture = "抓取";
+                    statusData.innerText = "✊ 黑洞吸附中...";
+                } else if (isIndexUp && isMiddleUp && isRingUp && isPinkyUp) {
+                    currentGesture = "张开";
+                    statusData.innerText = "🖐️ 爆炸斥力开启";
+                } else {
+                    currentGesture = "滑动";
+                    statusData.innerText = "✨ 自由交互中...";
+                }
+
+                // === 左右滑动核心检测逻辑 ===
+                if (!gestureCooldown && currentGesture !== "抓取") {
+                    swipeHistory.push(palmCenter.x);
+                    if (swipeHistory.length > 15) swipeHistory.shift(); // 维持15帧记录
+
+                    if (swipeHistory.length === 15) {
+                        const deltaX = swipeHistory[0] - swipeHistory[14]; // 相机是镜像的，逻辑反向
+                        
+                        // 滑动阈值判断 (0.3 意味着横跨了屏幕 30% 的距离)
+                        if (Math.abs(deltaX) > 0.35) {
+                            gestureCooldown = true;
+                            statusData.innerText = "↔️ 触发翻页！";
+                            
+                            if (deltaX > 0) libraryIndex = (libraryIndex + 1) % textLibrary.length; // 右滑
+                            else libraryIndex = (libraryIndex - 1 + textLibrary.length) % textLibrary.length; // 左滑
+                            
+                            document.getElementById('textInput').value = textLibrary[libraryIndex];
+                            manualUpdate();
+                            
+                            swipeHistory.length = 0; // 清空历史
+                            setTimeout(() => { gestureCooldown = false; }, 1500);
+                        }
+                    }
+                }
+
+            } else {
+                handPos.set(999, 999, 0);
+                fingerSphere.position.copy(handPos);
+                swipeHistory.length = 0;
+            }
+        });
+
+        const cameraFeed = new Camera(videoElement, {
+            onFrame: async () => { await hands.send({image: videoElement}); }, width: 640, height: 480
+        });
+        cameraFeed.start();
+
+        // --- 物理渲染与待机抖动引擎 ---
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.05;
+
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                let px = posAttr[i3]; let py = posAttr[i3 + 1]; let pz = posAttr[i3 + 2];
+                let tx = targetPositions[i3]; let ty = targetPositions[i3 + 1]; let tz = targetPositions[i3 + 2];
+                let vx = velocities[i3]; let vy = velocities[i3 + 1]; let vz = velocities[i3 + 2];
+
+                // === 待机呼吸晃动特效 ===
+                // 利用正弦波在目标坐标周围产生微小的扰动漂浮
+                const phase = randomPhases[i];
+                let dynamicTx = tx + Math.sin(time + phase) * 1.5;
+                let dynamicTy = ty + Math.cos(time + phase * 0.8) * 1.5;
+
+                let homeForce = 0.04;
+                const dx = px - handPos.x;
+                const dy = py - handPos.y;
+                const dist = Math.sqrt(dx * dx + dy * dy) + 0.1;
+
+                if (currentGesture === "抓取") {
+                    homeForce = 0;
+                    vx += (-dx / dist) * 2.2;
+                    vy += (-dy / dist) * 2.2;
+                    vz += ((Math.random()-0.5)*4);
+                } 
+                else if (currentGesture === "张开" && dist < 90) {
+                    homeForce = 0.001; 
+                    const blast = (90 - dist) / 90;
+                    vx += (dx / dist) * blast * 15;
+                    vy += (dy / dist) * blast * 15;
+                } 
+                else if (dist < 30) { 
+                    const push = (30 - dist) / 30;
+                    vx += (dx / dist) * push * 5;
+                    vy += (dy / dist) * push * 5;
+                }
+
+                vx += (dynamicTx - px) * homeForce;
+                vy += (dynamicTy - py) * homeForce;
+                vz += (tz - pz) * homeForce;
+
+                const friction = currentGesture === "抓取" ? 0.92 : 0.82;
+                vx *= friction; vy *= friction; vz *= friction;
+
+                posAttr[i3] += vx; posAttr[i3 + 1] += vy; posAttr[i3 + 2] += vz;
+                velocities[i3] = vx; velocities[i3 + 1] = vy; velocities[i3 + 2] = vz;
+            }
+
+            geometry.attributes.position.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
