@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Holiday - Custom Text</title>
+    <!-- 引入多种字体：Great Vibes(英手写), Ma Shan Zheng(中毛笔), Long Cang(中草书) -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Ma+Shan+Zheng&family=Long+Cang&family=Noto+Sans+SC:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Segoe UI', sans-serif; transition: background 1s ease; }
+        
+        /* 背景样式 */
+        body.bg-black { background: #000; }
+        body.bg-deep { background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%); }
+        body.bg-warm { background: radial-gradient(circle at center, #2e1a1a 0%, #0f0505 100%); }
+        body.bg-aurora { background: radial-gradient(circle at top, #0f2027 0%, #203a43 50%, #2c5364 100%); }
+        body.bg-china { background: radial-gradient(circle at center, #4a0000 0%, #1a0000 100%); }
+
+        /* 标题基础样式 */
+        #main-title {
+            position: absolute; top: 18px; left: 0; width: 100%;
+            text-align: center; z-index: 50; pointer-events: none; opacity: 0; transition: all 0.5s ease;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255,215,0,0.3);
+            /* 默认字体大小，会被JS覆盖 */
+            font-size: 4.5rem; 
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        /* 圣诞配色 */
+        .style-xmas {
+            background: linear-gradient(to bottom, #ffd700, #ffec8b);
+            font-family: 'Ma Shan Zheng', 'Long Cang', cursive;
+            text-shadow: 0 0 18px rgba(255, 244, 190, 0.8), 0 0 42px rgba(255, 80, 80, 0.45);
+        }
+        /* 新春配色 */
+        .style-cny {
+            background: linear-gradient(to bottom, #ff3333, #ffd700);
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
+        }
+
+        /* 启动页 */
+        #start-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top, #17334a 0%, #07111f 48%, #000 100%);
+            z-index: 200; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; color: #fff;
+        }
+        #start-screen::before {
+            content: ""; position: absolute; inset: 0; pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 25%, rgba(255,255,255,0.9) 0 1px, transparent 2px),
+                radial-gradient(circle at 75% 30%, rgba(255,255,255,0.8) 0 1px, transparent 2px),
+                radial-gradient(circle at 55% 70%, rgba(255,255,255,0.7) 0 1px, transparent 2px);
+            background-size: 180px 180px, 240px 240px, 210px 210px;
+            opacity: 0.55;
+        }
+        .start-title {
+            position: relative; margin: 0;
+            font-family: 'Ma Shan Zheng', 'Long Cang', cursive;
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-weight: 400; letter-spacing: 0;
+            color: transparent; -webkit-background-clip: text; background-clip: text;
+            background-image: linear-gradient(180deg, #fff7c7 0%, #ffd45f 42%, #ff7f7f 100%);
+            text-shadow: 0 0 18px rgba(255, 240, 170, 0.75), 0 0 45px rgba(80, 210, 255, 0.28);
+        }
+        .start-subtitle {
+            position: relative; margin-top: 20px; text-align: center;
+            color: #dfefff; font-size: 16px; line-height: 1.8;
+            text-shadow: 0 0 14px rgba(120, 210, 255, 0.35);
+        }
+        #btn-start {
+            position: relative;
+            padding: 15px 50px; font-size: 20px; background: linear-gradient(90deg, #ffd700, #ffaa00);
+            border: none; border-radius: 30px; color: #000; font-weight: bold; cursor: pointer;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); margin-top: 30px; transition: transform 0.2s;
+        }
+        #btn-start:hover { transform: scale(1.05); }
+
+        /* 照片弹窗 */
+        #photo-modal {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5);
+            max-width: 80%; max-height: 80%; background: #fff; padding: 10px 10px 40px 10px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8); z-index: 150;
+            opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 4px;
+        }
+        #photo-modal.active { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-3deg); }
+        #photo-modal img { max-width: 100%; max-height: 60vh; display: block; }
+        #photo-caption { text-align: center; color: #333; font-family: 'Great Vibes', cursive; font-size: 2rem; margin-top: 5px; }
+
+        /* 摄像头小窗 */
+        #input_video {
+            position: absolute; bottom: 20px; left: 20px;
+            width: 200px; height: 150px; border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transform: scaleX(-1); z-index: 90; object-fit: cover;
+            transition: opacity 0.5s ease;
+        }
+        #input_video.hidden-cam { opacity: 0; pointer-events: none; }
+
+        /* 设置按钮 */
+        #toggle-btn {
+            position: absolute; top: 20px; right: 20px; width: 40px; height: 40px;
+            background: rgba(255,255,255,0.1); border-radius: 50%; color: #fff;
+            border: 1px solid rgba(255,255,255,0.2); cursor: pointer; z-index: 101;
+            display: flex; justify-content: center; align-items: center; font-size: 18px;
+        }
+
+        /* === UI 面板优化 === */
+        #ui-panel {
+            position: absolute; top: 80px; right: 20px; width: 300px;
+            max-height: 85vh; overflow-y: auto;
+            background: rgba(15, 15, 20, 0.85); backdrop-filter: blur(15px);
+            padding: 20px; border-radius: 12px; color: #fff;
+            border: 1px solid rgba(255,255,255,0.15); z-index: 100;
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+        }
+        #ui-panel.hidden { transform: translateX(130%); }
+        /* 滚动条美化 */
+        #ui-panel::-webkit-scrollbar { width: 5px; }
+        #ui-panel::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
+        .control-section { border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 15px; margin-bottom: 15px; }
+        .control-section:last-child { border-bottom: none; }
+        
+        .control-group { margin-bottom: 10px; }
+        .control-group label { display: flex; justify-content: space-between; font-size: 12px; color: #ccc; margin-bottom: 5px; }
+        
+        /* 输入控件样式 */
+        input[type=range] { width: 100%; accent-color: #ffd700; cursor: pointer; }
+        input[type=text] {
+            width: 100%; padding: 8px; background: rgba(0,0,0,0.3); border: 1px solid #444;
+            color: #ffd700; border-radius: 4px; font-size: 14px; box-sizing: border-box;
+        }
+        select { width: 100%; padding: 6px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; }
+        
+        .btn { width: 100%; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; border-radius: 6px; font-size: 12px; transition: 0.2s; }
+        .btn:hover { background: rgba(255,255,255,0.2); }
+        .btn.active { background: linear-gradient(90deg, #ff7675, #d63031); border:none; font-weight:bold; }
+
+        h3 { margin: 0 0 10px 0; font-size: 14px; color: #ffd700; font-weight: bold; }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-black">
+
+    <div id="main-title" class="style-xmas">圣诞快乐</div>
+
+    <!-- 启动页 -->
+    <div id="start-screen">
+        <h1 class="start-title">冬日魔法</h1>
+        <div class="start-subtitle">
+            ⬅️ <strong>左手</strong>：控制爆炸 | ➡️ <strong>右手</strong>：捏合取图<br>
+            可在控制台自定义标题文字
+        </div>
+        <button id="btn-start">开始体验 ✨</button>
+    </div>
+
+    <div id="photo-modal">
+        <img id="modal-img" src="" alt="Memory">
+        <div id="photo-caption">Sweet Memory</div>
+    </div>
+
+    <button id="toggle-btn">⚙️</button>
+    <video id="input_video" class="hidden-cam"></video>
+
+    <!-- 控制面板 -->
+    <div id="ui-panel">
+        <div class="control-group">
+            <button id="btn-fullscreen" class="btn">⛶ 全屏模式</button>
+        </div>
+
+        <!-- 1. 文字自定义模块 -->
+        <div class="control-section">
+            <h3>📝 文字自定义</h3>
+            <div class="control-group">
+                <label>标题内容</label>
+                <input type="text" id="custom-text" value="圣诞快乐">
+            </div>
+            <div class="control-group">
+                <label>字体大小 <span id="val-font-size">4.5</span>rem</label>
+                <input type="range" id="font-size" min="2.0" max="10.0" step="0.5" value="4.5">
+            </div>
+            <div class="control-group">
+                <label>选择字体</label>
+                <select id="font-family">
+                    <option value="'Great Vibes', cursive">Great Vibes (英/手写)</option>
+                    <option value="'Ma Shan Zheng', cursive" selected>马善政 (中/毛笔)</option>
+                    <option value="'Long Cang', cursive">龙苍 (中/草书)</option>
+                    <option value="'Noto Sans SC', sans-serif">思源黑体 (中/粗体)</option>
+                    <option value="'Segoe UI', sans-serif">系统默认 (简洁)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 2. 风格切换 -->
+        <div class="control-section">
+            <h3>🎨 风格与场景</h3>
+            <div class="control-group">
+                <div style="display:flex; gap:10px;">
+                    <button id="theme-xmas" class="btn active">🎄 圣诞</button>
+                    <button id="theme-cny" class="btn">🧧 新春</button>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>背景颜色</label>
+                <select id="bg-select">
+                    <option value="black">🌌 纯黑 (Black)</option>
+                    <option value="deep">🌃 深邃 (Deep Blue)</option>
+                    <option value="warm">🔥 暖冬 (Warm)</option>
+                    <option value="aurora">❄️ 极光 (Aurora)</option>
+                    <option value="china">🧧 中国红 (China Red)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 3. 音乐与媒体 -->
+        <div class="control-section">
+            <h3>🎵 媒体控制</h3>
+            <div class="control-group">
+                <label>背景音乐</label>
+                <button class="btn" onclick="document.getElementById('music-input').click()">📁 上传 MP3</button>
+                <input type="file" id="music-input" accept="audio/*" style="display:none;">
+                <div style="display:flex; gap:10px; margin-top:5px;">
+                    <button id="btn-play-pause" class="btn" style="width:40px;">⏸</button>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.6">
+                </div>
+            </div>
+            <div class="control-group">
+                <label>照片管理</label>
+                <button class="btn" style="background:linear-gradient(90deg, #00b894, #00cec9); color:black;" onclick="document.getElementById('folder-input').click()">📷 导入照片 (多选)</button>
+                <input type="file" id="folder-input" multiple accept="image/*" style="display:none;">
+            </div>
+            <div class="control-group">
+                <label>辅助显示</label>
+                <button id="btn-toggle-cam" class="btn" style="background:rgba(255,255,255,0.15)">📹 显示/隐藏 摄像头</button>
+            </div>
+        </div>
+
+        <!-- 4. 参数调节 -->
+        <div class="control-section">
+            <h3>🎛️ 参数调节</h3>
+            <div class="control-group">
+                <label>旋转速度 <span id="val-rot">0.002</span></label>
+                <input type="range" id="rot-speed" min="0" max="0.02" step="0.001" value="0.002">
+            </div>
+            <div class="control-group">
+                <label>树的高度</label>
+                <input type="range" id="tree-height" min="40" max="100" step="5" value="70">
+            </div>
+            <div class="control-group">
+                <label>音乐律动</label>
+                <input type="range" id="beat-sense" min="0.1" max="3.0" step="0.1" value="1.0">
+            </div>
+        </div>
+    </div>
+
+    <!-- Shader -->
+    <script type="x-shader/x-vertex" id="vertexshader">
+        attribute float size; attribute vec3 customColor; attribute vec3 spherePos; attribute float type;     
+        varying vec3 vColor; varying float vType;
+        uniform float uTime; uniform float uExplosion; uniform float uBeat;      
+        void main() {
+            vColor = customColor; vType = type;
+            float t = uExplosion;
+            float ease = 1.0 - pow(1.0 - t, 3.0);
+            vec3 finalPos = mix(position, spherePos, ease);
+            float beatScale = 1.0;
+            if (t < 0.2) beatScale += uBeat * 0.15 * (1.0 - t*3.0); 
+            if (type > 0.5) beatScale += uBeat * 0.2; 
+            vec4 mvPosition = modelViewMatrix * vec4(finalPos * beatScale, 1.0);
+            float s = size;
+            if(type > 0.5) s *= (1.0 + uBeat * 0.5);
+            gl_PointSize = s * (300.0 / -mvPosition.z);
+            gl_Position = projectionMatrix * mvPosition;
+        }
+    </script>
+    <script type="x-shader/x-fragment" id="fragmentshader">
+        uniform float uTime; uniform float uBeat;
+        varying vec3 vColor; varying float vType;
+        void main() {
+            vec2 coord = gl_PointCoord - vec2(0.5);
+            if(length(coord) > 0.5) discard;
+            vec3 color = vColor; float alpha = 1.0;
+            if(vType > 0.5) {
+                float flash = 0.5 + 0.5 * sin(uTime * 5.0 + vType * 10.0);
+                color += vec3(0.5) * flash * uBeat * 2.0;
+            } else { alpha = 0.8; }
+            gl_FragColor = vec4(color, alpha);
+        }
+    </script>
+
+    <script>
+        const state = { 
+            explosion: 0.0, targetExplosion: 0.0, photoActive: false, treeHeight: 70, rotationSpeed: 0.002,
+            style: 'xmas' // 'xmas' or 'cny'
+        };
+
+        let scene, camera, renderer, clock;
+        let particleSystem, treeGroup, topDecoration;
+        let photoMeshes = [], loadedImages = [];
+// === 预置圣诞图片 (SVG卡通风格) ===
+const PRELOADED_IMAGES = [
+    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCI+CiAgPGRlZnM+CiAgICA8ZmlsdGVyIGlkPSJzaGFkb3ciIHg9Ii0xMCUiIHk9Ii0xMCUiIHdpZHRoPSIxMzAlIiBoZWlnaHQ9IjEzMCUiPgogICAgICA8ZmVEcm9wU2hhZG93IGR4PSIxIiBkeT0iMiIgc3RkRGV2aWF0aW9uPSIyIiBmbG9vZC1vcGFjaXR5PSIwLjI1Ii8+CiAgICA8L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9Imdsb3ciIHg9Ii01MCUiIHk9Ii01MCUiIHdpZHRoPSIyMDAlIiBoZWlnaHQ9IjIwMCUiPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIzIiByZXN1bHQ9ImJsdXIiLz4KICAgICAgPGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJibHVyIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiByeD0iMzAiIHJ5PSIzMCIgZmlsbD0iIzBGMzA1NyIvPgogIAogIDwhLS0gdHJ1bmsgLS0+CiAgPHJlY3QgeD0iMTg1IiB5PSIzMDAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI1MCIgcng9IjQiIGZpbGw9IiM4QjVBMkIiLz4KICA8IS0tIHRyZWUgYm9keSBsYXllcnMgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIyMDAsNTAgMTAwLDE4MCAxNDAsMTgwIDkwLDI2MCAxNjAsMjYwIDE0MCwzMjAgMjYwLDMyMCAyNDAsMjYwIDMxMCwyNjAgMjYwLDE4MCAzMDAsMTgwIiBmaWxsPSIjMkQ2QTJFIiBmaWx0ZXI9InVybCgjc2hhZG93KSIvPgogIDxwb2x5Z29uIHBvaW50cz0iMjAwLDcwIDExNSwxNzUgMTUwLDE3NSAxMDUsMjQ4IDE2NSwyNDggMTQ4LDMwNSAyNTIsMzA1IDIzNSwyNDggMjk1LDI0OCAyNTAsMTc1IDI4NSwxNzUiIGZpbGw9IiMzQThDM0EiLz4KICA8cG9seWdvbiBwb2ludHM9IjIwMCwxMDAgMTMwLDE3MCAxNjAsMTcwIDEyMCwyMzUgMTcwLDIzNSAxNTUsMjg1IDI0NSwyODUgMjMwLDIzNSAyODAsMjM1IDI0MCwxNzAgMjcwLDE3MCIgZmlsbD0iIzRDQUY1MCIvPgogIDwhLS0gZGVjb3JhdGlvbnMgLS0+CiAgPGNpcmNsZSBjeD0iMTYwIiBjeT0iMTUwIiByPSI5IiBmaWxsPSIjRkY0NDQ0IiBmaWx0ZXI9InVybCgjc2hhZG93KSIvPgogIDxjaXJjbGUgY3g9IjI0MCIgY3k9IjE1MCIgcj0iOSIgZmlsbD0iI0ZGRDcwMCIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KICA8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxMzAiIHI9IjgiIGZpbGw9IiM0MTY5RTEiIGZpbHRlcj0idXJsKCNzaGFkb3cpIi8+CiAgPGNpcmNsZSBjeD0iMTQ1IiBjeT0iMjEwIiByPSI5IiBmaWxsPSIjRkY2OUI0IiBmaWx0ZXI9InVybCgjc2hhZG93KSIvPgogIDxjaXJjbGUgY3g9IjI1NSIgY3k9IjIxMCIgcj0iOSIgZmlsbD0iI0ZGNDQ0NCIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KICA8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxOTUiIHI9IjkiIGZpbGw9IiNGRkQ3MDAiIGZpbHRlcj0idXJsKCNzaGFkb3cpIi8+CiAgPGNpcmNsZSBjeD0iMTc1IiBjeT0iMjcwIiByPSI4IiBmaWxsPSIjNDE2OUUxIiBmaWx0ZXI9InVybCgjc2hhZG93KSIvPgogIDxjaXJjbGUgY3g9IjIyNSIgY3k9IjI3MCIgcj0iOCIgZmlsbD0iI0ZGNjlCNCIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KICA8IS0tIHRpbnNlbCAvIGdhcmxhbmRzIC0tPgogIDxwYXRoIGQ9Ik0xMzAsMTc1IFExNjUsMTkwIDIwMCwxNzUgUTIzNSwxNjAgMjcwLDE3NSIgc3Ryb2tlPSIjRkZENzAwIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuNyIvPgogIDxwYXRoIGQ9Ik0xMTUsMjQzIFExNTgsMjU4IDIwMCwyNDMgUTI0MiwyMjggMjg1LDI0MyIgc3Ryb2tlPSIjRkY0NDQ0IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuNyIvPgogIDwhLS0gc3RhciBvbiB0b3AgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIyMDAsMjUgMjA2LDQ4IDIzMCw0OCAyMTAsNjMgMjE4LDg4IDIwMCw3MyAxODIsODggMTkwLDYzIDE3MCw0OCAxOTQsNDgiIGZpbGw9IiNGRkQ3MDAiIGZpbHRlcj0idXJsKCNnbG93KSIvPgogIDxjaXJjbGUgY3g9IjIwMCIgY3k9IjU1IiByPSI1IiBmaWxsPSIjRkZGOERDIiBvcGFjaXR5PSIwLjgiLz4KCjwvc3ZnPg==",
+    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCI+CiAgPGRlZnM+CiAgICA8ZmlsdGVyIGlkPSJzaGFkb3ciIHg9Ii0xMCUiIHk9Ii0xMCUiIHdpZHRoPSIxMzAlIiBoZWlnaHQ9IjEzMCUiPgogICAgICA8ZmVEcm9wU2hhZG93IGR4PSIxIiBkeT0iMiIgc3RkRGV2aWF0aW9uPSIyIiBmbG9vZC1vcGFjaXR5PSIwLjI1Ii8+CiAgICA8L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9Imdsb3ciIHg9Ii01MCUiIHk9Ii01MCUiIHdpZHRoPSIyMDAlIiBoZWlnaHQ9IjIwMCUiPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIzIiByZXN1bHQ9ImJsdXIiLz4KICAgICAgPGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJibHVyIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiByeD0iMzAiIHJ5PSIzMCIgZmlsbD0iIzJDM0U1MCIvPgogIAogIDwhLS0gYm9keSAtLT4KICA8cmVjdCB4PSIxNDAiIHk9IjIyMCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMzAiIHJ4PSIyMCIgZmlsbD0iI0NDMDAwMCIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KICA8IS0tIGJlbHQgLS0+CiAgPHJlY3QgeD0iMTM1IiB5PSIyNTUiIHdpZHRoPSIxMzAiIGhlaWdodD0iMTgiIHJ4PSI0IiBmaWxsPSIjMUExQTFBIi8+CiAgPHJlY3QgeD0iMTkwIiB5PSIyNTAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyOCIgcng9IjQiIGZpbGw9IiNGRkQ3MDAiLz4KICA8IS0tIGFybXMgLS0+CiAgPHJlY3QgeD0iMTAwIiB5PSIyMzAiIHdpZHRoPSI0NSIgaGVpZ2h0PSIyNSIgcng9IjEyIiBmaWxsPSIjQ0MwMDAwIi8+CiAgPHJlY3QgeD0iMjU1IiB5PSIyMzAiIHdpZHRoPSI0NSIgaGVpZ2h0PSIyNSIgcng9IjEyIiBmaWxsPSIjQ0MwMDAwIi8+CiAgPCEtLSBnbG92ZXMgLS0+CiAgPGNpcmNsZSBjeD0iOTgiIGN5PSIyNDIiIHI9IjEzIiBmaWxsPSIjRkZGRkZGIi8+CiAgPGNpcmNsZSBjeD0iMzAyIiBjeT0iMjQyIiByPSIxMyIgZmlsbD0iI0ZGRkZGRiIvPgogIDwhLS0gbGVncyAtLT4KICA8cmVjdCB4PSIxNTAiIHk9IjM0MCIgd2lkdGg9IjM1IiBoZWlnaHQ9IjQ1IiByeD0iNiIgZmlsbD0iI0NDMDAwMCIvPgogIDxyZWN0IHg9IjIxNSIgeT0iMzQwIiB3aWR0aD0iMzUiIGhlaWdodD0iNDUiIHJ4PSI2IiBmaWxsPSIjQ0MwMDAwIi8+CiAgPCEtLSBib290cyAtLT4KICA8cmVjdCB4PSIxNDUiIHk9IjM3MCIgd2lkdGg9IjQ1IiBoZWlnaHQ9IjI1IiByeD0iMTAiIGZpbGw9IiMxQTFBMUEiLz4KICA8cmVjdCB4PSIyMTAiIHk9IjM3MCIgd2lkdGg9IjQ1IiBoZWlnaHQ9IjI1IiByeD0iMTAiIGZpbGw9IiMxQTFBMUEiLz4KICA8IS0tIGhlYWQgLS0+CiAgPGNpcmNsZSBjeD0iMjAwIiBjeT0iMTgwIiByPSI2MCIgZmlsbD0iI0ZERENCNSIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KICA8IS0tIGV5ZXMgLS0+CiAgPGNpcmNsZSBjeD0iMTgyIiBjeT0iMTcyIiByPSI2IiBmaWxsPSIjMUExQTFBIi8+CiAgPGNpcmNsZSBjeD0iMjE4IiBjeT0iMTcyIiByPSI2IiBmaWxsPSIjMUExQTFBIi8+CiAgPGNpcmNsZSBjeD0iMTg0IiBjeT0iMTcwIiByPSIyLjUiIGZpbGw9IiNGRkZGRkYiLz4KICA8Y2lyY2xlIGN4PSIyMjAiIGN5PSIxNzAiIHI9IjIuNSIgZmlsbD0iI0ZGRkZGRiIvPgogIDwhLS0gcm9zeSBjaGVla3MgLS0+CiAgPGNpcmNsZSBjeD0iMTY1IiBjeT0iMTkwIiByPSIxMCIgZmlsbD0iI0ZGOTk5OSIgb3BhY2l0eT0iMC41Ii8+CiAgPGNpcmNsZSBjeD0iMjM1IiBjeT0iMTkwIiByPSIxMCIgZmlsbD0iI0ZGOTk5OSIgb3BhY2l0eT0iMC41Ii8+CiAgPCEtLSBub3NlIC0tPgogIDxlbGxpcHNlIGN4PSIyMDAiIGN5PSIxOTAiIHJ4PSI4IiByeT0iNiIgZmlsbD0iI0U4OEI4QiIvPgogIDwhLS0gc21pbGUgLS0+CiAgPHBhdGggZD0iTTE4MCwyMDAgUTIwMCwyMjAgMjIwLDIwMCIgc3Ryb2tlPSIjOEI0NTEzIiBzdHJva2Utd2lkdGg9IjIuNSIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBoYXQgLS0+CiAgPHBhdGggZD0iTTEzMCwxNjUgUTEzMCwxMDAgMjAwLDgwIFEyNzAsMTAwIDI3MCwxNjUiIGZpbGw9IiNDQzAwMDAiLz4KICA8cmVjdCB4PSIxMjUiIHk9IjE1OCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxOCIgcng9IjgiIGZpbGw9IiNGRkZGRkYiIGZpbHRlcj0idXJsKCNzaGFkb3cpIi8+CiAgPGNpcmNsZSBjeD0iMjAwIiBjeT0iODAiIHI9IjE1IiBmaWxsPSIjRkZGRkZGIiBmaWx0ZXI9InVybCgjc2hhZG93KSIvPgogIDwhLS0gYmVhcmQgLS0+CiAgPHBhdGggZD0iTTE0NSwxOTUgUTE0MCwyMjAgMTYwLDI1MCBRMTgwLDI2MCAyMDAsMjU1IFEyMjAsMjYwIDI0MCwyNTAgUTI2MCwyMjAgMjU1LDE5NSIgZmlsbD0iI0ZGRkZGRiIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KICA8cGF0aCBkPSJNMTU1LDIxNSBRMTc1LDIzNSAyMDAsMjMwIFEyMjUsMjM1IDI0NSwyMTUiIHN0cm9rZT0iI0U4RThFOCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIi8+CiAgPHBhdGggZD0iTTE2NSwyMzAgUTE4MiwyNDUgMjAwLDI0MCBRMjE4LDI0NSAyMzUsMjMwIiBzdHJva2U9IiNFOEU4RTgiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIvPgoKPC9zdmc+",
+    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCI+CiAgPGRlZnM+CiAgICA8ZmlsdGVyIGlkPSJzaGFkb3ciIHg9Ii0xMCUiIHk9Ii0xMCUiIHdpZHRoPSIxMzAlIiBoZWlnaHQ9IjEzMCUiPgogICAgICA8ZmVEcm9wU2hhZG93IGR4PSIxIiBkeT0iMiIgc3RkRGV2aWF0aW9uPSIyIiBmbG9vZC1vcGFjaXR5PSIwLjI1Ii8+CiAgICA8L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9Imdsb3ciIHg9Ii01MCUiIHk9Ii01MCUiIHdpZHRoPSIyMDAlIiBoZWlnaHQ9IjIwMCUiPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIzIiByZXN1bHQ9ImJsdXIiLz4KICAgICAgPGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJibHVyIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiByeD0iMzAiIHJ5PSIzMCIgZmlsbD0iIzFCM0E0QiIvPgogIAogIDwhLS0gYm90dG9tIGJhbGwgLS0+CiAgPGNpcmNsZSBjeD0iMjAwIiBjeT0iMzEwIiByPSI3MCIgZmlsbD0iI0YwRjhGRiIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KICA8IS0tIG1pZGRsZSBiYWxsIC0tPgogIDxjaXJjbGUgY3g9IjIwMCIgY3k9IjIyMCIgcj0iNTUiIGZpbGw9IiNGNUZDRkYiIGZpbHRlcj0idXJsKCNzaGFkb3cpIi8+CiAgPCEtLSBoZWFkIC0tPgogIDxjaXJjbGUgY3g9IjIwMCIgY3k9IjE0MCIgcj0iNDIiIGZpbGw9IiNGQUZGRkYiIGZpbHRlcj0idXJsKCNzaGFkb3cpIi8+CiAgPCEtLSBzY2FyZiAtLT4KICA8cGF0aCBkPSJNMTQ4LDE2OCBRMTU1LDE4NSAyMDAsMTgwIFEyNDUsMTg1IDI1MiwxNjgiIHN0cm9rZT0iI0ZGNDQ0NCIgc3Ryb2tlLXdpZHRoPSIxNCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHJlY3QgeD0iMjM1IiB5PSIxNzAiIHdpZHRoPSIxOCIgaGVpZ2h0PSI0NSIgcng9IjYiIGZpbGw9IiNGRjQ0NDQiLz4KICA8cmVjdCB4PSIyMzMiIHk9IjIwNSIgd2lkdGg9IjIyIiBoZWlnaHQ9IjEyIiByeD0iNCIgZmlsbD0iI0NDMDAwMCIvPgogIDwhLS0gaGF0IC0tPgogIDxyZWN0IHg9IjE2NSIgeT0iOTAiIHdpZHRoPSI3MCIgaGVpZ2h0PSI0MCIgcng9IjQiIGZpbGw9IiMxQTFBMUEiLz4KICA8cmVjdCB4PSIxNTUiIHk9IjEyMCIgd2lkdGg9IjkwIiBoZWlnaHQ9IjEyIiByeD0iNiIgZmlsbD0iIzFBMUExQSIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KICA8IS0tIGhhdCBiYW5kIC0tPgogIDxyZWN0IHg9IjE2NSIgeT0iMTA4IiB3aWR0aD0iNzAiIGhlaWdodD0iOCIgcng9IjIiIGZpbGw9IiNDQzAwMDAiLz4KICA8IS0tIGV5ZXMgLS0+CiAgPGNpcmNsZSBjeD0iMTg1IiBjeT0iMTMyIiByPSI1IiBmaWxsPSIjMUExQTFBIi8+CiAgPGNpcmNsZSBjeD0iMjE1IiBjeT0iMTMyIiByPSI1IiBmaWxsPSIjMUExQTFBIi8+CiAgPGNpcmNsZSBjeD0iMTg2IiBjeT0iMTMwIiByPSIyIiBmaWxsPSIjRkZGRkZGIi8+CiAgPGNpcmNsZSBjeD0iMjE2IiBjeT0iMTMwIiByPSIyIiBmaWxsPSIjRkZGRkZGIi8+CiAgPCEtLSBub3NlIChjYXJyb3QpIC0tPgogIDxwb2x5Z29uIHBvaW50cz0iMjAwLDE0MiAxNTUsMTQ4IDIwMCwxNTAiIGZpbGw9IiNGRjhDMDAiLz4KICA8IS0tIHNtaWxlIC0tPgogIDxwYXRoIGQ9Ik0xODMsMTU1IFExOTIsMTYzIDIwMCwxNTUgUTIwOCwxNjMgMjE3LDE1NSIgc3Ryb2tlPSIjMUExQTFBIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwhLS0gYnV0dG9ucyAtLT4KICA8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxOTUiIHI9IjUiIGZpbGw9IiMxQTFBMUEiLz4KICA8Y2lyY2xlIGN4PSIyMDAiIGN5PSIyMTUiIHI9IjUiIGZpbGw9IiMxQTFBMUEiLz4KICA8Y2lyY2xlIGN4PSIyMDAiIGN5PSIyMzUiIHI9IjUiIGZpbGw9IiMxQTFBMUEiLz4KICA8IS0tIGFybXMgLS0+CiAgPGxpbmUgeDE9IjEwMCIgeTE9IjIyMCIgeDI9IjE0NSIgeTI9IjIzMCIgc3Ryb2tlPSIjOEI1QTJCIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxsaW5lIHgxPSIzMDAiIHkxPSIyMjAiIHgyPSIyNTUiIHkyPSIyMzAiIHN0cm9rZT0iIzhCNUEyQiIgc3Ryb2tlLXdpZHRoPSI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8bGluZSB4MT0iMTAwIiB5MT0iMjIwIiB4Mj0iOTAiIHkyPSIyMDUiIHN0cm9rZT0iIzhCNUEyQiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8bGluZSB4MT0iMzAwIiB5MT0iMjIwIiB4Mj0iMzEwIiB5Mj0iMjA1IiBzdHJva2U9IiM4QjVBMkIiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBzbm93IGJhc2UgLS0+CiAgPGVsbGlwc2UgY3g9IjIwMCIgY3k9IjM3NSIgcng9IjEyMCIgcnk9IjE4IiBmaWxsPSIjRThGNEZEIiBvcGFjaXR5PSIwLjYiLz4KCjwvc3ZnPg==",
+    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCI+CiAgPGRlZnM+CiAgICA8ZmlsdGVyIGlkPSJzaGFkb3ciIHg9Ii0xMCUiIHk9Ii0xMCUiIHdpZHRoPSIxMzAlIiBoZWlnaHQ9IjEzMCUiPgogICAgICA8ZmVEcm9wU2hhZG93IGR4PSIxIiBkeT0iMiIgc3RkRGV2aWF0aW9uPSIyIiBmbG9vZC1vcGFjaXR5PSIwLjI1Ii8+CiAgICA8L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9Imdsb3ciIHg9Ii01MCUiIHk9Ii01MCUiIHdpZHRoPSIyMDAlIiBoZWlnaHQ9IjIwMCUiPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIzIiByZXN1bHQ9ImJsdXIiLz4KICAgICAgPGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJibHVyIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiByeD0iMzAiIHJ5PSIzMCIgZmlsbD0iIzFBM0EyQSIvPgogIAogIDwhLS0gYm9keSAtLT4KICA8ZWxsaXBzZSBjeD0iMjAwIiBjeT0iMjUwIiByeD0iNzUiIHJ5PSI1MCIgZmlsbD0iIzhCNUUzQyIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KICA8ZWxsaXBzZSBjeD0iMjAwIiBjeT0iMjQ4IiByeD0iNjUiIHJ5PSI0MiIgZmlsbD0iI0EwNzA0QSIvPgogIDwhLS0gbGVncyAtLT4KICA8cmVjdCB4PSIxNTAiIHk9IjI4MCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjYwIiByeD0iNiIgZmlsbD0iIzhCNUUzQyIvPgogIDxyZWN0IHg9IjE3NSIgeT0iMjgwIiB3aWR0aD0iMTgiIGhlaWdodD0iNjAiIHJ4PSI2IiBmaWxsPSIjN0E1MDMwIi8+CiAgPHJlY3QgeD0iMjI1IiB5PSIyODAiIHdpZHRoPSIxOCIgaGVpZ2h0PSI2MCIgcng9IjYiIGZpbGw9IiM4QjVFM0MiLz4KICA8cmVjdCB4PSIyNTAiIHk9IjI4MCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjYwIiByeD0iNiIgZmlsbD0iIzdBNTAzMCIvPgogIDwhLS0gaG9vdmVzIC0tPgogIDxyZWN0IHg9IjE0OCIgeT0iMzMyIiB3aWR0aD0iMjIiIGhlaWdodD0iMTIiIHJ4PSI1IiBmaWxsPSIjM0QyQjFGIi8+CiAgPHJlY3QgeD0iMTczIiB5PSIzMzIiIHdpZHRoPSIyMiIgaGVpZ2h0PSIxMiIgcng9IjUiIGZpbGw9IiMzRDJCMUYiLz4KICA8cmVjdCB4PSIyMjMiIHk9IjMzMiIgd2lkdGg9IjIyIiBoZWlnaHQ9IjEyIiByeD0iNSIgZmlsbD0iIzNEMkIxRiIvPgogIDxyZWN0IHg9IjI0OCIgeT0iMzMyIiB3aWR0aD0iMjIiIGhlaWdodD0iMTIiIHJ4PSI1IiBmaWxsPSIjM0QyQjFGIi8+CiAgPCEtLSBuZWNrIC0tPgogIDxwYXRoIGQ9Ik0yNTUsMjMwIFEyODAsMjAwIDI3NSwxNzAiIHN0cm9rZT0iIzhCNUUzQyIgc3Ryb2tlLXdpZHRoPSIyOCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTI1NSwyMjggUTI3OCwyMDAgMjc0LDE3MiIgc3Ryb2tlPSIjQTA3MDRBIiBzdHJva2Utd2lkdGg9IjIwIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8IS0tIGhlYWQgLS0+CiAgPGVsbGlwc2UgY3g9IjI3MCIgY3k9IjE1MCIgcng9IjM1IiByeT0iMzAiIGZpbGw9IiNBMDcwNEEiIGZpbHRlcj0idXJsKCNzaGFkb3cpIi8+CiAgPGVsbGlwc2UgY3g9IjI3MiIgY3k9IjE0OCIgcng9IjMwIiByeT0iMjUiIGZpbGw9IiNCODg2NEUiLz4KICA8IS0tIGVhcnMgLS0+CiAgPGVsbGlwc2UgY3g9IjI1MCIgY3k9IjEyNSIgcng9IjEwIiByeT0iMTgiIGZpbGw9IiM4QjVFM0MiIHRyYW5zZm9ybT0icm90YXRlKC0yMCwyNTAsMTI1KSIvPgogIDxlbGxpcHNlIGN4PSIyNTAiIGN5PSIxMjUiIHJ4PSI2IiByeT0iMTIiIGZpbGw9IiNFOEM0QTAiIHRyYW5zZm9ybT0icm90YXRlKC0yMCwyNTAsMTI1KSIvPgogIDxlbGxpcHNlIGN4PSIyOTIiIGN5PSIxMjUiIHJ4PSIxMCIgcnk9IjE4IiBmaWxsPSIjOEI1RTNDIiB0cmFuc2Zvcm09InJvdGF0ZSgyMCwyOTIsMTI1KSIvPgogIDxlbGxpcHNlIGN4PSIyOTIiIGN5PSIxMjUiIHJ4PSI2IiByeT0iMTIiIGZpbGw9IiNFOEM0QTAiIHRyYW5zZm9ybT0icm90YXRlKDIwLDI5MiwxMjUpIi8+CiAgPCEtLSBhbnRsZXJzIC0tPgogIDxwYXRoIGQ9Ik0yNTUsMTI1IFEyNDAsOTUgMjI1LDgwIiBzdHJva2U9IiM1QzNBMUUiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTI0MCwxMDAgUTIyNSw5NSAyMjAsODUiIHN0cm9rZT0iIzVDM0ExRSIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMjM1LDkwIFEyMTgsODUgMjE1LDcyIiBzdHJva2U9IiM1QzNBMUUiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTI4NSwxMjUgUTMwMCw5NSAzMTUsODAiIHN0cm9rZT0iIzVDM0ExRSIgc3Ryb2tlLXdpZHRoPSI0IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMzAwLDEwMCBRMzE1LDk1IDMyMCw4NSIgc3Ryb2tlPSIjNUMzQTFFIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMDUsOTAgUTMyMiw4NSAzMjUsNzIiIHN0cm9rZT0iIzVDM0ExRSIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8IS0tIGV5ZXMgLS0+CiAgPGNpcmNsZSBjeD0iMjYwIiBjeT0iMTQ1IiByPSI1IiBmaWxsPSIjMUExQTFBIi8+CiAgPGNpcmNsZSBjeD0iMjgyIiBjeT0iMTQ1IiByPSI1IiBmaWxsPSIjMUExQTFBIi8+CiAgPGNpcmNsZSBjeD0iMjYxIiBjeT0iMTQzIiByPSIyIiBmaWxsPSIjRkZGRkZGIi8+CiAgPGNpcmNsZSBjeD0iMjgzIiBjeT0iMTQzIiByPSIyIiBmaWxsPSIjRkZGRkZGIi8+CiAgPCEtLSByZWQgbm9zZSAoUnVkb2xwaCEpIC0tPgogIDxjaXJjbGUgY3g9IjI3NSIgY3k9IjE1OCIgcj0iOCIgZmlsbD0iI0ZGMDAwMCIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CiAgPGNpcmNsZSBjeD0iMjc1IiBjeT0iMTU4IiByPSI0IiBmaWxsPSIjRkY2NjY2Ii8+CiAgPCEtLSB0YWlsIC0tPgogIDxjaXJjbGUgY3g9IjEyNSIgY3k9IjI0MCIgcj0iMTAiIGZpbGw9IiM3QTUwMzAiLz4KICA8IS0tIGNvbGxhciAtLT4KICA8cGF0aCBkPSJNMjYwLDE3NSBRMjc1LDE4MiAyOTAsMTc1IiBzdHJva2U9IiNDQzAwMDAiIHN0cm9rZS13aWR0aD0iNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGNpcmNsZSBjeD0iMjc1IiBjeT0iMTgwIiByPSI1IiBmaWxsPSIjRkZENzAwIi8+Cgo8L3N2Zz4=",
+    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCI+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSI0MDAiIHJ4PSIzMCIgcnk9IjMwIiBmaWxsPSIjMUExQTJFIi8+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0ic3RyaXBlcyIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjMwIiBoZWlnaHQ9IjMwIiBwYXR0ZXJuVHJhbnNmb3JtPSJyb3RhdGUoNDUpIj4KICAgICAgPHJlY3Qgd2lkdGg9IjE1IiBoZWlnaHQ9IjMwIiBmaWxsPSIjRkZGRkZGIi8+CiAgICAgIDxyZWN0IHg9IjE1IiB3aWR0aD0iMTUiIGhlaWdodD0iMzAiIGZpbGw9IiNGRjY2NjYiIG9wYWNpdHk9IjAuNSIvPgogICAgPC9wYXR0ZXJuPgogICAgPGZpbHRlciBpZD0ic2hhZG93IiB4PSItMTAlIiB5PSItMTAlIiB3aWR0aD0iMTMwJSIgaGVpZ2h0PSIxMzAlIj4KICAgICAgPGZlRHJvcFNoYWRvdyBkeD0iMSIgZHk9IjIiIHN0ZERldmlhdGlvbj0iMiIgZmxvb2Qtb3BhY2l0eT0iMC4yNSIvPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgogIDwhLS0gc2hhZG93IHVuZGVyIGJveCAtLT4KICA8ZWxsaXBzZSBjeD0iMjAwIiBjeT0iMzU1IiByeD0iMTEwIiByeT0iMTUiIGZpbGw9IiMwMDAwMDAiIG9wYWNpdHk9IjAuMTUiLz4KICA8IS0tIG1haW4gYm94IGJvZHkgLS0+CiAgPHJlY3QgeD0iOTAiIHk9IjIwMCIgd2lkdGg9IjIyMCIgaGVpZ2h0PSIxNTUiIHJ4PSIxMCIgZmlsbD0iI0ZGNDQ0NCIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KICA8IS0tIGxpZCAtLT4KICA8cmVjdCB4PSI4NSIgeT0iMTg1IiB3aWR0aD0iMjMwIiBoZWlnaHQ9IjMwIiByeD0iOCIgZmlsbD0iI0NDMDAwMCIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KICA8cmVjdCB4PSI4NSIgeT0iMTg1IiB3aWR0aD0iMjMwIiBoZWlnaHQ9IjMwIiByeD0iOCIgZmlsbD0iI0U1MzkzNSIvPgogIDwhLS0gd3JhcHBpbmcgcGFwZXIgc3RyaXBlcyAtLT4KICA8cmVjdCB4PSI5MCIgeT0iMjAwIiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjE1NSIgcng9IjEwIiBmaWxsPSJ1cmwoI3N0cmlwZXMpIiBvcGFjaXR5PSIwLjMiLz4KICA8IS0tIHJpYmJvbiB2ZXJ0aWNhbCAtLT4KICA8cmVjdCB4PSIxOTMiIHk9IjIwMCIgd2lkdGg9IjE0IiBoZWlnaHQ9IjE1NSIgZmlsbD0iI0ZGRDcwMCIvPgogIDwhLS0gcmliYm9uIGhvcml6b250YWwgLS0+CiAgPHJlY3QgeD0iOTAiIHk9IjI2OCIgd2lkdGg9IjIyMCIgaGVpZ2h0PSIxNCIgZmlsbD0iI0ZGRDcwMCIvPgogIDwhLS0gbGlkIHJpYmJvbiAtLT4KICA8cmVjdCB4PSIxOTMiIHk9IjE4NSIgd2lkdGg9IjE0IiBoZWlnaHQ9IjMwIiBmaWxsPSIjRkZENzAwIi8+CiAgPCEtLSBib3cgLyBidXR0ZXJmbHkgLS0+CiAgPGcgZmlsdGVyPSJ1cmwoI3NoYWRvdykiPgogICAgPHBhdGggZD0iTTIwMCwxODUgUTE3NSwxNjUgMTYwLDE3NSBRMTUwLDE4NSAyMDAsMTg1IiBmaWxsPSIjRkZENzAwIi8+CiAgICA8cGF0aCBkPSJNMjAwLDE4NSBRMjI1LDE2NSAyNDAsMTc1IFEyNTAsMTg1IDIwMCwxODUiIGZpbGw9IiNGRkQ3MDAiLz4KICAgIDxwYXRoIGQ9Ik0yMDAsMTg1IFExNzUsMjAwIDE2MCwxOTUgUTE1MCwxOTAgMjAwLDE4NSIgZmlsbD0iI0ZGRDcwMCIvPgogICAgPHBhdGggZD0iTTIwMCwxODUgUTIyNSwyMDAgMjQwLDE5NSBRMjUwLDE5MCAyMDAsMTg1IiBmaWxsPSIjRkZENzAwIi8+CiAgICA8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxODUiIHI9IjYiIGZpbGw9IiNGRkY4REMiLz4KICA8L2c+CiAgPCEtLSBzbWFsbCBkZWNvcmF0aXZlIGRvdHMgb24gcGFwZXIgLS0+CiAgPGNpcmNsZSBjeD0iMTMwIiBjeT0iMjMwIiByPSI1IiBmaWxsPSIjRkZGRkZGIiBvcGFjaXR5PSIwLjQiLz4KICA8Y2lyY2xlIGN4PSIyNzAiIGN5PSIyMzAiIHI9IjUiIGZpbGw9IiNGRkZGRkYiIG9wYWNpdHk9IjAuNCIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9IjMwNSIgcj0iNSIgZmlsbD0iI0ZGRkZGRiIgb3BhY2l0eT0iMC40Ii8+CiAgPGNpcmNsZSBjeD0iMjcwIiBjeT0iMzA1IiByPSI1IiBmaWxsPSIjRkZGRkZGIiBvcGFjaXR5PSIwLjQiLz4KICA8Y2lyY2xlIGN4PSIxNjAiIGN5PSIzMjAiIHI9IjMiIGZpbGw9IiNGRkZGRkYiIG9wYWNpdHk9IjAuMyIvPgogIDxjaXJjbGUgY3g9IjI0MCIgY3k9IjMyMCIgcj0iMyIgZmlsbD0iI0ZGRkZGRiIgb3BhY2l0eT0iMC4zIi8+CiAgPCEtLSBzbWFsbCB0YWcgLS0+CiAgPHJlY3QgeD0iMjcwIiB5PSIxOTUiIHdpZHRoPSIyNSIgaGVpZ2h0PSIxNSIgcng9IjMiIGZpbGw9IiNGRkY4REMiIHRyYW5zZm9ybT0icm90YXRlKDE1LDI4MiwyMDIpIi8+CiAgPHRleHQgeD0iMjc4IiB5PSIyMDYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI4IiBmaWxsPSIjQ0MwMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB0cmFuc2Zvcm09InJvdGF0ZSgxNSwyODIsMjAyKSI+8J+OgTwvdGV4dD4KCjwvc3ZnPg==",
+    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCI+CiAgPGRlZnM+CiAgICA8ZmlsdGVyIGlkPSJzaGFkb3ciIHg9Ii0xMCUiIHk9Ii0xMCUiIHdpZHRoPSIxMzAlIiBoZWlnaHQ9IjEzMCUiPgogICAgICA8ZmVEcm9wU2hhZG93IGR4PSIxIiBkeT0iMiIgc3RkRGV2aWF0aW9uPSIyIiBmbG9vZC1vcGFjaXR5PSIwLjI1Ii8+CiAgICA8L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9Imdsb3ciIHg9Ii01MCUiIHk9Ii01MCUiIHdpZHRoPSIyMDAlIiBoZWlnaHQ9IjIwMCUiPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIzIiByZXN1bHQ9ImJsdXIiLz4KICAgICAgPGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJibHVyIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiByeD0iMzAiIHJ5PSIzMCIgZmlsbD0iIzBBMTYyOCIvPgogIAogIDwhLS0gYmFja2dyb3VuZCBkZWNvcmF0aXZlIGRvdHMgLS0+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iMyIgZmlsbD0iI0ZGRkZGRiIgb3BhY2l0eT0iMC4zIi8+CiAgPGNpcmNsZSBjeD0iMzQwIiBjeT0iNTAiIHI9IjIuNSIgZmlsbD0iI0ZGRkZGRiIgb3BhY2l0eT0iMC4yNSIvPgogIDxjaXJjbGUgY3g9IjUwIiBjeT0iMzQwIiByPSIyIiBmaWxsPSIjRkZGRkZGIiBvcGFjaXR5PSIwLjIiLz4KICA8Y2lyY2xlIGN4PSIzNTAiIGN5PSIzNTAiIHI9IjMiIGZpbGw9IiNGRkZGRkYiIG9wYWNpdHk9IjAuMyIvPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjEyMCIgcj0iMiIgZmlsbD0iI0ZGRkZGRiIgb3BhY2l0eT0iMC4yIi8+CiAgPGNpcmNsZSBjeD0iMzAwIiBjeT0iMTAwIiByPSIyLjUiIGZpbGw9IiNGRkZGRkYiIG9wYWNpdHk9IjAuMjUiLz4KICA8Y2lyY2xlIGN4PSIzMjAiIGN5PSIzMTAiIHI9IjIiIGZpbGw9IiNGRkZGRkYiIG9wYWNpdHk9IjAuMiIvPgogIDxjaXJjbGUgY3g9IjgwIiBjeT0iMzAwIiByPSIyLjUiIGZpbGw9IiNGRkZGRkYiIG9wYWNpdHk9IjAuMjUiLz4KICA8IS0tIG1haW4gc25vd2ZsYWtlIC0tPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIwMCwyMDApIiBmaWx0ZXI9InVybCgjZ2xvdykiPgogICAgPCEtLSA2IG1haW4gYnJhbmNoZXMgLS0+CiAgICA8ZyBzdHJva2U9IiNFMEYwRkYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj4KICAgICAgPCEtLSAwwrAgLS0+CiAgICAgIDxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSItMTIwIi8+CiAgICAgIDwhLS0gNjDCsCAtLT4KICAgICAgPGxpbmUgeDE9IjAiIHkxPSIwIiB4Mj0iMTA0IiB5Mj0iLTYwIi8+CiAgICAgIDwhLS0gMTIwwrAgLS0+CiAgICAgIDxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjEwNCIgeTI9IjYwIi8+CiAgICAgIDwhLS0gMTgwwrAgLS0+CiAgICAgIDxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxMjAiLz4KICAgICAgPCEtLSAyNDDCsCAtLT4KICAgICAgPGxpbmUgeDE9IjAiIHkxPSIwIiB4Mj0iLTEwNCIgeTI9IjYwIi8+CiAgICAgIDwhLS0gMzAwwrAgLS0+CiAgICAgIDxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9Ii0xMDQiIHkyPSItNjAiLz4KICAgIDwvZz4KICAgIDwhLS0gYnJhbmNoIGRlY29yYXRpb25zIC0tPgogICAgPGcgc3Ryb2tlPSIjQjBENEYxIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj4KICAgICAgPCEtLSAwwrAgLS0+CiAgICAgIDxsaW5lIHgxPSIwIiB5MT0iLTQwIiB4Mj0iLTIwIiB5Mj0iLTYwIi8+CiAgICAgIDxsaW5lIHgxPSIwIiB5MT0iLTQwIiB4Mj0iMjAiIHkyPSItNjAiLz4KICAgICAgPGxpbmUgeDE9IjAiIHkxPSItNzAiIHgyPSItMTgiIHkyPSItODgiLz4KICAgICAgPGxpbmUgeDE9IjAiIHkxPSItNzAiIHgyPSIxOCIgeTI9Ii04OCIvPgogICAgICA8IS0tIDYwwrAgLS0+CiAgICAgIDxsaW5lIHgxPSIzNSIgeTE9Ii0yMCIgeDI9IjUyIiB5Mj0iLTM1Ii8+CiAgICAgIDxsaW5lIHgxPSIzNSIgeTE9Ii0yMCIgeDI9IjUyIiB5Mj0iLTUiLz4KICAgICAgPGxpbmUgeDE9IjYxIiB5MT0iLTM1IiB4Mj0iNzgiIHkyPSItNTAiLz4KICAgICAgPGxpbmUgeDE9IjYxIiB5MT0iLTM1IiB4Mj0iNzgiIHkyPSItMjAiLz4KICAgICAgPCEtLSAxMjDCsCAtLT4KICAgICAgPGxpbmUgeDE9IjM1IiB5MT0iMjAiIHgyPSI1MiIgeTI9IjUiLz4KICAgICAgPGxpbmUgeDE9IjM1IiB5MT0iMjAiIHgyPSI1MiIgeTI9IjM1Ii8+CiAgICAgIDxsaW5lIHgxPSI2MSIgeTE9IjM1IiB4Mj0iNzgiIHkyPSIyMCIvPgogICAgICA8bGluZSB4MT0iNjEiIHkxPSIzNSIgeDI9Ijc4IiB5Mj0iNTAiLz4KICAgICAgPCEtLSAxODDCsCAtLT4KICAgICAgPGxpbmUgeDE9IjAiIHkxPSI0MCIgeDI9Ii0yMCIgeTI9IjYwIi8+CiAgICAgIDxsaW5lIHgxPSIwIiB5MT0iNDAiIHgyPSIyMCIgeTI9IjYwIi8+CiAgICAgIDxsaW5lIHgxPSIwIiB5MT0iNzAiIHgyPSItMTgiIHkyPSI4OCIvPgogICAgICA8bGluZSB4MT0iMCIgeTE9IjcwIiB4Mj0iMTgiIHkyPSI4OCIvPgogICAgICA8IS0tIDI0MMKwIC0tPgogICAgICA8bGluZSB4MT0iLTM1IiB5MT0iMjAiIHgyPSItNTIiIHkyPSI1Ii8+CiAgICAgIDxsaW5lIHgxPSItMzUiIHkxPSIyMCIgeDI9Ii01MiIgeTI9IjM1Ii8+CiAgICAgIDxsaW5lIHgxPSItNjEiIHkxPSIzNSIgeDI9Ii03OCIgeTI9IjIwIi8+CiAgICAgIDxsaW5lIHgxPSItNjEiIHkxPSIzNSIgeDI9Ii03OCIgeTI9IjUwIi8+CiAgICAgIDwhLS0gMzAwwrAgLS0+CiAgICAgIDxsaW5lIHgxPSItMzUiIHkxPSItMjAiIHgyPSItNTIiIHkyPSItMzUiLz4KICAgICAgPGxpbmUgeDE9Ii0zNSIgeTE9Ii0yMCIgeDI9Ii01MiIgeTI9Ii01Ii8+CiAgICAgIDxsaW5lIHgxPSItNjEiIHkxPSItMzUiIHgyPSItNzgiIHkyPSItNTAiLz4KICAgICAgPGxpbmUgeDE9Ii02MSIgeTE9Ii0zNSIgeDI9Ii03OCIgeTI9Ii0yMCIvPgogICAgPC9nPgogICAgPCEtLSBpbm5lciBkaWFtb25kIGhpZ2hsaWdodHMgLS0+CiAgICA8ZyBmaWxsPSIjRkZGRkZGIiBvcGFjaXR5PSIwLjYiPgogICAgICA8cG9seWdvbiBwb2ludHM9IjAsLTMwIDE1LC0xNSAwLC01IC0xNSwtMTUiLz4KICAgICAgPHBvbHlnb24gcG9pbnRzPSIyNiwxNSAxNSwyNiAwLDE1IDE1LDQiLz4KICAgICAgPHBvbHlnb24gcG9pbnRzPSItMjYsMTUgLTE1LDI2IDAsMTUgLTE1LDQiLz4KICAgICAgPHBvbHlnb24gcG9pbnRzPSIyNiwtMTUgMTUsLTI2IDAsLTE1IDE1LC00Ii8+CiAgICAgIDxwb2x5Z29uIHBvaW50cz0iLTI2LC0xNSAtMTUsLTI2IDAsLTE1IC0xNSwtNCIvPgogICAgICA8cG9seWdvbiBwb2ludHM9IjAsMzAgMTUsMTUgMCw1IC0xNSwxNSIvPgogICAgPC9nPgogICAgPCEtLSBjZW50ZXIgamV3ZWwgLS0+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iMTAiIGZpbGw9IiNCMEQ0RjEiIG9wYWNpdHk9IjAuOCIvPgogICAgPGNpcmNsZSBjeD0iMCIgY3k9IjAiIHI9IjUiIGZpbGw9IiNGRkZGRkYiLz4KICA8L2c+Cgo8L3N2Zz4=",
+];
+
+        let audioCtx, analyser, dataArray, audioEl, musicGain, generatedMusicTimer, uploadedSource;
+        let pointerInteractionReady = false;
+        let isGeneratedMusic = true;
+        
+        document.getElementById('btn-start').addEventListener('click', async () => {
+            const screen = document.getElementById('start-screen');
+            screen.style.opacity = 0; setTimeout(() => screen.remove(), 1000);
+            document.getElementById('main-title').style.opacity = 1;
+            document.getElementById('input_video').classList.remove('hidden-cam');
+            await initAudio();
+            initThree(); setupUI(); startHandTracking();
+            loadPreloadedImages();
+        });
+
+        async function initAudio() {
+            if(audioEl) return;
+            isGeneratedMusic = true;
+            audioEl = new Audio(createChristmasWavUrl());
+            audioEl.loop = true; audioEl.preload = "auto"; audioEl.setAttribute("playsinline", "");
+            audioEl.style.display = "none"; document.body.appendChild(audioEl);
+            setMusicVolume(document.getElementById('volume-slider').value);
+            const btn = document.getElementById('btn-play-pause');
+            const playPromise = audioEl.play();
+            audioEl.addEventListener('play', () => btn.innerText = "⏸");
+            audioEl.addEventListener('pause', () => btn.innerText = "▶");
+            try { await playPromise; } catch (err) { btn.innerText = "▶"; }
+        }
+
+        function createChristmasWavUrl() {
+            const sampleRate = 22050;
+            const beat = 60 / 138;
+            const loopBeats = 16;
+            const totalSamples = Math.floor(sampleRate * beat * loopBeats);
+            const samples = new Float32Array(totalSamples);
+            const notes = {
+                C3:130.81, F3:174.61, G3:196.00,
+                C4:261.63, E4:329.63, F4:349.23, G4:392.00, A4:440.00, B4:493.88,
+                C5:523.25, D5:587.33, E5:659.25, F5:698.46, G5:783.99, A5:880.00,
+                C6:1046.50, D6:1174.66, E6:1318.51
+            };
+            function wave(type, phase) {
+                if(type === "triangle") return 2 * Math.asin(Math.sin(phase)) / Math.PI;
+                if(type === "bell") return Math.sin(phase) + 0.35 * Math.sin(phase * 2) + 0.18 * Math.sin(phase * 3);
+                return Math.sin(phase);
+            }
+            function addNote(note, startBeat, durBeat, volume, type) {
+                const freq = notes[note];
+                const start = Math.floor(startBeat * beat * sampleRate);
+                const len = Math.floor(durBeat * beat * sampleRate);
+                for(let i = 0; i < len; i++) {
+                    const p = start + i;
+                    if(p < 0 || p >= totalSamples) continue;
+                    const attack = Math.min(1, i / (sampleRate * 0.02));
+                    const release = Math.min(1, (len - i) / (sampleRate * 0.08));
+                    const env = Math.max(0, Math.min(attack, release));
+                    samples[p] += wave(type, Math.PI * 2 * freq * i / sampleRate) * volume * env;
+                }
+            }
+            [
+                [0,'G4',0.45],[0.5,'C5',0.45],[1,'C5',0.3],[1.5,'D5',0.3],[2,'C5',0.3],[2.5,'B4',0.3],[3,'A4',0.55],[3.6,'A4',0.35],
+                [4,'A4',0.45],[4.5,'D5',0.45],[5,'D5',0.3],[5.5,'E5',0.3],[6,'D5',0.3],[6.5,'C5',0.3],[7,'B4',0.6],[7.75,'G4',0.3],
+                [8,'G4',0.45],[8.5,'E5',0.45],[9,'E5',0.3],[9.5,'F5',0.3],[10,'E5',0.3],[10.5,'D5',0.3],[11,'C5',0.55],[11.6,'A4',0.35],
+                [12,'G4',0.3],[12.5,'A4',0.3],[13,'D5',0.5],[13.5,'B4',0.45],[14,'C5',0.95],[15.35,'G5',0.2],[15.65,'E5',0.2],
+            ].forEach(n => addNote(n[1], n[0], n[2], 0.26, "triangle"));
+            [[0,4,'C4','E4','G4'], [4,4,'F4','A4','C5'], [8,4,'G4','B4','D5'], [12,4,'C4','G4','C5']]
+                .forEach(c => c.slice(2).forEach(note => addNote(note, c[0], c[1], 0.055, "sine")));
+            [[0,'C3'],[2,'G3'],[4,'F3'],[6,'C3'],[8,'G3'],[10,'G3'],[12,'C3'],[14,'G3']]
+                .forEach(b => addNote(b[1], b[0], 0.7, 0.12, "sine"));
+            [[0,'C6'],[1,'G5'],[2,'E6'],[3,'G5'],[4,'C6'],[5,'A5'],[6,'E6'],[7,'A5'],[8,'D6'],[9,'G5'],[10,'E6'],[11,'G5'],[12,'C6'],[13,'G5'],[14,'E6'],[15,'C6']]
+                .forEach(s => addNote(s[1], s[0], 0.18, 0.08, "bell"));
+
+            const buffer = new ArrayBuffer(44 + totalSamples * 2);
+            const view = new DataView(buffer);
+            const write = (offset, text) => { for(let i = 0; i < text.length; i++) view.setUint8(offset + i, text.charCodeAt(i)); };
+            write(0, "RIFF"); view.setUint32(4, 36 + totalSamples * 2, true); write(8, "WAVE");
+            write(12, "fmt "); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+            write(36, "data"); view.setUint32(40, totalSamples * 2, true);
+            for(let i = 0; i < totalSamples; i++) {
+                const s = Math.max(-1, Math.min(1, samples[i] * 0.75));
+                view.setInt16(44 + i * 2, s * 32767, true);
+            }
+            return URL.createObjectURL(new Blob([view], { type: "audio/wav" }));
+        }
+
+        function playChristmasMelody(ctx, dest) {
+            if (generatedMusicTimer) clearInterval(generatedMusicTimer);
+            const masterGain = ctx.createGain(); musicGain = masterGain;
+            masterGain.connect(dest);
+            setMusicVolume(document.getElementById('volume-slider').value);
+            const notes = {
+                C3:130.81, F3:174.61, G3:196.00,
+                C4:261.63, E4:329.63, F4:349.23, G4:392.00, A4:440.00, B4:493.88,
+                C5:523.25, D5:587.33, E5:659.25, F5:698.46, G5:783.99, A5:880.00,
+                D6:1174.66,
+                C6:1046.50, E6:1318.51
+            };
+            const beat = 60 / 138;
+            const melody = [
+                [0,'G4',0.45],[0.5,'C5',0.45],[1,'C5',0.3],[1.5,'D5',0.3],[2,'C5',0.3],[2.5,'B4',0.3],[3,'A4',0.55],[3.6,'A4',0.35],
+                [4,'A4',0.45],[4.5,'D5',0.45],[5,'D5',0.3],[5.5,'E5',0.3],[6,'D5',0.3],[6.5,'C5',0.3],[7,'B4',0.6],[7.75,'G4',0.3],
+                [8,'G4',0.45],[8.5,'E5',0.45],[9,'E5',0.3],[9.5,'F5',0.3],[10,'E5',0.3],[10.5,'D5',0.3],[11,'C5',0.55],[11.6,'A4',0.35],
+                [12,'G4',0.3],[12.5,'A4',0.3],[13,'D5',0.5],[13.5,'B4',0.45],[14,'C5',0.95],[15.35,'G5',0.2],[15.65,'E5',0.2],
+            ];
+            const chords = [
+                [0,4,'C4','E4','G4'], [4,4,'F4','A4','C5'],
+                [8,4,'G4','B4','D5'], [12,4,'C4','G4','C5']
+            ];
+            const bass = [[0,'C3'],[2,'G3'],[4,'F3'],[6,'C3'],[8,'G3'],[10,'G3'],[12,'C3'],[14,'G3']];
+            const sparkles = [[0,'C6'],[1,'G5'],[2,'E6'],[3,'G5'],[4,'C6'],[5,'A5'],[6,'E6'],[7,'A5'],[8,'D6'],[9,'G5'],[10,'E6'],[11,'G5'],[12,'C6'],[13,'G5'],[14,'E6'],[15,'C6']];
+            const loopLen = 16 * beat;
+            let nextStart = ctx.currentTime + 0.08;
+            function addNote(note, t, dur, type, gainValue) {
+                const osc = ctx.createOscillator(); const g = ctx.createGain();
+                osc.type = type; osc.frequency.value = notes[note];
+                const holdTime = t + Math.max(0.04, dur - 0.06);
+                g.gain.setValueAtTime(0.001, t);
+                g.gain.exponentialRampToValueAtTime(gainValue, t + 0.025);
+                g.gain.setValueAtTime(gainValue, holdTime);
+                g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+                osc.connect(g); g.connect(masterGain); osc.start(t); osc.stop(t + dur + 0.05);
+            }
+            function scheduleLoop(startT) {
+                for (const [off, note, dur] of melody) {
+                    addNote(note, startT + off * beat, dur * beat, "triangle", 0.18);
+                }
+                for (const [off, dur, ...chordNotes] of chords) {
+                    chordNotes.forEach(note => addNote(note, startT + off * beat, dur * beat, "sine", 0.04));
+                }
+                bass.forEach(([off, note]) => addNote(note, startT + off * beat, 0.7 * beat, "sine", 0.07));
+                sparkles.forEach(([off, note]) => addNote(note, startT + off * beat, 0.18 * beat, "triangle", 0.055));
+            }
+            function scheduleUpcoming() {
+                while (nextStart < ctx.currentTime + loopLen * 1.4) {
+                    scheduleLoop(nextStart);
+                    nextStart += loopLen;
+                }
+            }
+            scheduleUpcoming();
+            generatedMusicTimer = setInterval(() => {
+                if (isGeneratedMusic && ctx.state === "running") scheduleUpcoming();
+            }, 500);
+        }
+
+        function setMusicVolume(value) {
+            const volume = parseFloat(value);
+            if (audioEl) audioEl.volume = volume;
+            if (musicGain && audioCtx) {
+                const target = isGeneratedMusic ? volume * 0.45 : 0.001;
+                musicGain.gain.setTargetAtTime(target, audioCtx.currentTime, 0.05);
+            }
+        }
+
+        function initThree() {
+            clock = new THREE.Clock(); scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x000000, 0.004);
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 30, 105); camera.lookAt(0, 30, 0);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+            treeGroup = new THREE.Group(); scene.add(treeGroup);
+            
+            createParticles(); createTopObject(); createSnow(); animate();
+        }
+
+        function createParticles() {
+            if(particleSystem) { treeGroup.remove(particleSystem); particleSystem.geometry.dispose(); }
+            const count = 18000;
+            const geo = new THREE.BufferGeometry();
+            const positions = [], spherePos = [], colors = [], sizes = [], types = [];
+            const h = state.treeHeight;
+            const colorHelper = new THREE.Color();
+
+            for(let i=0; i<count; i++) {
+                const y = (i/count) * h;
+                const rBase = (1 - y/h) * (h*0.4);
+                const angle = i * 0.2;
+                const r = rBase * Math.sqrt(Math.random());
+                positions.push(Math.cos(angle)*r, y - 10, Math.sin(angle)*r);
+
+                const v = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize();
+                v.multiplyScalar(40 + Math.random()*50);
+                spherePos.push(v.x, v.y + 20, v.z);
+
+                const rnd = Math.random();
+                let type = 0;
+                if (state.style === 'cny') {
+                    if(rnd > 0.95) { type = 2; sizes.push(4); colorHelper.setHex(0xffd700); }
+                    else if(rnd > 0.85) { type = 1; sizes.push(5); colorHelper.setHex(0xff0000); }
+                    else { type = 0; sizes.push(1.5); if(Math.random()>0.5) colorHelper.setHex(0xffcc00); else colorHelper.setHex(0xffaa00); }
+                } else {
+                    if(rnd > 0.96) { type = 2; sizes.push(4); colorHelper.setHex(0xffaa00); }
+                    else if(rnd > 0.92) { type = 1; sizes.push(3); colorHelper.setHex(Math.random()>0.5?0xff0000:0x00aaff); }
+                    else { type = 0; sizes.push(1.5); colorHelper.setHex(0x228b22); }
+                }
+                types.push(type); colors.push(colorHelper.r, colorHelper.g, colorHelper.b);
+            }
+
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geo.setAttribute('spherePos', new THREE.Float32BufferAttribute(spherePos, 3));
+            geo.setAttribute('customColor', new THREE.Float32BufferAttribute(colors, 3));
+            geo.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+            geo.setAttribute('type', new THREE.Float32BufferAttribute(types, 1));
+
+            state.uniforms = { uTime: { value: 0 }, uExplosion: { value: 0 }, uBeat: { value: 0 } };
+            const mat = new THREE.ShaderMaterial({
+                uniforms: state.uniforms, vertexShader: document.getElementById('vertexshader').textContent,
+                fragmentShader: document.getElementById('fragmentshader').textContent,
+                blending: THREE.AdditiveBlending, depthTest: false, transparent: true
+            });
+            particleSystem = new THREE.Points(geo, mat);
+            treeGroup.add(particleSystem);
+        }
+
+        function createTopObject() {
+            if(topDecoration) { treeGroup.remove(topDecoration); }
+            if(state.style === 'xmas') {
+                const s=new THREE.Shape(); const p=5; for(let i=0;i<p*2;i++){ const r=(i%2===0)?4:2; const a=i/p*Math.PI; s.lineTo(Math.cos(a)*r,Math.sin(a)*r); }
+                const g=new THREE.ExtrudeGeometry(s,{depth:1,bevelEnabled:true,bevelThickness:0.5,bevelSize:0.2});
+                topDecoration=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:0xffdd00}));
+            } else {
+                topDecoration = new THREE.Group();
+                const sphere = new THREE.Mesh(new THREE.SphereGeometry(3.5, 32, 32), new THREE.MeshBasicMaterial({color: 0xff0000})); sphere.scale.set(1, 0.8, 1);
+                const cap1 = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 0.5, 32), new THREE.MeshBasicMaterial({color: 0xffd700})); cap1.position.y = 2.6;
+                const cap2 = cap1.clone(); cap2.position.y = -2.6;
+                const t1 = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 8, 8), new THREE.MeshBasicMaterial({color: 0xff3300})); t1.position.set(0, -6, 0);
+                const t2 = t1.clone(); t2.position.set(1, -6, 0); t2.rotation.z=0.2;
+                const t3 = t1.clone(); t3.position.set(-1, -6, 0); t3.rotation.z=-0.2;
+                topDecoration.add(sphere, cap1, cap2, t1, t2, t3);
+            }
+            topDecoration.position.y = state.treeHeight;
+            treeGroup.add(topDecoration);
+        }
+
+        function createSnow() {
+            const g=new THREE.BufferGeometry(); const pos=[]; for(let i=0;i<1000;i++) pos.push((Math.random()-0.5)*200,Math.random()*150,(Math.random()-0.5)*200);
+            g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+            window.snowSystem=new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:0.6,transparent:true,opacity:0.6}));
+            scene.add(window.snowSystem);
+        }
+
+        function updatePhotos() {
+            photoMeshes.forEach(m => treeGroup.remove(m)); photoMeshes = [];
+            if(loadedImages.length === 0) return;
+            loadedImages.forEach(img => {
+                const cvs = document.createElement('canvas'); cvs.width=256; cvs.height=256; const ctx = cvs.getContext('2d');
+                ctx.beginPath(); ctx.arc(128,128,120,0,Math.PI*2); ctx.clip();
+                const asp = img.width/img.height;
+                if(asp>1) ctx.drawImage(img, (img.width-img.height)/2, 0, img.height, img.height, 0,0,256,256); else ctx.drawImage(img, 0, (img.height-img.width)/2, img.width, img.width, 0,0,256,256);
+                ctx.lineWidth=10; ctx.strokeStyle = state.style === 'cny' ? '#ffd700' : '#ffffff'; ctx.stroke();
+                const mesh = new THREE.Mesh(new THREE.PlaneGeometry(6,6), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cvs), side: THREE.DoubleSide, transparent:true }));
+                const y = Math.random() * (state.treeHeight * 0.8);
+                const r = (1 - y/state.treeHeight) * (state.treeHeight*0.4) + 2; 
+                const a = Math.random() * Math.PI * 2;
+                const origin = new THREE.Vector3(Math.cos(a)*r, y-10, Math.sin(a)*r);
+                const explodeDir = origin.clone().normalize().multiplyScalar(40 + Math.random()*30); explodeDir.y += 20;
+                mesh.position.copy(origin);
+                mesh.userData = { origin: origin, explodePos: explodeDir, imgSrc: img.src };
+                treeGroup.add(mesh); photoMeshes.push(mesh);
+            });
+            alert(`已挂载 ${loadedImages.length} 张照片`);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate); const t = clock.getElapsedTime();
+            const beatSense = parseFloat(document.getElementById('beat-sense').value);
+            let beat = 0;
+            if(audioEl && !audioEl.paused) {
+                const pulse = Math.max(0, Math.sin(audioEl.currentTime * Math.PI * 4));
+                const sparkle = Math.max(0, Math.sin(audioEl.currentTime * Math.PI * 9));
+                beat = (pulse * 0.35 + sparkle * 0.18) * beatSense;
+            } else if(analyser) {
+                analyser.getByteFrequencyData(dataArray); let sum = 0;
+                for(let i=0; i<15; i++) sum+=dataArray[i];
+                beat = (sum/15/255) * beatSense;
+            }
+            if(state.uniforms) { state.uniforms.uTime.value = t; state.uniforms.uBeat.value = beat; state.explosion += (state.targetExplosion - state.explosion) * 0.05; state.uniforms.uExplosion.value = state.explosion; }
+            
+            const ease = 1.0 - Math.pow(1.0 - state.explosion, 3.0);
+            photoMeshes.forEach(p => { p.position.lerpVectors(p.userData.origin, p.userData.explodePos, ease); p.lookAt(camera.position); p.rotation.z += 0.005 * (1 + state.explosion * 5); });
+            
+            treeGroup.rotation.y += state.rotationSpeed + state.explosion * 0.01;
+            
+            if(topDecoration) {
+                if(state.style === 'xmas') topDecoration.rotation.y -= 0.02;
+                else topDecoration.rotation.z = Math.sin(t * 2) * 0.1;
+                const s = 1 + beat * 0.3; topDecoration.scale.set(s,s,s);
+            }
+            if(window.snowSystem) {
+                const pos = window.snowSystem.geometry.attributes.position.array;
+                for(let i=1; i<pos.length; i+=3) { pos[i] -= 0.3; if(pos[i]<-20) pos[i]=100; }
+                window.snowSystem.geometry.attributes.position.needsUpdate = true;
+            }
+            renderer.render(scene, camera);
+        }
+
+        async function startHandTracking() {
+            try {
+                if(typeof Hands === "undefined" || typeof Camera === "undefined" || !navigator.mediaDevices) throw new Error("hand tracking unavailable");
+                const video = document.getElementById('input_video');
+                const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+                hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+                hands.onResults(results => {
+                    let leftFound = false;
+                    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                        for (let i = 0; i < results.multiHandedness.length; i++) {
+                            const label = results.multiHandedness[i].label; const lm = results.multiHandLandmarks[i];
+                            if (label === 'Left') {
+                                leftFound = true; const d = Math.hypot(lm[4].x - lm[20].x, lm[4].y - lm[20].y);
+                                state.targetExplosion = Math.min(Math.max((d - 0.15) * 4, 0), 1);
+                            }
+                            if (label === 'Right') {
+                                const pinchDist = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y);
+                                if (pinchDist < 0.05) { if (!state.photoActive) { showRandomPhoto(); state.photoActive = true; } }
+                                else if (pinchDist > 0.08) { if (state.photoActive) { document.getElementById('photo-modal').classList.remove('active'); state.photoActive = false; } }
+                            }
+                        }
+                    }
+                    if (!leftFound) state.targetExplosion = 0;
+                });
+                const cameraUtils = new Camera(video, { onFrame: async () => { await hands.send({image: video}); }, width: 320, height: 240 });
+                await cameraUtils.start();
+            } catch (err) {
+                setupPointerInteraction();
+                document.getElementById('input_video').classList.add('hidden-cam');
+            }
+        }
+
+        function setupPointerInteraction() {
+            if(pointerInteractionReady) return;
+            pointerInteractionReady = true;
+            window.addEventListener('pointermove', (e) => {
+                state.targetExplosion = Math.max(0, Math.min(1, 1 - e.clientY / window.innerHeight));
+            });
+            window.addEventListener('pointerleave', () => state.targetExplosion = 0);
+            window.addEventListener('click', (e) => {
+                if(e.target.closest('#ui-panel, #toggle-btn, #start-screen')) return;
+                showRandomPhoto();
+            });
+        }
+        function loadPreloadedImages() {
+            PRELOADED_IMAGES.forEach(src => {
+                const i = new Image(); i.onload = () => { loadedImages.push(i); if (loadedImages.length === PRELOADED_IMAGES.length) { updatePhotos(); } }; i.src = src;
+            });
+        }
+        function showRandomPhoto() { if(loadedImages.length === 0) return; const img = loadedImages[Math.floor(Math.random() * loadedImages.length)]; const modal = document.getElementById('photo-modal'); document.getElementById('modal-img').src = img.src; modal.classList.add('active'); }
+
+        function setupUI() {
+            const fsBtn = document.getElementById('btn-fullscreen');
+            fsBtn.addEventListener('click', () => { if(!document.fullscreenElement) { document.documentElement.requestFullscreen(); fsBtn.innerText="❌ 退出全屏模式"; } else { document.exitFullscreen(); fsBtn.innerText="⛶ 全屏模式"; } });
+            document.getElementById('btn-toggle-cam').addEventListener('click', () => { document.getElementById('input_video').classList.toggle('hidden-cam'); });
+            document.getElementById('bg-select').addEventListener('change', (e) => document.body.className = 'bg-'+e.target.value);
+            document.getElementById('toggle-btn').addEventListener('click', () => document.getElementById('ui-panel').classList.toggle('hidden'));
+            
+            document.getElementById('rot-speed').addEventListener('input', (e) => { state.rotationSpeed = parseFloat(e.target.value); document.getElementById('val-rot').innerText = state.rotationSpeed.toFixed(3); });
+            document.getElementById('music-input').addEventListener('change', async (e) => {
+                if(e.target.files[0]) {
+                    isGeneratedMusic = false; setMusicVolume(document.getElementById('volume-slider').value);
+                    audioEl.src = URL.createObjectURL(e.target.files[0]);
+                    try { await audioEl.play(); document.getElementById('btn-play-pause').innerText="⏸"; }
+                    catch (err) { document.getElementById('btn-play-pause').innerText="▶"; }
+                }
+            });
+            document.getElementById('btn-play-pause').addEventListener('click', async () => {
+                const btn = document.getElementById('btn-play-pause');
+                if(!audioEl) await initAudio();
+                if(audioEl.paused) {
+                    try { await audioEl.play(); btn.innerText="⏸"; }
+                    catch (err) { btn.innerText="▶"; }
+                } else {
+                    audioEl.pause(); btn.innerText="▶";
+                }
+            });
+            document.getElementById('volume-slider').addEventListener('input', (e) => setMusicVolume(e.target.value));
+            document.getElementById('folder-input').addEventListener('change', (e) => { const files = Array.from(e.target.files); loadedImages = []; files.forEach(f => { const r = new FileReader(); r.onload=ev=>{ const i=new Image(); i.onload=()=>loadedImages.push(i)===Math.min(files.length,30)&&updatePhotos(); i.src=ev.target.result; }; r.readAsDataURL(f); }); });
+            document.getElementById('tree-height').addEventListener('input', (e) => { state.treeHeight = parseInt(e.target.value); createParticles(); if(topDecoration) topDecoration.position.y = state.treeHeight; });
+            document.getElementById('beat-sense').addEventListener('input', (e) => document.getElementById('beat-sense').value = e.target.value );
+
+            // === 标题文字控制逻辑 ===
+            const titleEl = document.getElementById('main-title');
+            const textInput = document.getElementById('custom-text');
+            const sizeInput = document.getElementById('font-size');
+            const fontSelect = document.getElementById('font-family');
+            
+            textInput.addEventListener('input', (e) => titleEl.innerText = e.target.value);
+            sizeInput.addEventListener('input', (e) => { titleEl.style.fontSize = e.target.value + 'rem'; document.getElementById('val-font-size').innerText = e.target.value; });
+            fontSelect.addEventListener('change', (e) => titleEl.style.fontFamily = e.target.value);
+
+            // === 主题切换逻辑 ===
+            const switchTheme = (type) => {
+                state.style = type;
+                if(type === 'xmas') {
+                    titleEl.innerText = '圣诞快乐'; titleEl.className = 'style-xmas'; titleEl.style.fontFamily = "'Ma Shan Zheng', cursive";
+                    // 更新输入框状态
+                    textInput.value = '圣诞快乐'; fontSelect.value = "'Ma Shan Zheng', cursive";
+                    document.body.className = 'bg-black'; document.getElementById('bg-select').value = 'black';
+                    document.getElementById('theme-xmas').classList.add('active'); document.getElementById('theme-cny').classList.remove('active');
+                } else {
+                    titleEl.innerText = '新春快乐 万事如意'; titleEl.className = 'style-cny'; titleEl.style.fontFamily = "'Ma Shan Zheng', cursive";
+                    textInput.value = '新春快乐 万事如意'; fontSelect.value = "'Ma Shan Zheng', cursive";
+                    document.body.className = 'bg-china'; document.getElementById('bg-select').value = 'china';
+                    document.getElementById('theme-cny').classList.add('active'); document.getElementById('theme-xmas').classList.remove('active');
+                }
+                createParticles(); createTopObject(); if(loadedImages.length > 0) updatePhotos();
+            };
+
+            document.getElementById('theme-xmas').addEventListener('click', () => switchTheme('xmas'));
+            document.getElementById('theme-cny').addEventListener('click', () => switchTheme('cny'));
+        }
+    </script>
+</body>
+</html>
