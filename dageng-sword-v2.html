@@ -30,6 +30,7 @@
         .ctrl-group label { display: block; font-size: 12px; color: #aaa; margin-bottom: 4px; }
         .ctrl-group input[type="range"] { width: 100%; accent-color: #00ff96; }
         .ctrl-group select { width: 100%; background: #111; color: #fff; border: 1px solid #333; padding: 4px; border-radius: 4px; }
+        #webgl-container.mouse-control { cursor: crosshair; }
         
         /* 摄像头画面容器 */
         #video-wrapper {
@@ -328,6 +329,26 @@
     <div id="ui-overlay" style="display:none;">
         <button class="toggle-btn" style="position:absolute; top:15px; right:15px; box-shadow:none;" onclick="toggleUI(true)">隐藏</button>
         <h2>大庚剑阵 · 枢纽</h2>
+
+        <div class="ctrl-group">
+            <label>控制方式</label>
+            <select id="control-mode" onchange="switchControlMode(this.value)">
+                <option value="camera">摄像头手势</option>
+                <option value="mouse">鼠标御剑</option>
+            </select>
+        </div>
+
+        <div class="ctrl-group" id="mouse-formation-group" style="display:none;">
+            <label>鼠标阵法</label>
+            <select id="mouse-formation-mode" onchange="setMouseFormation(this.value)">
+                <option value="WANDER">寻敌游弋态</option>
+                <option value="ATTACK">一指飞梭</option>
+                <option value="SHIELD">五掌战环</option>
+                <option value="CORE">守护球阵</option>
+                <option value="SPIRAL">三指杀阵</option>
+                <option value="GIANT">开天巨剑</option>
+            </select>
+        </div>
         
         <div class="ctrl-group">
             <label>飞剑数目 (刷新后生效)</label>
@@ -612,7 +633,6 @@
             setTimeout(() => {
                 document.getElementById('start-portal').style.display = 'none';
                 document.getElementById('ui-overlay').style.display = 'block';
-                document.getElementById('video-wrapper').style.display = 'block';
                 document.getElementById('loading').style.display = 'block';
                 
                 AudioEngine.init();
@@ -630,7 +650,15 @@
                 setAudioVolume(30);
                 const camHint = document.getElementById('cam-hint');
                 if (camHint) camHint.style.display = 'none';
-                startCamera();
+                syncControlModeUI();
+                if (controlMode === CONTROL_MODES.CAMERA) {
+                    document.getElementById('video-wrapper').style.display = 'block';
+                    startCamera();
+                } else {
+                    stopCamera();
+                    finishLoading("当前阵法: 鼠标御剑已启动");
+                    setFormationState(mouseBaseState);
+                }
             }, 500);
         }
 
@@ -641,9 +669,27 @@
         const TOTAL_SWORDS = parseInt(localStorage.getItem('swCount'));
         
         const STATES = { WANDER: 'WANDER', SHIELD: 'SHIELD', ATTACK: 'ATTACK', CORE: 'CORE', SPIRAL: 'SPIRAL', GIANT: 'GIANT' };
+        const STATE_LABELS = {
+            WANDER: "当前阵法: 寻敌游弋态",
+            CORE: "当前阵法: 大成立体球剑阵 (神圣御守)",
+            ATTACK: "当前阵法: 游龙往复飞梭 (一指跟随 · 双色麻绳交织)",
+            GIANT: "当前阵法: 剑指 · 开天合一 (开天巨剑姿态)",
+            SPIRAL: "当前阵法: 三指 · 太乙天诛剑阵 (毁灭大杀招)",
+            SHIELD: "当前阵法: 五掌 · 青元戮魔阵 (同心进攻波环)"
+        };
+        const CONTROL_MODES = { CAMERA: 'camera', MOUSE: 'mouse' };
+        const urlParams = new URLSearchParams(location.search);
+        const requestedMode = urlParams.get('mode');
+        const isDesktopShell = urlParams.get('desktop') === '1';
+        let controlMode = isDesktopShell ? CONTROL_MODES.MOUSE : (requestedMode === CONTROL_MODES.MOUSE || requestedMode === CONTROL_MODES.CAMERA ? requestedMode : (localStorage.getItem('controlMode') || CONTROL_MODES.CAMERA));
+        if (controlMode !== CONTROL_MODES.MOUSE && controlMode !== CONTROL_MODES.CAMERA) controlMode = CONTROL_MODES.CAMERA;
+        let mouseBaseState = STATES.WANDER;
+        let mouseOverrideState = null;
+        let cameraFrameLoopActive = false;
         let currentState = STATES.WANDER;
         let targetPoint = new THREE.Vector3(0, 0, 0);
         let fingerTipPoint = new THREE.Vector3(0, 0, 0);
+        const mouseHandDir = new THREE.Vector3(0, 1, 0);
         
         const fingerHistory = [];
         const MAX_HISTORY_SIZE = 140; 
@@ -745,6 +791,66 @@
             getGatherSpeed: () => document.getElementById('gather-toggle').checked ? parseFloat(document.getElementById('gather-speed').value) : 1.0,
             getColorMode: () => document.getElementById('color-mode').value
         };
+
+        function syncControlModeUI() {
+            const modeSelect = document.getElementById('control-mode');
+            const mouseGroup = document.getElementById('mouse-formation-group');
+            const mouseSelect = document.getElementById('mouse-formation-mode');
+            const videoWrapper = document.getElementById('video-wrapper');
+            const webgl = document.getElementById('webgl-container');
+
+            if (modeSelect) modeSelect.value = controlMode;
+            if (mouseSelect) mouseSelect.value = mouseBaseState;
+            if (mouseGroup) mouseGroup.style.display = controlMode === CONTROL_MODES.MOUSE ? 'block' : 'none';
+            if (videoWrapper) videoWrapper.style.display = controlMode === CONTROL_MODES.CAMERA ? 'block' : 'none';
+            if (webgl) webgl.classList.toggle('mouse-control', controlMode === CONTROL_MODES.MOUSE);
+        }
+
+        function setFormationState(nextState) {
+            if (!STATE_LABELS[nextState]) nextState = STATES.WANDER;
+            if (nextState === STATES.GIANT && currentState !== STATES.GIANT) {
+                AudioEngine.triggerGiantSwordAssembly();
+            }
+            if (nextState !== currentState) {
+                currentState = nextState;
+                updateSwordColors();
+            }
+            statusText.innerText = STATE_LABELS[currentState];
+        }
+
+        function setMouseFormation(state) {
+            if (!STATE_LABELS[state]) state = STATES.WANDER;
+            mouseBaseState = state;
+            const mouseSelect = document.getElementById('mouse-formation-mode');
+            if (mouseSelect) mouseSelect.value = mouseBaseState;
+            if (controlMode === CONTROL_MODES.MOUSE && !mouseOverrideState) {
+                setFormationState(mouseBaseState);
+            }
+        }
+
+        function switchControlMode(mode) {
+            controlMode = mode === CONTROL_MODES.MOUSE ? CONTROL_MODES.MOUSE : CONTROL_MODES.CAMERA;
+            localStorage.setItem('controlMode', controlMode);
+            syncControlModeUI();
+
+            if (controlMode === CONTROL_MODES.MOUSE) {
+                stopCamera();
+                latestLandmarks = null;
+                gestureHistory.length = 0;
+                finishLoading("当前阵法: 鼠标御剑已启动");
+                setFormationState(mouseOverrideState || mouseBaseState);
+            } else {
+                mouseOverrideState = null;
+                setFormationState(STATES.WANDER);
+                loadingText.style.display = 'block';
+                loadingText.innerText = '开启法阵天眼，合炼剑鸣神乐...';
+                startCamera();
+            }
+        }
+
+        window.setControlMode = switchControlMode;
+        window.setMouseFormation = setMouseFormation;
+        syncControlModeUI();
 
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
@@ -1289,6 +1395,8 @@
                 const dy = -(pKnuckle.y - pWrist.y);
                 const dz = -(pKnuckle.z - pWrist.z) * 1.5;
                 handDir.set(dx, dy, dz).normalize();
+            } else if (controlMode === CONTROL_MODES.MOUSE) {
+                handDir.copy(mouseHandDir);
             }
             smoothedHandDir.lerp(handDir, currentState === STATES.GIANT ? 0.10 : 0.28).normalize();
             const giantRotation = new THREE.Quaternion();
@@ -1848,6 +1956,7 @@
         }
 
         function onResults(results) {
+            if (controlMode !== CONTROL_MODES.CAMERA) return;
             finishLoading();
 
             if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
@@ -1868,9 +1977,7 @@
                 }
 
                 if(majorityState !== currentState) {
-                    currentState = majorityState;
-                    statusText.innerText = "当前阵法: 寻敌游弋态";
-                    updateSwordColors();
+                    setFormationState(majorityState);
                 }
                 return;
             }
@@ -1940,20 +2047,7 @@
             }
 
             if(majorityState !== currentState) {
-                if (majorityState === STATES.GIANT) {
-                    AudioEngine.triggerGiantSwordAssembly();
-                }
-                currentState = majorityState;
-                
-                let text = "当前阵法: 寻敌游弋态";
-                if (currentState === STATES.CORE) text = "当前阵法: 大成立体球剑阵 (神圣御守)";
-                else if (currentState === STATES.ATTACK) text = "当前阵法: 游龙往复飞梭 (一指跟随 · 双色麻绳交织)";
-                else if (currentState === STATES.GIANT) text = "当前阵法: 剑指 · 开天合一 (开天巨剑姿态)";
-                else if (currentState === STATES.SPIRAL) text = "当前阵法: 三指 · 太乙天诛剑阵 (毁灭大杀招)";
-                else if (currentState === STATES.SHIELD) text = "当前阵法: 五掌 · 青元戮魔阵 (同心进攻波环)";
-                
-                statusText.innerText = text;
-                updateSwordColors(); 
+                setFormationState(majorityState);
             }
         }
 
@@ -1962,7 +2056,16 @@
         hands.setOptions({ maxNumHands: 1, modelComplexity: isMobileDevice ? 0 : 1, minDetectionConfidence: 0.55, minTrackingConfidence: 0.55 });
         hands.onResults(onResults);
 
+        function stopCamera() {
+            cameraFrameLoopActive = false;
+            if (videoElement.srcObject) {
+                videoElement.srcObject.getTracks().forEach(track => track.stop());
+                videoElement.srcObject = null;
+            }
+        }
+
         async function startCamera() {
+            if (controlMode !== CONTROL_MODES.CAMERA) return;
             const retryBtn = document.getElementById('cam-retry-btn');
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 finishLoading("当前阵法: 当前环境不支持摄像头，自动游弋");
@@ -1971,6 +2074,7 @@
             }
 
             try {
+                stopCamera();
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: { width: 320, height: 240, facingMode: "user" },
                     audio: false
@@ -1978,8 +2082,10 @@
                 videoElement.srcObject = stream;
                 await videoElement.play();
                 retryBtn.style.display = 'none';
+                cameraFrameLoopActive = true;
 
                 const sendFrame = async () => {
+                    if (!cameraFrameLoopActive || controlMode !== CONTROL_MODES.CAMERA) return;
                     try {
                         if (videoElement.readyState >= 2) {
                             await hands.send({ image: videoElement });
@@ -2006,11 +2112,124 @@
         }
 
         async function retryCamera() {
+            if (controlMode !== CONTROL_MODES.CAMERA) {
+                switchControlMode(CONTROL_MODES.CAMERA);
+                return;
+            }
             document.getElementById('cam-retry-btn').style.display = 'none';
             loadingText.style.display = 'block';
             loadingText.innerText = '重新开启天眼...';
             await startCamera();
         }
+
+        function updateMouseTarget(e) {
+            if (controlMode !== CONTROL_MODES.MOUSE) return;
+            const next = new THREE.Vector3(
+                (e.clientX / window.innerWidth - 0.5) * 150,
+                -(e.clientY / window.innerHeight - 0.5) * 110,
+                8
+            );
+            const moveDir = next.clone().sub(fingerTipPoint);
+            if (moveDir.lengthSq() > 0.04) {
+                mouseHandDir.copy(moveDir).normalize();
+            }
+            targetPoint.lerp(next, 0.42);
+            fingerTipPoint.lerp(next, 0.42);
+        }
+
+        function getMouseOverrideState(e) {
+            if (e.shiftKey) return STATES.SHIELD;
+            if (e.altKey) return STATES.SPIRAL;
+            if (e.buttons & 2) return STATES.CORE;
+            if (e.buttons & 4) return STATES.GIANT;
+            if (e.buttons & 1) return STATES.ATTACK;
+            return null;
+        }
+
+        function applyMouseOverride(e) {
+            if (controlMode !== CONTROL_MODES.MOUSE) return;
+            const nextOverride = getMouseOverrideState(e);
+            if (nextOverride !== mouseOverrideState) {
+                mouseOverrideState = nextOverride;
+                setFormationState(mouseOverrideState || mouseBaseState);
+            }
+        }
+
+        function isControlElement(target) {
+            return target && target.closest && target.closest('#ui-overlay, #video-wrapper, #start-portal');
+        }
+
+        document.addEventListener('pointermove', (e) => {
+            if (isControlElement(e.target)) return;
+            updateMouseTarget(e);
+            applyMouseOverride(e);
+        }, { passive: true });
+
+        document.addEventListener('pointerdown', (e) => {
+            if (controlMode !== CONTROL_MODES.MOUSE || isControlElement(e.target)) return;
+            updateMouseTarget(e);
+            applyMouseOverride(e);
+        });
+
+        document.addEventListener('pointerup', (e) => {
+            if (controlMode !== CONTROL_MODES.MOUSE) return;
+            updateMouseTarget(e);
+            applyMouseOverride(e);
+        });
+
+        document.addEventListener('dblclick', (e) => {
+            if (controlMode !== CONTROL_MODES.MOUSE || isControlElement(e.target)) return;
+            updateMouseTarget(e);
+            setMouseFormation(STATES.GIANT);
+        });
+
+        document.addEventListener('contextmenu', (e) => {
+            if (controlMode === CONTROL_MODES.MOUSE && !isControlElement(e.target)) e.preventDefault();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (isControlElement(e.target)) return;
+            if (e.key === 'm' || e.key === 'M') {
+                switchControlMode(CONTROL_MODES.MOUSE);
+                return;
+            }
+            if (e.key === 'c' || e.key === 'C') {
+                switchControlMode(CONTROL_MODES.CAMERA);
+                return;
+            }
+            if (controlMode !== CONTROL_MODES.MOUSE) return;
+
+            const keyStates = {
+                '0': STATES.WANDER,
+                '1': STATES.ATTACK,
+                '2': STATES.GIANT,
+                '3': STATES.SPIRAL,
+                '4': STATES.CORE,
+                '5': STATES.SHIELD
+            };
+            if (keyStates[e.key]) {
+                setMouseFormation(keyStates[e.key]);
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                setMouseFormation(mouseBaseState === STATES.WANDER ? STATES.ATTACK : STATES.WANDER);
+            } else if (e.key === 'Escape') {
+                setMouseFormation(STATES.WANDER);
+            } else if (e.key === 'Shift') {
+                mouseOverrideState = STATES.SHIELD;
+                setFormationState(mouseOverrideState);
+            } else if (e.key === 'Alt') {
+                mouseOverrideState = STATES.SPIRAL;
+                setFormationState(mouseOverrideState);
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (controlMode !== CONTROL_MODES.MOUSE) return;
+            if ((e.key === 'Shift' && mouseOverrideState === STATES.SHIELD) || (e.key === 'Alt' && mouseOverrideState === STATES.SPIRAL)) {
+                mouseOverrideState = null;
+                setFormationState(mouseBaseState);
+            }
+        });
 
         // 3D 电影级视差控制输入
         document.addEventListener('mousemove', (e) => {
@@ -2058,6 +2277,9 @@
 
         window.onload = function() {
             animate();
+            if (urlParams.get('autostart') === '1') {
+                setTimeout(awakenSwordFormation, 350);
+            }
         };
     </script>
     <script>
