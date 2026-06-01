@@ -1136,14 +1136,17 @@
             const cohesion = new THREE.Vector3();
             let count = 0;
 
+            const isAttackFlow = currentState === STATES.ATTACK;
             const activeLimit = TOTAL_SWORDS;
+            const flowStep = isAttackFlow ? 4 : 1;
+            const startJ = isAttackFlow ? index % flowStep : 0;
 
-            for (let j = 0; j < activeLimit; j++) {
+            for (let j = startJ; j < activeLimit; j += flowStep) {
                 if (j === index) continue;
                 const other = boids[j];
                 const distSq = boid.position.distanceToSquared(other.position);
                 
-                const maxDistSq = (currentState === STATES.ATTACK) ? 60 : (currentState === STATES.CORE ? 12 : 220);
+                const maxDistSq = isAttackFlow ? 42 : (currentState === STATES.CORE ? 12 : 220);
                 if (distSq > 0.01 && distSq < maxDistSq) {
                     if (currentState === STATES.CORE || currentState === STATES.SPIRAL) {
                         const push = boid.position.clone().sub(other.position);
@@ -1170,7 +1173,7 @@
             }
 
             if (count > 0) {
-                const sepMult = (currentState === STATES.ATTACK) ? 0.35 : (currentState === STATES.CORE ? 0.65 : 0.70);
+                const sepMult = isAttackFlow ? 0.24 : (currentState === STATES.CORE ? 0.65 : 0.70);
                 separation.normalize().multiplyScalar(sepMult);
                 
                 if (currentState !== STATES.ATTACK && currentState !== STATES.CORE) {
@@ -1352,7 +1355,8 @@
 
                             const localZ = (boid.phase - Math.PI) * 0.22; 
                             const followTarget = rawTarget.clone().add(new THREE.Vector3(localX, localY, localZ));
-                            const followStrength = (0.024 + (1.0 - dispersedT) * 0.045) * gatherSpd * 1.4;
+                            const handMotionBoost = 1.0 + Math.min(currentAverageSpeed, 8.0) * 0.08;
+                            const followStrength = (0.052 + (1.0 - dispersedT) * 0.088) * gatherSpd * 1.65 * handMotionBoost;
                             
                             targetVel.subVectors(followTarget, boid.position).multiplyScalar(followStrength);
 
@@ -1361,7 +1365,7 @@
                                 const nextIdx = Math.min(historyLen - 1, historyLen - 1 - historyIdx + 4);
                                 if (prevIdx !== nextIdx) {
                                     const pathDir = fingerHistory[nextIdx].clone().sub(fingerHistory[prevIdx]).normalize();
-                                    targetVel.add(pathDir.multiplyScalar(actionSpd * 0.48)); 
+                                    targetVel.add(pathDir.multiplyScalar(actionSpd * 0.95 + Math.min(currentAverageSpeed, 10.0) * 0.12)); 
                                 }
                             }
                         } else {
@@ -1549,8 +1553,9 @@
                 let exactPower = 0.0;
                 
                 if (speed > 0.12 && boid.currentScaleFactor > 0.1) {
-                    const trailMult = (currentState === STATES.ATTACK || currentState === STATES.SPIRAL || currentState === STATES.GIANT) ? 3.2 : 0.85;
-                    exactPower = Math.min((speed - 0.12) * trailMult, 3.8); 
+                    const trailMult = currentState === STATES.ATTACK ? 4.1 : ((currentState === STATES.SPIRAL || currentState === STATES.GIANT) ? 3.2 : 0.85);
+                    const trailLimit = currentState === STATES.ATTACK ? 4.5 : 3.8;
+                    exactPower = Math.min((speed - 0.12) * trailMult, trailLimit); 
                 } else {
                     exactPower = 0.0; 
                 }
@@ -1823,7 +1828,8 @@
         }
 
         const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.55, minTrackingConfidence: 0.55 });
+        const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        hands.setOptions({ maxNumHands: 1, modelComplexity: isMobileDevice ? 0 : 1, minDetectionConfidence: 0.55, minTrackingConfidence: 0.55 });
         hands.onResults(onResults);
 
         async function startCamera() {
@@ -1905,7 +1911,7 @@
             bgPlane.position.copy(currentBgPos);
 
             updateBoidsLogic();
-            if (currentState === STATES.WANDER) {
+            if (currentState === STATES.WANDER || currentState === STATES.ATTACK) {
                 renderer.render(scene, camera);
             } else {
                 composer.render();
