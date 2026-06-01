@@ -1127,6 +1127,11 @@
         const dummy = new THREE.Object3D();
         dummy.rotation.order = 'XYZ'; 
         const wanderLookTarget = new THREE.Vector3();
+        const smoothedHandDir = new THREE.Vector3(0, 1, 0);
+        const stableCoreAnchor = new THREE.Vector3();
+        const stableGiantAnchor = new THREE.Vector3();
+        let hasStableCoreAnchor = false;
+        let hasStableGiantAnchor = false;
 
         function addFlowBoidForce(index, boid, targetVel) {
             if (currentState === STATES.GIANT) return;
@@ -1219,16 +1224,37 @@
                 const dz = -(pKnuckle.z - pWrist.z) * 1.5;
                 handDir.set(dx, dy, dz).normalize();
             }
+            smoothedHandDir.lerp(handDir, currentState === STATES.GIANT ? 0.10 : 0.28).normalize();
             const giantRotation = new THREE.Quaternion();
-            giantRotation.setFromUnitVectors(new THREE.Vector3(0, 1, 0), handDir);
+            giantRotation.setFromUnitVectors(new THREE.Vector3(0, 1, 0), smoothedHandDir);
 
             const defenseShakeFreq = 1.2; 
-            const defenseShakeAmp = 0.15; 
+            const defenseShakeAmp = 0.025; 
             const unifiedShakeX = Math.sin(time * defenseShakeFreq) * defenseShakeAmp;
             const unifiedShakeY = Math.cos(time * (defenseShakeFreq * 0.95)) * defenseShakeAmp;
             const unifiedShakeZ = Math.sin(time * (defenseShakeFreq * 1.1)) * defenseShakeAmp;
 
             const calligraphyCount = jianLaiPoints.length; 
+            if (currentState === STATES.CORE) {
+                if (!hasStableCoreAnchor) {
+                    stableCoreAnchor.copy(fingerTipPoint);
+                    hasStableCoreAnchor = true;
+                } else {
+                    stableCoreAnchor.lerp(fingerTipPoint, 0.14);
+                }
+            } else {
+                hasStableCoreAnchor = false;
+            }
+            if (currentState === STATES.GIANT) {
+                if (!hasStableGiantAnchor) {
+                    stableGiantAnchor.copy(fingerTipPoint);
+                    hasStableGiantAnchor = true;
+                } else {
+                    stableGiantAnchor.lerp(fingerTipPoint, 0.12);
+                }
+            } else {
+                hasStableGiantAnchor = false;
+            }
 
             for (let i = 0; i < TOTAL_SWORDS; i++) {
                 const boid = boids[i];
@@ -1384,11 +1410,11 @@
                         const u = (i + 0.5) / TOTAL_SWORDS;
                         const y = 1 - 2 * u; 
                         const r = Math.sqrt(Math.max(0, 1 - y * y));
-                        const theta = i * ga + time * actionSpd * 0.12;
+                        const theta = i * ga;
                         
-                        const sphereCenter = new THREE.Vector3(fingerTipPoint.x, fingerTipPoint.y, fingerTipPoint.z * 0.5 + 105.0);
+                        const sphereCenter = new THREE.Vector3(stableCoreAnchor.x, stableCoreAnchor.y, stableCoreAnchor.z + 38.0);
                         const distToCam = Math.max(10.0, camera.position.z - sphereCenter.z);
-                        const shellR = distToCam * Math.tan(THREE.MathUtils.degToRad(camera.fov) * 0.5) / 3.0;
+                        const shellR = THREE.MathUtils.clamp(distToCam * Math.tan(THREE.MathUtils.degToRad(camera.fov) * 0.5) / 3.0, 12.0, 22.0);
 
                         const sphereTarget = new THREE.Vector3(
                             sphereCenter.x + Math.cos(theta) * r * shellR + unifiedShakeX,
@@ -1400,7 +1426,7 @@
                             -Math.sin(theta),
                             0.0,
                             Math.cos(theta)
-                        ).multiplyScalar(actionSpd * 0.05);
+                        ).multiplyScalar(actionSpd * 0.012);
 
                         targetVel.subVectors(sphereTarget, boid.position).multiplyScalar(0.25 * gatherSpd);
                         targetVel.add(swirl);
@@ -1478,7 +1504,7 @@
                             localPos.set(xLocal, yLocal, zLocal);
                         }
 
-                        const worldTarget = localPos.applyQuaternion(giantRotation).add(fingerTipPoint);
+                        const worldTarget = localPos.applyQuaternion(giantRotation).add(stableGiantAnchor);
                         worldTarget.z += 35.0; 
 
                         targetVel.subVectors(worldTarget, boid.position).multiplyScalar(0.08 * gatherSpd);
@@ -1522,13 +1548,13 @@
                     const selfSpinAngle = time * actionSpd * 5.5 + boid.phase * 3.0;
                     dummy.rotateZ(selfSpinAngle);
                 } else if (currentState === STATES.CORE) {
-                    const sphereCenter = new THREE.Vector3(fingerTipPoint.x, fingerTipPoint.y, fingerTipPoint.z * 0.5 + 105.0);
+                    const sphereCenter = new THREE.Vector3(stableCoreAnchor.x, stableCoreAnchor.y, stableCoreAnchor.z + 38.0);
                     const toBoid = boid.position.clone().sub(sphereCenter);
                     const circulationTangent = new THREE.Vector3(-toBoid.z, 0, toBoid.x).normalize();
                     
                     dummy.lookAt(boid.position.clone().add(circulationTangent));
-                    dummy.rotateX(unifiedShakeX * 0.12);
-                    dummy.rotateY(unifiedShakeY * 0.12);
+                    dummy.rotateX(unifiedShakeX * 0.03);
+                    dummy.rotateY(unifiedShakeY * 0.03);
                 } else {
                     if (boid.velocity.lengthSq() > 0.001) {
                         dummy.lookAt(boid.position.clone().add(boid.velocity));
