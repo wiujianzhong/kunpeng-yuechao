@@ -378,6 +378,7 @@
         <div id="status-text">当前阵法: 寻敌游弋态</div>
     </div>
 
+    <div id="cam-hint" style="display:none;position:absolute;bottom:30px;left:50%;transform:translateX(-50%);color:rgba(0,255,150,0.75);font-size:13px;z-index:10;background:rgba(5,12,10,0.85);padding:8px 18px;border-radius:20px;border:1px solid rgba(0,255,150,0.25);pointer-events:none;">本地模式下摄像头不可用，请使用鼠标/键盘控制</div>
     <div id="video-wrapper" style="display:none;">
         <button class="cam-toggle" id="cam-retry-btn" onclick="retryCamera()" style="display:none;">重试天眼</button>
         <button class="cam-toggle" id="cam-toggle-btn" onclick="toggleCam()">隐藏天眼画面</button>
@@ -397,6 +398,7 @@
     </div>
 
     <script>
+        const isFileProtocol = window.location.protocol === 'file:';
         class AdvancedSwordAudioEngine {
             constructor() {
                 this.ctx = null;
@@ -626,6 +628,8 @@
                 }
                 
                 setAudioVolume(30);
+                const camHint = document.getElementById('cam-hint');
+                if (camHint) camHint.style.display = 'none';
                 startCamera();
             }, 500);
         }
@@ -651,27 +655,28 @@
 
         const jianLaiPoints = [];
         const jianLaiRotations = [];
+        const wanderStrokeDensity = 1.22;
+        const wanderFormationScale = 0.74;
+        const wanderFormationZ = 40.0;
 
-        // 完美重绘汉字「剑」的字型，对齐「佥」与「刂」的比例与空间结构，去除中央多余刀意
+        // 重绘汉字「剑」：左部改为「佥」的屋脊、横势、双点和底横，右侧立刀拉高拉长
         const calligraphyStrokes = [
-            // ====== 汉字: 「剑」 (Jian) ======
-            // 左部: "佥" 的顶部大 chevron (𠆢)
-            { from: [-14, 14, 60], to: [-20, 8, 60], count: 10 },
-            { from: [-14, 14, 60], to: [-8, 8, 60], count: 10 },
-            // 左部: "佥" 中部横线 (一)
-            { from: [-18, 4, 60], to: [-10, 4, 60], count: 9 },
-            // 左部: "佥" 中部小 box (口)
-            { from: [-16, 4, 60], to: [-16, -1, 60], count: 6 },
-            { from: [-12, 4, 60], to: [-12, -1, 60], count: 6 },
-            { from: [-16, -1, 60], to: [-12, -1, 60], count: 5 },
-            // 左部: "佥" 底部的交叉 (乂)
-            { from: [-17, -2, 60], to: [-11, -8, 60], count: 7 },
-            { from: [-11, -2, 60], to: [-17, -8, 60], count: 7 },
+            // ====== 汉字: 「剑」 ======
+            // 左部：「佥」上方屋脊
+            { from: [-18, 15, 60], to: [-27, 6, 60], count: 11 },
+            { from: [-18, 15, 60], to: [-9, 6, 60], count: 11 },
+            // 左部：「佥」中部压阵横
+            { from: [-25, 4, 60], to: [-10, 4, 60], count: 14 },
+            // 左部：「佥」中下双点
+            { from: [-23, 1, 60], to: [-19, -5, 60], count: 7 },
+            { from: [-13, 1, 60], to: [-17, -5, 60], count: 7 },
+            // 左部：「佥」底部长横
+            { from: [-27, -10, 60], to: [-8, -10, 60], count: 16 },
             // 右部: 立刀旁 (刂) 短竖
-            { from: [-4, 6, 60], to: [-4, -1, 60], count: 8 },
+            { from: [-2, 8, 60], to: [-2, -4, 60], count: 11 },
             // 右部: 立刀旁 (刂) 长竖与底钩
-            { from: [1, 13, 60], to: [1, -13, 60], count: 24 },
-            { from: [1, -13, 60], to: [-2, -10, 60], count: 5 }, 
+            { from: [4, 15, 60], to: [4, -16, 60], count: 28 },
+            { from: [4, -16, 60], to: [-1, -12, 60], count: 7 }, 
 
             // ====== 汉字: 「来」 (Lai) ======
             // 最上方顶横
@@ -695,32 +700,41 @@
             const p1 = new THREE.Vector3(s.from[0], s.from[1], s.from[2]);
             const p2 = new THREE.Vector3(s.to[0], s.to[1], s.to[2]);
 
-            for (let j = 0; j < s.count; j++) {
-                const t = j / (s.count - 1 || 1);
+            const denseCount = Math.max(2, Math.round(s.count * wanderStrokeDensity));
+            for (let j = 0; j < denseCount; j++) {
+                const t = j / (denseCount - 1 || 1);
                 const pos = new THREE.Vector3().lerpVectors(p1, p2, t);
+                pos.x *= wanderFormationScale;
+                pos.y *= wanderFormationScale;
+                pos.z = wanderFormationZ;
                 jianLaiPoints.push(pos);
                 // 强制字面飞剑直直对准屏幕
                 jianLaiRotations.push(new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, 0)));
             }
         });
 
-        // 在“剑来”外围使用20把左右飞剑围成一个圈
-        const circleSwordsCount = 20;
-        const circleRadius = 26.5; 
-        const circleCenterX = 4.5; // X 的中间区域
+        // 在“剑来”外围使用双层飞剑圈，强化阵法层次
+        const circleLayers = [
+            { count: 48, radius: 22.2, z: 40.0, phase: 0 },
+            { count: 28, radius: 17.4, z: 38.8, phase: Math.PI / 28 }
+        ];
+        const circleSwordsCount = circleLayers.reduce((sum, layer) => sum + layer.count, 0);
+        const circleCenterX = 3.3; // X 的中间区域
         const circleCenterY = 0.0;
         
-        for (let i = 0; i < circleSwordsCount; i++) {
-            const angle = (i / circleSwordsCount) * Math.PI * 2;
-            const x = circleCenterX + Math.cos(angle) * circleRadius;
-            const y = circleCenterY + Math.sin(angle) * circleRadius;
-            const pos = new THREE.Vector3(x, y, 60.0);
-            
-            jianLaiPoints.push(pos);
-            // 沿圈的切线方向旋转排列，展现完美的阵法圆环张力
-            const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, angle + Math.PI / 2));
-            jianLaiRotations.push(q);
-        }
+        circleLayers.forEach(layer => {
+            for (let i = 0; i < layer.count; i++) {
+                const angle = layer.phase + (i / layer.count) * Math.PI * 2;
+                const x = circleCenterX + Math.cos(angle) * layer.radius;
+                const y = circleCenterY + Math.sin(angle) * layer.radius;
+                const pos = new THREE.Vector3(x, y, layer.z);
+                
+                jianLaiPoints.push(pos);
+                // 沿圈的切线方向旋转排列，展现完美的阵法圆环张力
+                const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, angle + Math.PI / 2));
+                jianLaiRotations.push(q);
+            }
+        });
 
         const gestureHistory = [];
         const GESTURE_FILTER_WINDOW = 8; 
@@ -737,7 +751,7 @@
         scene.fog = new THREE.FogExp2(0x020202, 0.001);
 
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 5, 130);
+        camera.position.set(0, 5, 90);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1016,6 +1030,10 @@
         const COLOR_WHITE = new THREE.Color(0xffffff); 
         const COLOR_TRAIL_WHITE = new THREE.Color(0xffffee);
         const COLOR_TRAIL_GOLD = new THREE.Color(0xffd76a);
+        const COLOR_WANDER_SILVER = new THREE.Color().setRGB(0.86, 0.94, 1.00);
+        const COLOR_WANDER_BLUE = new THREE.Color().setRGB(0.22, 0.68, 1.00);
+        const COLOR_TRAIL_SILVER = new THREE.Color().setRGB(0.78, 0.90, 1.00);
+        const COLOR_TRAIL_BLUE = new THREE.Color().setRGB(0.18, 0.56, 0.92);
 
         const boids = [];
         const colorColors = new Float32Array(TOTAL_SWORDS * 3);
@@ -1045,11 +1063,18 @@
             const c0 = Math.floor(TOTAL_SWORDS * 0.15);
             const c1 = Math.floor(TOTAL_SWORDS * 0.25);
             const c2 = Math.floor(TOTAL_SWORDS * 0.30);
+            const wanderWordCount = Math.max(0, initialCalligraphyCount - circleSwordsCount);
 
             for(let i=0; i<TOTAL_SWORDS; i++) {
                 let c;
                 if (currentState === STATES.WANDER) {
-                    c = i % 2 === 0 ? new THREE.Color(0xffffff) : new THREE.Color(0x60d2ff);
+                    if (i < wanderWordCount) {
+                        c = i % 2 === 0 ? COLOR_WANDER_SILVER : COLOR_WANDER_BLUE;
+                    } else if (i < initialCalligraphyCount) {
+                        c = i % 2 === 0 ? COLOR_WANDER_SILVER : COLOR_WANDER_BLUE;
+                    } else {
+                        c = boids[i].isGreen ? COLOR_WANDER_BLUE : COLOR_WANDER_SILVER;
+                    }
                 } else if (currentState === STATES.GIANT) {
                     c = i % 3 === 0 ? COLOR_WHITE : (i % 3 === 1 ? COLOR_GOLD : new THREE.Color(0xff8c00));
                 } else if (currentState === STATES.SPIRAL) {
@@ -1071,7 +1096,9 @@
                 
                 colorsAttr.setXYZ(i, c.r, c.g, c.b);
                 instancedSwords.setColorAt(i, c);
-                const trailC = i % 2 === 0 ? COLOR_TRAIL_WHITE : COLOR_TRAIL_GOLD;
+                const trailC = currentState === STATES.WANDER
+                    ? (i % 2 === 0 ? COLOR_TRAIL_SILVER : COLOR_TRAIL_BLUE)
+                    : (i % 2 === 0 ? COLOR_TRAIL_WHITE : COLOR_TRAIL_GOLD);
                 trailColors[i * 3] = trailC.r;
                 trailColors[i * 3 + 1] = trailC.g;
                 trailColors[i * 3 + 2] = trailC.b;
@@ -1136,6 +1163,32 @@
         const haloSparkPoints = new THREE.Points(haloSparkGeo, haloSparkMat);
         scene.add(haloSparkPoints);
         haloSparkPoints.visible = false;
+
+        const wanderGlowGroup = new THREE.Group();
+        const wanderGlowRings = [];
+        [
+            { radius: 22.6, width: 0.26, color: 0x16ffd2, opacity: 0.18, speed: 0.08 },
+            { radius: 17.7, width: 0.20, color: 0xffc452, opacity: 0.13, speed: -0.10 },
+            { radius: 25.2, width: 0.14, color: 0xf8fff0, opacity: 0.07, speed: 0.05 }
+        ].forEach(cfg => {
+            const ringGeo = new THREE.RingGeometry(cfg.radius - cfg.width, cfg.radius + cfg.width, 160);
+            const ringMat = new THREE.MeshBasicMaterial({
+                color: cfg.color,
+                transparent: true,
+                opacity: cfg.opacity,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                side: THREE.DoubleSide
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.position.set(circleCenterX, circleCenterY, 38.2);
+            ring.userData.baseOpacity = cfg.opacity;
+            ring.userData.speed = cfg.speed;
+            wanderGlowGroup.add(ring);
+            wanderGlowRings.push(ring);
+        });
+        scene.add(wanderGlowGroup);
+        wanderGlowGroup.visible = false;
 
         const dummy = new THREE.Object3D();
         dummy.rotation.order = 'XYZ'; 
@@ -1277,14 +1330,32 @@
 
                 switch (currentState) {
                     case STATES.WANDER: {
-                        targetScaleFactor = 0.95;
+                        const wanderWordCount = calligraphyCount - circleSwordsCount;
+                        targetScaleFactor = 0.86;
 
                         if (i < calligraphyCount) {
                             // 拼装高精度「剑来」书法字点阵及外环圈，极其整齐美观
-                            const screenTarget = jianLaiPoints[i];
-                            targetVel.subVectors(screenTarget, boid.position).multiplyScalar(0.08 * wanderSpd);
+                            const screenTarget = jianLaiPoints[i].clone();
+                            const isCircleSword = i >= wanderWordCount;
+                            if (isCircleSword) {
+                                const ringIndex = i - wanderWordCount;
+                                const orbitDir = ringIndex < circleLayers[0].count ? 1 : -1;
+                                const orbitAngle = time * 0.055 * orbitDir;
+                                const dx = screenTarget.x - circleCenterX;
+                                const dy = screenTarget.y - circleCenterY;
+                                const cosA = Math.cos(orbitAngle);
+                                const sinA = Math.sin(orbitAngle);
+                                screenTarget.x = circleCenterX + dx * cosA - dy * sinA;
+                                screenTarget.y = circleCenterY + dx * sinA + dy * cosA;
+                                screenTarget.z += Math.sin(time * 1.5 + i * 0.11) * 0.75;
+                                targetScaleFactor = 0.78;
+                            } else {
+                                screenTarget.z += Math.sin(time * 1.15 + i * 0.08) * 0.38;
+                                targetScaleFactor = 0.70;
+                            }
+                            targetVel.subVectors(screenTarget, boid.position).multiplyScalar((isCircleSword ? 0.105 : 0.092) * wanderSpd);
                         } else {
-                            targetScaleFactor = 0.82;
+                            targetScaleFactor = 0.88;
                             // 其余飞剑：由远及近、由近及远地进行极其肆意混沌的穿梭乱飞，不形成任何有规律的围绕轨迹
                             const seed = i * 0.17;
                             const freqX = 0.35 + (i % 5) * 0.12;
@@ -1322,6 +1393,7 @@
 
                     case STATES.SHIELD: {
                         // 五掌：青元戮魔大阵 (同心进攻波纹阵)
+                        targetScaleFactor = 0.88;
                         const count0 = Math.floor(TOTAL_SWORDS * 0.15);
                         const count1 = Math.floor(TOTAL_SWORDS * 0.25);
                         const count2 = Math.floor(TOTAL_SWORDS * 0.30);
@@ -1332,26 +1404,26 @@
                         let dirSign = 1; 
                         
                         if (i < count0) {
-                            radius = 16;
+                            radius = 13;
                             ringAngle = (i / count0) * Math.PI * 2;
                             dirSign = 1.2;
                         } else if (i < count0 + count1) {
-                            radius = 30;
+                            radius = 25;
                             ringAngle = ((i - count0) / count1) * Math.PI * 2;
                             dirSign = -1.0;
                         } else if (i < count0 + count1 + count2) {
-                            radius = 46;
+                            radius = 38;
                             ringAngle = ((i - count0 - count1) / count2) * Math.PI * 2;
                             dirSign = 0.8;
                         } else {
-                            radius = 62; 
+                            radius = 51; 
                             ringAngle = ((i - count0 - count1 - count2) / count3) * Math.PI * 2;
                             dirSign = -0.8;
                         }
 
                         const attackTremor = Math.sin(time * 12.0 + boid.phase) * 2.5;
                         const currentAngle = ringAngle + time * actionSpd * 0.25 * dirSign;
-                        const flatPlaneZ = fingerTipPoint.z + 2.0 + attackTremor; 
+                        const flatPlaneZ = fingerTipPoint.z - 8.0 + attackTremor; 
 
                         const planeTarget = new THREE.Vector3(
                             fingerTipPoint.x + Math.cos(currentAngle) * radius,
@@ -1417,7 +1489,7 @@
 
                     case STATES.CORE: {
                         // 拳头：贴身守护球。快速归拢贴合，稳固不摇晃
-                        targetScaleFactor = 0.38; 
+                        targetScaleFactor = 0.34; 
                         
                         const ga = Math.PI * (3 - Math.sqrt(5));
                         const u = (i + 0.5) / TOTAL_SWORDS;
@@ -1425,9 +1497,9 @@
                         const r = Math.sqrt(Math.max(0, 1 - y * y));
                         const theta = i * ga;
                         
-                        const sphereCenter = new THREE.Vector3(stableCoreAnchor.x, stableCoreAnchor.y, stableCoreAnchor.z + 38.0);
+                        const sphereCenter = new THREE.Vector3(stableCoreAnchor.x, stableCoreAnchor.y, stableCoreAnchor.z + 56.0);
                         const distToCam = Math.max(10.0, camera.position.z - sphereCenter.z);
-                        const shellR = THREE.MathUtils.clamp(distToCam * Math.tan(THREE.MathUtils.degToRad(camera.fov) * 0.5) / 3.0, 12.0, 22.0);
+                        const shellR = THREE.MathUtils.clamp(distToCam * Math.tan(THREE.MathUtils.degToRad(camera.fov) * 0.5) / 4.8, 7.5, 13.0);
 
                         const sphereTarget = new THREE.Vector3(
                             sphereCenter.x + Math.cos(theta) * r * shellR + unifiedShakeX,
@@ -1543,11 +1615,16 @@
                     dummy.rotation.setFromQuaternion(giantRotation);
                 } else if (currentState === STATES.WANDER) {
                     if (i < calligraphyCount) {
-                        // 完美呈现字形与切向圆环！文字给予微幅三维倾斜迎风角，外圈飞剑完美贴合旋转切线角度。
-                        if (i < calligraphyCount - circleSwordsCount) {
-                            dummy.rotation.set(0.12, 0.18, 0.05); 
+                        // 完美呈现字形与切向圆环，并让字面飞剑与外圈飞剑沿剑身中轴自转。
+                        const wanderWordCount = calligraphyCount - circleSwordsCount;
+                        if (i < wanderWordCount) {
+                            dummy.rotation.set(0.12, 0.18, 0.04);
+                            dummy.rotateZ(time * 2.35 + i * 0.17);
                         } else {
+                            const ringIndex = i - wanderWordCount;
+                            const orbitDir = ringIndex < circleLayers[0].count ? 1 : -1;
                             dummy.rotation.setFromQuaternion(jianLaiRotations[i]);
+                            dummy.rotateZ(time * 2.45 * orbitDir + i * 0.08);
                         }
                     } else {
                         if (boid.velocity.lengthSq() > 0.001) {
@@ -1556,12 +1633,12 @@
                         }
                     }
                 } else if (currentState === STATES.SHIELD) {
-                    const centerPoint = new THREE.Vector3(fingerTipPoint.x, fingerTipPoint.y, fingerTipPoint.z + 10);
+                    const centerPoint = new THREE.Vector3(fingerTipPoint.x, fingerTipPoint.y, fingerTipPoint.z - 8);
                     dummy.lookAt(centerPoint);
                     const selfSpinAngle = time * actionSpd * 5.5 + boid.phase * 3.0;
                     dummy.rotateZ(selfSpinAngle);
                 } else if (currentState === STATES.CORE) {
-                    const sphereCenter = new THREE.Vector3(stableCoreAnchor.x, stableCoreAnchor.y, stableCoreAnchor.z + 38.0);
+                    const sphereCenter = new THREE.Vector3(stableCoreAnchor.x, stableCoreAnchor.y, stableCoreAnchor.z + 56.0);
                     const toBoid = boid.position.clone().sub(sphereCenter);
                     const circulationTangent = new THREE.Vector3(-toBoid.z, 0, toBoid.x).normalize();
                     
@@ -1591,7 +1668,13 @@
                 const speed = boid.velocity.length();
                 let exactPower = 0.0;
                 
-                if (speed > 0.12 && boid.currentScaleFactor > 0.1) {
+                if (currentState === STATES.WANDER && boid.currentScaleFactor > 0.1) {
+                    if (i < calligraphyCount) {
+                        exactPower = 0.08 + Math.sin(time * 1.8 + i * 0.09) * 0.03;
+                    } else if (speed > 0.08) {
+                        exactPower = Math.min((speed - 0.08) * 1.55, 4.4);
+                    }
+                } else if (speed > 0.12 && boid.currentScaleFactor > 0.1) {
                     const trailMult = currentState === STATES.ATTACK ? 4.1 : ((currentState === STATES.SPIRAL || currentState === STATES.GIANT) ? 3.2 : 0.85);
                     const trailLimit = currentState === STATES.ATTACK ? 4.5 : 3.8;
                     exactPower = Math.min((speed - 0.12) * trailMult, trailLimit); 
@@ -1703,6 +1786,14 @@
                 haloMesh.visible = false;
                 haloSparkPoints.visible = false;
                 lightningLines.visible = false;
+            }
+
+            wanderGlowGroup.visible = currentState === STATES.WANDER;
+            if (wanderGlowGroup.visible) {
+                wanderGlowRings.forEach((ring, idx) => {
+                    ring.rotation.z = time * ring.userData.speed + idx * 0.16;
+                    ring.material.opacity = ring.userData.baseOpacity * (0.78 + Math.sin(time * 1.4 + idx * 1.7) * 0.22);
+                });
             }
 
             const starArr = starGeo.attributes.position.array;
@@ -1950,7 +2041,7 @@
             bgPlane.position.copy(currentBgPos);
 
             updateBoidsLogic();
-            if (currentState === STATES.WANDER || currentState === STATES.ATTACK) {
+            if (currentState === STATES.ATTACK) {
                 renderer.render(scene, camera);
             } else {
                 composer.render();
