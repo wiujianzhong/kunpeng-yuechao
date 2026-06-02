@@ -852,14 +852,14 @@
 
           <div class="entry-pane" id="textPane">
             <label>
-              输入一句话
-              <textarea id="textInput" placeholder="例如：午饭18、今天买菜38、收入500、中桥买材料126"></textarea>
+              输入一句或多句
+              <textarea id="textInput" placeholder="例如：午饭18、买菜38、加油200、收入500"></textarea>
             </label>
             <div class="row-actions">
               <button class="secondary" id="parseTextBtn" type="button">识别预览</button>
               <button class="ghost" id="clearTextBtn" type="button">清空</button>
             </div>
-            <p class="hint">按关键词识别分类，不使用 AI，不花钱。识别不准时可以改成手动记账。</p>
+            <p class="hint">多笔可换行，或用顿号、逗号、分号隔开。按关键词识别分类，不使用 AI，不花钱。</p>
             <div class="preview" id="textPreview" aria-live="polite"></div>
           </div>
 
@@ -989,7 +989,7 @@
         manualType: "expense",
         editType: "expense",
         editingId: null,
-        pendingTextRecord: null,
+        pendingTextRecords: [],
         pendingVoiceRecord: null,
         speechRecognition: null,
         isListening: false
@@ -1069,15 +1069,15 @@
         });
 
         document.getElementById("parseTextBtn").addEventListener("click", () => {
-          const parsed = parseSentence(el.textInput.value);
+          const parsed = parseTextInput(el.textInput.value);
           if (!parsed) return;
-          state.pendingTextRecord = parsed;
-          renderPreview(el.textPreview, parsed, "text");
+          state.pendingTextRecords = parsed.records;
+          renderPreview(el.textPreview, parsed.records, "text", parsed.failures);
         });
 
         document.getElementById("clearTextBtn").addEventListener("click", () => {
           el.textInput.value = "";
-          state.pendingTextRecord = null;
+          state.pendingTextRecords = [];
           el.textPreview.classList.remove("active");
           el.textPreview.innerHTML = "";
         });
@@ -1165,14 +1165,14 @@
         document.getElementById("saveStatus").textContent = "已自动保存到本机";
       }
 
-      function buildRecord(input, id) {
+      function buildRecord(input, id, silent = false) {
         const amount = normalizeAmount(input.amount);
         if (!amount) {
-          toast("请输入正确金额");
+          if (!silent) toast("请输入正确金额");
           return null;
         }
         if (!input.date) {
-          toast("请选择日期");
+          if (!silent) toast("请选择日期");
           return null;
         }
         return {
@@ -1211,22 +1211,72 @@
         return state.records.find((record) => record.id === id);
       }
 
-      function parseSentence(input) {
+      function parseTextInput(input) {
         const original = String(input || "").trim();
         if (!original) {
-          toast("先输入一句话");
+          toast("先输入内容");
+          return null;
+        }
+        const entries = splitTextEntries(original);
+        const records = [];
+        const failures = [];
+        entries.forEach((entry, index) => {
+          const record = parseSentence(entry, true);
+          if (record) records.push(record);
+          else failures.push(`第 ${index + 1} 条没有识别到金额：${entry}`);
+        });
+        if (!records.length) {
+          renderPreview(el.textPreview, [], "text", failures);
+          toast("没有识别到可保存的账目");
+          return null;
+        }
+        if (failures.length) toast(`识别到 ${records.length} 笔，${failures.length} 条需补金额`);
+        return { records, failures };
+      }
+
+      function splitTextEntries(input) {
+        return String(input || "")
+          .split(/[\n；;、，]+|,(?=\s*\D)/)
+          .flatMap(splitContinuousEntries)
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+
+      function splitContinuousEntries(text) {
+        const item = String(text || "").trim();
+        if (!item) return [];
+        const shadow = item.replace(/(\d{1,2})[月\/.-](\d{1,2})[日号]?/g, (match) => " ".repeat(match.length));
+        const matches = [...shadow.matchAll(/(?:\d+(?:[.,]\d{1,2})?|\.\d{1,2})/g)];
+        if (matches.length <= 1) return [item];
+        const entries = [];
+        let start = 0;
+        matches.forEach((match) => {
+          const end = match.index + match[0].length;
+          const entry = item.slice(start, end).trim();
+          if (entry) entries.push(entry);
+          start = end;
+        });
+        const tail = item.slice(start).trim();
+        if (tail && entries.length) entries[entries.length - 1] += tail;
+        return entries;
+      }
+
+      function parseSentence(input, silent = false) {
+        const original = String(input || "").trim();
+        if (!original) {
+          if (!silent) toast("先输入一句话");
           return null;
         }
         const normalized = original.replace(/[，,]/g, ".").replace(/[元块]/g, "");
         const matches = [...normalized.matchAll(/(?:\d+(?:\.\d{1,2})?|\.\d{1,2})/g)];
         if (!matches.length) {
-          toast("没有识别到金额");
+          if (!silent) toast("没有识别到金额");
           return null;
         }
         const amountText = matches[matches.length - 1][0];
         const amount = normalizeAmount(amountText);
         if (!amount) {
-          toast("金额不正确");
+          if (!silent) toast("金额不正确");
           return null;
         }
         const moneyIndex = normalized.lastIndexOf(amountText);
@@ -1239,7 +1289,7 @@
           amount,
           note,
           date: detectDate(original)
-        });
+        }, undefined, silent);
       }
 
       function detectType(text) {
@@ -1280,48 +1330,68 @@
           .trim();
       }
 
-      function renderPreview(container, record, source) {
+      function renderPreview(container, records, source, failures = []) {
+        const list = Array.isArray(records) ? records : [records].filter(Boolean);
         container.classList.add("active");
         container.innerHTML = "";
-        const previewGrid = document.createElement("div");
-        previewGrid.className = "preview-grid";
-        [
-          ["类型", typeText(record.type)],
-          ["分类", record.category],
-          ["金额", money(record.amount)],
-          ["日期", record.date],
-          ["备注", record.note || "无"]
-        ].forEach(([label, value]) => {
-          const item = document.createElement("div");
-          item.className = "preview-item";
-          const span = document.createElement("span");
-          const bold = document.createElement("b");
-          span.textContent = label;
-          bold.textContent = value;
-          item.append(span, bold);
-          previewGrid.appendChild(item);
+        if (list.length) {
+          const title = document.createElement("div");
+          title.className = "notice";
+          title.textContent = list.length > 1 ? `识别到 ${list.length} 笔，请确认后保存。` : "识别到 1 笔，请确认后保存。";
+          container.appendChild(title);
+        }
+        list.forEach((record, index) => {
+          const previewGrid = document.createElement("div");
+          previewGrid.className = "preview-grid";
+          [
+            ["序号", `第 ${index + 1} 笔`],
+            ["类型", typeText(record.type)],
+            ["分类", record.category],
+            ["金额", money(record.amount)],
+            ["日期", record.date],
+            ["备注", record.note || "无"]
+          ].forEach(([label, value]) => {
+            const item = document.createElement("div");
+            item.className = "preview-item";
+            const span = document.createElement("span");
+            const bold = document.createElement("b");
+            span.textContent = label;
+            bold.textContent = value;
+            item.append(span, bold);
+            previewGrid.appendChild(item);
+          });
+          container.appendChild(previewGrid);
         });
+        if (failures.length) {
+          const failure = document.createElement("div");
+          failure.className = "notice";
+          failure.textContent = failures.join("；");
+          container.appendChild(failure);
+        }
+        if (!list.length) return;
         const actions = document.createElement("div");
         actions.className = "row-actions";
         const confirm = document.createElement("button");
         confirm.className = "secondary";
         confirm.type = "button";
-        confirm.textContent = "确认保存";
+        confirm.textContent = list.length > 1 ? `全部保存 ${list.length} 笔` : "确认保存";
         confirm.addEventListener("click", () => {
-          const pending = source === "voice" ? state.pendingVoiceRecord : state.pendingTextRecord;
-          if (!pending) return;
-          addRecord(pending);
+          const pending = source === "voice" ? (state.pendingVoiceRecord ? [state.pendingVoiceRecord] : []) : state.pendingTextRecords;
+          if (!pending.length) return;
+          state.records.unshift(...pending);
+          persist();
+          render();
           if (source === "voice") {
             state.pendingVoiceRecord = null;
             el.voicePreview.classList.remove("active");
             el.voicePreview.innerHTML = "";
           } else {
-            state.pendingTextRecord = null;
+            state.pendingTextRecords = [];
             el.textInput.value = "";
             el.textPreview.classList.remove("active");
             el.textPreview.innerHTML = "";
           }
-          toast("已保存");
+          toast(pending.length > 1 ? `已保存 ${pending.length} 笔` : "已保存");
         });
         const cancel = document.createElement("button");
         cancel.className = "ghost";
@@ -1329,12 +1399,12 @@
         cancel.textContent = "取消";
         cancel.addEventListener("click", () => {
           if (source === "voice") state.pendingVoiceRecord = null;
-          if (source === "text") state.pendingTextRecord = null;
+          if (source === "text") state.pendingTextRecords = [];
           container.classList.remove("active");
           container.innerHTML = "";
         });
         actions.append(confirm, cancel);
-        container.append(previewGrid, actions);
+        container.appendChild(actions);
       }
 
       function startVoice() {
