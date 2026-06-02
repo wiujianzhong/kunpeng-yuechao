@@ -268,6 +268,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="./virtual-hand-renderer.js"></script>
 </head>
 <body>
 
@@ -678,6 +679,14 @@
             SHIELD: "当前阵法: 五掌 · 青元戮魔阵 (同心进攻波环)"
         };
         const CONTROL_MODES = { CAMERA: 'camera', MOUSE: 'mouse' };
+        const VIRTUAL_HAND_CONFIG = {
+            showVirtualHand: true,
+            virtualHandScale: 1,
+            virtualHandOpacity: 0.86,
+            virtualHandPosition: { x: 0.5, y: 0.86 },
+            mirror: true
+        };
+        window.VIRTUAL_HAND_CONFIG = Object.assign({}, window.VIRTUAL_HAND_CONFIG || {}, VIRTUAL_HAND_CONFIG);
         const urlParams = new URLSearchParams(location.search);
         const requestedMode = urlParams.get('mode');
         const isDesktopShell = urlParams.get('desktop') === '1';
@@ -835,6 +844,7 @@
 
             if (controlMode === CONTROL_MODES.MOUSE) {
                 stopCamera();
+                hideVirtualHand();
                 latestLandmarks = null;
                 gestureHistory.length = 0;
                 finishLoading("当前阵法: 鼠标御剑已启动");
@@ -851,6 +861,22 @@
         window.setControlMode = switchControlMode;
         window.setMouseFormation = setMouseFormation;
         syncControlModeUI();
+
+        const virtualHandRenderer = window.VirtualHandRenderer ? new window.VirtualHandRenderer(window.VIRTUAL_HAND_CONFIG) : null;
+        window.virtualHandRenderer = virtualHandRenderer;
+
+        function hideVirtualHand() {
+            if (virtualHandRenderer) virtualHandRenderer.hide();
+        }
+
+        function updateVirtualHand(landmarks, state, gestureInfo) {
+            if (!virtualHandRenderer || controlMode !== CONTROL_MODES.CAMERA) return;
+            virtualHandRenderer.update({
+                landmarks,
+                state,
+                openCount: gestureInfo.openCount
+            });
+        }
 
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
@@ -1961,6 +1987,7 @@
 
             if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
                 latestLandmarks = null;
+                hideVirtualHand();
                 
                 gestureHistory.push(STATES.WANDER);
                 if(gestureHistory.length > GESTURE_FILTER_WINDOW) gestureHistory.shift();
@@ -2049,6 +2076,14 @@
             if(majorityState !== currentState) {
                 setFormationState(majorityState);
             }
+
+            updateVirtualHand(landmarks, majorityState, {
+                openCount,
+                indexOpen,
+                middleOpen,
+                ringOpen,
+                pinkyOpen
+            });
         }
 
         const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
@@ -2058,6 +2093,7 @@
 
         function stopCamera() {
             cameraFrameLoopActive = false;
+            hideVirtualHand();
             if (videoElement.srcObject) {
                 videoElement.srcObject.getTracks().forEach(track => track.stop());
                 videoElement.srcObject = null;
