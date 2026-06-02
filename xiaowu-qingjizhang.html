@@ -228,7 +228,7 @@
 
     .tabs {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
       margin-bottom: 12px;
     }
@@ -419,57 +419,6 @@
       display: block;
       font-size: 15px;
       overflow-wrap: anywhere;
-    }
-
-    .voice-box {
-      display: grid;
-      gap: 10px;
-      text-align: center;
-      padding: 10px 0;
-    }
-
-    .mic {
-      width: 116px;
-      height: 116px;
-      margin: 0 auto;
-      border-radius: 50%;
-      border: 3px solid #2d241c;
-      background: #ffe3b6;
-      box-shadow: 8px 8px 0 rgba(45, 36, 28, .13);
-      position: relative;
-    }
-
-    .mic::before {
-      content: "";
-      position: absolute;
-      left: 39px;
-      top: 27px;
-      width: 36px;
-      height: 48px;
-      border: 4px solid #2d241c;
-      border-radius: 22px;
-      background: #fff;
-    }
-
-    .mic::after {
-      content: "";
-      position: absolute;
-      left: 55px;
-      top: 73px;
-      width: 4px;
-      height: 28px;
-      background: #2d241c;
-      box-shadow: -16px 20px 0 -1px #2d241c, 16px 20px 0 -1px #2d241c;
-    }
-
-    .mic.listening {
-      animation: pulse 1s ease-in-out infinite;
-      background: #ffd39b;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
     }
 
     .notice {
@@ -819,7 +768,6 @@
           <div class="tabs" role="tablist" aria-label="记账方式">
             <button class="entry-tab active" type="button" data-tab="manual">手动</button>
             <button class="entry-tab" type="button" data-tab="text">文字</button>
-            <button class="entry-tab" type="button" data-tab="voice">语音</button>
           </div>
 
           <div class="entry-pane active" id="manualPane">
@@ -861,15 +809,6 @@
             </div>
             <p class="hint">多笔可换行，或用顿号、逗号、分号隔开。按关键词识别分类，不使用 AI，不花钱。</p>
             <div class="preview" id="textPreview" aria-live="polite"></div>
-          </div>
-
-          <div class="entry-pane" id="voicePane">
-            <div class="voice-box">
-              <button class="mic" id="voiceBtn" type="button" aria-label="开始语音记账"></button>
-              <button class="secondary" id="startVoiceBtn" type="button">点我说一句</button>
-              <div class="notice" id="voiceNotice">说完后会先转成文字，再按文字识别规则预览。</div>
-              <div class="preview" id="voicePreview" aria-live="polite"></div>
-            </div>
           </div>
         </section>
 
@@ -990,9 +929,6 @@
         editType: "expense",
         editingId: null,
         pendingTextRecords: [],
-        pendingVoiceRecord: null,
-        speechRecognition: null,
-        isListening: false
       };
 
       const el = {
@@ -1003,10 +939,6 @@
         manualNote: document.getElementById("manualNote"),
         textInput: document.getElementById("textInput"),
         textPreview: document.getElementById("textPreview"),
-        voicePreview: document.getElementById("voicePreview"),
-        voiceNotice: document.getElementById("voiceNotice"),
-        voiceBtn: document.getElementById("voiceBtn"),
-        startVoiceBtn: document.getElementById("startVoiceBtn"),
         editModal: document.getElementById("editModal"),
         editForm: document.getElementById("editForm"),
         editCategory: document.getElementById("editCategory"),
@@ -1072,7 +1004,7 @@
           const parsed = parseTextInput(el.textInput.value);
           if (!parsed) return;
           state.pendingTextRecords = parsed.records;
-          renderPreview(el.textPreview, parsed.records, "text", parsed.failures);
+          renderPreview(el.textPreview, parsed.records, parsed.failures);
         });
 
         document.getElementById("clearTextBtn").addEventListener("click", () => {
@@ -1081,9 +1013,6 @@
           el.textPreview.classList.remove("active");
           el.textPreview.innerHTML = "";
         });
-
-        el.startVoiceBtn.addEventListener("click", startVoice);
-        el.voiceBtn.addEventListener("click", startVoice);
 
         document.getElementById("exportCsvBtn").addEventListener("click", exportAllCsv);
         document.getElementById("exportMonthBtn").addEventListener("click", exportMonthCsv);
@@ -1226,7 +1155,7 @@
           else failures.push(`第 ${index + 1} 条没有识别到金额：${entry}`);
         });
         if (!records.length) {
-          renderPreview(el.textPreview, [], "text", failures);
+          renderPreview(el.textPreview, [], failures);
           toast("没有识别到可保存的账目");
           return null;
         }
@@ -1330,7 +1259,7 @@
           .trim();
       }
 
-      function renderPreview(container, records, source, failures = []) {
+      function renderPreview(container, records, failures = []) {
         const list = Array.isArray(records) ? records : [records].filter(Boolean);
         container.classList.add("active");
         container.innerHTML = "";
@@ -1376,21 +1305,15 @@
         confirm.type = "button";
         confirm.textContent = list.length > 1 ? `全部保存 ${list.length} 笔` : "确认保存";
         confirm.addEventListener("click", () => {
-          const pending = source === "voice" ? (state.pendingVoiceRecord ? [state.pendingVoiceRecord] : []) : state.pendingTextRecords;
+          const pending = state.pendingTextRecords;
           if (!pending.length) return;
           state.records.unshift(...pending);
           persist();
           render();
-          if (source === "voice") {
-            state.pendingVoiceRecord = null;
-            el.voicePreview.classList.remove("active");
-            el.voicePreview.innerHTML = "";
-          } else {
-            state.pendingTextRecords = [];
-            el.textInput.value = "";
-            el.textPreview.classList.remove("active");
-            el.textPreview.innerHTML = "";
-          }
+          state.pendingTextRecords = [];
+          el.textInput.value = "";
+          el.textPreview.classList.remove("active");
+          el.textPreview.innerHTML = "";
           toast(pending.length > 1 ? `已保存 ${pending.length} 笔` : "已保存");
         });
         const cancel = document.createElement("button");
@@ -1398,51 +1321,12 @@
         cancel.type = "button";
         cancel.textContent = "取消";
         cancel.addEventListener("click", () => {
-          if (source === "voice") state.pendingVoiceRecord = null;
-          if (source === "text") state.pendingTextRecords = [];
+          state.pendingTextRecords = [];
           container.classList.remove("active");
           container.innerHTML = "";
         });
         actions.append(confirm, cancel);
         container.appendChild(actions);
-      }
-
-      function startVoice() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-          el.voiceNotice.textContent = "当前浏览器语音识别不稳定，请使用文字输入或手动记账。";
-          toast("当前浏览器语音识别不稳定，请使用文字输入或手动记账。");
-          return;
-        }
-        if (state.isListening && state.speechRecognition) {
-          state.speechRecognition.stop();
-          return;
-        }
-        const recognition = new SpeechRecognition();
-        recognition.lang = "zh-CN";
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-        state.speechRecognition = recognition;
-        state.isListening = true;
-        el.voiceBtn.classList.add("listening");
-        el.voiceNotice.textContent = "正在听，请说一句记账内容";
-        recognition.onresult = (event) => {
-          const text = event.results[0][0].transcript;
-          el.voiceNotice.textContent = `识别到：${text}`;
-          const parsed = parseSentence(text);
-          if (parsed) {
-            state.pendingVoiceRecord = parsed;
-            renderPreview(el.voicePreview, parsed, "voice");
-          }
-        };
-        recognition.onerror = () => {
-          el.voiceNotice.textContent = "当前浏览器语音识别不稳定，请使用文字输入或手动记账。";
-        };
-        recognition.onend = () => {
-          state.isListening = false;
-          el.voiceBtn.classList.remove("listening");
-        };
-        recognition.start();
       }
 
       function render() {
