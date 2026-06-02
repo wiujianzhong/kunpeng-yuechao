@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/kunpeng-yuechao/cent/sw.js', { scope: '/kunpeng-yuechao/cent/' })})}

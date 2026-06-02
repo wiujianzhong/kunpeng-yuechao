@@ -1,0 +1,1 @@
+import{a as e}from"./rolldown-runtime-COnpUsM8.js";import{v as t}from"./dndkit-DFWEzLie.js";var n=e(t(),1),r=(e,t)=>(Promise.resolve().then(()=>{e()}),(0,n.lazy)(async()=>(await t?.(),e())));export{r as t};
