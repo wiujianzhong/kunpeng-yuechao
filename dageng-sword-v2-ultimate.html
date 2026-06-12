@@ -630,6 +630,20 @@
             }, 500);
         }
 
+        const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const lowPowerDevice = isMobileDevice || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+        const PERF = {
+            pixelRatioCap: lowPowerDevice ? 1.15 : 1.5,
+            starCount: lowPowerDevice ? 360 : 560,
+            haloSparkCount: lowPowerDevice ? 180 : 280,
+            lightningLines: lowPowerDevice ? 28 : 42,
+            flowSampleStep: lowPowerDevice ? 8 : 5,
+            coreFlowSampleStep: lowPowerDevice ? 7 : 4,
+            handFrameInterval: lowPowerDevice ? 120 : 85,
+            cameraWidth: lowPowerDevice ? 256 : 320,
+            cameraHeight: lowPowerDevice ? 192 : 240
+        };
+
         const ALLOWED_SWORD_COUNTS = ['500', '800', '1000'];
         if(!ALLOWED_SWORD_COUNTS.includes(localStorage.getItem('swCount'))) localStorage.setItem('swCount', '500');
         document.getElementById('sword-count-select').value = localStorage.getItem('swCount');
@@ -741,7 +755,7 @@
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, PERF.pixelRatioCap));
         renderer.toneMapping = THREE.ReinhardToneMapping;
         renderer.toneMappingExposure = 1.6;
         renderer.setClearColor(0x000000, 0); 
@@ -832,7 +846,7 @@
 
         const particleTexture = createSpiritualGlowTexture();
 
-        const starCount = 800;
+        const starCount = PERF.starCount;
         const starGeo = new THREE.BufferGeometry();
         const starPositions = new Float32Array(starCount * 3);
         const starPhases = []; 
@@ -996,7 +1010,7 @@
         const instancedTrails = new THREE.InstancedMesh(trailGeometry, trailMat, TOTAL_SWORDS);
         scene.add(instancedTrails);
 
-        const maxLightningLines = 60;
+        const maxLightningLines = PERF.lightningLines;
         const lightningGeometry = new THREE.BufferGeometry();
         const lightningPositions = new Float32Array(maxLightningLines * 3 * 2 * 3); 
         lightningGeometry.setAttribute('position', new THREE.BufferAttribute(lightningPositions, 3));
@@ -1034,7 +1048,8 @@
                 randScale: 0.85 + Math.random() * 0.35,
                 isGreen: Math.random() > 0.5,
                 trailPower: 0,
-                currentScaleFactor: 1.0
+                currentScaleFactor: 1.0,
+                targetVel: new THREE.Vector3()
             });
         }
 
@@ -1097,7 +1112,7 @@
         scene.add(haloMesh);
         haloMesh.visible = false;
 
-        const haloSparkCount = 400; 
+        const haloSparkCount = PERF.haloSparkCount;
         const haloSparkGeo = new THREE.BufferGeometry();
         const haloSparkPositions = new Float32Array(haloSparkCount * 3);
         const haloSparkColors = new Float32Array(haloSparkCount * 3);
@@ -1155,9 +1170,10 @@
             let count = 0;
 
             const isAttackFlow = currentState === STATES.ATTACK;
+            const isCoreFlow = currentState === STATES.CORE;
             const activeLimit = TOTAL_SWORDS;
-            const flowStep = isAttackFlow ? 4 : 1;
-            const startJ = isAttackFlow ? index % flowStep : 0;
+            const flowStep = isAttackFlow ? 4 : (isCoreFlow ? PERF.coreFlowSampleStep : PERF.flowSampleStep);
+            const startJ = index % flowStep;
 
             for (let j = startJ; j < activeLimit; j += flowStep) {
                 if (j === index) continue;
@@ -1271,7 +1287,7 @@
 
             for (let i = 0; i < TOTAL_SWORDS; i++) {
                 const boid = boids[i];
-                let targetVel = new THREE.Vector3();
+                const targetVel = boid.targetVel.set(0, 0, 0);
                 let targetScaleFactor = 1.0; 
                 let boidTwistAngle = 0; 
 
@@ -1867,8 +1883,7 @@
         }
 
         const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
-        const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        hands.setOptions({ maxNumHands: 1, modelComplexity: isMobileDevice ? 0 : 1, minDetectionConfidence: 0.55, minTrackingConfidence: 0.55 });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: 0.55, minTrackingConfidence: 0.55 });
         hands.onResults(onResults);
 
         async function startCamera() {
@@ -1881,24 +1896,30 @@
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 320, height: 240, facingMode: "user" },
+                    video: { width: PERF.cameraWidth, height: PERF.cameraHeight, facingMode: "user" },
                     audio: false
                 });
                 videoElement.srcObject = stream;
                 await videoElement.play();
                 retryBtn.style.display = 'none';
 
-                const sendFrame = async () => {
-                    try {
-                        if (videoElement.readyState >= 2) {
+                let lastHandFrameAt = 0;
+                let handFrameBusy = false;
+                const sendFrame = async (now) => {
+                    if (!handFrameBusy && videoElement.readyState >= 2 && now - lastHandFrameAt >= PERF.handFrameInterval) {
+                        handFrameBusy = true;
+                        lastHandFrameAt = now;
+                        try {
                             await hands.send({ image: videoElement });
+                        } catch (err) {
+                            console.error(err);
+                        } finally {
+                            handFrameBusy = false;
                         }
-                    } catch (err) {
-                        console.error(err);
                     }
                     requestAnimationFrame(sendFrame);
                 };
-                sendFrame();
+                requestAnimationFrame(sendFrame);
 
                 setTimeout(() => {
                     if (loadingText.style.display !== 'none') finishLoading("当前阵法: 天眼启动中，自动游弋");
