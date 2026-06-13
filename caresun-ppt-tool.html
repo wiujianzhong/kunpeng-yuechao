@@ -105,8 +105,80 @@
             touch-action: none;
         }
     </style>
+
+<!-- ===== 激活弹窗样式 ===== -->
+<style>
+#activation-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    background: rgba(0,0,0,0.55);
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(3px);
+}
+#activation-overlay.hidden { display: none; }
+.activation-card {
+    background: #fff; border-radius: 16px; padding: 32px 28px;
+    max-width: 420px; width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
+}
+.activation-card h2 { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+.activation-card .subtitle { font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px; }
+.activation-card .logo-area { margin-bottom: 16px; }
+.activation-card .logo-area img { width: 48px; height: 48px; border-radius: 5px; }
+.machine-code-box {
+    background: #f1f5f9; border: 1px solid #e2e8f0;
+    border-radius: 10px; padding: 12px; margin-bottom: 16px;
+}
+.machine-code-box .label { font-size: 0.75rem; color: #64748b; margin-bottom: 6px; }
+.machine-code-box .code {
+    font-family: 'Courier New', monospace; font-size: 1rem;
+    font-weight: 700; color: #0f172a; letter-spacing: 1px; word-break: break-all;
+}
+.machine-code-copy-btn {
+    margin-top: 8px; font-size: 0.75rem; color: #3b82f6;
+    cursor: pointer; border: 1px solid #bfdbfe; border-radius: 6px;
+    padding: 4px 12px; background: #eff6ff; transition: all 0.2s;
+}
+.machine-code-copy-btn:hover { background: #dbeafe; }
+#activation-input {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid #e2e8f0; border-radius: 10px;
+    font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+    box-sizing: border-box; margin-bottom: 12px; text-align: center;
+}
+#activation-input:focus { border-color: #16a34a; }
+#activation-btn {
+    width: 100%; padding: 12px; background: #16a34a; color: #fff;
+    border: none; border-radius: 10px; font-size: 1rem;
+    font-weight: 600; cursor: pointer; transition: background 0.2s;
+}
+#activation-btn:hover { background: #15803d; }
+#activation-error {
+    color: #dc2626; font-size: 0.8rem; margin-top: 10px; display: none;
+}
+#activation-error.visible { display: block; }
+.activation-footer { font-size: 0.7rem; color: #94a3b8; margin-top: 16px; }
+</style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+<!-- ===== 激活弹窗 ===== -->
+<div id="activation-overlay">
+    <div class="activation-card">
+        <div class="logo-area">
+            <img src="data:image/jpeg;base64,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" alt="嘉新集团">
+        </div>
+        <h2>🔑 设备激活</h2>
+        <p class="subtitle">请先激活后使用工具</p>
+        <div class="machine-code-box">
+            <div class="label">📱 您的设备机器码</div>
+            <div class="code" id="machine-code-display">——</div>
+            <button class="machine-code-copy-btn" onclick="copyMachineCode()">📋 复制</button>
+        </div>
+        <input id="activation-input" type="text" placeholder="请输入管理员给您的激活码" autocomplete="off">
+        <button id="activation-btn" onclick="tryActivate()">激 活</button>
+        <div id="activation-error"></div>
+        <p class="activation-footer">每个设备拥有唯一机器码，激活码仅限该设备使用</p>
+    </div>
+</div>
     <div class="container mx-auto px-4 py-6 max-w-5xl">
         <!-- 标题 -->
         <div class="text-center mb-6">
@@ -1462,6 +1534,123 @@
             const m = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
             return `${y}-${m}-${day}`;
+        }
+
+        // ========== 激活码系统 ==========
+        const ACTIVATION_SECRET = 'jxw2026';
+        const ACTIVATION_KEY = 'jx_ppt_activation';
+
+        function getCanvasFingerprint() {
+            const c = document.createElement('canvas');
+            c.width = 200; c.height = 50;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 200, 50);
+            ctx.fillStyle = '#000';
+            ctx.font = '14px Arial';
+            ctx.fillText('KunpengYuechao2026', 10, 30);
+            return c.toDataURL();
+        }
+
+        function simpleHash(str) {
+            let hash = 5381;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) + hash) + str.charCodeAt(i);
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(36).toUpperCase().slice(0, 8);
+        }
+
+        function getMachineCode() {
+            const factors = [
+                navigator.userAgent,
+                navigator.platform,
+                screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
+                navigator.language,
+                navigator.hardwareConcurrency || '',
+                navigator.deviceMemory || '',
+                getCanvasFingerprint()
+            ];
+            return simpleHash(factors.join('|||'));
+        }
+
+        function computeActivationSignature(machineCode, expiryTimestamp) {
+            let hash = 5381;
+            const str = machineCode + '|' + expiryTimestamp + '|' + ACTIVATION_SECRET;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) + hash) + str.charCodeAt(i);
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(36);
+        }
+
+        function verifyActivationCode(code, machineCode) {
+            try {
+                const raw = decodeURIComponent(escape(atob(code)));
+                const obj = JSON.parse(raw);
+                if (obj.m !== machineCode) return { valid: false, reason: '该激活码不匹配此设备' };
+                const expectedSig = computeActivationSignature(obj.m, obj.e);
+                if (obj.s !== expectedSig) return { valid: false, reason: '激活码无效' };
+                if (Date.now() > obj.e) return { valid: false, reason: '激活码已过期' };
+                return { valid: true };
+            } catch(e) {
+                return { valid: false, reason: '激活码格式错误' };
+            }
+        }
+
+        (function() {
+            function checkActivation() {
+                const machineCode = getMachineCode();
+                const stored = localStorage.getItem(ACTIVATION_KEY);
+                if (stored) {
+                    try {
+                        const result = verifyActivationCode(stored, machineCode);
+                        if (result.valid) {
+                            document.getElementById('activation-overlay').classList.add('hidden');
+                            return;
+                        }
+                    } catch(e) {}
+                }
+                document.getElementById('machine-code-display').textContent = machineCode;
+                document.getElementById('activation-overlay').classList.remove('hidden');
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', checkActivation);
+            } else {
+                checkActivation();
+            }
+        })();
+
+        window.tryActivate = function() {
+            const machineCode = document.getElementById('machine-code-display').textContent;
+            const code = document.getElementById('activation-input').value.trim();
+            if (!code) { showActivationError('请输入激活码'); return; }
+            const result = verifyActivationCode(code, machineCode);
+            if (result.valid) {
+                localStorage.setItem(ACTIVATION_KEY, code);
+                document.getElementById('activation-error').classList.remove('visible');
+                document.getElementById('activation-overlay').classList.add('hidden');
+            } else {
+                showActivationError(result.reason);
+            }
+        };
+
+        window.copyMachineCode = function() {
+            const code = document.getElementById('machine-code-display').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.machine-code-copy-btn');
+                btn.textContent = '已复制 ✓';
+                setTimeout(() => btn.textContent = '📋 复制', 1500);
+            }).catch(() => {
+                const btn = document.querySelector('.machine-code-copy-btn');
+                btn.textContent = '已复制 ✓';
+                setTimeout(() => btn.textContent = '📋 复制', 1500);
+            });
+        };
+
+        function showActivationError(msg) {
+            const err = document.getElementById('activation-error');
+            err.textContent = '⚠️ ' + msg;
+            err.classList.add('visible');
         }
     </script>
 </body>
