@@ -478,9 +478,10 @@
                 if (!mediaPath) continue;
 
                 try {
+                    const box = parsePPTXXfrm(pic);
+                    if (box.w < 1 && box.h < 1) continue;
                     const image = await readPPTXImage(zip, mediaPath);
                     if (!image) continue;
-                    const box = parsePPTXXfrm(pic);
                     pictures.push({ ...box, image });
                 } catch (error) {
                     console.warn(`跳过无法读取的图片：${mediaPath}`, error);
@@ -1061,7 +1062,7 @@
                 return;
             }
 
-            const fileBaseName = await openFileNameDialog(COMPANY_COVER_TITLE);
+            const fileBaseName = await openFileNameDialog(buildDefaultFileName(issues));
             if (!fileBaseName) return;
             const cleanBaseName = cleanFileName(fileBaseName);
 
@@ -1131,6 +1132,7 @@
 
         function renderCompanySlide(pptx, slide, data) {
             const title = data.title || '';
+            const processName = (data.processName || '').trim();
             slide.background = { color: 'FFFFFF' };
 
             slide.addImage({
@@ -1148,6 +1150,17 @@
                 fill: { color: '70AD47' },
                 line: { color: '70AD47' }
             });
+            if (processName) {
+                slide.addText(processName, {
+                    x: 0.78, y: 0.34, w: 2.8, h: 0.38,
+                    fontFace: '微软雅黑',
+                    fontSize: 28,
+                    color: '70AD47',
+                    bold: true,
+                    align: 'left',
+                    valign: 'middle'
+                });
+            }
 
             drawImagePanel(pptx, slide, {
                 label: title,
@@ -1164,7 +1177,8 @@
                 placeholder: '整改后（待补充）',
                 x: 5.05, y: 1.04, w: 4.15, h: 4.02,
                 color: '2F7D32',
-                fill: 'F4FFF6'
+                fill: 'F4FFF6',
+                labelStyle: 'outline'
             });
 
             slide.addShape(pptx.ShapeType.rect, {
@@ -1235,37 +1249,44 @@
         }
 
         function drawImagePanel(pptx, slide, opt) {
-            const labelY = opt.y + opt.h - 0.44;
+            const isOutlineLabel = opt.labelStyle === 'outline';
+            const labelH = isOutlineLabel ? 0.62 : 0.44;
+            const labelGap = isOutlineLabel ? 0.14 : 0;
+            const labelInset = isOutlineLabel ? 0.12 : 0;
+            const labelX = opt.x + labelInset;
+            const labelW = opt.w - labelInset * 2;
+            const imgX = opt.x;
+            const imgY = opt.y;
+            const imgW = opt.w;
+            const imgH = opt.h - labelH - labelGap;
+            const labelY = opt.y + imgH + labelGap;
+
             if (opt.labelStyle === 'outline') {
                 slide.addShape(pptx.ShapeType.rect, {
-                    x: opt.x, y: labelY, w: opt.w, h: 0.44,
+                    x: labelX, y: labelY, w: labelW, h: labelH,
                     fill: { color: 'FFFFFF', transparency: 100 },
                     line: { color: '000000', width: 1 }
                 });
                 slide.addText(opt.label, {
-                    x: opt.x + 0.08, y: labelY + 0.06, w: opt.w - 0.16, h: 0.32,
+                    x: labelX + 0.08, y: labelY + 0.07, w: labelW - 0.16, h: labelH - 0.14,
                     fontFace: '汉仪旗黑',
-                    fontSize: 18, color: '000000',
+                    fontSize: 16, color: '000000',
                     align: 'center',
                     valign: 'middle',
                     fit: 'shrink'
                 });
             } else {
                 slide.addShape(pptx.ShapeType.rect, {
-                    x: opt.x, y: labelY, w: opt.w, h: 0.44,
+                    x: labelX, y: labelY, w: labelW, h: labelH,
                     fill: { color: opt.color },
                     line: { color: opt.color }
                 });
                 slide.addText(opt.label, {
-                    x: opt.x, y: labelY + 0.08, w: opt.w, h: 0.24,
+                    x: labelX, y: labelY + 0.08, w: labelW, h: 0.24,
                     fontSize: 15, color: 'FFFFFF', bold: true, align: 'center'
                 });
             }
 
-            const imgX = opt.x;
-            const imgY = opt.y;
-            const imgW = opt.w;
-            const imgH = opt.h - 0.44;
             if (opt.img) {
                 slide.addImage({
                     data: opt.img,
@@ -1352,7 +1373,7 @@
 
         function confirmFileNameDialog() {
             const input = document.getElementById('ppt-file-name');
-            const value = cleanFileName(input.value || `问题整改${formatToday()}`);
+            const value = cleanFileName(input.value || `问题整改汇总_${formatTodayCompact()}`);
             closeFileNameDialog(value);
         }
 
@@ -1400,7 +1421,22 @@
 
         function cleanFileName(name) {
             const safeName = name.replace(/[<>:"/\\|?*\u0000-\u001F]/g, '').trim();
-            return safeName.replace(/\.pptx$/i, '') || `问题整改${formatToday()}`;
+            return safeName.replace(/\.pptx$/i, '') || `问题整改汇总_${formatTodayCompact()}`;
+        }
+
+        function buildDefaultFileName(issues) {
+            const processName = issues
+                .map(issue => {
+                    const issueId = issue.id.replace('issue-', '');
+                    return document.getElementById(`process-${issueId}`)?.value.trim() || '';
+                })
+                .find(Boolean);
+            const dateText = formatTodayCompact();
+            return processName ? `(${processName})问题整改汇总_${dateText}` : `问题整改汇总_${dateText}`;
+        }
+
+        function formatTodayCompact() {
+            return formatToday().replace(/-/g, '');
         }
 
         function formatToday() {
