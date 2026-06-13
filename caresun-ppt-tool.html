@@ -1271,7 +1271,7 @@
                     line: { color: '000000', width: 1 }
                 });
                 slide.addText(opt.label, {
-                    x: labelX + 0.08, y: labelY + 0.07, w: labelW - 0.16, h: labelH - 0.14,
+                    x: labelX, y: labelY, w: labelW, h: labelH,
                     fontFace: '汉仪旗黑',
                     fontSize: 16, color: '000000',
                     align: 'center',
@@ -1285,8 +1285,11 @@
                     line: { color: opt.color }
                 });
                 slide.addText(opt.label, {
-                    x: labelX, y: labelY + 0.08, w: labelW, h: 0.24,
-                    fontSize: 15, color: 'FFFFFF', bold: true, align: 'center'
+                    x: labelX, y: labelY, w: labelW, h: labelH,
+                    fontSize: 15, color: 'FFFFFF', bold: true,
+                    align: 'center',
+                    valign: 'middle',
+                    fit: 'shrink'
                 });
             }
 
