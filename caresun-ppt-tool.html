@@ -1189,7 +1189,8 @@
                 color: '2F7D32',
                 fill: 'F4FFF6',
                 labelH: 0.62,
-                labelGap: 0.14
+                labelGap: 0.14,
+                labelTextBox: true
             });
 
             slide.addShape(pptx.ShapeType.rect, {
@@ -1279,18 +1280,28 @@
                     fit: 'shrink'
                 });
             } else {
-                slide.addShape(pptx.ShapeType.rect, {
-                    x: labelX, y: labelY, w: labelW, h: labelH,
-                    fill: { color: opt.color },
-                    line: { color: opt.color }
-                });
-                slide.addText(opt.label, {
+                const labelTextOpt = {
                     x: labelX, y: labelY, w: labelW, h: labelH,
                     fontSize: 15, color: 'FFFFFF', bold: true,
                     align: 'center',
                     valign: 'middle',
-                    fit: 'shrink'
-                });
+                    fit: 'shrink',
+                    margin: 0
+                };
+                if (opt.labelTextBox) {
+                    slide.addText(opt.label, {
+                        ...labelTextOpt,
+                        fill: { color: opt.color },
+                        line: { color: opt.color }
+                    });
+                } else {
+                    slide.addShape(pptx.ShapeType.rect, {
+                        x: labelX, y: labelY, w: labelW, h: labelH,
+                        fill: { color: opt.color },
+                        line: { color: opt.color }
+                    });
+                    slide.addText(opt.label, labelTextOpt);
+                }
             }
 
             if (opt.img) {
