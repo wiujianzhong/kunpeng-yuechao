@@ -227,7 +227,7 @@
                 </div>
             </div>
             <div id="batch-dropzone" data-paste-batch="true" tabindex="0" class="drop-zone rounded-lg p-8 text-center cursor-pointer outline-none">
-                <input type="file" id="batch-image" accept="image/*" multiple class="mobile-file-input" aria-hidden="true">
+                <input type="file" id="batch-image" accept="image/*,video/*" multiple class="mobile-file-input" aria-hidden="true">
                 <div id="batch-prompt">
                     <svg class="w-14 h-14 mx-auto text-blue-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -394,9 +394,9 @@
                 pptxInput.value = '';
             });
             setupDropZone(batchZone, (files) => {
-                const imageFiles = files.filter(f => f.type.startsWith('image/'));
-                if (imageFiles.length > 0) {
-                    handleBatchUpload(imageFiles);
+                const mediaFiles = files.filter(isImageOrVideoFile);
+                if (mediaFiles.length > 0) {
+                    handleBatchUpload(mediaFiles);
                 }
             });
             batchZone.addEventListener('mouseenter', () => setPasteTarget('batch', null));
@@ -417,14 +417,15 @@
 
         // 批量上传处理
         async function handleBatchUpload(files) {
-            const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+            const mediaFiles = Array.from(files).filter(isImageOrVideoFile);
+            if (mediaFiles.length === 0) return;
             removeEmptyIssues();
-            const imageDataUrls = await Promise.all(imageFiles.map(readImageFile));
-            imageDataUrls.forEach(dataUrl => {
+            const mediaItems = await Promise.all(mediaFiles.map(readMediaFile));
+            mediaItems.forEach(item => {
                 const issueId = addEmptyIssue();
-                window[`beforeImage-${issueId}`] = dataUrl;
-                batchImages.push(dataUrl);
-                updateImagePreview(issueId, 'before', dataUrl);
+                setIssueMedia(issueId, 'before', item.kind, item.data, item.name);
+                batchImages.push(item.data);
+                updateImagePreview(issueId, 'before', item.data, item.kind);
             });
             updateBatchPreview();
             renumberIssues();
@@ -743,6 +744,56 @@
             return processImage(file);
         }
 
+        function isImageFile(file) {
+            return file?.type?.startsWith('image/');
+        }
+
+        function isVideoFile(file) {
+            return file?.type?.startsWith('video/');
+        }
+
+        function isImageOrVideoFile(file) {
+            return isImageFile(file) || isVideoFile(file);
+        }
+
+        async function readMediaFile(file) {
+            if (isVideoFile(file)) {
+                return { kind: 'video', data: await readVideoFile(file), name: file.name || '' };
+            }
+            return { kind: 'image', data: await readImageFile(file), name: file.name || '' };
+        }
+
+        function readVideoFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function isVideoDataUrl(dataUrl) {
+            return String(dataUrl || '').startsWith('data:video/');
+        }
+
+        function setIssueMedia(issueId, type, kind, dataUrl, name = '') {
+            if (kind === 'video') {
+                delete window[`${type}Image-${issueId}`];
+                window[`${type}Video-${issueId}`] = dataUrl;
+                window[`${type}VideoName-${issueId}`] = name;
+                return;
+            }
+            delete window[`${type}Video-${issueId}`];
+            delete window[`${type}VideoName-${issueId}`];
+            window[`${type}Image-${issueId}`] = dataUrl;
+        }
+
+        function clearIssueMedia(issueId, type) {
+            delete window[`${type}Image-${issueId}`];
+            delete window[`${type}Video-${issueId}`];
+            delete window[`${type}VideoName-${issueId}`];
+        }
+
         async function compressAllImages(options = {}) {
             const imageRefs = getUploadedImageRefs();
             if (imageRefs.length === 0) {
@@ -824,7 +875,9 @@
             document.querySelectorAll('[id^="issue-"]').forEach(issue => {
                 const issueId = issue.id.replace('issue-', '');
                 const beforeImg = window[`beforeImage-${issueId}`];
+                const beforeVideo = window[`beforeVideo-${issueId}`];
                 if (beforeImg) batchImages.push(beforeImg);
+                if (beforeVideo) batchImages.push(beforeVideo);
             });
             if (batchImages.length > 0) updateBatchPreview();
         }
@@ -884,7 +937,7 @@
                                 整改前
                             </div>
                             <div id="before-zone-${issueId}" data-paste-image="true" data-issue-id="${issueId}" data-image-type="before" tabindex="0" class="drop-zone drop-zone-before rounded-lg p-4 text-center cursor-pointer min-h-[190px] flex items-center justify-center relative overflow-hidden outline-none">
-                                <input type="file" id="before-file-${issueId}" accept="image/*" class="mobile-file-input" aria-hidden="true">
+                                <input type="file" id="before-file-${issueId}" accept="image/*,video/*" class="mobile-file-input" aria-hidden="true">
                                 <div id="before-prompt-${issueId}">
                                     <svg class="w-8 h-8 mx-auto text-red-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
@@ -894,6 +947,7 @@
                                 </div>
                                 <div id="before-preview-${issueId}" class="hidden single-preview">
                                     <img id="before-img-${issueId}" class="image-preview">
+                                    <video id="before-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
                                     <div class="preview-actions">
                                         <p class="preview-status text-xs text-red-600 font-semibold">已上传</p>
                                         <button type="button" onclick="clearSingleImage(event, ${issueId}, 'before')" class="px-2 py-1 text-xs rounded border border-red-200 bg-white text-red-600 hover:bg-red-50">清除</button>
@@ -909,7 +963,7 @@
                                 整改后
                             </div>
                             <div id="after-zone-${issueId}" data-paste-image="true" data-issue-id="${issueId}" data-image-type="after" tabindex="0" class="drop-zone drop-zone-after rounded-lg p-4 text-center cursor-pointer min-h-[190px] flex items-center justify-center relative overflow-hidden outline-none">
-                                <input type="file" id="after-file-${issueId}" accept="image/*" class="mobile-file-input" aria-hidden="true">
+                                <input type="file" id="after-file-${issueId}" accept="image/*,video/*" class="mobile-file-input" aria-hidden="true">
                                 <div id="after-prompt-${issueId}">
                                     <svg class="w-8 h-8 mx-auto text-green-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
@@ -919,6 +973,7 @@
                                 </div>
                                 <div id="after-preview-${issueId}" class="hidden single-preview">
                                     <img id="after-img-${issueId}" class="image-preview">
+                                    <video id="after-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
                                     <div class="preview-actions">
                                         <p class="preview-status text-xs text-green-600 font-semibold">已上传</p>
                                         <button type="button" onclick="clearSingleImage(event, ${issueId}, 'after')" class="px-2 py-1 text-xs rounded border border-green-200 bg-white text-green-600 hover:bg-green-50">清除</button>
@@ -953,8 +1008,9 @@
                     openMobileFilePicker(issueId, type);
                 });
                 setupDropZone(zone, (files) => {
-                    if (files.length > 0 && files[0].type.startsWith('image/')) {
-                        handleSingleUpload(issueId, type, files[0]);
+                    const file = files.find(isImageOrVideoFile);
+                    if (file) {
+                        handleSingleUpload(issueId, type, file);
                     }
                 });
             });
@@ -1051,6 +1107,19 @@
         // 单个图片上传
         function handleSingleUpload(issueId, type, file) {
             if (!file) return;
+            if (isVideoFile(file)) {
+                readVideoFile(file)
+                    .then(dataUrl => {
+                        setIssueMedia(issueId, type, 'video', dataUrl, file.name || '');
+                        updateImagePreview(issueId, type, dataUrl, 'video');
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert(`视频读取失败：${getErrorMessage(error)}`);
+                    });
+                return;
+            }
+            if (!isImageFile(file)) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
@@ -1060,8 +1129,8 @@
                     c.height = img.naturalHeight;
                     c.getContext('2d').drawImage(img, 0, 0);
                     const dataUrl = c.toDataURL('image/jpeg', 0.95);
-                    window[`${type}Image-${issueId}`] = dataUrl;
-                    updateImagePreview(issueId, type, dataUrl);
+                    setIssueMedia(issueId, type, 'image', dataUrl, file.name || '');
+                    updateImagePreview(issueId, type, dataUrl, 'image');
                 };
                 img.src = e.target.result;
             };
@@ -1069,18 +1138,49 @@
         }
 
         // 更新预览
-        function updateImagePreview(issueId, type, dataUrl) {
+        function updateImagePreview(issueId, type, dataUrl, kind = isVideoDataUrl(dataUrl) ? 'video' : 'image') {
+            const img = document.getElementById(`${type}-img-${issueId}`);
+            const video = document.getElementById(`${type}-video-${issueId}`);
             document.getElementById(`${type}-prompt-${issueId}`).classList.add('hidden');
             document.getElementById(`${type}-preview-${issueId}`).classList.remove('hidden');
-            document.getElementById(`${type}-img-${issueId}`).src = dataUrl;
+            if (kind === 'video') {
+                if (img) {
+                    img.removeAttribute('src');
+                    img.classList.add('hidden');
+                }
+                if (video) {
+                    video.src = dataUrl;
+                    video.classList.remove('hidden');
+                    video.load();
+                }
+            } else {
+                if (video) {
+                    video.pause();
+                    video.removeAttribute('src');
+                    video.load();
+                    video.classList.add('hidden');
+                }
+                if (img) {
+                    img.src = dataUrl;
+                    img.classList.remove('hidden');
+                }
+            }
             document.getElementById(`${type}-zone-${issueId}`).classList.add('uploaded');
         }
 
         function clearSingleImage(event, issueId, type) {
             event.preventDefault();
             event.stopPropagation();
-            delete window[`${type}Image-${issueId}`];
-            document.getElementById(`${type}-img-${issueId}`).removeAttribute('src');
+            clearIssueMedia(issueId, type);
+            document.getElementById(`${type}-img-${issueId}`)?.removeAttribute('src');
+            const video = document.getElementById(`${type}-video-${issueId}`);
+            if (video) {
+                video.pause();
+                video.removeAttribute('src');
+                video.load();
+                video.classList.add('hidden');
+            }
+            document.getElementById(`${type}-img-${issueId}`)?.classList.remove('hidden');
             document.getElementById(`${type}-preview-${issueId}`).classList.add('hidden');
             document.getElementById(`${type}-prompt-${issueId}`).classList.remove('hidden');
             document.getElementById(`${type}-zone-${issueId}`).classList.remove('uploaded');
@@ -1093,15 +1193,17 @@
             document.getElementById('batch-dropzone').classList.add('uploaded');
             document.getElementById('batch-thumbs').innerHTML = batchImages
                 .slice(-12)
-                .map(src => `<img class="batch-thumb" src="${src}" alt="已上传图片缩略图">`)
+                .map(src => isVideoDataUrl(src)
+                    ? `<video class="batch-thumb" src="${src}" muted playsinline></video>`
+                    : `<img class="batch-thumb" src="${src}" alt="已上传图片缩略图">`)
                 .join('');
         }
 
         // 删除问题项
         function removeIssue(issueId) {
             document.getElementById(`issue-${issueId}`)?.remove();
-            delete window[`beforeImage-${issueId}`];
-            delete window[`afterImage-${issueId}`];
+            clearIssueMedia(issueId, 'before');
+            clearIssueMedia(issueId, 'after');
             renumberIssues();
         }
 
@@ -1112,7 +1214,9 @@
                 const title = document.getElementById(`title-${issueId}`)?.value.trim();
                 const beforeImg = window[`beforeImage-${issueId}`];
                 const afterImg = window[`afterImage-${issueId}`];
-                if (!processName && !title && !beforeImg && !afterImg) {
+                const beforeVideo = window[`beforeVideo-${issueId}`];
+                const afterVideo = window[`afterVideo-${issueId}`];
+                if (!processName && !title && !beforeImg && !afterImg && !beforeVideo && !afterVideo) {
                     issue.remove();
                 }
             });
@@ -1173,12 +1277,16 @@
                     const title = document.getElementById(`title-${issueId}`)?.value || '';
                     const beforeImg = window[`beforeImage-${issueId}`];
                     const afterImg = window[`afterImage-${issueId}`];
+                    const beforeVideo = window[`beforeVideo-${issueId}`];
+                    const afterVideo = window[`afterVideo-${issueId}`];
+                    const beforeVideoName = window[`beforeVideoName-${issueId}`];
+                    const afterVideoName = window[`afterVideoName-${issueId}`];
                     
                     const slide = pptx.addSlide();
                     if (templateMode === 'company') {
-                        renderCompanySlide(pptx, slide, { processName, title, beforeImg, afterImg, pageNum, total: issues.length });
+                        renderCompanySlide(pptx, slide, { processName, title, beforeImg, afterImg, beforeVideo, afterVideo, beforeVideoName, afterVideoName, pageNum, total: issues.length });
                     } else {
-                        renderDefaultSlide(pptx, slide, { processName, title, beforeImg, afterImg, pageNum, total: issues.length });
+                        renderDefaultSlide(pptx, slide, { processName, title, beforeImg, afterImg, beforeVideo, afterVideo, beforeVideoName, afterVideoName, pageNum, total: issues.length });
                     }
                 }
                 
@@ -1247,6 +1355,8 @@
             drawImagePanel(pptx, slide, {
                 label: title,
                 img: data.beforeImg,
+                video: data.beforeVideo,
+                videoName: data.beforeVideoName,
                 placeholder: '整改前图片',
                 x: 0.7, y: 1.18, w: 4.15, h: 4.1,
                 color: 'C53030',
@@ -1256,6 +1366,8 @@
             drawImagePanel(pptx, slide, {
                 label: '整改后',
                 img: data.afterImg,
+                video: data.afterVideo,
+                videoName: data.afterVideoName,
                 placeholder: '整改后（待补充）',
                 x: 5.05, y: 1.18, w: 4.15, h: 4.1,
                 color: '2F7D32',
@@ -1286,6 +1398,8 @@
             drawImagePanel(pptx, slide, {
                 label: '整改前',
                 img: data.beforeImg,
+                video: data.beforeVideo,
+                videoName: data.beforeVideoName,
                 placeholder: '整改前图片',
                 x: 0.7, y: 0.78, w: 4.15, h: 4.52,
                 color: 'DC2626',
@@ -1294,6 +1408,8 @@
             drawImagePanel(pptx, slide, {
                 label: '整改后',
                 img: data.afterImg,
+                video: data.afterVideo,
+                videoName: data.afterVideoName,
                 placeholder: '整改后（待补充）',
                 x: 5.05, y: 0.78, w: 4.15, h: 4.52,
                 color: '16A34A',
@@ -1382,6 +1498,13 @@
                     x: imgX, y: imgY, w: imgW, h: imgH,
                     sizing: { type: 'cover', x: imgX, y: imgY, w: imgW, h: imgH }
                 });
+            } else if (opt.video) {
+                slide.addMedia({
+                    type: 'video',
+                    data: normalizeMediaData(opt.video),
+                    extn: getVideoExtension(opt.videoName, opt.video),
+                    x: imgX, y: imgY, w: imgW, h: imgH
+                });
             } else {
                 slide.addShape(pptx.ShapeType.rect, {
                     x: imgX, y: imgY, w: imgW, h: imgH,
@@ -1393,6 +1516,20 @@
                     fontSize: 15, color: opt.color, align: 'center'
                 });
             }
+        }
+
+        function normalizeMediaData(dataUrl) {
+            return String(dataUrl || '').replace(/^data:/, '');
+        }
+
+        function getVideoExtension(name, dataUrl) {
+            const fromName = String(name || '').match(/\.([a-z0-9]+)$/i)?.[1];
+            if (fromName) return fromName.toLowerCase();
+            const mime = String(dataUrl || '').match(/^data:video\/([^;,]+)/i)?.[1]?.toLowerCase();
+            if (!mime) return 'mp4';
+            if (mime.includes('quicktime')) return 'mov';
+            if (mime.includes('x-m4v')) return 'm4v';
+            return mime.split('+')[0];
         }
 
         async function savePPT(pptx, fileName) {
