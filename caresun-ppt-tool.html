@@ -157,6 +157,25 @@
 }
 #activation-error.visible { display: block; }
 .activation-footer { font-size: 0.7rem; color: #94a3b8; margin-top: 16px; }
+#trial-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: #fff; border: none; border-radius: 10px;
+    font-size: 1.05rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; margin-bottom: 4px;
+    box-shadow: 0 3px 10px rgba(249,115,22,0.35);
+}
+#trial-btn:hover { background: linear-gradient(135deg, #ea580c, #dc2626); transform: translateY(-1px); }
+#trial-btn:active { transform: translateY(0px); }
+.divider-line {
+    display: flex; align-items: center; gap: 10px;
+    margin: 12px 0; color: #94a3b8; font-size: 0.8rem;
+}
+.divider-line::before, .divider-line::after {
+    content: ''; flex: 1; height: 1px; background: #e2e8f0;
+}
+.trial-success-text { font-size: 0.85rem; color: #16a34a; margin-top: 8px; display: none; }
+.trial-success-text.visible { display: block; }
 </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -173,10 +192,12 @@
             <div class="code" id="machine-code-display">——</div>
             <button class="machine-code-copy-btn" onclick="copyMachineCode()">📋 复制</button>
         </div>
-        <input id="activation-input" type="text" placeholder="请输入管理员给您的激活码" autocomplete="off">
+        <input id="activation-input" type="text" placeholder="请输入管理员给的激活码" autocomplete="off">
         <button id="activation-btn" onclick="tryActivate()">激 活</button>
         <div id="activation-error"></div>
-        <p class="activation-footer">每个设备拥有唯一机器码，激活码仅限该设备使用</p>
+        <button id="trial-btn" onclick="startFreeTrial()">🎉 免费体验7天</button>
+        <div class="divider-line"><span>或</span></div>
+        <p class="activation-footer">👆 新用户点上方免费体验 · 已有激活码则输入激活</p>
     </div>
 </div>
     <div class="container mx-auto px-4 py-6 max-w-5xl">
@@ -1676,6 +1697,7 @@
         // ========== 激活码系统 ==========
         const ACTIVATION_SECRET = 'jxw2026';
         const ACTIVATION_KEY = 'jx_ppt_activation';
+        const TRIAL_KEY = 'jx_ppt_trial';
 
         function getCanvasFingerprint() {
             const c = document.createElement('canvas');
@@ -1737,6 +1759,18 @@
         (function() {
             function checkActivation() {
                 const machineCode = getMachineCode();
+                // Check free trial first
+                const trialData = localStorage.getItem(TRIAL_KEY);
+                if (trialData) {
+                    try {
+                        const trial = JSON.parse(trialData);
+                        if (Date.now() < trial.expiry) {
+                            document.getElementById('activation-overlay').classList.add('hidden');
+                            return;
+                        }
+                    } catch(e) {}
+                }
+                // Then check activation code
                 const stored = localStorage.getItem(ACTIVATION_KEY);
                 if (stored) {
                     try {
@@ -1756,6 +1790,15 @@
                 checkActivation();
             }
         })();
+
+        window.startFreeTrial = function() {
+            const trial = {
+                start: Date.now(),
+                expiry: Date.now() + 7 * 24 * 60 * 60 * 1000
+            };
+            localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
+            document.getElementById('activation-overlay').classList.add('hidden');
+        };
 
         window.tryActivate = function() {
             const machineCode = document.getElementById('machine-code-display').textContent;
