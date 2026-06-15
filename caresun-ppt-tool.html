@@ -511,6 +511,13 @@
                     // 导入PPT后，右边描述默认填"已整改"
                     const rightDesc = document.getElementById(`rightDesc-${issueId}`);
                     if (rightDesc) rightDesc.value = '已整改';
+                    // 如果从PPT中提取到了工序，自动填入下拉框
+                    if (item.processName) {
+                        const processEl = document.getElementById(`process-${issueId}`);
+                        if (processEl) {
+                            processEl.value = item.processName;
+                        }
+                    }
                     batchImages.push(item.image);
                     updateImagePreview(issueId, 'left', item.image);
                 });
@@ -601,11 +608,18 @@
                 }
             }
 
+            // 提取顶部工序文字（位于所有图片上方的文本）
+            const minImageY = pictures.length > 0 ? Math.min(...pictures.map(p => p.y)) : Infinity;
+            const topTexts = texts.filter(t => t.cy < minImageY);
+            const processName = topTexts.length > 0
+                ? topTexts.sort((a, b) => a.y - b.y)[0].text
+                : '';
+
             return pictures
                 .sort((a, b) => a.x - b.x)
                 .map(pic => {
                     const text = findPPTXDescriptionText(pic, texts);
-                    return { image: pic.image, title: text?.text || '' };
+                    return { image: pic.image, title: text?.text || '', processName };
                 });
         }
 
@@ -1430,9 +1444,10 @@
                 drawDescriptionBox(pptx, slide, {
                     title: processName,
                     x: 0.7, y: 0.24, w: 8.6, h: 0.46,
-                    textColor: '000000',
-                    textFontSize: 22,
-                    noBox: true
+                    fill: 'F0FDF4',
+                    line: '70AD47',
+                    textColor: '166534',
+                    textFontSize: 22
                 });
             }
 
