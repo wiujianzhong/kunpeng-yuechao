@@ -508,6 +508,9 @@
                     const issueId = addEmptyIssue();
                     setIssueMedia(issueId, 'left', 'image', item.image);
                     document.getElementById(`leftDesc-${issueId}`).value = item.title || '';
+                    // 导入PPT后，右边描述默认填"已整改"
+                    const rightDesc = document.getElementById(`rightDesc-${issueId}`);
+                    if (rightDesc) rightDesc.value = '已整改';
                     batchImages.push(item.image);
                     updateImagePreview(issueId, 'left', item.image);
                 });
@@ -1575,42 +1578,44 @@
         async function savePPT(pptx, fileName) {
             const blob = await pptx.write({ outputType: 'blob' });
 
-            if (window.showSaveFilePicker) {
+            // 方案一：iOS/移动端用 Web Share API 分享文件（支持桌面快捷方式打开的独立模式）
+            if (navigator.share && /iPad|iPhone|iPod|Android/i.test(navigator.userAgent)) {
                 try {
-                    const handle = await window.showSaveFilePicker({
-                        suggestedName: fileName,
-                        startIn: 'desktop',
-                        types: [{
-                            description: 'PowerPoint 文件',
-                            accept: {
-                                'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx']
-                            }
-                        }]
+                    const file = new File([blob], fileName, {
+                        type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
                     });
-                    const writable = await handle.createWritable();
-                    await writable.write(blob);
-                    await writable.close();
+                    await navigator.share({ files: [file], title: fileName });
                     alert(`已生成：${fileName}`);
                     return;
-                } catch (error) {
-                    if (error?.name === 'AbortError') throw error;
-                    console.warn('选择桌面保存失败，改用浏览器下载。', error);
+                } catch (e) {
+                    if (e?.name === 'AbortError') throw e;
+                    console.warn('分享失败，改用浏览器下载。', e);
                 }
             }
 
+            // 方案二：普通浏览器下载（桌面/安卓/苹果正常浏览器）
             downloadBlob(blob, fileName);
-            alert(`已生成：${fileName}\n已改用浏览器下载，请到下载目录查看。`);
+            alert(`已生成：${fileName}，请到下载目录查看（苹果手机在「文件」App → 下载项）`);
         }
 
         function downloadBlob(blob, fileName) {
             const url = URL.createObjectURL(blob);
+            // 方法A：<a> 标签点击下载（桌面/安卓通用）
             const link = document.createElement('a');
             link.href = url;
             link.download = fileName;
             document.body.appendChild(link);
             link.click();
-            link.remove();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            document.body.removeChild(link);
+            // 方法B：新窗口打开（兼容iOS桌面快捷方式独立模式，作为后备）
+            setTimeout(() => {
+                const w = window.open(url, '_blank');
+                if (!w) {
+                    // 如果弹窗被拦截，用 location.href 降级
+                    // 注意：只有用户主动操作触发的才行
+                }
+            }, 200);
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
         }
 
         function getErrorMessage(error) {
