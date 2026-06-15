@@ -506,6 +506,11 @@
                 removeEmptyIssues();
                 items.forEach(item => {
                     const issueId = addEmptyIssue();
+                    // 导入拆解后，右边占位改为"整改后"提示
+                    const rightPrompt = document.getElementById(`right-prompt-${issueId}`);
+                    if (rightPrompt) {
+                        rightPrompt.innerHTML = '<p class="text-xs text-slate-400 font-medium mt-2">整改后</p><p class="text-xs text-slate-300 mt-0.5">请添加整改后照片</p>';
+                    }
                     setIssueMedia(issueId, 'left', 'image', item.image);
                     document.getElementById(`leftDesc-${issueId}`).value = item.title || '';
                     // 导入PPT后，右边描述默认填"已整改"
