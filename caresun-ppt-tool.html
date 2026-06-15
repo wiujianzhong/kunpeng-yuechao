@@ -195,9 +195,11 @@
         <input id="activation-input" type="text" placeholder="请输入管理员给的激活码" autocomplete="off">
         <button id="activation-btn" onclick="tryActivate()">激 活</button>
         <div id="activation-error"></div>
-        <button id="trial-btn" onclick="startFreeTrial()">🎉 免费体验7天</button>
-        <div class="divider-line"><span>或</span></div>
-        <p class="activation-footer">👆 新用户点上方免费体验 · 已有激活码则输入激活</p>
+        <div id="trial-section">
+            <button id="trial-btn" onclick="startFreeTrial()">🎉 免费体验7天</button>
+            <div class="divider-line"><span>或</span></div>
+        </div>
+        <p class="activation-footer" id="activation-footer-text">👆 新用户点上方免费体验 · 已有激活码则输入激活</p>
     </div>
 </div>
     <div class="container mx-auto px-4 py-6 max-w-5xl">
@@ -1782,7 +1784,48 @@
                     } catch(e) {}
                 }
                 document.getElementById('machine-code-display').textContent = machineCode;
-                document.getElementById('activation-overlay').classList.remove('hidden');
+                // 先别显示弹窗，等IndexedDB查完再说（防闪屏）
+                checkIDBThenShow();
+            }
+            // IndexedDB查完才决定显不显示弹窗
+            function checkIDBThenShow() {
+                try {
+                    const r = indexedDB.open('jx_ppt_data', 1);
+                    r.onupgradeneeded = e => e.target.result.createObjectStore('store');
+                    r.onsuccess = e => {
+                        const tx = e.target.result.transaction('store', 'readonly');
+                        const req = tx.objectStore('store').get('trial');
+                        req.onsuccess = function() {
+                            const trial = this.result;
+                            const overlay = document.getElementById('activation-overlay');
+                            if (trial && Date.now() < trial.expiry) {
+                                // IndexedDB有有效试用 → 恢复到localStorage，不弹窗
+                                if (!localStorage.getItem(TRIAL_KEY)) {
+                                    localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
+                                }
+                                overlay.classList.add('hidden');
+                            } else if (trial && Date.now() >= trial.expiry) {
+                                // 试用过期 → 弹窗，隐藏体验按钮
+                                const sec = document.getElementById('trial-section');
+                                if (sec) sec.style.display = 'none';
+                                document.getElementById('activation-footer-text').textContent = '⏰ 免费体验已到期 · 请联系管理员激活';
+                                overlay.classList.remove('hidden');
+                            } else {
+                                // 没有试用记录 → 弹窗，显示体验按钮
+                                document.getElementById('activation-footer-text').textContent = '👆 新用户点上方免费体验 · 已有激活码则输入激活';
+                                overlay.classList.remove('hidden');
+                            }
+                        };
+                        req.onerror = () => {
+                            document.getElementById('activation-overlay').classList.remove('hidden');
+                        };
+                    };
+                    r.onerror = () => {
+                        document.getElementById('activation-overlay').classList.remove('hidden');
+                    };
+                } catch(e) {
+                    document.getElementById('activation-overlay').classList.remove('hidden');
+                }
             }
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', checkActivation);
@@ -1797,6 +1840,15 @@
                 expiry: Date.now() + 7 * 24 * 60 * 60 * 1000
             };
             localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
+            // 同时存入IndexedDB（防止清缓存失效）
+            try {
+                const r = indexedDB.open('jx_ppt_data', 1);
+                r.onupgradeneeded = e => e.target.result.createObjectStore('store');
+                r.onsuccess = e => {
+                    const tx = e.target.result.transaction('store', 'readwrite');
+                    tx.objectStore('store').put(trial, 'trial');
+                };
+            } catch(e) {}
             document.getElementById('activation-overlay').classList.add('hidden');
         };
 
