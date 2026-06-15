@@ -21,21 +21,34 @@
             border-color: #3b82f6;
             background-color: #eff6ff;
         }
-        .drop-zone-before {
-            border-color: #f87171;
-            background-color: #fef2f2;
+        .drop-zone-left,
+        .drop-zone-right {
+            border-color: #cbd5e1;
+            background-color: #f8fafc;
         }
-        .drop-zone-before.drag-over {
-            border-color: #dc2626;
-            background-color: #fee2e2;
+        .drop-zone-left.drag-over,
+        .drop-zone-right.drag-over {
+            border-color: #2563eb;
+            background-color: #eff6ff;
         }
-        .drop-zone-after {
-            border-color: #4ade80;
-            background-color: #f0fdf4;
+        .media-slot {
+            width: 100%;
         }
-        .drop-zone-after.drag-over {
-            border-color: #16a34a;
-            background-color: #dcfce7;
+        .media-drop-area {
+            min-height: 220px;
+            height: 220px;
+        }
+        .issue-desc-input {
+            width: 100%;
+            min-height: 44px;
+            resize: vertical;
+            font-size: 0.875rem;
+            line-height: 1.45;
+        }
+        @media (max-width: 767px) {
+            .media-drop-area {
+                height: 210px;
+            }
         }
         .image-preview {
             width: 100%;
@@ -241,7 +254,7 @@
         <!-- 批量上传区 -->
         <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-                <h2 class="text-lg font-semibold text-gray-700">📸 批量上传整改前图片</h2>
+                <h2 class="text-lg font-semibold text-gray-700">📸 批量上传图片</h2>
                 <div class="flex flex-col sm:flex-row gap-2">
                     <input type="file" id="pptx-import" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" class="hidden">
                     <button type="button" id="import-pptx-btn" onclick="triggerPPTXImport()" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-blue-200 bg-blue-50 text-sm font-semibold text-blue-700 hover:bg-blue-100 transition-all">
@@ -258,7 +271,7 @@
                     <p class="desktop-upload-note text-gray-600 font-medium">拖拽或粘贴图片到此处</p>
                     <p class="mobile-upload-note text-gray-600 font-medium">点此选择相册图片</p>
                     <p class="desktop-upload-note text-sm text-gray-400 mt-1">拖拽可一次放多张，自动生成对应页数PPT</p>
-                    <p class="mobile-upload-note text-sm text-gray-400 mt-1">可一次选择多张整改前图片，自动生成对应页数PPT</p>
+                    <p class="mobile-upload-note text-sm text-gray-400 mt-1">可一次选择多张图片，自动生成对应页数PPT</p>
                 </div>
                 <div id="batch-uploaded" class="hidden">
                     <p class="text-green-600 font-semibold">已上传 <span id="batch-count">0</span> 张</p>
@@ -444,12 +457,19 @@
             if (mediaFiles.length === 0) return;
             removeEmptyIssues();
             const mediaItems = await Promise.all(mediaFiles.map(readMediaFile));
-            mediaItems.forEach(item => {
+            for (let i = 0; i < mediaItems.length; i += 2) {
                 const issueId = addEmptyIssue();
-                setIssueMedia(issueId, 'before', item.kind, item.data, item.name);
-                batchImages.push(item.data);
-                updateImagePreview(issueId, 'before', item.data, item.kind);
-            });
+                const leftItem = mediaItems[i];
+                const rightItem = mediaItems[i + 1];
+                setIssueMedia(issueId, 'left', leftItem.kind, leftItem.data, leftItem.name);
+                batchImages.push(leftItem.data);
+                updateImagePreview(issueId, 'left', leftItem.data, leftItem.kind);
+                if (rightItem) {
+                    setIssueMedia(issueId, 'right', rightItem.kind, rightItem.data, rightItem.name);
+                    batchImages.push(rightItem.data);
+                    updateImagePreview(issueId, 'right', rightItem.data, rightItem.kind);
+                }
+            }
             updateBatchPreview();
             renumberIssues();
         }
@@ -486,10 +506,10 @@
                 removeEmptyIssues();
                 items.forEach(item => {
                     const issueId = addEmptyIssue();
-                    window[`beforeImage-${issueId}`] = item.image;
-                    document.getElementById(`title-${issueId}`).value = item.title || '';
+                    setIssueMedia(issueId, 'left', 'image', item.image);
+                    document.getElementById(`leftDesc-${issueId}`).value = item.title || '';
                     batchImages.push(item.image);
-                    updateImagePreview(issueId, 'before', item.image);
+                    updateImagePreview(issueId, 'left', item.image);
                 });
                 updateBatchPreview();
                 renumberIssues();
@@ -861,7 +881,7 @@
             const refs = [];
             document.querySelectorAll('[id^="issue-"]').forEach(issue => {
                 const issueId = issue.id.replace('issue-', '');
-                ['before', 'after'].forEach(type => {
+                ['left', 'right'].forEach(type => {
                     const key = `${type}Image-${issueId}`;
                     if (window[key]) refs.push({ issueId, type, key });
                 });
@@ -897,10 +917,14 @@
             batchImages.length = 0;
             document.querySelectorAll('[id^="issue-"]').forEach(issue => {
                 const issueId = issue.id.replace('issue-', '');
-                const beforeImg = window[`beforeImage-${issueId}`];
-                const beforeVideo = window[`beforeVideo-${issueId}`];
-                if (beforeImg) batchImages.push(beforeImg);
-                if (beforeVideo) batchImages.push(beforeVideo);
+                const leftImg = window[`leftImage-${issueId}`];
+                const rightImg = window[`rightImage-${issueId}`];
+                const leftVideo = window[`leftVideo-${issueId}`];
+                const rightVideo = window[`rightVideo-${issueId}`];
+                if (leftImg) batchImages.push(leftImg);
+                if (leftVideo) batchImages.push(leftVideo);
+                if (rightImg) batchImages.push(rightImg);
+                if (rightVideo) batchImages.push(rightVideo);
             });
             if (batchImages.length > 0) updateBatchPreview();
         }
@@ -934,9 +958,8 @@
                         </button>
                     </div>
                     
-                    <!-- 工序和问题描述 -->
-                    <div class="mb-3 flex flex-col md:flex-row gap-2">
-                        <select id="process-${issueId}" class="w-full md:w-40 flex-none px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
+                    <div class="mb-3">
+                        <select id="process-${issueId}" class="w-full md:w-40 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
                             <option value="">工序（可选）</option>
                             <option value="清梳">清梳</option>
                             <option value="精梳">精梳</option>
@@ -949,60 +972,51 @@
                             <option value="6s 检查">6s 检查</option>
                             <option value="安全检查">安全检查</option>
                         </select>
-                        <input type="text" id="title-${issueId}" placeholder="问题描述（可选）" class="w-full flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <!-- 整改前 -->
-                        <div>
-                            <div class="text-sm font-medium text-red-600 mb-2 flex items-center gap-1">
-                                <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-                                整改前
-                            </div>
-                            <div id="before-zone-${issueId}" data-paste-image="true" data-issue-id="${issueId}" data-image-type="before" tabindex="0" class="drop-zone drop-zone-before rounded-lg p-4 text-center cursor-pointer min-h-[190px] flex items-center justify-center relative overflow-hidden outline-none">
-                                <input type="file" id="before-file-${issueId}" accept="image/*,video/*" class="mobile-file-input" aria-hidden="true">
-                                <div id="before-prompt-${issueId}">
-                                    <svg class="w-8 h-8 mx-auto text-red-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="media-slot">
+                            <div id="left-zone-${issueId}" data-paste-image="true" data-issue-id="${issueId}" data-image-type="left" tabindex="0" class="drop-zone drop-zone-left media-drop-area rounded-lg p-4 text-center cursor-pointer flex items-center justify-center relative overflow-hidden outline-none">
+                                <input type="file" id="left-file-${issueId}" accept="image/*,video/*" class="mobile-file-input" aria-hidden="true">
+                                <div id="left-prompt-${issueId}">
+                                    <svg class="w-8 h-8 mx-auto text-slate-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
                                     </svg>
-                                    <p class="desktop-upload-note text-xs text-red-400">拖拽或粘贴</p>
-                                    <p class="mobile-upload-note text-xs text-red-400">点此选择单张</p>
+                                    <p class="desktop-upload-note text-xs text-slate-400">拖拽或粘贴</p>
+                                    <p class="mobile-upload-note text-xs text-slate-400">点此选择单张</p>
                                 </div>
-                                <div id="before-preview-${issueId}" class="hidden single-preview">
-                                    <img id="before-img-${issueId}" class="image-preview">
-                                    <video id="before-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
+                                <div id="left-preview-${issueId}" class="hidden single-preview">
+                                    <img id="left-img-${issueId}" class="image-preview">
+                                    <video id="left-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
                                     <div class="preview-actions">
-                                        <p class="preview-status text-xs text-red-600 font-semibold">已上传</p>
-                                        <button type="button" onclick="clearSingleImage(event, ${issueId}, 'before')" class="px-2 py-1 text-xs rounded border border-red-200 bg-white text-red-600 hover:bg-red-50">清除</button>
+                                        <p class="preview-status text-xs text-slate-600 font-semibold">已上传</p>
+                                        <button type="button" onclick="clearSingleImage(event, ${issueId}, 'left')" class="px-2 py-1 text-xs rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">清除</button>
                                     </div>
                                 </div>
                             </div>
+                            <textarea id="leftDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input mt-2 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
                         </div>
                         
-                        <!-- 整改后 -->
-                        <div>
-                            <div class="text-sm font-medium text-green-600 mb-2 flex items-center gap-1">
-                                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                                整改后
-                            </div>
-                            <div id="after-zone-${issueId}" data-paste-image="true" data-issue-id="${issueId}" data-image-type="after" tabindex="0" class="drop-zone drop-zone-after rounded-lg p-4 text-center cursor-pointer min-h-[190px] flex items-center justify-center relative overflow-hidden outline-none">
-                                <input type="file" id="after-file-${issueId}" accept="image/*,video/*" class="mobile-file-input" aria-hidden="true">
-                                <div id="after-prompt-${issueId}">
-                                    <svg class="w-8 h-8 mx-auto text-green-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="media-slot">
+                            <div id="right-zone-${issueId}" data-paste-image="true" data-issue-id="${issueId}" data-image-type="right" tabindex="0" class="drop-zone drop-zone-right media-drop-area rounded-lg p-4 text-center cursor-pointer flex items-center justify-center relative overflow-hidden outline-none">
+                                <input type="file" id="right-file-${issueId}" accept="image/*,video/*" class="mobile-file-input" aria-hidden="true">
+                                <div id="right-prompt-${issueId}">
+                                    <svg class="w-8 h-8 mx-auto text-slate-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
                                     </svg>
-                                    <p class="desktop-upload-note text-xs text-green-400">拖拽或粘贴（可选）</p>
-                                    <p class="mobile-upload-note text-xs text-green-400">点此选择单张（可选）</p>
+                                    <p class="desktop-upload-note text-xs text-slate-400">拖拽或粘贴</p>
+                                    <p class="mobile-upload-note text-xs text-slate-400">点此选择单张</p>
                                 </div>
-                                <div id="after-preview-${issueId}" class="hidden single-preview">
-                                    <img id="after-img-${issueId}" class="image-preview">
-                                    <video id="after-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
+                                <div id="right-preview-${issueId}" class="hidden single-preview">
+                                    <img id="right-img-${issueId}" class="image-preview">
+                                    <video id="right-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
                                     <div class="preview-actions">
-                                        <p class="preview-status text-xs text-green-600 font-semibold">已上传</p>
-                                        <button type="button" onclick="clearSingleImage(event, ${issueId}, 'after')" class="px-2 py-1 text-xs rounded border border-green-200 bg-white text-green-600 hover:bg-green-50">清除</button>
+                                        <p class="preview-status text-xs text-slate-600 font-semibold">已上传</p>
+                                        <button type="button" onclick="clearSingleImage(event, ${issueId}, 'right')" class="px-2 py-1 text-xs rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">清除</button>
                                     </div>
                                 </div>
                             </div>
+                            <textarea id="rightDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input mt-2 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
                         </div>
                     </div>
                 </div>
@@ -1016,7 +1030,7 @@
 
         // 设置单个拖拽
         function setupSingleDragDrop(issueId) {
-            ['before', 'after'].forEach(type => {
+            ['left', 'right'].forEach(type => {
                 const zone = document.getElementById(`${type}-zone-${issueId}`);
                 const input = document.getElementById(`${type}-file-${issueId}`);
                 input.addEventListener('change', () => {
@@ -1225,8 +1239,8 @@
         // 删除问题项
         function removeIssue(issueId) {
             document.getElementById(`issue-${issueId}`)?.remove();
-            clearIssueMedia(issueId, 'before');
-            clearIssueMedia(issueId, 'after');
+            clearIssueMedia(issueId, 'left');
+            clearIssueMedia(issueId, 'right');
             renumberIssues();
         }
 
@@ -1234,12 +1248,13 @@
             document.querySelectorAll('[id^="issue-"]').forEach(issue => {
                 const issueId = issue.id.replace('issue-', '');
                 const processName = document.getElementById(`process-${issueId}`)?.value.trim();
-                const title = document.getElementById(`title-${issueId}`)?.value.trim();
-                const beforeImg = window[`beforeImage-${issueId}`];
-                const afterImg = window[`afterImage-${issueId}`];
-                const beforeVideo = window[`beforeVideo-${issueId}`];
-                const afterVideo = window[`afterVideo-${issueId}`];
-                if (!processName && !title && !beforeImg && !afterImg && !beforeVideo && !afterVideo) {
+                const leftDesc = document.getElementById(`leftDesc-${issueId}`)?.value.trim();
+                const rightDesc = document.getElementById(`rightDesc-${issueId}`)?.value.trim();
+                const leftImg = window[`leftImage-${issueId}`];
+                const rightImg = window[`rightImage-${issueId}`];
+                const leftVideo = window[`leftVideo-${issueId}`];
+                const rightVideo = window[`rightVideo-${issueId}`];
+                if (!processName && !leftDesc && !rightDesc && !leftImg && !rightImg && !leftVideo && !rightVideo) {
                     issue.remove();
                 }
             });
@@ -1297,19 +1312,20 @@
                     pageNum++;
                     const issueId = issue.id.replace('issue-', '');
                     const processName = document.getElementById(`process-${issueId}`)?.value || '';
-                    const title = document.getElementById(`title-${issueId}`)?.value || '';
-                    const beforeImg = window[`beforeImage-${issueId}`];
-                    const afterImg = window[`afterImage-${issueId}`];
-                    const beforeVideo = window[`beforeVideo-${issueId}`];
-                    const afterVideo = window[`afterVideo-${issueId}`];
-                    const beforeVideoName = window[`beforeVideoName-${issueId}`];
-                    const afterVideoName = window[`afterVideoName-${issueId}`];
+                    const leftDesc = document.getElementById(`leftDesc-${issueId}`)?.value || '';
+                    const rightDesc = document.getElementById(`rightDesc-${issueId}`)?.value || '';
+                    const leftImg = window[`leftImage-${issueId}`];
+                    const rightImg = window[`rightImage-${issueId}`];
+                    const leftVideo = window[`leftVideo-${issueId}`];
+                    const rightVideo = window[`rightVideo-${issueId}`];
+                    const leftVideoName = window[`leftVideoName-${issueId}`];
+                    const rightVideoName = window[`rightVideoName-${issueId}`];
                     
                     const slide = pptx.addSlide();
                     if (templateMode === 'company') {
-                        renderCompanySlide(pptx, slide, { processName, title, beforeImg, afterImg, beforeVideo, afterVideo, beforeVideoName, afterVideoName, pageNum, total: issues.length });
+                        renderCompanySlide(pptx, slide, { processName, leftImg, leftDesc, rightImg, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
                     } else {
-                        renderDefaultSlide(pptx, slide, { processName, title, beforeImg, afterImg, beforeVideo, afterVideo, beforeVideoName, afterVideoName, pageNum, total: issues.length });
+                        renderDefaultSlide(pptx, slide, { processName, leftImg, leftDesc, rightImg, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
                     }
                 }
                 
@@ -1344,7 +1360,6 @@
         }
 
         function renderCompanySlide(pptx, slide, data) {
-            const title = data.title || '';
             const processName = (data.processName || '').trim();
             slide.background = { color: 'FFFFFF' };
 
@@ -1376,28 +1391,26 @@
             }
 
             drawImagePanel(pptx, slide, {
-                label: title,
-                img: data.beforeImg,
-                video: data.beforeVideo,
-                videoName: data.beforeVideoName,
-                placeholder: '整改前图片',
+                label: data.leftDesc || '',
+                img: data.leftImg,
+                video: data.leftVideo,
+                videoName: data.leftVideoName,
+                placeholder: '图片',
                 x: 0.7, y: 1.18, w: 4.15, h: 4.1,
-                color: 'C53030',
-                fill: 'FFF7F7',
+                color: '64748B',
+                fill: 'F8FAFC',
                 labelStyle: 'outline'
             });
             drawImagePanel(pptx, slide, {
-                label: '整改后',
-                img: data.afterImg,
-                video: data.afterVideo,
-                videoName: data.afterVideoName,
-                placeholder: '整改后（待补充）',
+                label: data.rightDesc || '',
+                img: data.rightImg,
+                video: data.rightVideo,
+                videoName: data.rightVideoName,
+                placeholder: '图片',
                 x: 5.05, y: 1.18, w: 4.15, h: 4.1,
-                color: '2F7D32',
-                fill: 'F4FFF6',
-                labelH: 0.62,
-                labelGap: 0.14,
-                labelTextBox: true
+                color: '64748B',
+                fill: 'F8FAFC',
+                labelStyle: 'outline'
             });
 
             slide.addShape(pptx.ShapeType.rect, {
@@ -1408,35 +1421,39 @@
         }
 
         function renderDefaultSlide(pptx, slide, data) {
-            const title = data.title || `问题整改对比 ${data.pageNum}`;
+            const processName = (data.processName || '').trim();
             slide.background = { color: 'FFFFFF' };
-            drawDescriptionBox(pptx, slide, {
-                title,
-                x: 0.7, y: 0.24, w: 8.6, h: 0.46,
-                textColor: '000000',
-                textFontSize: 22,
-                noBox: true
-            });
+            if (processName) {
+                drawDescriptionBox(pptx, slide, {
+                    title: processName,
+                    x: 0.7, y: 0.24, w: 8.6, h: 0.46,
+                    textColor: '000000',
+                    textFontSize: 22,
+                    noBox: true
+                });
+            }
 
             drawImagePanel(pptx, slide, {
-                label: '整改前',
-                img: data.beforeImg,
-                video: data.beforeVideo,
-                videoName: data.beforeVideoName,
-                placeholder: '整改前图片',
+                label: data.leftDesc || '',
+                img: data.leftImg,
+                video: data.leftVideo,
+                videoName: data.leftVideoName,
+                placeholder: '图片',
                 x: 0.7, y: 0.78, w: 4.15, h: 4.52,
-                color: 'DC2626',
-                fill: 'FFF1F2'
+                color: '64748B',
+                fill: 'F8FAFC',
+                labelStyle: 'outline'
             });
             drawImagePanel(pptx, slide, {
-                label: '整改后',
-                img: data.afterImg,
-                video: data.afterVideo,
-                videoName: data.afterVideoName,
-                placeholder: '整改后（待补充）',
+                label: data.rightDesc || '',
+                img: data.rightImg,
+                video: data.rightVideo,
+                videoName: data.rightVideoName,
+                placeholder: '图片',
                 x: 5.05, y: 0.78, w: 4.15, h: 4.52,
-                color: '16A34A',
-                fill: 'ECFDF5'
+                color: '64748B',
+                fill: 'F8FAFC',
+                labelStyle: 'outline'
             });
 
             slide.addText(`${data.pageNum} / ${data.total}`, {
@@ -1700,6 +1717,7 @@
         const ACTIVATION_SECRET = 'jxw2026';
         const ACTIVATION_KEY = 'jx_ppt_activation';
         const TRIAL_KEY = 'jx_ppt_trial';
+        const TRIAL_FINGERPRINT_PREFIX = 'trialFingerprint-';
 
         function getCanvasFingerprint() {
             const c = document.createElement('canvas');
@@ -1758,6 +1776,74 @@
             }
         }
 
+        function getTrialFingerprint() {
+            const factors = [
+                navigator.userAgent || '',
+                `${screen.width}x${screen.height}x${screen.colorDepth}`,
+                Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+                navigator.language || ''
+            ];
+            return simpleHash(factors.join('|||'));
+        }
+
+        function getTrialFingerprintKey() {
+            return `${TRIAL_FINGERPRINT_PREFIX}${getTrialFingerprint()}`;
+        }
+
+        function openActivationDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('jx_ppt_data', 1);
+                request.onupgradeneeded = e => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('store')) {
+                        db.createObjectStore('store');
+                    }
+                };
+                request.onsuccess = e => resolve(e.target.result);
+                request.onerror = () => reject(request.error || new Error('IndexedDB打开失败'));
+            });
+        }
+
+        async function getActivationDBValue(key) {
+            const db = await openActivationDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('store', 'readonly');
+                const req = tx.objectStore('store').get(key);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error || new Error('IndexedDB读取失败'));
+                tx.oncomplete = () => db.close();
+                tx.onerror = () => db.close();
+            });
+        }
+
+        async function putActivationDBValue(key, value) {
+            const db = await openActivationDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('store', 'readwrite');
+                tx.objectStore('store').put(value, key);
+                tx.oncomplete = () => {
+                    db.close();
+                    resolve();
+                };
+                tx.onerror = () => {
+                    db.close();
+                    reject(tx.error || new Error('IndexedDB写入失败'));
+                };
+            });
+        }
+
+        function showTrialSection(message) {
+            const sec = document.getElementById('trial-section');
+            if (sec) sec.style.display = '';
+            document.getElementById('activation-footer-text').textContent = message || '👆 新用户点上方免费体验 · 已有激活码则输入激活';
+        }
+
+        function hideTrialSection(message) {
+            const sec = document.getElementById('trial-section');
+            if (sec) sec.style.display = 'none';
+            document.getElementById('activation-footer-text').textContent = message;
+        }
+
         (function() {
             function checkActivation() {
                 const machineCode = getMachineCode();
@@ -1788,41 +1874,29 @@
                 checkIDBThenShow();
             }
             // IndexedDB查完才决定显不显示弹窗
-            function checkIDBThenShow() {
+            async function checkIDBThenShow() {
                 try {
-                    const r = indexedDB.open('jx_ppt_data', 1);
-                    r.onupgradeneeded = e => e.target.result.createObjectStore('store');
-                    r.onsuccess = e => {
-                        const tx = e.target.result.transaction('store', 'readonly');
-                        const req = tx.objectStore('store').get('trial');
-                        req.onsuccess = function() {
-                            const trial = this.result;
-                            const overlay = document.getElementById('activation-overlay');
-                            if (trial && Date.now() < trial.expiry) {
-                                // IndexedDB有有效试用 → 恢复到localStorage，不弹窗
-                                if (!localStorage.getItem(TRIAL_KEY)) {
-                                    localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
-                                }
-                                overlay.classList.add('hidden');
-                            } else if (trial && Date.now() >= trial.expiry) {
-                                // 试用过期 → 弹窗，隐藏体验按钮
-                                const sec = document.getElementById('trial-section');
-                                if (sec) sec.style.display = 'none';
-                                document.getElementById('activation-footer-text').textContent = '⏰ 免费体验已到期 · 请联系管理员激活';
-                                overlay.classList.remove('hidden');
-                            } else {
-                                // 没有试用记录 → 弹窗，显示体验按钮
-                                document.getElementById('activation-footer-text').textContent = '👆 新用户点上方免费体验 · 已有激活码则输入激活';
-                                overlay.classList.remove('hidden');
-                            }
-                        };
-                        req.onerror = () => {
-                            document.getElementById('activation-overlay').classList.remove('hidden');
-                        };
-                    };
-                    r.onerror = () => {
-                        document.getElementById('activation-overlay').classList.remove('hidden');
-                    };
+                    const trial = await getActivationDBValue('trial');
+                    const fingerprintRecord = await getActivationDBValue(getTrialFingerprintKey());
+                    const overlay = document.getElementById('activation-overlay');
+                    if (trial && Date.now() < trial.expiry) {
+                        // IndexedDB有有效试用 → 恢复到localStorage，不弹窗
+                        if (!localStorage.getItem(TRIAL_KEY)) {
+                            localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
+                        }
+                        overlay.classList.add('hidden');
+                    } else if (trial && Date.now() >= trial.expiry) {
+                        // 试用过期 → 弹窗，隐藏体验按钮
+                        hideTrialSection('⏰ 免费体验已到期 · 请联系管理员激活');
+                        overlay.classList.remove('hidden');
+                    } else if (fingerprintRecord) {
+                        hideTrialSection('⏰ 此设备已领取过免费体验 · 请联系管理员激活');
+                        overlay.classList.remove('hidden');
+                    } else {
+                        // 没有试用记录 → 弹窗，显示体验按钮
+                        showTrialSection();
+                        overlay.classList.remove('hidden');
+                    }
                 } catch(e) {
                     document.getElementById('activation-overlay').classList.remove('hidden');
                 }
@@ -1834,22 +1908,44 @@
             }
         })();
 
-        window.startFreeTrial = function() {
+        window.startFreeTrial = async function() {
+            const btn = document.getElementById('trial-btn');
+            const oldText = btn?.textContent;
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '正在开通...';
+            }
+            const fingerprint = getTrialFingerprint();
+            const fingerprintKey = getTrialFingerprintKey();
+            const start = Date.now();
             const trial = {
-                start: Date.now(),
-                expiry: Date.now() + 7 * 24 * 60 * 60 * 1000
+                start,
+                expiry: start + 7 * 24 * 60 * 60 * 1000,
+                fingerprint
             };
-            localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
-            // 同时存入IndexedDB（防止清缓存失效）
             try {
-                const r = indexedDB.open('jx_ppt_data', 1);
-                r.onupgradeneeded = e => e.target.result.createObjectStore('store');
-                r.onsuccess = e => {
-                    const tx = e.target.result.transaction('store', 'readwrite');
-                    tx.objectStore('store').put(trial, 'trial');
-                };
-            } catch(e) {}
-            document.getElementById('activation-overlay').classList.add('hidden');
+                const localTrial = localStorage.getItem(TRIAL_KEY);
+                const idbTrial = await getActivationDBValue('trial');
+                const fingerprintRecord = await getActivationDBValue(fingerprintKey);
+                if (localTrial || idbTrial || fingerprintRecord) {
+                    hideTrialSection('⏰ 此设备已领取过免费体验 · 请联系管理员激活');
+                    showActivationError('此设备已领取过免费体验，请联系管理员激活');
+                    return;
+                }
+
+                localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
+                await putActivationDBValue('trial', trial);
+                await putActivationDBValue(fingerprintKey, { fingerprint, start });
+                document.getElementById('activation-error').classList.remove('visible');
+                document.getElementById('activation-overlay').classList.add('hidden');
+            } catch(e) {
+                showActivationError('免费体验记录写入失败，请刷新后重试或联系管理员激活');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = oldText || '🎉 免费体验7天';
+                }
+            }
         };
 
         window.tryActivate = function() {
