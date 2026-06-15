@@ -1737,10 +1737,22 @@
         }
 
         // ========== 激活码系统 ==========
+        const SERVER_URL = 'https://constitutes-mercy-covers-price.trycloudflare.com';
         const ACTIVATION_SECRET = 'jxw2026';
         const ACTIVATION_KEY = 'jx_ppt_activation';
         const TRIAL_KEY = 'jx_ppt_trial';
         const TRIAL_FINGERPRINT_PREFIX = 'trialFingerprint-';
+
+        async function serverTrialCheck(fingerprint) {
+            try {
+                const r = await fetch(SERVER_URL + '/api/trial/check', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ fingerprint })
+                });
+                return await r.json();
+            } catch(e) { return null; }
+        }
 
         function getCanvasFingerprint() {
             const c = document.createElement('canvas');
@@ -1955,6 +1967,9 @@
                     showActivationError('此设备已领取过免费体验，请联系管理员激活');
                     return;
                 }
+
+                // 同时向服务器注册（服务器离线不影响本地试用）
+                serverTrialCheck(fingerprint);
 
                 localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
                 await putActivationDBValue('trial', trial);
