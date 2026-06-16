@@ -213,6 +213,22 @@
             <div class="divider-line"><span>或</span></div>
         </div>
         <p class="activation-footer" id="activation-footer-text">👆 新用户点上方免费体验 · 已有激活码则输入激活</p>
+        <div style="text-align:center;margin-top:8px;"><a href="javascript:void(0)" onclick="toggleAdminPanel()" style="font-size:11px;color:#999;text-decoration:none;">⚙ 管理员</a></div>
+    </div>
+</div>
+<!-- ===== 激活码生成器（管理员） ===== -->
+<div id="admin-generator" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:420px;width:90%;">
+        <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:8px;">🔐 激活码生成器</h3>
+        <p style="font-size:0.8rem;color:#888;margin-bottom:14px;">输入对方机器码，生成激活码</p>
+        <input id="admin-machine-input" type="text" placeholder="粘贴对方机器码" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:0.95rem;margin-bottom:10px;box-sizing:border-box;">
+        <input id="admin-password-input" type="password" placeholder="管理员密码" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:0.95rem;margin-bottom:12px;box-sizing:border-box;">
+        <button onclick="generateActivationCode()" style="width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:0.95rem;cursor:pointer;margin-bottom:10px;">生成激活码</button>
+        <textarea id="admin-output" readonly rows="2" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:0.8rem;resize:none;margin-bottom:8px;box-sizing:border-box;background:#f9fafb;" placeholder="生成的激活码会显示在这里"></textarea>
+        <div style="display:flex;gap:8px;">
+            <button onclick="copyAdminOutput()" style="flex:1;padding:8px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;cursor:pointer;font-size:0.85rem;">📋 复制</button>
+            <button onclick="closeAdminPanel()" style="flex:1;padding:8px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;cursor:pointer;font-size:0.85rem;">关闭</button>
+        </div>
     </div>
 </div>
     <div class="container mx-auto px-4 py-6 max-w-5xl">
@@ -1736,23 +1752,11 @@
             return `${y}-${m}-${day}`;
         }
 
-        // ========== 激活码系统 ==========
-        const SERVER_URL = 'https://constitutes-mercy-covers-price.trycloudflare.com';
+        // ========== 激活码系统（纯前端，无后端） ==========
         const ACTIVATION_SECRET = 'jxw2026';
         const ACTIVATION_KEY = 'jx_ppt_activation';
         const TRIAL_KEY = 'jx_ppt_trial';
         const TRIAL_FINGERPRINT_PREFIX = 'trialFingerprint-';
-
-        async function serverTrialCheck(fingerprint) {
-            try {
-                const r = await fetch(SERVER_URL + '/api/trial/check', {
-                    method: 'POST',
-                    headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ fingerprint })
-                });
-                return await r.json();
-            } catch(e) { return null; }
-        }
 
         function getCanvasFingerprint() {
             const c = document.createElement('canvas');
@@ -1968,9 +1972,6 @@
                     return;
                 }
 
-                // 同时向服务器注册（服务器离线不影响本地试用）
-                serverTrialCheck(fingerprint);
-
                 localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
                 await putActivationDBValue('trial', trial);
                 await putActivationDBValue(fingerprintKey, { fingerprint, start });
@@ -2017,6 +2018,36 @@
             const err = document.getElementById('activation-error');
             err.textContent = '⚠️ ' + msg;
             err.classList.add('visible');
+        }
+
+        // ===== 管理员激活码生成器 =====
+        function toggleAdminPanel() {
+            const panel = document.getElementById('admin-generator');
+            panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+        }
+        function closeAdminPanel() {
+            document.getElementById('admin-generator').style.display = 'none';
+        }
+        function generateActivationCode() {
+            const machineCode = document.getElementById('admin-machine-input').value.trim();
+            const password = document.getElementById('admin-password-input').value.trim();
+            if (!machineCode) { alert('请输入机器码'); return; }
+            if (password !== 'jxw2026') { alert('管理员密码错误'); return; }
+            const expiry = Date.now() + 365 * 24 * 60 * 60 * 1000;
+            const sig = (function(mc, exp) {
+                let h = 5381;
+                const s = mc + '|' + exp + '|jxw2026';
+                for (let i = 0; i < s.length; i++) { h = ((h << 5) + h) + s.charCodeAt(i); h = h & h; }
+                return Math.abs(h).toString(36);
+            })(machineCode, expiry);
+            const obj = { m: machineCode, e: expiry, s: sig };
+            const code = btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+            document.getElementById('admin-output').value = code;
+        }
+        function copyAdminOutput() {
+            const ta = document.getElementById('admin-output');
+            ta.select();
+            navigator.clipboard.writeText(ta.value).then(() => alert('已复制')).catch(() => alert('复制失败，请手动选择复制'));
         }
     </script>
 </body>
