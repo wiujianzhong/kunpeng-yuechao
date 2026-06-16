@@ -3,200 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>嘉新集团 - 激活码管理后台</title>
+    <title>激活码生成器 · 小伍工坊</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%);
             min-height: 100vh;
         }
-        .code-box {
-            font-family: 'Courier New', monospace;
-            word-break: break-all;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+        .card {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.5);
         }
-        .auth-box {
-            max-width: 480px;
-        }
+        .copy-btn { transition: all 0.2s; }
+        .copy-btn:active { transform: scale(0.97); }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
-    <!-- 密码验证 -->
-    <div id="login-screen" class="auth-box w-full">
-        <div class="bg-white rounded-xl shadow-2xl overflow-hidden border-t-4 border-blue-600">
-            <div class="p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-2">🔑 激活码管理</h3>
-                <p class="text-sm text-gray-500 mb-4">仅限管理员使用</p>
-                <div class="mb-3">
-                    <label class="block text-sm font-medium text-gray-600 mb-2">账户</label>
-                    <input id="admin-username" type="text" value="xiaowu" class="w-full px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-gray-50 text-gray-400 cursor-not-allowed" readonly>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-600 mb-2">密码</label>
-                    <input id="admin-password" type="password" placeholder="请输入管理密码" class="w-full px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                    <p id="login-error" class="text-xs text-red-500 mt-2 hidden">⚠️ 账户或密码错误！</p>
-                </div>
-                <button onclick="adminLogin()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow transition-all">进入</button>
-            </div>
+    <div class="card w-full max-w-md rounded-2xl shadow-lg p-8">
+        <!-- 标题 -->
+        <div class="text-center mb-6">
+            <div class="text-3xl mb-2">🔐</div>
+            <h1 class="text-xl font-bold text-gray-800">激活码生成器</h1>
+            <p class="text-sm text-gray-500 mt-1">输入对方机器码，生成激活码</p>
         </div>
-    </div>
 
-    <!-- 生成器主界面 -->
-    <div id="generator-screen" class="hidden w-full max-w-2xl">
-        <div class="bg-white rounded-xl shadow-2xl overflow-hidden border-t-4 border-green-600">
-            <div class="p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-800">🔑 激活码管理</h3>
-                        <p class="text-sm text-gray-400">输入用户机器码，生成激活码</p>
-                    </div>
-                    <button onclick="adminLogout()" class="text-xs text-gray-400 hover:text-red-500 border border-gray-200 px-3 py-1 rounded">退出</button>
-                </div>
+        <!-- 机器码输入 -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">对方机器码</label>
+            <input id="machine-input" type="text" placeholder="粘贴对方给的机器码"
+                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-white/70">
+        </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-600 mb-2">用户机器码</label>
-                    <textarea id="input-machine-codes" rows="3" placeholder="粘贴用户发给您的机器码（可一次粘贴多个，每行一个）" class="w-full px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none font-mono text-sm"></textarea>
-                </div>
+        <!-- 管理员密码 -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">管理员密码</label>
+            <input id="pwd-input" type="password" placeholder="输入管理员密码"
+                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-white/70">
+        </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-600 mb-2">有效期</label>
-                    <div class="flex flex-wrap gap-2">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="expiry" value="7" checked class="hidden peer">
-                            <div class="border border-gray-200 rounded-lg px-4 py-2 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 transition-all text-sm">7天试用</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="expiry" value="30" class="hidden peer">
-                            <div class="border border-gray-200 rounded-lg px-4 py-2 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 transition-all text-sm">30天</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="expiry" value="365" class="hidden peer">
-                            <div class="border border-gray-200 rounded-lg px-4 py-2 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 transition-all text-sm">365天</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="expiry" value="9999" checked class="hidden peer">
-                            <div class="border border-gray-200 rounded-lg px-4 py-2 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 transition-all text-sm">永久</div>
-                        </label>
-                    </div>
-                </div>
+        <!-- 有效期 -->
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-1">有效期</label>
+            <select id="expiry-select"
+                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-white/70">
+                <option value="7">7天</option>
+                <option value="30">30天</option>
+                <option value="90">90天</option>
+                <option value="365" selected>1年</option>
+                <option value="9999">永久</option>
+            </select>
+        </div>
 
-                <button onclick="generateCodes()" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow transition-all mb-4">生成激活码</button>
+        <!-- 生成按钮 -->
+        <button onclick="generate()"
+            class="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium shadow-md hover:shadow-lg hover:from-green-600 hover:to-emerald-700 transition-all mb-4">
+            ⚡ 生成激活码
+        </button>
 
-                <div id="result-area" class="hidden">
-                    <label class="block text-sm font-medium text-gray-600 mb-2">生成结果</label>
-                    <div id="result-list" class="code-box rounded-lg p-4 text-sm space-y-3"></div>
-                    <p class="text-xs text-gray-400 mt-2">将激活码发给用户，用户在他的工具页面输入即可激活</p>
-                </div>
+        <!-- 结果 -->
+        <div id="result-area" class="hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-1">生成的激活码</label>
+            <div class="relative">
+                <textarea id="output" readonly rows="3"
+                    class="w-full px-4 py-3 border border-green-200 rounded-xl text-xs bg-green-50/50 resize-none"
+                    placeholder="生成的激活码会显示在这里"></textarea>
+                <button onclick="copyCode()" class="copy-btn absolute top-2 right-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-600 hover:bg-gray-50 shadow-sm">
+                    📋 复制
+                </button>
             </div>
+            <div id="expiry-hint" class="text-xs text-gray-400 mt-2 text-center"></div>
+        </div>
+
+        <!-- 错误提示 -->
+        <div id="error" class="hidden text-sm text-red-500 text-center mt-3"></div>
+
+        <!-- 底部 -->
+        <div class="mt-6 text-center text-xs text-gray-400">
+            小伍工坊 · 技术支持 19009925522
         </div>
     </div>
 
     <script>
-        // ========== 与主工具完全一致的加密逻辑 ==========
-        const ACTIVATION_SECRET = 'jxw2026';
+        const SECRET = 'jxw2026';
 
-        function computeActivationSignature(machineCode, expiryTimestamp) {
-            let hash = 5381;
-            const str = machineCode + '|' + expiryTimestamp + '|' + ACTIVATION_SECRET;
-            for (let i = 0; i < str.length; i++) {
-                hash = ((hash << 5) + hash) + str.charCodeAt(i);
-                hash = hash & hash;
+        function calcSig(machineCode, expiry) {
+            let h = 5381;
+            const s = machineCode + '|' + expiry + '|' + SECRET;
+            for (let i = 0; i < s.length; i++) {
+                h = ((h << 5) + h) + s.charCodeAt(i);
+                h = h & h;
             }
-            return Math.abs(hash).toString(36);
+            return Math.abs(h).toString(36);
         }
 
-        function generateActivationCode(machineCode, days) {
-            const expiry = days === 9999 ? 4102444800000 : Date.now() + days * 24 * 60 * 60 * 1000;
-            const signature = computeActivationSignature(machineCode, expiry);
-            const raw = JSON.stringify({ m: machineCode, e: expiry, s: signature });
-            return btoa(unescape(encodeURIComponent(raw)));
-        }
+        function generate() {
+            const machine = document.getElementById('machine-input').value.trim();
+            const pwd = document.getElementById('pwd-input').value.trim();
+            const days = parseInt(document.getElementById('expiry-select').value);
 
-        // ========== 管理员登录 ==========
-        const ADMIN_USERNAME = 'xiaowu';
-        const ADMIN_PASSWORD = '940224';
+            document.getElementById('error').classList.add('hidden');
 
-        function adminLogin() {
-            const pwd = document.getElementById('admin-password').value;
-            const error = document.getElementById('login-error');
-            if (pwd === ADMIN_PASSWORD) {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('generator-screen').classList.remove('hidden');
+            if (!machine) {
+                showError('请输入机器码');
+                return;
+            }
+            if (pwd !== SECRET) {
+                showError('管理员密码错误');
+                return;
+            }
+
+            let expiry;
+            if (days === 9999) {
+                expiry = 4102444800000; // 2099-12-31
             } else {
-                error.classList.remove('hidden');
-            }
-        }
-
-        function adminLogout() {
-            document.getElementById('generator-screen').classList.add('hidden');
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('admin-password').value = '';
-            document.getElementById('login-error').classList.add('hidden');
-        }
-
-        // Enter键登录
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('admin-password').addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') adminLogin();
-            });
-        });
-
-        // ========== 生成激活码 ==========
-        function generateCodes() {
-            const input = document.getElementById('input-machine-codes');
-            const raw = input.value.trim();
-            if (!raw) {
-                alert('请先输入机器码！');
-                return;
+                expiry = Date.now() + days * 24 * 60 * 60 * 1000;
             }
 
-            const expiry = parseInt(document.querySelector('input[name="expiry"]:checked').value);
-            const machines = raw.split('\n').map(s => s.trim()).filter(Boolean);
+            const sig = calcSig(machine, expiry);
+            const obj = { m: machine, e: expiry, s: sig };
+            const code = btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
 
-            const resultArea = document.getElementById('result-area');
-            const resultList = document.getElementById('result-list');
+            document.getElementById('output').value = code;
+            document.getElementById('result-area').classList.remove('hidden');
 
-            if (machines.length === 0) {
-                alert('请先输入机器码！');
-                return;
-            }
-
-            let html = '';
-            machines.forEach((mc, idx) => {
-                const code = generateActivationCode(mc, expiry);
-                const daysLabel = expiry === 9999 ? '永久' : expiry + '天';
-                html += `
-                    <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
-                        <div class="text-xs text-gray-500 mb-1 flex justify-between">
-                            <span>机器码 ${idx + 1}: <span class="font-mono font-bold text-gray-700">${mc}</span></span>
-                            <span class="text-green-600">${daysLabel}</span>
-                        </div>
-                        <div class="flex gap-2 items-start">
-                            <input type="text" value="${code}" readonly class="flex-1 text-xs font-mono bg-white border border-gray-200 rounded p-2 select-all">
-                            <button onclick="copyCode(this)" class="shrink-0 bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-2 rounded transition-all">复制</button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            resultList.innerHTML = html;
-            resultArea.classList.remove('hidden');
+            // 显示有效期提示
+            const d = new Date(expiry);
+            const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+            document.getElementById('expiry-hint').textContent = '有效期至：' + dateStr + (days === 9999 ? '（永久）' : '（' + days + '天）');
         }
 
-        window.copyCode = function(btn) {
-            const input = btn.previousElementSibling;
-            const code = input.value;
-            navigator.clipboard.writeText(code).then(() => {
-                btn.textContent = '已复制 ✓';
-                setTimeout(() => btn.textContent = '复制', 1500);
+        function copyCode() {
+            const ta = document.getElementById('output');
+            ta.select();
+            navigator.clipboard.writeText(ta.value).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const old = btn.textContent;
+                btn.textContent = '✅ 已复制';
+                setTimeout(() => btn.textContent = old, 1500);
             }).catch(() => {
-                input.select();
-                document.execCommand('copy');
-                btn.textContent = '已复制 ✓';
-                setTimeout(() => btn.textContent = '复制', 1500);
+                alert('复制失败，请手动选择后复制');
             });
-        };
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('error');
+            el.textContent = '⚠️ ' + msg;
+            el.classList.remove('hidden');
+        }
     </script>
 </body>
 </html>
