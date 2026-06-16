@@ -1753,7 +1753,7 @@
         }
 
         // ========== 激活码系统（纯前端，无后端） ==========
-        const ACTIVATION_SECRET = 'jxw2026';
+        const ACTIVATION_SECRET = 'xiaowu1994';
         const ACTIVATION_KEY = 'jx_ppt_activation';
         const TRIAL_KEY = 'jx_ppt_trial';
         const TRIAL_FINGERPRINT_PREFIX = 'trialFingerprint-';
@@ -2032,11 +2032,11 @@
             const machineCode = document.getElementById('admin-machine-input').value.trim();
             const password = document.getElementById('admin-password-input').value.trim();
             if (!machineCode) { alert('请输入机器码'); return; }
-            if (password !== 'jxw2026') { alert('管理员密码错误'); return; }
+            if (password !== 'xiaowu1994') { alert('管理员密码错误'); return; }
             const expiry = Date.now() + 365 * 24 * 60 * 60 * 1000;
             const sig = (function(mc, exp) {
                 let h = 5381;
-                const s = mc + '|' + exp + '|jxw2026';
+                const s = mc + '|' + exp + '|xiaowu1994';
                 for (let i = 0; i < s.length; i++) { h = ((h << 5) + h) + s.charCodeAt(i); h = h & h; }
                 return Math.abs(h).toString(36);
             })(machineCode, expiry);
