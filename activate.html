@@ -29,36 +29,8 @@
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
-    <!-- ===== 登录界面 ===== -->
-    <div id="login-page" class="card w-full max-w-sm rounded-2xl shadow-lg p-8 fade-in">
-        <div class="text-center mb-6">
-            <div class="text-4xl mb-3">🔐</div>
-            <h1 class="text-xl font-bold text-gray-800">激活码生成器</h1>
-            <p class="text-sm text-gray-500 mt-1">请先登录管理员账户</p>
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">账户</label>
-            <input id="login-user" type="text" placeholder="输入账户"
-                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-white/70">
-        </div>
-
-        <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">密码</label>
-            <input id="login-pwd" type="password" placeholder="输入密码"
-                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-white/70">
-        </div>
-
-        <button onclick="doLogin()" class="btn-primary w-full py-3 text-white rounded-xl font-medium shadow-md hover:shadow-lg mb-4">
-            ➡ 进入
-        </button>
-
-        <div id="login-error" class="hidden text-sm text-red-500 text-center"></div>
-        <div class="mt-6 text-center text-xs text-gray-400">小伍工坊 · 技术支持 19009925522</div>
-    </div>
-
     <!-- ===== 生成器界面 ===== -->
-    <div id="generator-page" class="hidden card w-full max-w-md rounded-2xl shadow-lg p-8 fade-in">
+    <div id="generator-page" class="card w-full max-w-md rounded-2xl shadow-lg p-8 fade-in">
         <div class="text-center mb-6">
             <div class="text-3xl mb-2">🔑</div>
             <h1 class="text-xl font-bold text-gray-800">激活码生成器</h1>
@@ -97,7 +69,7 @@
                 <textarea id="output" readonly rows="3"
                     class="w-full px-4 py-3 border border-green-200 rounded-xl text-xs bg-green-50/50 resize-none"
                     placeholder="生成的激活码会显示在这里"></textarea>
-                <button onclick="copyCode()" class="absolute top-2 right-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-600 hover:bg-gray-50 shadow-sm">
+                <button id="copy-btn" onclick="copyCode()" class="absolute top-2 right-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-600 hover:bg-gray-50 shadow-sm">
                     📋 复制
                 </button>
             </div>
@@ -105,46 +77,11 @@
         </div>
 
         <div id="gen-error" class="hidden text-sm text-red-500 text-center mt-3"></div>
-
-        <div class="mt-5 pt-4 border-t border-gray-100 text-center">
-            <button onclick="logout()" class="text-xs text-gray-400 hover:text-gray-600">退出登录</button>
-        </div>
+        <div class="mt-6 text-center text-xs text-gray-400">小伍工坊 · 技术支持 19009925522</div>
     </div>
 
     <script>
-        // ===== 账户密码 =====
-        const ADMIN_USER = 'xiaowu';
-        const ADMIN_PASS = '940224';
         const SECRET='xiaowu1994';
-
-        // ===== 登录 =====
-        function doLogin() {
-            const user = document.getElementById('login-user').value.trim();
-            const pwd = document.getElementById('login-pwd').value.trim();
-            const err = document.getElementById('login-error');
-
-            if (!user || !pwd) {
-                err.textContent = '⚠️ 请输入账户和密码';
-                err.classList.remove('hidden');
-                return;
-            }
-            if (user !== ADMIN_USER) {
-                err.textContent = '⚠️ 账户错误';
-                err.classList.remove('hidden');
-                return;
-            }
-            if (pwd !== ADMIN_PASS) {
-                err.textContent = '⚠️ 密码错误';
-                err.classList.remove('hidden');
-                return;
-            }
-
-            // 登录成功
-            document.getElementById('login-page').classList.add('hidden');
-            document.getElementById('generator-page').classList.remove('hidden');
-            // 默认选中"1年"
-            selectDays(document.querySelector('.day-opt[data-days="365"]'), 365);
-        }
 
         // ===== 天数选择 =====
         let selectedDays = 365;
@@ -205,22 +142,10 @@
             const ta = document.getElementById('output');
             ta.select();
             navigator.clipboard.writeText(ta.value).then(() => {
-                const btn = document.querySelector('#result-area .copy-btn');
-                const old = btn.textContent;
+                const btn = document.getElementById('copy-btn');
                 btn.textContent = '✅ 已复制';
                 setTimeout(() => btn.textContent = '📋 复制', 1500);
             }).catch(() => alert('复制失败，请手动选择后复制'));
-        }
-
-        // ===== 退出 =====
-        function logout() {
-            document.getElementById('generator-page').classList.add('hidden');
-            document.getElementById('login-page').classList.remove('hidden');
-            document.getElementById('login-user').value = '';
-            document.getElementById('login-pwd').value = '';
-            document.getElementById('machine-input').value = '';
-            document.getElementById('result-area').classList.add('hidden');
-            document.getElementById('login-error').classList.add('hidden');
         }
     </script>
 </body>
