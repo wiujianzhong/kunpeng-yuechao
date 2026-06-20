@@ -1531,11 +1531,6 @@
             const labelY = opt.y + imgH + labelGap;
 
             if (opt.labelStyle === 'outline') {
-                slide.addShape(pptx.ShapeType.rect, {
-                    x: labelX, y: labelY, w: labelW, h: labelH,
-                    fill: { color: 'FFFFFF', transparency: 100 },
-                    line: { color: '000000', width: 1 }
-                });
                 slide.addText(opt.label, {
                     x: labelX, y: labelY, w: labelW, h: labelH,
                     fontFace: '汉仪旗黑',
@@ -1947,7 +1942,7 @@
             }
         })();
 
-        window.startFreeTrial = async function() {
+        window.startFreeTrial = function() {
             const btn = document.getElementById('trial-btn');
             const oldText = btn?.textContent;
             if (btn) {
@@ -1962,28 +1957,22 @@
                 expiry: start + 7 * 24 * 60 * 60 * 1000,
                 fingerprint
             };
-            try {
-                const localTrial = localStorage.getItem(TRIAL_KEY);
-                const idbTrial = await getActivationDBValue('trial');
-                const fingerprintRecord = await getActivationDBValue(fingerprintKey);
-                if (localTrial || idbTrial || fingerprintRecord) {
-                    hideTrialSection('⏰ 此设备已领取过免费体验 · 请联系管理员激活');
-                    showActivationError('此设备已领取过免费体验，请联系管理员激活');
-                    return;
-                }
-
+            const localTrial = localStorage.getItem(TRIAL_KEY);
+            if (localTrial) {
+                hideTrialSection('⏰ 此设备已领取过免费体验 · 请联系管理员激活');
+                showActivationError('此设备已领取过免费体验，请联系管理员激活');
+            } else {
                 localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
-                await putActivationDBValue('trial', trial);
-                await putActivationDBValue(fingerprintKey, { fingerprint, start });
                 document.getElementById('activation-error').classList.remove('visible');
                 document.getElementById('activation-overlay').classList.add('hidden');
-            } catch(e) {
-                showActivationError('免费体验记录写入失败，请刷新后重试或联系管理员激活');
-            } finally {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = oldText || '🎉 免费体验7天';
-                }
+                Promise.all([
+                    putActivationDBValue('trial', trial),
+                    putActivationDBValue(fingerprintKey, { fingerprint, start })
+                ]).catch(error => console.warn('免费体验兼容记录写入失败', error));
+            }
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = oldText || '🎉 免费体验7天';
             }
         };
 
