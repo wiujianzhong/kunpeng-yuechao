@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>嘉新集团问题整改PPT生成工具</title>
-    <script src="./vendor/tailwindcss-cdn.js"></script>
-    <script src="./vendor/pptxgen.bundle.js"></script>
-    <script src="./vendor/jszip.min.js"></script>
+    <script src="./vendor/tailwindcss-cdn.js" defer></script>
+    <script src="./vendor/pptxgen.bundle.js" defer></script>
+    <script src="./vendor/jszip.min.js" defer></script>
     <style>
         body {
             background:
@@ -1754,14 +1754,42 @@
         const TRIAL_FINGERPRINT_PREFIX = 'trialFingerprint-';
 
         function getCanvasFingerprint() {
-            const c = document.createElement('canvas');
-            c.width = 200; c.height = 50;
-            const ctx = c.getContext('2d');
-            ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 200, 50);
-            ctx.fillStyle = '#000';
-            ctx.font = '14px Arial';
-            ctx.fillText('KunpengYuechao2026', 10, 30);
-            return c.toDataURL();
+            try {
+                const c = document.createElement('canvas');
+                c.width = 200; c.height = 50;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 200, 50);
+                ctx.fillStyle = '#000';
+                ctx.font = '14px Arial';
+                ctx.fillText('KunpengYuechao2026', 10, 30);
+                return c.toDataURL();
+            } catch(e) {
+                return '';
+            }
+        }
+
+        function getActivationStorageValue(key) {
+            try {
+                return localStorage.getItem(key);
+            } catch(e) {
+                const prefix = `${encodeURIComponent(key)}=`;
+                const cookies = document.cookie ? document.cookie.split('; ') : [];
+                for (const cookie of cookies) {
+                    if (cookie.indexOf(prefix) === 0) {
+                        return decodeURIComponent(cookie.slice(prefix.length));
+                    }
+                }
+                return null;
+            }
+        }
+
+        function setActivationStorageValue(key, value) {
+            try {
+                localStorage.setItem(key, value);
+                return;
+            } catch(e) {}
+            const maxAge = key === TRIAL_KEY ? 7 * 24 * 60 * 60 : 400 * 24 * 60 * 60;
+            document.cookie = `${encodeURIComponent(key)}=${encodeURIComponent(value)}; max-age=${maxAge}; path=/; SameSite=Lax`;
         }
 
         function simpleHash(str) {
@@ -1882,7 +1910,7 @@
             function checkActivation() {
                 const machineCode = getMachineCode();
                 // Check free trial first
-                const trialData = localStorage.getItem(TRIAL_KEY);
+                const trialData = getActivationStorageValue(TRIAL_KEY);
                 if (trialData) {
                     try {
                         const trial = JSON.parse(trialData);
@@ -1893,7 +1921,7 @@
                     } catch(e) {}
                 }
                 // Then check activation code
-                const stored = localStorage.getItem(ACTIVATION_KEY);
+                const stored = getActivationStorageValue(ACTIVATION_KEY);
                 if (stored) {
                     try {
                         const result = verifyActivationCode(stored, machineCode);
@@ -1915,8 +1943,8 @@
                     const overlay = document.getElementById('activation-overlay');
                     if (trial && Date.now() < trial.expiry) {
                         // IndexedDB有有效试用 → 恢复到localStorage，不弹窗
-                        if (!localStorage.getItem(TRIAL_KEY)) {
-                            localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
+                        if (!getActivationStorageValue(TRIAL_KEY)) {
+                            setActivationStorageValue(TRIAL_KEY, JSON.stringify(trial));
                         }
                         overlay.classList.add('hidden');
                     } else if (trial && Date.now() >= trial.expiry) {
@@ -1935,11 +1963,7 @@
                     document.getElementById('activation-overlay').classList.remove('hidden');
                 }
             }
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', checkActivation);
-            } else {
-                checkActivation();
-            }
+            checkActivation();
         })();
 
         window.startFreeTrial = function() {
@@ -1957,12 +1981,12 @@
                 expiry: start + 7 * 24 * 60 * 60 * 1000,
                 fingerprint
             };
-            const localTrial = localStorage.getItem(TRIAL_KEY);
+            const localTrial = getActivationStorageValue(TRIAL_KEY);
             if (localTrial) {
                 hideTrialSection('⏰ 此设备已领取过免费体验 · 请联系管理员激活');
                 showActivationError('此设备已领取过免费体验，请联系管理员激活');
             } else {
-                localStorage.setItem(TRIAL_KEY, JSON.stringify(trial));
+                setActivationStorageValue(TRIAL_KEY, JSON.stringify(trial));
                 document.getElementById('activation-error').classList.remove('visible');
                 document.getElementById('activation-overlay').classList.add('hidden');
                 Promise.all([
@@ -1982,7 +2006,7 @@
             if (!code) { showActivationError('请输入激活码'); return; }
             const result = verifyActivationCode(code, machineCode);
             if (result.valid) {
-                localStorage.setItem(ACTIVATION_KEY, code);
+                setActivationStorageValue(ACTIVATION_KEY, code);
                 document.getElementById('activation-error').classList.remove('visible');
                 document.getElementById('activation-overlay').classList.add('hidden');
             } else {
