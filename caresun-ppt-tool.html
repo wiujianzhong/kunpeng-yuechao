@@ -4,6 +4,187 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>嘉新集团问题整改PPT生成工具</title>
+    <script>
+        (function () {
+            var ACTIVATION_SECRET = 'xiaowu1994';
+            var ACTIVATION_KEY = 'jx_ppt_activation';
+            var TRIAL_KEY = 'jx_ppt_trial';
+
+            function simpleHash(str) {
+                var hash = 5381;
+                for (var i = 0; i < str.length; i++) {
+                    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+                    hash = hash & hash;
+                }
+                return Math.abs(hash).toString(36).toUpperCase().slice(0, 8);
+            }
+
+            function getCanvasFingerprint() {
+                try {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    canvas.width = 200;
+                    canvas.height = 50;
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(0, 0, 200, 50);
+                    ctx.fillStyle = '#000';
+                    ctx.font = '14px Arial';
+                    ctx.fillText('KunpengYuechao2026', 10, 30);
+                    return canvas.toDataURL();
+                } catch (e) {
+                    return '';
+                }
+            }
+
+            function getMachineCode() {
+                return simpleHash([
+                    navigator.userAgent || '',
+                    navigator.platform || '',
+                    screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
+                    navigator.language || '',
+                    navigator.hardwareConcurrency || '',
+                    navigator.deviceMemory || '',
+                    getCanvasFingerprint()
+                ].join('|||'));
+            }
+
+            function getStorageValue(key) {
+                try {
+                    return window.localStorage.getItem(key);
+                } catch (e) {
+                    var prefix = encodeURIComponent(key) + '=';
+                    var cookies = document.cookie ? document.cookie.split('; ') : [];
+                    for (var i = 0; i < cookies.length; i++) {
+                        if (cookies[i].indexOf(prefix) === 0) {
+                            return decodeURIComponent(cookies[i].slice(prefix.length));
+                        }
+                    }
+                    return null;
+                }
+            }
+
+            function setStorageValue(key, value) {
+                try {
+                    window.localStorage.setItem(key, value);
+                    return;
+                } catch (e) {}
+                var maxAge = key === TRIAL_KEY ? 604800 : 34560000;
+                document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + '; max-age=' + maxAge + '; path=/; SameSite=Lax';
+            }
+
+            function computeSignature(machineCode, expiry) {
+                var hash = 5381;
+                var str = machineCode + '|' + expiry + '|' + ACTIVATION_SECRET;
+                for (var i = 0; i < str.length; i++) {
+                    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+                    hash = hash & hash;
+                }
+                return Math.abs(hash).toString(36);
+            }
+
+            function verifyActivationCode(code, machineCode) {
+                try {
+                    var raw = decodeURIComponent(escape(atob(code)));
+                    var data = JSON.parse(raw);
+                    if (data.m !== machineCode) return false;
+                    if (data.s !== computeSignature(data.m, data.e)) return false;
+                    return Date.now() <= data.e;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function hideOverlay() {
+                var overlay = document.getElementById('activation-overlay');
+                if (overlay) overlay.classList.add('hidden');
+            }
+
+            function showError(message) {
+                var error = document.getElementById('activation-error');
+                if (error) {
+                    error.textContent = '⚠️ ' + message;
+                    error.classList.add('visible');
+                }
+            }
+
+            function hideTrial(message) {
+                var section = document.getElementById('trial-section');
+                var footer = document.getElementById('activation-footer-text');
+                if (section) section.style.display = 'none';
+                if (footer) footer.textContent = message;
+            }
+
+            function initActivation() {
+                var codeBox = document.getElementById('machine-code-display');
+                if (!codeBox) {
+                    window.setTimeout(initActivation, 10);
+                    return;
+                }
+                var machineCode = getMachineCode();
+                codeBox.textContent = machineCode;
+                var trialData = getStorageValue(TRIAL_KEY);
+                if (trialData) {
+                    try {
+                        if (Date.now() < JSON.parse(trialData).expiry) {
+                            hideOverlay();
+                            return;
+                        }
+                        hideTrial('⏰ 免费体验已到期 · 请联系管理员激活');
+                    } catch (e) {}
+                }
+                var activationCode = getStorageValue(ACTIVATION_KEY);
+                if (activationCode && verifyActivationCode(activationCode, machineCode)) {
+                    hideOverlay();
+                }
+            }
+
+            window.startFreeTrial = function () {
+                var button = document.getElementById('trial-btn');
+                if (getStorageValue(TRIAL_KEY)) {
+                    hideTrial('⏰ 此设备已领取过免费体验 · 请联系管理员激活');
+                    showError('此设备已领取过免费体验，请联系管理员激活');
+                    return;
+                }
+                var start = Date.now();
+                setStorageValue(TRIAL_KEY, JSON.stringify({ start: start, expiry: start + 604800000 }));
+                hideOverlay();
+                if (button) button.disabled = false;
+            };
+
+            window.tryActivate = function () {
+                var input = document.getElementById('activation-input');
+                var machineCode = document.getElementById('machine-code-display');
+                var code = input ? input.value.replace(/^\s+|\s+$/g, '') : '';
+                if (!code) {
+                    showError('请输入激活码');
+                    return;
+                }
+                if (verifyActivationCode(code, machineCode ? machineCode.textContent : getMachineCode())) {
+                    setStorageValue(ACTIVATION_KEY, code);
+                    hideOverlay();
+                } else {
+                    showError('激活码无效或不匹配此设备');
+                }
+            };
+
+            window.copyMachineCode = function () {
+                var codeBox = document.getElementById('machine-code-display');
+                var code = codeBox ? codeBox.textContent : '';
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(code);
+                    return;
+                }
+                var input = document.createElement('input');
+                input.value = code;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+            };
+
+            window.setTimeout(initActivation, 0);
+        })();
+    </script>
     <script src="./vendor/tailwindcss-cdn.js" defer></script>
     <script src="./vendor/pptxgen.bundle.js" defer></script>
     <script src="./vendor/jszip.min.js" defer></script>
@@ -192,6 +373,12 @@
 </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+<noscript>
+    <style>
+        .javascript-disabled-tip { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 24px; background: #fff; color: #1e293b; text-align: center; font: 16px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
+    </style>
+    <div class="javascript-disabled-tip">此页面需要开启 JavaScript 才能生成机器码和使用工具。<br>请在 iPhone“设置 → Safari浏览器 → 高级 → JavaScript”中开启后，再刷新本页。</div>
+</noscript>
 <!-- ===== 激活弹窗 ===== -->
 <div id="activation-overlay">
     <div class="activation-card">
