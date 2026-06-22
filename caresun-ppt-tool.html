@@ -488,24 +488,6 @@
             <!-- 问题项将动态添加到这里 -->
         </div>
 
-        <datalist id="process-options">
-            <option value="一分厂"></option>
-            <option value="二分厂"></option>
-            <option value="三分厂"></option>
-            <option value="四分厂"></option>
-            <option value="七分厂"></option>
-            <option value="清梳"></option>
-            <option value="精梳"></option>
-            <option value="并条"></option>
-            <option value="粗纱"></option>
-            <option value="细纱"></option>
-            <option value="络筒"></option>
-            <option value="空调"></option>
-            <option value="电器"></option>
-            <option value="6s 检查"></option>
-            <option value="安全检查"></option>
-        </datalist>
-
         <!-- 操作按钮区 -->
         <div class="flex flex-col md:flex-row gap-3 mb-6">
             <button onclick="addEmptyIssue()" class="flex-1 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-all flex items-center justify-center gap-2">
@@ -1402,6 +1384,14 @@
             return `${bytes}B`;
         }
 
+        function selectIssueProcess(issueId, value) {
+            if (!value) return;
+            const input = document.getElementById(`process-${issueId}`);
+            if (input) input.value = value;
+            const picker = document.getElementById(`process-picker-${issueId}`);
+            if (picker) picker.value = '';
+        }
+
         // 添加空问题项
         function addEmptyIssue() {
             issueCount++;
@@ -1420,7 +1410,27 @@
                     </div>
                     
                     <div class="mb-3">
-                        <input id="process-${issueId}" list="process-options" placeholder="工序（可输入或选择）" autocomplete="off" class="w-full md:w-48 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
+                        <div class="flex w-full md:w-80">
+                            <input id="process-${issueId}" placeholder="可直接输入工序或分厂" autocomplete="off" class="min-w-0 flex-1 px-3 py-2 text-sm border border-gray-200 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
+                            <select id="process-picker-${issueId}" onchange="selectIssueProcess(${issueId}, this.value)" aria-label="选择工序或分厂" class="w-32 px-2 py-2 text-sm border border-l-0 border-gray-200 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer">
+                                <option value="">下拉选择 ▾</option>
+                                <option value="一分厂">一分厂</option>
+                                <option value="二分厂">二分厂</option>
+                                <option value="三分厂">三分厂</option>
+                                <option value="四分厂">四分厂</option>
+                                <option value="七分厂">七分厂</option>
+                                <option value="清梳">清梳</option>
+                                <option value="精梳">精梳</option>
+                                <option value="并条">并条</option>
+                                <option value="粗纱">粗纱</option>
+                                <option value="细纱">细纱</option>
+                                <option value="络筒">络筒</option>
+                                <option value="空调">空调</option>
+                                <option value="电器">电器</option>
+                                <option value="6s 检查">6s 检查</option>
+                                <option value="安全检查">安全检查</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
