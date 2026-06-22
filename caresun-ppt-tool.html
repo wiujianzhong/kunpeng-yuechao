@@ -720,15 +720,15 @@
 
             try {
                 const importResult = await extractIssuesFromPPTX(file);
-                const { items, preservedSlidePaths } = importResult;
+                const { items, preservedSlides } = importResult;
                 importedPPTX = null;
                 if (items.length === 0) {
                     alert('未能识别到任何图片');
                     return;
                 }
 
-                importedPPTX = preservedSlidePaths.length > 0
-                    ? { file, preservedSlidePaths }
+                importedPPTX = preservedSlides.length > 0
+                    ? { file, preservedSlides }
                     : null;
 
                 removeEmptyIssues();
@@ -756,7 +756,7 @@
                 });
                 updateBatchPreview();
                 renumberIssues();
-                const preservedText = preservedSlidePaths.length > 0 ? '，已保留原PPT第2页和最后一页' : '';
+                const preservedText = preservedSlides.length > 0 ? `，已保留${preservedSlides.length}页文字或表格内容` : '';
                 alert(`拆解完成，共生成${items.length}页${preservedText}`);
             } catch (error) {
                 console.error(error);
@@ -781,26 +781,26 @@
 
             const slidePaths = await getPPTXSlidePaths(zip);
             const items = [];
-            for (const slidePath of slidePaths) {
+            const preservedSlides = [];
+            for (const [slideIndex, slidePath] of slidePaths.entries()) {
                 try {
-                    const slideItems = await extractItemsFromPPTXSlide(zip, slidePath);
-                    items.push(...slideItems);
+                    const result = await extractItemsFromPPTXSlide(zip, slidePath);
+                    items.push(...result.items);
+                    // 首页由工具重新生成封面；其余没有可拆解照片的文字/表格页保留原样。
+                    if (slideIndex > 0 && result.shouldPreserve) {
+                        preservedSlides.push({
+                            sourceSlidePath: slidePath,
+                            afterIssueCount: items.length
+                        });
+                    }
                 } catch (error) {
                     console.warn(`跳过无法拆解的页面：${slidePath}`, error);
                 }
             }
             return {
                 items,
-                preservedSlidePaths: getPPTXPreservedSlidePaths(slidePaths)
+                preservedSlides
             };
-        }
-
-        // 原PPT第2页通常是表格，最后一页通常是致谢；生成时保留原始页面。
-        function getPPTXPreservedSlidePaths(slidePaths) {
-            if (slidePaths.length < 2) return [];
-            const tableSlide = slidePaths[1];
-            const thanksSlide = slidePaths[slidePaths.length - 1];
-            return tableSlide === thanksSlide ? [tableSlide] : [tableSlide, thanksSlide];
         }
 
         // 按PPT内部顺序拿到每一页路径
@@ -825,7 +825,7 @@
         // 从单页中按图片X坐标拆成多个问题页
         async function extractItemsFromPPTXSlide(zip, slidePath) {
             const slideFile = zip.file(slidePath);
-            if (!slideFile) return [];
+            if (!slideFile) return { items: [], shouldPreserve: false };
 
             const slideDoc = parsePPTXXml(await slideFile.async('text'));
             const slideDir = slidePath.slice(0, slidePath.lastIndexOf('/') + 1);
@@ -864,12 +864,16 @@
                 ? topTexts.sort((a, b) => a.y - b.y)[0].text
                 : '';
 
-            return pictures
+            const items = pictures
                 .sort((a, b) => a.x - b.x)
                 .map(pic => {
                     const text = findPPTXDescriptionText(pic, texts);
                     return { image: pic.image, title: text?.text || '', processName };
                 });
+            return {
+                items,
+                shouldPreserve: items.length === 0 && hasPPTXNonPhotoContent(slideDoc, texts)
+            };
         }
 
         function isPPTXBoxOnSlide(box) {
@@ -878,6 +882,12 @@
                 && box.y < SLIDE_H
                 && box.x + box.w > 0
                 && box.y + box.h > 0;
+        }
+
+        function hasPPTXNonPhotoContent(slideDoc, texts) {
+            return texts.length > 0
+                || getPPTXNodes(slideDoc, 'tbl').length > 0
+                || getPPTXNodes(slideDoc, 'graphicFrame').length > 0;
         }
 
         // 收集有实际文字内容的文本框
@@ -1042,9 +1052,9 @@
             return Number(path.match(/slide(\d+)\.xml$/)?.[1] || 0);
         }
 
-        // 把原PPT指定页面作为原生幻灯片合并进新PPT，保留表格、文字和排版。
-        async function appendPreservedPPTXSlides(generatedBlob, sourceFile, sourceSlidePaths, insertTableAfterCover) {
-            if (!sourceFile || sourceSlidePaths.length === 0) return generatedBlob;
+        // 把原PPT的文字/表格页作为原生幻灯片合并进新PPT，保留表格、文字和排版。
+        async function appendPreservedPPTXSlides(generatedBlob, sourceFile, sourceSlides, insertAfterCover) {
+            if (!sourceFile || sourceSlides.length === 0) return generatedBlob;
 
             const [outputZip, sourceZip] = await Promise.all([
                 JSZip.loadAsync(generatedBlob),
@@ -1095,14 +1105,18 @@
             };
 
             const importedSlides = [];
-            for (const sourceSlidePath of sourceSlidePaths) {
+            for (const sourceSlide of sourceSlides) {
+                const sourceSlidePath = sourceSlide.sourceSlidePath;
                 const outputSlidePath = `ppt/slides/slide${nextSlideNumber++}.xml`;
                 await copyPart(sourceSlidePath, outputSlidePath);
                 const relationshipId = `rId${nextRelationshipNumber++}`;
                 addPPTXRelationship(presentationRelsDoc, relationshipId,
                     'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide',
                     getPPTXRelativePath('ppt/', outputSlidePath));
-                importedSlides.push(createPPTXSlideId(presentationDoc, nextSlideId++, relationshipId));
+                importedSlides.push({
+                    afterIssueCount: sourceSlide.afterIssueCount,
+                    slideId: createPPTXSlideId(presentationDoc, nextSlideId++, relationshipId)
+                });
             }
 
             const masterList = getPPTXFirstNode(presentationDoc, 'sldMasterIdLst');
@@ -1121,15 +1135,12 @@
 
             const slideList = getPPTXFirstNode(presentationDoc, 'sldIdLst');
             const existingSlides = slideList ? Array.from(slideList.children) : [];
-            const tableSlide = importedSlides[0];
-            if (tableSlide && slideList) {
-                if (insertTableAfterCover && existingSlides[0]) {
-                    slideList.insertBefore(tableSlide, existingSlides[0].nextSibling);
-                } else {
-                    slideList.insertBefore(tableSlide, existingSlides[0] || null);
-                }
-            }
-            importedSlides.slice(1).forEach(slide => slideList?.appendChild(slide));
+            const issueStartIndex = insertAfterCover ? 1 : 0;
+            importedSlides.forEach(slide => {
+                if (!slideList) return;
+                const targetIndex = issueStartIndex + slide.afterIssueCount;
+                slideList.insertBefore(slide.slideId, existingSlides[targetIndex] || null);
+            });
 
             outputZip.file('[Content_Types].xml', new XMLSerializer().serializeToString(outputContentTypes));
             outputZip.file('ppt/presentation.xml', new XMLSerializer().serializeToString(presentationDoc));
@@ -1768,7 +1779,7 @@
                     pptBlob = await appendPreservedPPTXSlides(
                         pptBlob,
                         importedPPTX.file,
-                        importedPPTX.preservedSlidePaths,
+                        importedPPTX.preservedSlides,
                         templateMode === 'company'
                     );
                 }
