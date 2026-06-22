@@ -489,6 +489,10 @@
         </div>
 
         <!-- 操作按钮区 -->
+        <div id="draft-status-bar" class="mb-4 flex flex-col gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 sm:flex-row sm:items-center sm:justify-between">
+            <span id="draft-status">💾 正在开启本机自动草稿保存…</span>
+            <button type="button" onclick="clearAllWork()" class="self-start rounded border border-emerald-300 bg-white px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 sm:self-auto">清空全部内容</button>
+        </div>
         <div class="flex flex-col md:flex-row gap-3 mb-6">
             <button onclick="addEmptyIssue()" class="flex-1 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-all flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -508,6 +512,7 @@
             </button>
         </div>
     </div>
+    <button id="back-to-top" type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="hidden fixed bottom-24 right-4 z-30 rounded-full bg-slate-700 px-4 py-3 text-sm font-semibold text-white shadow-lg hover:bg-slate-800">↑ 回到顶部</button>
 
     <!-- 命名弹窗 -->
     <div id="file-name-modal" class="hidden fixed inset-0 z-50 bg-black/40 items-center justify-center px-4">
@@ -533,6 +538,16 @@
         let importedPPTX = null;
         let pendingFileNameResolve = null;
         let activePasteTarget = null;
+        const DRAFT_DB_NAME = 'caresun-ppt-draft-v1';
+        const DRAFT_META_STORE = 'draft-meta';
+        const DRAFT_MEDIA_STORE = 'draft-media';
+        const DRAFT_ID = 'current';
+        const draftMediaKeys = new Set();
+        const draftPendingMedia = new Map();
+        let draftDBPromise = null;
+        let draftSaveTimer = null;
+        let isRestoringDraft = false;
+        let draftAvailable = false;
         const COMPRESS_MAX_EDGE = 2400;
         const COMPRESS_QUALITY = 0.88;
         const PPT_IMPORT_MAX_EDGE = 2800;
@@ -653,7 +668,237 @@
                 if (e.key === 'Enter') confirmFileNameDialog();
                 if (e.key === 'Escape') cancelFileNameDialog();
             });
+            const backToTop = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                backToTop?.classList.toggle('hidden', window.scrollY < 360);
+            }, { passive: true });
+            initializeLocalDraft();
         });
+
+        // 手机闪退后可恢复的本机草稿：图片以 Blob 单独保存，文字仅保存轻量清单。
+        function getDraftDB() {
+            if (draftDBPromise) return draftDBPromise;
+            draftDBPromise = new Promise((resolve, reject) => {
+                if (!window.indexedDB) {
+                    reject(new Error('当前浏览器不支持本机草稿'));
+                    return;
+                }
+                const request = indexedDB.open(DRAFT_DB_NAME, 1);
+                request.onupgradeneeded = () => {
+                    const db = request.result;
+                    if (!db.objectStoreNames.contains(DRAFT_META_STORE)) db.createObjectStore(DRAFT_META_STORE, { keyPath: 'id' });
+                    if (!db.objectStoreNames.contains(DRAFT_MEDIA_STORE)) db.createObjectStore(DRAFT_MEDIA_STORE, { keyPath: 'key' });
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('本机草稿库打开失败'));
+            });
+            return draftDBPromise;
+        }
+
+        function runDraftRequest(storeName, mode, action) {
+            return getDraftDB().then(db => new Promise((resolve, reject) => {
+                const transaction = db.transaction(storeName, mode);
+                const request = action(transaction.objectStore(storeName));
+                let result;
+                request.onsuccess = () => { result = request.result; };
+                request.onerror = () => reject(request.error || new Error('本机草稿保存失败'));
+                transaction.oncomplete = () => resolve(result);
+                transaction.onerror = () => reject(transaction.error || new Error('本机草稿保存失败'));
+            }));
+        }
+
+        function getDraftMediaKey(issueId, type) {
+            return `${issueId}:${type}`;
+        }
+
+        function updateDraftStatus(message) {
+            const el = document.getElementById('draft-status');
+            if (el) el.textContent = message;
+        }
+
+        function formatDraftTime(time) {
+            return new Date(time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        async function initializeLocalDraft() {
+            try {
+                await getDraftDB();
+                draftAvailable = true;
+                navigator.storage?.persist?.().catch(() => {});
+                const draft = await runDraftRequest(DRAFT_META_STORE, 'readonly', store => store.get(DRAFT_ID));
+                if (!draft?.issues?.length) {
+                    updateDraftStatus('💾 自动草稿已开启：照片和描述会保存到本机');
+                    return;
+                }
+                await restoreLocalDraft(draft);
+            } catch (error) {
+                console.warn('本机草稿不可用', error);
+                updateDraftStatus('⚠️ 当前浏览器未开启本机草稿，请及时生成PPT备份');
+            }
+        }
+
+        function collectDraftState() {
+            const issues = Array.from(document.querySelectorAll('[id^="issue-"]'))
+                .map(issue => {
+                    const id = issue.id.replace('issue-', '');
+                    const leftKey = getDraftMediaKey(id, 'left');
+                    const rightKey = getDraftMediaKey(id, 'right');
+                    const leftKind = window[`leftVideo-${id}`] ? 'video' : window[`leftImage-${id}`] ? 'image' : draftPendingMedia.get(leftKey)?.kind;
+                    const rightKind = window[`rightVideo-${id}`] ? 'video' : window[`rightImage-${id}`] ? 'image' : draftPendingMedia.get(rightKey)?.kind;
+                    return {
+                        id,
+                        processName: document.getElementById(`process-${id}`)?.value || '',
+                        leftDesc: document.getElementById(`leftDesc-${id}`)?.value || '',
+                        rightDesc: document.getElementById(`rightDesc-${id}`)?.value || '',
+                        leftKind: leftKind || '',
+                        rightKind: rightKind || ''
+                    };
+                })
+                .filter(item => item.processName || item.leftDesc || item.rightDesc || item.leftKind || item.rightKind);
+            return { id: DRAFT_ID, savedAt: Date.now(), issues };
+        }
+
+        function scheduleDraftSave(delay = 450) {
+            if (!draftAvailable || isRestoringDraft) return;
+            clearTimeout(draftSaveTimer);
+            draftSaveTimer = setTimeout(() => saveLocalDraft(), delay);
+        }
+
+        async function saveLocalDraft() {
+            if (!draftAvailable || isRestoringDraft) return;
+            const draft = collectDraftState();
+            try {
+                if (draft.issues.length === 0) {
+                    await runDraftRequest(DRAFT_META_STORE, 'readwrite', store => store.delete(DRAFT_ID));
+                    updateDraftStatus('💾 自动草稿已开启：照片和描述会保存到本机');
+                    return;
+                }
+                await runDraftRequest(DRAFT_META_STORE, 'readwrite', store => store.put(draft));
+                updateDraftStatus(`💾 草稿已保存 ${formatDraftTime(draft.savedAt)} · ${draft.issues.length} 页`);
+            } catch (error) {
+                console.warn('草稿保存失败', error);
+                updateDraftStatus('⚠️ 草稿保存失败，请尽快生成PPT备份');
+            }
+        }
+
+        async function saveDraftOriginalMedia(issueId, type, file, kind) {
+            if (!draftAvailable) return;
+            const key = getDraftMediaKey(issueId, type);
+            draftPendingMedia.set(key, { kind, name: file.name || '' });
+            try {
+                await runDraftRequest(DRAFT_MEDIA_STORE, 'readwrite', store => store.put({
+                    key, kind, name: file.name || '', blob: file
+                }));
+                draftMediaKeys.add(key);
+                await saveLocalDraft();
+            } catch (error) {
+                console.warn('原始照片草稿保存失败', error);
+                updateDraftStatus('⚠️ 照片草稿保存失败，请尽快生成PPT备份');
+            }
+        }
+
+        async function saveDraftMediaData(issueId, type, kind, dataUrl, name) {
+            if (!draftAvailable) return;
+            const key = getDraftMediaKey(issueId, type);
+            if (draftMediaKeys.has(key)) {
+                scheduleDraftSave(0);
+                return;
+            }
+            try {
+                const blob = await (await fetch(dataUrl)).blob();
+                await runDraftRequest(DRAFT_MEDIA_STORE, 'readwrite', store => store.put({ key, kind, name, blob }));
+                draftMediaKeys.add(key);
+                scheduleDraftSave(0);
+            } catch (error) {
+                console.warn('媒体草稿保存失败', error);
+                updateDraftStatus('⚠️ 照片草稿保存失败，请尽快生成PPT备份');
+            }
+        }
+
+        async function restoreLocalDraft(draft) {
+            isRestoringDraft = true;
+            try {
+                for (const item of draft.issues) {
+                    const issueId = addEmptyIssue(item.id);
+                    document.getElementById(`process-${issueId}`).value = item.processName || '';
+                    document.getElementById(`leftDesc-${issueId}`).value = item.leftDesc || '';
+                    document.getElementById(`rightDesc-${issueId}`).value = item.rightDesc || '';
+                    for (const type of ['left', 'right']) {
+                        const record = await runDraftRequest(DRAFT_MEDIA_STORE, 'readonly', store => store.get(getDraftMediaKey(item.id, type)));
+                        if (!record?.blob) continue;
+                        const dataUrl = await readDraftBlob(record.blob);
+                        setIssueMedia(issueId, type, record.kind, dataUrl, record.name || '', false);
+                        updateImagePreview(issueId, type, dataUrl, record.kind);
+                        draftMediaKeys.add(getDraftMediaKey(issueId, type));
+                    }
+                }
+                refreshBatchImagesFromIssues();
+                updateDraftStatus(`💾 已恢复 ${draft.issues.length} 页本机草稿 · 保存于 ${formatDraftTime(draft.savedAt)}`);
+            } finally {
+                isRestoringDraft = false;
+            }
+        }
+
+        function readDraftBlob(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(reader.error || new Error('草稿照片读取失败'));
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        async function deleteDraftMedia(issueId, type) {
+            const key = getDraftMediaKey(issueId, type);
+            draftPendingMedia.delete(key);
+            draftMediaKeys.delete(key);
+            if (!draftAvailable) return;
+            try {
+                await runDraftRequest(DRAFT_MEDIA_STORE, 'readwrite', store => store.delete(key));
+            } catch (error) {
+                console.warn('草稿媒体删除失败', error);
+            }
+        }
+
+        async function clearStoredDraft() {
+            try {
+                await getDraftDB();
+                await Promise.all([
+                    runDraftRequest(DRAFT_META_STORE, 'readwrite', store => store.delete(DRAFT_ID)),
+                    runDraftRequest(DRAFT_MEDIA_STORE, 'readwrite', store => store.clear())
+                ]);
+                draftMediaKeys.clear();
+                draftPendingMedia.clear();
+            } catch (error) {
+                console.warn('草稿清空失败', error);
+            }
+        }
+
+        async function clearAllWork() {
+            if (!confirm('确定清空本次所有照片、描述和本机草稿吗？此操作不能恢复。')) return;
+            clearTimeout(draftSaveTimer);
+            document.querySelectorAll('[id^="issue-"]').forEach(issue => {
+                const issueId = issue.id.replace('issue-', '');
+                ['left', 'right'].forEach(type => {
+                    delete window[`${type}Image-${issueId}`];
+                    delete window[`${type}Video-${issueId}`];
+                    delete window[`${type}VideoName-${issueId}`];
+                });
+            });
+            document.getElementById('issues-container').innerHTML = '';
+            issueCount = 0;
+            importedPPTX = null;
+            activePasteTarget = null;
+            batchImages.length = 0;
+            document.getElementById('batch-prompt').classList.remove('hidden');
+            document.getElementById('batch-uploaded').classList.add('hidden');
+            document.getElementById('batch-dropzone').classList.remove('uploaded');
+            document.getElementById('batch-thumbs').innerHTML = '';
+            document.getElementById('batch-count').textContent = '0';
+            await clearStoredDraft();
+            updateDraftStatus('💾 已清空全部内容；可开始新的检查');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         // 批量上传处理
         async function handleBatchUpload(files) {
@@ -1395,22 +1640,25 @@
             return String(dataUrl || '').startsWith('data:video/');
         }
 
-        function setIssueMedia(issueId, type, kind, dataUrl, name = '') {
+        function setIssueMedia(issueId, type, kind, dataUrl, name = '', shouldSaveDraft = true) {
             if (kind === 'video') {
                 delete window[`${type}Image-${issueId}`];
                 window[`${type}Video-${issueId}`] = dataUrl;
                 window[`${type}VideoName-${issueId}`] = name;
-                return;
+            } else {
+                delete window[`${type}Video-${issueId}`];
+                delete window[`${type}VideoName-${issueId}`];
+                window[`${type}Image-${issueId}`] = dataUrl;
             }
-            delete window[`${type}Video-${issueId}`];
-            delete window[`${type}VideoName-${issueId}`];
-            window[`${type}Image-${issueId}`] = dataUrl;
+            if (shouldSaveDraft) saveDraftMediaData(issueId, type, kind, dataUrl, name);
         }
 
         function clearIssueMedia(issueId, type) {
             delete window[`${type}Image-${issueId}`];
             delete window[`${type}Video-${issueId}`];
             delete window[`${type}VideoName-${issueId}`];
+            deleteDraftMedia(issueId, type);
+            scheduleDraftSave();
         }
 
         async function compressAllImages(options = {}) {
@@ -1523,12 +1771,13 @@
             if (input) input.value = value;
             const picker = document.getElementById(`process-picker-${issueId}`);
             if (picker) picker.value = '';
+            scheduleDraftSave();
         }
 
         // 添加空问题项
-        function addEmptyIssue() {
-            issueCount++;
-            const issueId = issueCount;
+        function addEmptyIssue(restoredId = null) {
+            const issueId = restoredId === null ? issueCount + 1 : Number(restoredId);
+            issueCount = Math.max(issueCount, issueId);
             const container = document.getElementById('issues-container');
             
             const issueHtml = `
@@ -1612,6 +1861,9 @@
             
             container.insertAdjacentHTML('beforeend', issueHtml);
             setupSingleDragDrop(issueId);
+            ['process', 'leftDesc', 'rightDesc'].forEach(prefix => {
+                document.getElementById(`${prefix}-${issueId}`)?.addEventListener('input', () => scheduleDraftSave());
+            });
             renumberIssues();
             return issueId;
         }
@@ -1730,8 +1982,12 @@
         }
 
         // 单个图片上传
-        function handleSingleUpload(issueId, type, file) {
+        async function handleSingleUpload(issueId, type, file) {
             if (!file) return;
+            const kind = isVideoFile(file) ? 'video' : isImageFile(file) ? 'image' : '';
+            if (!kind) return;
+            // 先把手机刚拍的原始文件落到本机草稿，再做较耗内存的图片处理。
+            await saveDraftOriginalMedia(issueId, type, file, kind);
             if (isVideoFile(file)) {
                 readVideoFile(file)
                     .then(dataUrl => {
@@ -1744,7 +2000,6 @@
                     });
                 return;
             }
-            if (!isImageFile(file)) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
@@ -1830,6 +2085,7 @@
             clearIssueMedia(issueId, 'left');
             clearIssueMedia(issueId, 'right');
             renumberIssues();
+            scheduleDraftSave();
         }
 
         function removeEmptyIssues() {
@@ -1847,6 +2103,7 @@
                 }
             });
             renumberIssues();
+            scheduleDraftSave();
         }
 
         function renumberIssues() {
