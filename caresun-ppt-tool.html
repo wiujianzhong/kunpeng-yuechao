@@ -473,8 +473,8 @@
                     </svg>
                     <p class="desktop-upload-note text-gray-600 font-medium">拖拽或粘贴图片到此处</p>
                     <p class="mobile-upload-note text-gray-600 font-medium">点此选择相册图片</p>
-                    <p class="desktop-upload-note text-sm text-gray-400 mt-1">拖拽可一次放多张，自动生成对应页数PPT</p>
-                    <p class="mobile-upload-note text-sm text-gray-400 mt-1">可一次选择多张图片，自动生成对应页数PPT</p>
+                    <p class="desktop-upload-note text-sm text-gray-400 mt-1">拖拽可一次放多张，按拖入顺序自动生成对应页数PPT</p>
+                    <p class="mobile-upload-note text-sm text-gray-400 mt-1">可一次选择多张图片，按选择顺序自动生成对应页数PPT</p>
                 </div>
                 <div id="batch-uploaded" class="hidden">
                     <p class="text-green-600 font-semibold">已上传 <span id="batch-count">0</span> 张</p>
@@ -535,6 +535,7 @@
     <script>
         let issueCount = 0;
         const batchImages = [];
+        let batchUploadQueue = Promise.resolve();
         let importedPPTX = null;
         let pendingFileNameResolve = null;
         let activePasteTarget = null;
@@ -900,12 +901,22 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 批量上传处理
-        async function handleBatchUpload(files) {
+        // 批量上传处理：多个批次和每张图片都严格按用户选择/拖入顺序执行。
+        function handleBatchUpload(files) {
             const mediaFiles = Array.from(files).filter(isImageOrVideoFile);
-            if (mediaFiles.length === 0) return;
+            if (mediaFiles.length === 0) return Promise.resolve();
+            batchUploadQueue = batchUploadQueue
+                .catch(error => console.error('上一批图片读取失败', error))
+                .then(() => processBatchUpload(mediaFiles));
+            return batchUploadQueue;
+        }
+
+        async function processBatchUpload(mediaFiles) {
             removeEmptyIssues();
-            const mediaItems = await Promise.all(mediaFiles.map(readMediaFile));
+            const mediaItems = [];
+            for (const file of mediaFiles) {
+                mediaItems.push(await readMediaFile(file));
+            }
             for (let i = 0; i < mediaItems.length; i += 2) {
                 const issueId = addEmptyIssue();
                 const leftItem = mediaItems[i];
