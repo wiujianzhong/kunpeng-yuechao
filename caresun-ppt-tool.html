@@ -488,6 +488,24 @@
             <!-- 问题项将动态添加到这里 -->
         </div>
 
+        <datalist id="process-options">
+            <option value="一分厂"></option>
+            <option value="二分厂"></option>
+            <option value="三分厂"></option>
+            <option value="四分厂"></option>
+            <option value="七分厂"></option>
+            <option value="清梳"></option>
+            <option value="精梳"></option>
+            <option value="并条"></option>
+            <option value="粗纱"></option>
+            <option value="细纱"></option>
+            <option value="络筒"></option>
+            <option value="空调"></option>
+            <option value="电器"></option>
+            <option value="6s 检查"></option>
+            <option value="安全检查"></option>
+        </datalist>
+
         <!-- 操作按钮区 -->
         <div class="flex flex-col md:flex-row gap-3 mb-6">
             <button onclick="addEmptyIssue()" class="flex-1 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-all flex items-center justify-center gap-2">
@@ -810,9 +828,12 @@
                     if (box.w < 1 && box.h < 1) continue;
                     // 跳过封面/背景图（宽度超过6英寸，一般是全幅封面图）
                     if (box.w > 6) continue;
+                    const description = findPPTXDescriptionText(box, texts);
+                    // 只拆解带有紧邻描述的实体问题照片，跳过角标、装饰图等无描述图片。
+                    if (!description) continue;
                     const image = await readPPTXImage(zip, mediaPath);
                     if (!image) continue;
-                    pictures.push({ ...box, image });
+                    pictures.push({ ...box, image, title: description.text });
                 } catch (error) {
                     console.warn(`跳过无法读取的图片：${mediaPath}`, error);
                 }
@@ -827,10 +848,7 @@
 
             return pictures
                 .sort((a, b) => a.x - b.x)
-                .map(pic => {
-                    const text = findPPTXDescriptionText(pic, texts);
-                    return { image: pic.image, title: text?.text || '', processName };
-                });
+                .map(pic => ({ image: pic.image, title: pic.title, processName }));
         }
 
         // 收集有实际文字内容的文本框
@@ -856,12 +874,20 @@
                 .filter(Boolean);
         }
 
-        // 给图片匹配其下方、横向中心最近的描述文字
+        // 给图片匹配正下方、横向对齐的描述文字，避免把装饰图误识别为问题照片。
         function findPPTXDescriptionText(pic, texts) {
             const picBottom = pic.y + pic.h;
             const picCenterX = pic.x + pic.w / 2;
             return texts
-                .filter(text => text.cy > picBottom)
+                .filter(text => {
+                    const verticalGap = text.y - picBottom;
+                    const horizontalGap = Math.abs(text.cx - picCenterX);
+                    const maxHorizontalGap = Math.max(0.5, Math.min(pic.w * 0.45, 1.2));
+                    return text.cy > picBottom
+                        && verticalGap >= -0.1
+                        && verticalGap <= 1.2
+                        && horizontalGap <= maxHorizontalGap;
+                })
                 .sort((a, b) => {
                     const xDiff = Math.abs(a.cx - picCenterX) - Math.abs(b.cx - picCenterX);
                     if (xDiff !== 0) return xDiff;
@@ -1186,19 +1212,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <select id="process-${issueId}" class="w-full md:w-40 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
-                            <option value="">工序（可选）</option>
-                            <option value="清梳">清梳</option>
-                            <option value="精梳">精梳</option>
-                            <option value="并条">并条</option>
-                            <option value="粗纱">粗纱</option>
-                            <option value="细纱">细纱</option>
-                            <option value="络筒">络筒</option>
-                            <option value="空调">空调</option>
-                            <option value="电器">电器</option>
-                            <option value="6s 检查">6s 检查</option>
-                            <option value="安全检查">安全检查</option>
-                        </select>
+                        <input id="process-${issueId}" list="process-options" placeholder="工序（可输入或选择）" autocomplete="off" class="w-full md:w-48 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
