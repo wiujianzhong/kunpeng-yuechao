@@ -682,6 +682,23 @@
                 <label for="ppt-file-name" class="block text-sm font-medium text-gray-600 mb-2">文件名称</label>
                 <input id="ppt-file-name" type="text" class="w-full px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
                 <p class="text-xs text-gray-400 mt-2">封面文字会同步这里填写的文件名称</p>
+                <div class="mt-5 border-t border-gray-100 pt-4">
+                    <label for="ppt-image-fit-mode" class="block text-sm font-medium text-gray-600 mb-2">照片呈现（仅影响这次导出）</label>
+                    <select id="ppt-image-fit-mode" class="w-full px-3 py-3 border border-gray-200 rounded-lg bg-white text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500" onchange="syncPPTImageFitControls()">
+                        <option value="balanced">适中调整（推荐）</option>
+                        <option value="cover">满铺裁剪</option>
+                        <option value="contain">完整不变形</option>
+                    </select>
+                    <div id="ppt-image-distortion-row" class="mt-3">
+                        <div class="flex items-center justify-between text-sm text-gray-600">
+                            <label for="ppt-image-distortion">变形量</label>
+                            <span id="ppt-image-distortion-value" class="font-semibold text-green-700">6%</span>
+                        </div>
+                        <input id="ppt-image-distortion" type="range" min="0" max="15" value="6" class="mt-2 w-full accent-green-600" oninput="syncPPTImageFitControls()">
+                    </div>
+                    <p id="ppt-image-fit-tip" class="mt-2 text-xs text-gray-400"></p>
+                    <p class="mt-1 text-xs text-gray-400">视频保持原样；工具内的图片预览和原图不会改变。</p>
+                </div>
                 <div class="flex justify-end gap-3 mt-5">
                     <button onclick="cancelFileNameDialog()" class="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">取消</button>
                     <button onclick="confirmFileNameDialog()" class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700">保存到桌面</button>
@@ -828,6 +845,7 @@
                 if (e.key === 'Enter') confirmFileNameDialog();
                 if (e.key === 'Escape') cancelFileNameDialog();
             });
+            syncPPTImageFitControls();
             const backToTop = document.getElementById('back-to-top');
             window.addEventListener('scroll', () => {
                 backToTop?.classList.toggle('hidden', window.scrollY < 360);
@@ -2636,9 +2654,9 @@
                 if (!compressed) return;
             }
 
-            const fileBaseName = await openFileNameDialog(buildDefaultFileName(issues));
-            if (!fileBaseName) return;
-            const cleanBaseName = cleanFileName(fileBaseName);
+            const exportOptions = await openFileNameDialog(buildDefaultFileName(issues));
+            if (!exportOptions) return;
+            const cleanBaseName = cleanFileName(exportOptions.fileName);
 
             btn.disabled = true;
             btn.innerHTML = '<svg class="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 正在生成PPT...';
@@ -2651,6 +2669,10 @@
                 pptx.company = 'Caresun International Group Limited';
                 
                 const templateMode = document.querySelector('input[name="template-mode"]:checked')?.value || 'company';
+                const imageFrameRatio = templateMode === 'company'
+                    ? 4.15 / (4.1 - 0.62 - 0.14)
+                    : 4.15 / (4.52 - 0.44);
+                const preparedImageCache = new Map();
                 if (templateMode === 'company') {
                     const coverSlide = pptx.addSlide();
                     renderCompanyCoverSlide(pptx, coverSlide, cleanBaseName);
@@ -2669,12 +2691,16 @@
                     const rightVideo = window[`rightVideo-${issueId}`];
                     const leftVideoName = window[`leftVideoName-${issueId}`];
                     const rightVideoName = window[`rightVideoName-${issueId}`];
+                    const [leftPptImage, rightPptImage] = await Promise.all([
+                        preparePPTImage(leftImg, imageFrameRatio, exportOptions, preparedImageCache),
+                        preparePPTImage(rightImg, imageFrameRatio, exportOptions, preparedImageCache)
+                    ]);
                     
                     const slide = pptx.addSlide();
                     if (templateMode === 'company') {
-                        renderCompanySlide(pptx, slide, { processName, leftImg, leftDesc, rightImg, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
+                        renderCompanySlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
                     } else {
-                        renderDefaultSlide(pptx, slide, { processName, leftImg, leftDesc, rightImg, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
+                        renderDefaultSlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
                     }
                 }
                 
@@ -2699,6 +2725,81 @@
             
             btn.disabled = false;
             btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> 一键生成PPT';
+        }
+
+        // 仅为本次导出生成适合PPT图片框的临时照片，不修改原图和页面预览。
+        function preparePPTImage(source, targetRatio, exportOptions, cache) {
+            if (!source) return Promise.resolve(null);
+            const mode = exportOptions.imageFitMode || 'balanced';
+            const distortion = Math.max(0, Math.min(15, Number(exportOptions.imageDistortion) || 0));
+            const variantKey = `${targetRatio.toFixed(4)}-${mode}-${distortion}`;
+            let variants = cache.get(source);
+            if (!variants) {
+                variants = new Map();
+                cache.set(source, variants);
+            }
+            if (variants.has(variantKey)) return variants.get(variantKey);
+
+            const task = new Promise((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => {
+                    try {
+                        const maxEdge = Math.min(2400, Math.max(image.naturalWidth, image.naturalHeight));
+                        const canvas = document.createElement('canvas');
+                        if (targetRatio >= 1) {
+                            canvas.width = Math.max(1, Math.round(maxEdge));
+                            canvas.height = Math.max(1, Math.round(maxEdge / targetRatio));
+                        } else {
+                            canvas.height = Math.max(1, Math.round(maxEdge));
+                            canvas.width = Math.max(1, Math.round(maxEdge * targetRatio));
+                        }
+
+                        const ctx = canvas.getContext('2d');
+                        const sourceRatio = image.naturalWidth / image.naturalHeight;
+                        ctx.fillStyle = '#F1F8EF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        if (mode === 'contain') {
+                            const inset = Math.max(4, Math.round(Math.min(canvas.width, canvas.height) * 0.02));
+                            const scale = Math.min(
+                                (canvas.width - inset * 2) / image.naturalWidth,
+                                (canvas.height - inset * 2) / image.naturalHeight
+                            );
+                            const drawW = image.naturalWidth * scale;
+                            const drawH = image.naturalHeight * scale;
+                            const drawX = (canvas.width - drawW) / 2;
+                            const drawY = (canvas.height - drawH) / 2;
+                            ctx.drawImage(image, drawX, drawY, drawW, drawH);
+                            ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+                            ctx.lineWidth = Math.max(2, Math.round(Math.min(canvas.width, canvas.height) * 0.008));
+                            ctx.strokeRect(drawX, drawY, drawW, drawH);
+                        } else {
+                            let adjustedWidth = image.naturalWidth;
+                            let adjustedHeight = image.naturalHeight;
+                            if (mode === 'balanced' && Math.abs(sourceRatio - targetRatio) > 0.001) {
+                                const needed = sourceRatio > targetRatio
+                                    ? sourceRatio / targetRatio - 1
+                                    : targetRatio / sourceRatio - 1;
+                                const amount = Math.min(distortion / 100, needed);
+                                if (sourceRatio > targetRatio) adjustedHeight *= 1 + amount;
+                                else adjustedWidth *= 1 + amount;
+                            }
+                            const scale = Math.max(canvas.width / adjustedWidth, canvas.height / adjustedHeight);
+                            const drawW = adjustedWidth * scale;
+                            const drawH = adjustedHeight * scale;
+                            ctx.drawImage(image, (canvas.width - drawW) / 2, (canvas.height - drawH) / 2, drawW, drawH);
+                        }
+
+                        resolve(canvas.toDataURL('image/jpeg', 0.94));
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                image.onerror = () => reject(new Error('照片处理失败，请重新上传后再试。'));
+                image.src = source;
+            });
+            variants.set(variantKey, task);
+            return task;
         }
 
         function renderCompanyCoverSlide(pptx, slide, title) {
@@ -2890,8 +2991,7 @@
             if (opt.img) {
                 slide.addImage({
                     data: opt.img,
-                    x: imgX, y: imgY, w: imgW, h: imgH,
-                    sizing: { type: 'cover', x: imgX, y: imgY, w: imgW, h: imgH }
+                    x: imgX, y: imgY, w: imgW, h: imgH
                 });
             } else if (opt.video) {
                 slide.addMedia({
@@ -2981,6 +3081,9 @@
                 const panel = document.getElementById('file-name-panel');
                 const input = document.getElementById('ppt-file-name');
                 input.value = defaultName;
+                document.getElementById('ppt-image-fit-mode').value = 'balanced';
+                document.getElementById('ppt-image-distortion').value = '6';
+                syncPPTImageFitControls();
                 panel.style.transform = '';
                 panel.dataset.x = '0';
                 panel.dataset.y = '0';
@@ -2995,8 +3098,10 @@
 
         function confirmFileNameDialog() {
             const input = document.getElementById('ppt-file-name');
-            const value = cleanFileName(input.value || `问题整改汇总_${formatTodayCompact()}`);
-            closeFileNameDialog(value);
+            const fileName = cleanFileName(input.value || `问题整改汇总_${formatTodayCompact()}`);
+            const imageFitMode = document.getElementById('ppt-image-fit-mode').value;
+            const imageDistortion = Number(document.getElementById('ppt-image-distortion').value);
+            closeFileNameDialog({ fileName, imageFitMode, imageDistortion });
         }
 
         function cancelFileNameDialog() {
@@ -3010,6 +3115,24 @@
             if (pendingFileNameResolve) {
                 pendingFileNameResolve(value);
                 pendingFileNameResolve = null;
+            }
+        }
+
+        function syncPPTImageFitControls() {
+            const mode = document.getElementById('ppt-image-fit-mode')?.value || 'balanced';
+            const distortion = Number(document.getElementById('ppt-image-distortion')?.value || 0);
+            const row = document.getElementById('ppt-image-distortion-row');
+            const value = document.getElementById('ppt-image-distortion-value');
+            const tip = document.getElementById('ppt-image-fit-tip');
+            if (!row || !value || !tip) return;
+            value.textContent = `${distortion}%`;
+            row.classList.toggle('hidden', mode !== 'balanced');
+            if (mode === 'cover') {
+                tip.textContent = '居中裁剪铺满图片框，不会拉伸照片。';
+            } else if (mode === 'contain') {
+                tip.textContent = '保留整张照片，四周以淡绿色补底，不裁不拉。';
+            } else {
+                tip.textContent = `最多 ${distortion}% 比例微调后居中裁剪，兼顾满铺与内容保留。`;
             }
         }
 
