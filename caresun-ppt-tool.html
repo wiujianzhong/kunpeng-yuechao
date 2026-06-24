@@ -646,6 +646,7 @@
                     <p class="mobile-upload-note text-gray-600 font-medium">点此选择相册图片</p>
                     <p class="desktop-upload-note text-sm text-gray-400 mt-1">拖拽可一次放多张，按拖入顺序自动生成对应页数PPT</p>
                     <p class="mobile-upload-note text-sm text-gray-400 mt-1">可一次选择多张图片，按选择顺序自动生成对应页数PPT</p>
+                    <p class="mt-3 inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-sm font-bold text-amber-700">💡 建议使用横屏照片，PPT展示效果更好</p>
                 </div>
                 <div id="batch-uploaded" class="hidden">
                     <p class="text-green-600 font-semibold">已上传 <span id="batch-count">0</span> 张</p>
@@ -1163,7 +1164,7 @@
                     // 导入拆解后，右边占位改为"整改后"提示
                     const rightPrompt = document.getElementById(`right-prompt-${issueId}`);
                     if (rightPrompt) {
-                        rightPrompt.innerHTML = '<p class="text-xl font-bold text-green-600">整改后照片</p><p class="text-base font-medium text-slate-500 mt-2">点击这里拍照或选择照片</p>';
+                        rightPrompt.innerHTML = '<p class="text-xl font-bold text-green-600">整改后照片</p><p class="text-base font-medium text-slate-500 mt-2">点击这里拍照或选择照片</p><p class="mt-2 text-sm font-bold text-amber-600">💡 建议使用横屏照片</p>';
                     }
                     setIssueMedia(issueId, 'left', 'image', item.image);
                     document.getElementById(`leftDesc-${issueId}`).value = item.title || '';
@@ -2024,6 +2025,7 @@
                                     </svg>
                                     <p class="desktop-upload-note text-xs text-slate-400">拖拽或粘贴</p>
                                     <p class="mobile-upload-note text-xs text-slate-400">点此选择单张</p>
+                                    <p class="mt-2 text-xs font-bold text-amber-600">建议使用横屏照片</p>
                                 </div>
                                 <div id="left-preview-${issueId}" class="hidden single-preview">
                                     <img id="left-img-${issueId}" class="image-preview">
@@ -2043,6 +2045,7 @@
                                 <input type="file" id="right-file-${issueId}" accept="image/*,video/*" class="mobile-file-input" aria-hidden="true">
                                 <div id="right-prompt-${issueId}">
                                     <p class="text-xs text-slate-300 mt-0.5">请添加照片</p>
+                                    <p class="mt-2 text-xs font-bold text-amber-600">建议使用横屏照片</p>
                                 </div>
                                 <div id="right-preview-${issueId}" class="hidden single-preview">
                                     <img id="right-img-${issueId}" class="image-preview">
