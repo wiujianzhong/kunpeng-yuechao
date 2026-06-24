@@ -298,6 +298,74 @@
         .modal-panel {
             touch-action: none;
         }
+        #photo-markup-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 100001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.8);
+        }
+        #photo-markup-modal.open { display: flex; }
+        .photo-markup-card {
+            display: flex;
+            flex-direction: column;
+            width: min(980px, 100%);
+            height: min(760px, calc(100vh - 24px));
+            overflow: hidden;
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+        }
+        .photo-markup-header,
+        .photo-markup-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 14px;
+        }
+        .photo-markup-header { border-bottom: 1px solid #e2e8f0; }
+        .photo-markup-footer { border-top: 1px solid #e2e8f0; }
+        .photo-markup-title { font-size: 1rem; font-weight: 700; color: #1e293b; }
+        .photo-markup-tip { margin-top: 2px; font-size: 0.75rem; color: #64748b; }
+        .photo-markup-stage { flex: 1; min-height: 0; background: #0f172a; }
+        #photo-markup-canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+        .photo-markup-tools,
+        .photo-markup-colors,
+        .photo-markup-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .photo-markup-tool,
+        .photo-markup-action {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #fff;
+            color: #334155;
+            padding: 7px 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .photo-markup-tool.active { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; }
+        .photo-markup-color {
+            width: 28px;
+            height: 28px;
+            border: 3px solid #fff;
+            border-radius: 9999px;
+            cursor: pointer;
+            box-shadow: 0 0 0 1px #cbd5e1;
+        }
+        .photo-markup-color.active { box-shadow: 0 0 0 3px #2563eb; }
+        .photo-markup-confirm { border-color: #16a34a; background: #16a34a; color: #fff; }
+        @media (max-width: 767px) {
+            #photo-markup-modal { padding: 0; }
+            .photo-markup-card { width: 100%; height: 100%; border-radius: 0; }
+            .photo-markup-header { align-items: flex-start; }
+            .photo-markup-footer { align-items: flex-start; flex-direction: column; }
+            .photo-markup-actions { width: 100%; }
+            .photo-markup-actions .photo-markup-action { flex: 1; }
+        }
     </style>
 
 <!-- ===== 激活弹窗样式 ===== -->
@@ -449,6 +517,45 @@
         <p class="purchase-note">扫码付款后，请将页面上的机器码发送给管理员 19009925522，领取对应时长的激活码。</p>
     </div>
 </div>
+<!-- ===== 照片标记 ===== -->
+<div id="photo-markup-modal" aria-hidden="true">
+    <div class="photo-markup-card" role="dialog" aria-modal="true" aria-labelledby="photo-markup-title">
+        <div class="photo-markup-header">
+            <div>
+                <div id="photo-markup-title" class="photo-markup-title">标记照片</div>
+                <div class="photo-markup-tip">选好工具后在大图上拖动；放大后可切换“移动照片”查看细节。</div>
+            </div>
+            <div class="photo-markup-actions">
+                <button type="button" class="photo-markup-action" onclick="setPhotoMarkupZoom(-0.25)">− 缩小</button>
+                <button type="button" class="photo-markup-action" onclick="setPhotoMarkupZoom(0.25)">＋ 放大</button>
+                <button type="button" class="photo-markup-action" onclick="resetPhotoMarkupView()">重置</button>
+            </div>
+        </div>
+        <div class="photo-markup-stage">
+            <canvas id="photo-markup-canvas"></canvas>
+        </div>
+        <div class="photo-markup-footer">
+            <div class="photo-markup-tools">
+                <button type="button" class="photo-markup-tool active" data-markup-tool="arrow" onclick="selectPhotoMarkupTool('arrow')">↗ 箭头</button>
+                <button type="button" class="photo-markup-tool" data-markup-tool="circle" onclick="selectPhotoMarkupTool('circle')">◯ 圆圈</button>
+                <button type="button" class="photo-markup-tool" data-markup-tool="rect" onclick="selectPhotoMarkupTool('rect')">□ 方框</button>
+                <button type="button" class="photo-markup-tool" data-markup-tool="move" onclick="selectPhotoMarkupTool('move')">✋ 移动照片</button>
+                <button type="button" class="photo-markup-action" onclick="undoPhotoMarkup()">↶ 撤销</button>
+                <button type="button" class="photo-markup-action" onclick="clearPhotoMarkup()">清除标记</button>
+            </div>
+            <div class="photo-markup-actions">
+                <div class="photo-markup-colors" aria-label="标记颜色">
+                    <button type="button" class="photo-markup-color active" data-markup-color="#ef4444" style="background:#ef4444" aria-label="红色" onclick="selectPhotoMarkupColor('#ef4444')"></button>
+                    <button type="button" class="photo-markup-color" data-markup-color="#f59e0b" style="background:#f59e0b" aria-label="黄色" onclick="selectPhotoMarkupColor('#f59e0b')"></button>
+                    <button type="button" class="photo-markup-color" data-markup-color="#2563eb" style="background:#2563eb" aria-label="蓝色" onclick="selectPhotoMarkupColor('#2563eb')"></button>
+                    <button type="button" class="photo-markup-color" data-markup-color="#16a34a" style="background:#16a34a" aria-label="绿色" onclick="selectPhotoMarkupColor('#16a34a')"></button>
+                </div>
+                <button type="button" class="photo-markup-action" onclick="closePhotoMarkup()">取消</button>
+                <button type="button" class="photo-markup-action photo-markup-confirm" onclick="confirmPhotoMarkup()">确认标记</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- ===== 激活码生成器（管理员） ===== -->
 <div id="admin-generator" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;">
     <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:420px;width:90%;">
@@ -584,6 +691,7 @@
         let issueCount = 0;
         const batchImages = [];
         let batchUploadQueue = Promise.resolve();
+        let photoMarkupState = null;
         let importedPPTX = null;
         let pendingFileNameResolve = null;
         let activePasteTarget = null;
@@ -721,6 +829,7 @@
             window.addEventListener('scroll', () => {
                 backToTop?.classList.toggle('hidden', window.scrollY < 360);
             }, { passive: true });
+            window.addEventListener('resize', resizePhotoMarkupCanvas);
             initializeLocalDraft();
         });
 
@@ -1890,6 +1999,7 @@
                                     <video id="left-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
                                     <div class="preview-actions">
                                         <p class="preview-status text-xs text-slate-600 font-semibold">已上传</p>
+                                        <button type="button" id="left-markup-${issueId}" onclick="openPhotoMarkup(event, ${issueId}, 'left')" class="hidden px-2 py-1 text-xs rounded border border-blue-200 bg-white text-blue-600 hover:bg-blue-50">标记</button>
                                         <button type="button" onclick="clearSingleImage(event, ${issueId}, 'left')" class="px-2 py-1 text-xs rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">清除</button>
                                     </div>
                                 </div>
@@ -1908,6 +2018,7 @@
                                     <video id="right-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
                                     <div class="preview-actions">
                                         <p class="preview-status text-xs text-slate-600 font-semibold">已上传</p>
+                                        <button type="button" id="right-markup-${issueId}" onclick="openPhotoMarkup(event, ${issueId}, 'right')" class="hidden px-2 py-1 text-xs rounded border border-blue-200 bg-white text-blue-600 hover:bg-blue-50">标记</button>
                                         <button type="button" onclick="clearSingleImage(event, ${issueId}, 'right')" class="px-2 py-1 text-xs rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">清除</button>
                                     </div>
                                 </div>
@@ -2080,8 +2191,10 @@
         function updateImagePreview(issueId, type, dataUrl, kind = isVideoDataUrl(dataUrl) ? 'video' : 'image') {
             const img = document.getElementById(`${type}-img-${issueId}`);
             const video = document.getElementById(`${type}-video-${issueId}`);
+            const markupButton = document.getElementById(`${type}-markup-${issueId}`);
             document.getElementById(`${type}-prompt-${issueId}`).classList.add('hidden');
             document.getElementById(`${type}-preview-${issueId}`).classList.remove('hidden');
+            markupButton?.classList.toggle('hidden', kind !== 'image');
             if (kind === 'video') {
                 if (img) {
                     img.removeAttribute('src');
@@ -2123,6 +2236,285 @@
             document.getElementById(`${type}-preview-${issueId}`).classList.add('hidden');
             document.getElementById(`${type}-prompt-${issueId}`).classList.remove('hidden');
             document.getElementById(`${type}-zone-${issueId}`).classList.remove('uploaded');
+        }
+
+        // 照片标记：在大图上画完后合成为新图片，原有PPT生成流程无需改变。
+        function openPhotoMarkup(event, issueId, type) {
+            event.preventDefault();
+            event.stopPropagation();
+            const source = window[`${type}Image-${issueId}`];
+            if (!source) {
+                alert('目前只能标记照片，视频暂不支持。');
+                return;
+            }
+
+            const modal = document.getElementById('photo-markup-modal');
+            const image = new Image();
+            photoMarkupState = {
+                issueId,
+                type,
+                image,
+                shapes: [],
+                tool: 'arrow',
+                color: '#ef4444',
+                zoom: 1,
+                panX: 0,
+                panY: 0,
+                activeShape: null,
+                pointer: null,
+                canvasWidth: 0,
+                canvasHeight: 0
+            };
+            image.onload = () => {
+                modal.classList.add('open');
+                modal.setAttribute('aria-hidden', 'false');
+                syncPhotoMarkupControls();
+                requestAnimationFrame(() => {
+                    resizePhotoMarkupCanvas();
+                    bindPhotoMarkupCanvas();
+                });
+            };
+            image.onerror = () => {
+                photoMarkupState = null;
+                alert('照片加载失败，请重新上传后再试。');
+            };
+            image.src = source;
+        }
+
+        function closePhotoMarkup() {
+            const modal = document.getElementById('photo-markup-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            const canvas = document.getElementById('photo-markup-canvas');
+            canvas.onpointerdown = null;
+            canvas.onpointermove = null;
+            canvas.onpointerup = null;
+            canvas.onpointercancel = null;
+            photoMarkupState = null;
+        }
+
+        function bindPhotoMarkupCanvas() {
+            const canvas = document.getElementById('photo-markup-canvas');
+            canvas.onpointerdown = startPhotoMarkupPointer;
+            canvas.onpointermove = movePhotoMarkupPointer;
+            canvas.onpointerup = endPhotoMarkupPointer;
+            canvas.onpointercancel = endPhotoMarkupPointer;
+        }
+
+        function resizePhotoMarkupCanvas() {
+            const state = photoMarkupState;
+            const canvas = document.getElementById('photo-markup-canvas');
+            if (!state || !state.image.complete || !canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            if (!rect.width || !rect.height) return;
+            const ratio = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = Math.round(rect.width * ratio);
+            canvas.height = Math.round(rect.height * ratio);
+            state.canvasWidth = rect.width;
+            state.canvasHeight = rect.height;
+            renderPhotoMarkup();
+        }
+
+        function getPhotoMarkupViewport() {
+            const state = photoMarkupState;
+            const fitScale = Math.min(state.canvasWidth / state.image.naturalWidth, state.canvasHeight / state.image.naturalHeight);
+            const scale = fitScale * state.zoom;
+            return {
+                scale,
+                x: (state.canvasWidth - state.image.naturalWidth * scale) / 2 + state.panX,
+                y: (state.canvasHeight - state.image.naturalHeight * scale) / 2 + state.panY
+            };
+        }
+
+        function getPhotoMarkupPoint(event) {
+            const canvas = document.getElementById('photo-markup-canvas');
+            const state = photoMarkupState;
+            const rect = canvas.getBoundingClientRect();
+            const view = getPhotoMarkupViewport();
+            const x = (event.clientX - rect.left - view.x) / view.scale;
+            const y = (event.clientY - rect.top - view.y) / view.scale;
+            return {
+                x: Math.max(0, Math.min(state.image.naturalWidth, x)),
+                y: Math.max(0, Math.min(state.image.naturalHeight, y))
+            };
+        }
+
+        function isPhotoMarkupPointInImage(event) {
+            const canvas = document.getElementById('photo-markup-canvas');
+            const rect = canvas.getBoundingClientRect();
+            const view = getPhotoMarkupViewport();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const state = photoMarkupState;
+            return x >= view.x && x <= view.x + state.image.naturalWidth * view.scale
+                && y >= view.y && y <= view.y + state.image.naturalHeight * view.scale;
+        }
+
+        function startPhotoMarkupPointer(event) {
+            const state = photoMarkupState;
+            const canvas = document.getElementById('photo-markup-canvas');
+            if (!state || !isPhotoMarkupPointInImage(event)) return;
+            event.preventDefault();
+            canvas.setPointerCapture?.(event.pointerId);
+            state.pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+            if (state.tool === 'move') return;
+            const point = getPhotoMarkupPoint(event);
+            state.activeShape = { type: state.tool, color: state.color, x1: point.x, y1: point.y, x2: point.x, y2: point.y };
+            renderPhotoMarkup();
+        }
+
+        function movePhotoMarkupPointer(event) {
+            const state = photoMarkupState;
+            if (!state?.pointer || state.pointer.id !== event.pointerId) return;
+            event.preventDefault();
+            if (state.tool === 'move') {
+                state.panX += event.clientX - state.pointer.x;
+                state.panY += event.clientY - state.pointer.y;
+                state.pointer.x = event.clientX;
+                state.pointer.y = event.clientY;
+            } else if (state.activeShape) {
+                const point = getPhotoMarkupPoint(event);
+                state.activeShape.x2 = point.x;
+                state.activeShape.y2 = point.y;
+            }
+            renderPhotoMarkup();
+        }
+
+        function endPhotoMarkupPointer(event) {
+            const state = photoMarkupState;
+            if (!state?.pointer || state.pointer.id !== event.pointerId) return;
+            event.preventDefault();
+            if (state.activeShape) {
+                const dx = state.activeShape.x2 - state.activeShape.x1;
+                const dy = state.activeShape.y2 - state.activeShape.y1;
+                if (Math.hypot(dx, dy) > 6) state.shapes.push(state.activeShape);
+                state.activeShape = null;
+            }
+            document.getElementById('photo-markup-canvas').releasePointerCapture?.(event.pointerId);
+            state.pointer = null;
+            renderPhotoMarkup();
+        }
+
+        function drawPhotoMarkupShape(ctx, shape, view, lineWidth) {
+            const x1 = view.x + shape.x1 * view.scale;
+            const y1 = view.y + shape.y1 * view.scale;
+            const x2 = view.x + shape.x2 * view.scale;
+            const y2 = view.y + shape.y2 * view.scale;
+            ctx.save();
+            ctx.strokeStyle = shape.color;
+            ctx.fillStyle = shape.color;
+            ctx.lineWidth = lineWidth;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            if (shape.type === 'circle') {
+                ctx.ellipse((x1 + x2) / 2, (y1 + y2) / 2, Math.abs(x2 - x1) / 2, Math.abs(y2 - y1) / 2, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            } else if (shape.type === 'rect') {
+                ctx.strokeRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
+            } else {
+                const angle = Math.atan2(y2 - y1, x2 - x1);
+                const head = Math.max(lineWidth * 4, 16);
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.moveTo(x2, y2);
+                ctx.lineTo(x2 - head * Math.cos(angle - Math.PI / 6), y2 - head * Math.sin(angle - Math.PI / 6));
+                ctx.moveTo(x2, y2);
+                ctx.lineTo(x2 - head * Math.cos(angle + Math.PI / 6), y2 - head * Math.sin(angle + Math.PI / 6));
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function renderPhotoMarkup() {
+            const state = photoMarkupState;
+            const canvas = document.getElementById('photo-markup-canvas');
+            if (!state || !state.canvasWidth || !canvas) return;
+            const ratio = Math.min(window.devicePixelRatio || 1, 2);
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+            ctx.clearRect(0, 0, state.canvasWidth, state.canvasHeight);
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, state.canvasWidth, state.canvasHeight);
+            const view = getPhotoMarkupViewport();
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(view.x, view.y, state.image.naturalWidth * view.scale, state.image.naturalHeight * view.scale);
+            ctx.clip();
+            ctx.drawImage(state.image, view.x, view.y, state.image.naturalWidth * view.scale, state.image.naturalHeight * view.scale);
+            state.shapes.forEach(shape => drawPhotoMarkupShape(ctx, shape, view, 4));
+            if (state.activeShape) drawPhotoMarkupShape(ctx, state.activeShape, view, 4);
+            ctx.restore();
+        }
+
+        function selectPhotoMarkupTool(tool) {
+            if (!photoMarkupState) return;
+            photoMarkupState.tool = tool;
+            syncPhotoMarkupControls();
+        }
+
+        function selectPhotoMarkupColor(color) {
+            if (!photoMarkupState) return;
+            photoMarkupState.color = color;
+            syncPhotoMarkupControls();
+        }
+
+        function syncPhotoMarkupControls() {
+            if (!photoMarkupState) return;
+            document.querySelectorAll('[data-markup-tool]').forEach(button => {
+                button.classList.toggle('active', button.dataset.markupTool === photoMarkupState.tool);
+            });
+            document.querySelectorAll('[data-markup-color]').forEach(button => {
+                button.classList.toggle('active', button.dataset.markupColor === photoMarkupState.color);
+            });
+        }
+
+        function setPhotoMarkupZoom(delta) {
+            if (!photoMarkupState) return;
+            photoMarkupState.zoom = Math.max(0.7, Math.min(4, Number((photoMarkupState.zoom + delta).toFixed(2))));
+            renderPhotoMarkup();
+        }
+
+        function resetPhotoMarkupView() {
+            if (!photoMarkupState) return;
+            photoMarkupState.zoom = 1;
+            photoMarkupState.panX = 0;
+            photoMarkupState.panY = 0;
+            renderPhotoMarkup();
+        }
+
+        function undoPhotoMarkup() {
+            if (!photoMarkupState) return;
+            photoMarkupState.shapes.pop();
+            renderPhotoMarkup();
+        }
+
+        function clearPhotoMarkup() {
+            if (!photoMarkupState) return;
+            photoMarkupState.shapes = [];
+            renderPhotoMarkup();
+        }
+
+        function confirmPhotoMarkup() {
+            const state = photoMarkupState;
+            if (!state) return;
+            try {
+                const output = document.createElement('canvas');
+                output.width = state.image.naturalWidth;
+                output.height = state.image.naturalHeight;
+                const ctx = output.getContext('2d');
+                ctx.drawImage(state.image, 0, 0);
+                const lineWidth = Math.max(6, Math.min(18, Math.min(output.width, output.height) * 0.006));
+                state.shapes.forEach(shape => drawPhotoMarkupShape(ctx, shape, { x: 0, y: 0, scale: 1 }, lineWidth));
+                const dataUrl = output.toDataURL('image/jpeg', 0.95);
+                setIssueMedia(state.issueId, state.type, 'image', dataUrl);
+                updateImagePreview(state.issueId, state.type, dataUrl, 'image');
+                refreshBatchImagesFromIssues();
+                closePhotoMarkup();
+            } catch (error) {
+                console.error(error);
+                alert('标记保存失败，请缩小照片后重试。');
+            }
         }
 
         function updateBatchPreview() {
