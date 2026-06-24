@@ -370,6 +370,36 @@
 }
 .trial-success-text { font-size: 0.85rem; color: #16a34a; margin-top: 8px; display: none; }
 .trial-success-text.visible { display: block; }
+#purchase-btn {
+    width: 100%; padding: 12px; border: 0; border-radius: 10px;
+    background: linear-gradient(135deg, #16a34a, #059669); color: #fff;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+}
+#purchase-modal {
+    position: fixed; inset: 0; z-index: 100000; display: none;
+    align-items: center; justify-content: center; padding: 16px;
+    background: rgba(15, 23, 42, 0.62); backdrop-filter: blur(3px);
+}
+#purchase-modal.open { display: flex; }
+.purchase-card {
+    position: relative; width: min(420px, 100%); max-height: calc(100vh - 32px);
+    overflow-y: auto; box-sizing: border-box; padding: 28px 24px;
+    border-radius: 18px; background: #fff; text-align: center;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+}
+.purchase-close {
+    position: absolute; top: 10px; right: 12px; border: 0; background: transparent;
+    color: #64748b; font-size: 28px; line-height: 1; cursor: pointer;
+}
+.purchase-plans { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
+.purchase-plan {
+    border: 2px solid #e2e8f0; border-radius: 12px; padding: 12px 8px;
+    background: #fff; color: #1e293b; cursor: pointer;
+}
+.purchase-plan.selected { border-color: #16a34a; background: #f0fdf4; }
+.purchase-plan strong { display: block; font-size: 1.15rem; color: #15803d; margin-top: 4px; }
+.purchase-qr { width: min(260px, 80vw); border-radius: 12px; display: block; margin: 8px auto 12px; }
+.purchase-note { color: #64748b; font-size: 0.8rem; line-height: 1.6; }
 </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -399,8 +429,24 @@
             <button id="trial-btn" onclick="startFreeTrial()">🎉 免费体验7天</button>
             <div class="divider-line"><span>或</span></div>
         </div>
+        <button id="purchase-btn" onclick="openPurchaseModal()">💳 开通会员 · ¥5/月起</button>
         <p class="activation-footer" id="activation-footer-text">👆 新用户点上方免费体验 · 已有激活码则输入激活</p>
         <div style="text-align:center;margin-top:8px;"><a href="javascript:void(0)" onclick="toggleAdminPanel()" style="font-size:11px;color:#999;text-decoration:none;">⚙ 管理员</a></div>
+    </div>
+</div>
+<!-- ===== 会员购买 ===== -->
+<div id="purchase-modal" aria-hidden="true">
+    <div class="purchase-card" role="dialog" aria-modal="true" aria-labelledby="purchase-title">
+        <button class="purchase-close" type="button" aria-label="关闭" onclick="closePurchaseModal()">×</button>
+        <h3 id="purchase-title" style="margin:0;color:#1e293b;font-size:1.35rem;">开通会员</h3>
+        <p style="margin:8px 0 0;color:#64748b;font-size:0.85rem;">选择套餐后，使用微信扫码支付</p>
+        <div class="purchase-plans">
+            <button id="purchase-plan-month" class="purchase-plan selected" type="button" onclick="selectPurchasePlan('月卡', '¥5 · 30天')">月卡<strong>¥5</strong><span style="font-size:0.78rem;">30天</span></button>
+            <button id="purchase-plan-year" class="purchase-plan" type="button" onclick="selectPurchasePlan('年卡', '¥50 · 12个月')">年卡<strong>¥50</strong><span style="font-size:0.78rem;">12个月</span></button>
+        </div>
+        <img class="purchase-qr" src="caresun-wechat-pay.jpg" alt="微信支付二维码">
+        <p id="purchase-plan-note" style="margin:0 0 8px;color:#15803d;font-weight:700;">当前选择：月卡 · ¥5 · 30天</p>
+        <p class="purchase-note">扫码付款后，请将页面上的机器码发送给管理员 19009925522，领取对应时长的激活码。</p>
     </div>
 </div>
 <!-- ===== 激活码生成器（管理员） ===== -->
@@ -2861,6 +2907,24 @@
             err.textContent = '⚠️ ' + msg;
             err.classList.add('visible');
         }
+
+        window.openPurchaseModal = function() {
+            const modal = document.getElementById('purchase-modal');
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+        };
+
+        window.closePurchaseModal = function() {
+            const modal = document.getElementById('purchase-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+        };
+
+        window.selectPurchasePlan = function(name, detail) {
+            document.getElementById('purchase-plan-month').classList.toggle('selected', name === '月卡');
+            document.getElementById('purchase-plan-year').classList.toggle('selected', name === '年卡');
+            document.getElementById('purchase-plan-note').textContent = `当前选择：${name} · ${detail}`;
+        };
 
         // ===== 管理员激活码生成器 =====
         function toggleAdminPanel() {
