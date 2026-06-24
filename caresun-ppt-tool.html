@@ -593,6 +593,9 @@
             <p class="mt-2 inline-flex items-center justify-center rounded-full border border-green-200 bg-green-50 px-4 py-1 text-sm font-semibold text-green-700">
                 小伍出品 · 技术支持 19009925522
             </p>
+            <p class="mx-auto mt-3 max-w-2xl rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">
+                推荐使用：电脑 Chrome/Edge、苹果 Safari、安卓 Chrome 或较新的系统浏览器。微信、QQ 内置浏览器可能无法下载PPT，请点右上角“在浏览器打开”。
+            </p>
         </div>
 
         <div class="mb-4 flex justify-center">
@@ -736,6 +739,8 @@
         let draftSaveTimer = null;
         let isRestoringDraft = false;
         let draftAvailable = false;
+        const UPLOAD_MAX_EDGE = 2400;
+        const UPLOAD_QUALITY = 0.9;
         const COMPRESS_MAX_EDGE = 2400;
         const COMPRESS_QUALITY = 0.88;
         const PPT_IMPORT_MAX_EDGE = 2800;
@@ -1785,21 +1790,25 @@
             return Number((Number(value || 0) / 914400).toFixed(4));
         }
 
-        // 图片处理：过canvas剥离EXIF，保留浏览器修正后的方向
+        // 图片处理：上传时先缩小超大照片，保留浏览器修正后的方向，避免手机内存占用过高。
         function processImage(file) {
-            return new Promise(resolve => {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const img = new Image();
                     img.onload = function() {
+                        const maxSide = Math.max(img.naturalWidth, img.naturalHeight);
+                        const scale = Math.min(1, UPLOAD_MAX_EDGE / maxSide);
                         const c = document.createElement('canvas');
-                        c.width = img.naturalWidth;
-                        c.height = img.naturalHeight;
+                        c.width = Math.max(1, Math.round(img.naturalWidth * scale));
+                        c.height = Math.max(1, Math.round(img.naturalHeight * scale));
                         c.getContext('2d').drawImage(img, 0, 0);
-                        resolve(c.toDataURL('image/jpeg', 0.95));
+                        resolve(c.toDataURL('image/jpeg', UPLOAD_QUALITY));
                     };
+                    img.onerror = () => reject(new Error('图片读取失败'));
                     img.src = e.target.result;
                 };
+                reader.onerror = () => reject(reader.error || new Error('图片读取失败'));
                 reader.readAsDataURL(file);
             });
         }
@@ -2204,21 +2213,15 @@
                     });
                 return;
             }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const c = document.createElement('canvas');
-                    c.width = img.naturalWidth;
-                    c.height = img.naturalHeight;
-                    c.getContext('2d').drawImage(img, 0, 0);
-                    const dataUrl = c.toDataURL('image/jpeg', 0.95);
+            readImageFile(file)
+                .then(dataUrl => {
                     setIssueMedia(issueId, type, 'image', dataUrl, file.name || '');
                     updateImagePreview(issueId, type, dataUrl, 'image');
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert(`图片读取失败：${getErrorMessage(error)}`);
+                });
         }
 
         // 更新预览
