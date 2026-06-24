@@ -686,15 +686,14 @@
                     <label for="ppt-image-fit-mode" class="block text-sm font-medium text-gray-600 mb-2">照片呈现（仅影响这次导出）</label>
                     <select id="ppt-image-fit-mode" class="w-full px-3 py-3 border border-gray-200 rounded-lg bg-white text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500" onchange="syncPPTImageFitControls()">
                         <option value="balanced">适中调整（推荐）</option>
-                        <option value="cover">满铺裁剪</option>
                         <option value="contain">完整不变形</option>
                     </select>
                     <div id="ppt-image-distortion-row" class="mt-3">
                         <div class="flex items-center justify-between text-sm text-gray-600">
                             <label for="ppt-image-distortion">变形量</label>
-                            <span id="ppt-image-distortion-value" class="font-semibold text-green-700">6%</span>
+                            <span id="ppt-image-distortion-value" class="font-semibold text-green-700">15%</span>
                         </div>
-                        <input id="ppt-image-distortion" type="range" min="0" max="15" value="6" class="mt-2 w-full accent-green-600" oninput="syncPPTImageFitControls()">
+                        <input id="ppt-image-distortion" type="range" min="10" max="30" value="15" class="mt-2 w-full accent-green-600" oninput="syncPPTImageFitControls()">
                     </div>
                     <p id="ppt-image-fit-tip" class="mt-2 text-xs text-gray-400"></p>
                     <p class="mt-1 text-xs text-gray-400">视频保持原样；工具内的图片预览和原图不会改变。</p>
@@ -2449,7 +2448,7 @@
             ctx.restore();
         }
 
-        function drawPhotoMagnifier(ctx, view, radius = 72) {
+        function drawPhotoMagnifier(ctx, view, radius = 58) {
             const state = photoMarkupState;
             if (!state?.magnifier) return;
             const zoom = 2.5;
@@ -2502,8 +2501,8 @@
             ctx.rect(view.x, view.y, state.image.naturalWidth * view.scale, state.image.naturalHeight * view.scale);
             ctx.clip();
             ctx.drawImage(state.image, view.x, view.y, state.image.naturalWidth * view.scale, state.image.naturalHeight * view.scale);
-            state.shapes.forEach(shape => drawPhotoMarkupShape(ctx, shape, view, 4));
-            if (state.activeShape) drawPhotoMarkupShape(ctx, state.activeShape, view, 4);
+            state.shapes.forEach(shape => drawPhotoMarkupShape(ctx, shape, view, 8));
+            if (state.activeShape) drawPhotoMarkupShape(ctx, state.activeShape, view, 8);
             ctx.restore();
             drawPhotoMagnifier(ctx, view);
         }
@@ -2573,10 +2572,10 @@
                 output.height = state.image.naturalHeight;
                 const ctx = output.getContext('2d');
                 ctx.drawImage(state.image, 0, 0);
-                const lineWidth = Math.max(6, Math.min(18, Math.min(output.width, output.height) * 0.006));
+                const lineWidth = Math.max(12, Math.min(36, Math.min(output.width, output.height) * 0.012));
                 state.shapes.forEach(shape => drawPhotoMarkupShape(ctx, shape, { x: 0, y: 0, scale: 1 }, lineWidth));
                 const editView = getPhotoMarkupViewport();
-                drawPhotoMagnifier(ctx, { x: 0, y: 0, scale: 1 }, 72 / editView.scale);
+                drawPhotoMagnifier(ctx, { x: 0, y: 0, scale: 1 }, 58 / editView.scale);
                 const dataUrl = output.toDataURL('image/jpeg', 0.95);
                 setIssueMedia(state.issueId, state.type, 'image', dataUrl);
                 updateImagePreview(state.issueId, state.type, dataUrl, 'image');
@@ -2731,7 +2730,7 @@
         function preparePPTImage(source, targetRatio, exportOptions, cache) {
             if (!source) return Promise.resolve(null);
             const mode = exportOptions.imageFitMode || 'balanced';
-            const distortion = Math.max(0, Math.min(15, Number(exportOptions.imageDistortion) || 0));
+            const distortion = Math.max(10, Math.min(30, Number(exportOptions.imageDistortion) || 15));
             const variantKey = `${targetRatio.toFixed(4)}-${mode}-${distortion}`;
             let variants = cache.get(source);
             if (!variants) {
@@ -3082,7 +3081,7 @@
                 const input = document.getElementById('ppt-file-name');
                 input.value = defaultName;
                 document.getElementById('ppt-image-fit-mode').value = 'balanced';
-                document.getElementById('ppt-image-distortion').value = '6';
+                document.getElementById('ppt-image-distortion').value = '15';
                 syncPPTImageFitControls();
                 panel.style.transform = '';
                 panel.dataset.x = '0';
@@ -3126,10 +3125,8 @@
             const tip = document.getElementById('ppt-image-fit-tip');
             if (!row || !value || !tip) return;
             value.textContent = `${distortion}%`;
-            row.classList.toggle('hidden', mode !== 'balanced');
-            if (mode === 'cover') {
-                tip.textContent = '居中裁剪铺满图片框，不会拉伸照片。';
-            } else if (mode === 'contain') {
+            row.classList.toggle('hidden', mode === 'contain');
+            if (mode === 'contain') {
                 tip.textContent = '保留整张照片，四周以淡绿色补底，不裁不拉。';
             } else {
                 tip.textContent = `最多 ${distortion}% 比例微调后居中裁剪，兼顾满铺与内容保留。`;
