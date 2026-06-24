@@ -522,7 +522,7 @@
     <div class="photo-markup-card" role="dialog" aria-modal="true" aria-labelledby="photo-markup-title">
         <div class="photo-markup-header">
             <div>
-                <div id="photo-markup-title" class="photo-markup-title">标记照片</div>
+                <div id="photo-markup-title" class="photo-markup-title">编辑照片</div>
                 <div class="photo-markup-tip">选好工具后在大图上拖动；放大后可切换“移动照片”查看细节。</div>
             </div>
             <div class="photo-markup-actions">
@@ -541,7 +541,7 @@
                 <button type="button" class="photo-markup-tool" data-markup-tool="rect" onclick="selectPhotoMarkupTool('rect')">□ 方框</button>
                 <button type="button" class="photo-markup-tool" data-markup-tool="move" onclick="selectPhotoMarkupTool('move')">✋ 移动照片</button>
                 <button type="button" class="photo-markup-action" onclick="undoPhotoMarkup()">↶ 撤销</button>
-                <button type="button" class="photo-markup-action" onclick="clearPhotoMarkup()">清除标记</button>
+                <button type="button" class="photo-markup-action" onclick="clearPhotoMarkup()">清除本次编辑</button>
             </div>
             <div class="photo-markup-actions">
                 <div class="photo-markup-colors" aria-label="标记颜色">
@@ -551,7 +551,7 @@
                     <button type="button" class="photo-markup-color" data-markup-color="#16a34a" style="background:#16a34a" aria-label="绿色" onclick="selectPhotoMarkupColor('#16a34a')"></button>
                 </div>
                 <button type="button" class="photo-markup-action" onclick="closePhotoMarkup()">取消</button>
-                <button type="button" class="photo-markup-action photo-markup-confirm" onclick="confirmPhotoMarkup()">确认标记</button>
+                <button type="button" class="photo-markup-action photo-markup-confirm" onclick="confirmPhotoMarkup()">确认编辑</button>
             </div>
         </div>
     </div>
@@ -1999,7 +1999,7 @@
                                     <video id="left-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
                                     <div class="preview-actions">
                                         <p class="preview-status text-xs text-slate-600 font-semibold">已上传</p>
-                                        <button type="button" id="left-markup-${issueId}" onclick="openPhotoMarkup(event, ${issueId}, 'left')" class="hidden px-2 py-1 text-xs rounded border border-blue-200 bg-white text-blue-600 hover:bg-blue-50">标记</button>
+                                        <button type="button" id="left-markup-${issueId}" onclick="openPhotoMarkup(event, ${issueId}, 'left')" class="hidden px-2 py-1 text-xs rounded border border-blue-200 bg-white text-blue-600 hover:bg-blue-50">编辑</button>
                                         <button type="button" onclick="clearSingleImage(event, ${issueId}, 'left')" class="px-2 py-1 text-xs rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">清除</button>
                                     </div>
                                 </div>
@@ -2018,7 +2018,7 @@
                                     <video id="right-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
                                     <div class="preview-actions">
                                         <p class="preview-status text-xs text-slate-600 font-semibold">已上传</p>
-                                        <button type="button" id="right-markup-${issueId}" onclick="openPhotoMarkup(event, ${issueId}, 'right')" class="hidden px-2 py-1 text-xs rounded border border-blue-200 bg-white text-blue-600 hover:bg-blue-50">标记</button>
+                                        <button type="button" id="right-markup-${issueId}" onclick="openPhotoMarkup(event, ${issueId}, 'right')" class="hidden px-2 py-1 text-xs rounded border border-blue-200 bg-white text-blue-600 hover:bg-blue-50">编辑</button>
                                         <button type="button" onclick="clearSingleImage(event, ${issueId}, 'right')" class="px-2 py-1 text-xs rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">清除</button>
                                     </div>
                                 </div>
@@ -2513,7 +2513,7 @@
                 closePhotoMarkup();
             } catch (error) {
                 console.error(error);
-                alert('标记保存失败，请缩小照片后重试。');
+                alert('编辑保存失败，请缩小照片后重试。');
             }
         }
 
