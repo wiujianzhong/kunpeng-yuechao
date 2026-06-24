@@ -526,7 +526,7 @@
         <div class="photo-markup-header">
             <div>
                 <div id="photo-markup-title" class="photo-markup-title">编辑照片</div>
-                <div class="photo-markup-tip">选好工具后在大图上拖动；点“放大镜”后按住照片可查看细节。</div>
+                <div class="photo-markup-tip">选好工具后在大图上拖动；点“放大镜”后，它会出现在图片中间，可用手指拖动位置。</div>
             </div>
             <div class="photo-markup-actions">
                 <button type="button" class="photo-markup-action" onclick="setPhotoMarkupZoom(-0.25)">− 缩小</button>
@@ -2389,9 +2389,7 @@
             const state = photoMarkupState;
             if (!state?.pointer || state.pointer.id !== event.pointerId) return;
             event.preventDefault();
-            if (state.tool === 'magnifier') {
-                state.magnifier = null;
-            } else if (state.activeShape) {
+            if (state.tool !== 'magnifier' && state.activeShape) {
                 const dx = state.activeShape.x2 - state.activeShape.x1;
                 const dy = state.activeShape.y2 - state.activeShape.y1;
                 if (Math.hypot(dx, dy) > 6) state.shapes.push(state.activeShape);
@@ -2433,10 +2431,9 @@
             ctx.restore();
         }
 
-        function drawPhotoMagnifier(ctx, view) {
+        function drawPhotoMagnifier(ctx, view, radius = 72) {
             const state = photoMarkupState;
             if (!state?.magnifier) return;
-            const radius = 72;
             const zoom = 2.5;
             const point = state.magnifier;
             const centerX = view.x + point.x * view.scale;
@@ -2496,6 +2493,13 @@
         function selectPhotoMarkupTool(tool) {
             if (!photoMarkupState) return;
             photoMarkupState.tool = tool;
+            if (tool === 'magnifier') {
+                photoMarkupState.magnifier = {
+                    x: photoMarkupState.image.naturalWidth / 2,
+                    y: photoMarkupState.image.naturalHeight / 2
+                };
+                renderPhotoMarkup();
+            }
             syncPhotoMarkupControls();
         }
 
@@ -2538,6 +2542,7 @@
         function clearPhotoMarkup() {
             if (!photoMarkupState) return;
             photoMarkupState.shapes = [];
+            photoMarkupState.magnifier = null;
             renderPhotoMarkup();
         }
 
@@ -2552,6 +2557,8 @@
                 ctx.drawImage(state.image, 0, 0);
                 const lineWidth = Math.max(6, Math.min(18, Math.min(output.width, output.height) * 0.006));
                 state.shapes.forEach(shape => drawPhotoMarkupShape(ctx, shape, { x: 0, y: 0, scale: 1 }, lineWidth));
+                const editView = getPhotoMarkupViewport();
+                drawPhotoMagnifier(ctx, { x: 0, y: 0, scale: 1 }, 72 / editView.scale);
                 const dataUrl = output.toDataURL('image/jpeg', 0.95);
                 setIssueMedia(state.issueId, state.type, 'image', dataUrl);
                 updateImagePreview(state.issueId, state.type, dataUrl, 'image');
