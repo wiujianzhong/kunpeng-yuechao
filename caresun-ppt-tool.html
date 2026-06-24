@@ -526,7 +526,7 @@
         <div class="photo-markup-header">
             <div>
                 <div id="photo-markup-title" class="photo-markup-title">编辑照片</div>
-                <div class="photo-markup-tip">选好工具后在大图上拖动；放大后可切换“移动照片”查看细节。</div>
+                <div class="photo-markup-tip">选好工具后在大图上拖动；点“放大镜”后按住照片可查看细节。</div>
             </div>
             <div class="photo-markup-actions">
                 <button type="button" class="photo-markup-action" onclick="setPhotoMarkupZoom(-0.25)">− 缩小</button>
@@ -542,7 +542,7 @@
                 <button type="button" class="photo-markup-tool active" data-markup-tool="arrow" onclick="selectPhotoMarkupTool('arrow')">↗ 箭头</button>
                 <button type="button" class="photo-markup-tool" data-markup-tool="circle" onclick="selectPhotoMarkupTool('circle')">◯ 圆圈</button>
                 <button type="button" class="photo-markup-tool" data-markup-tool="rect" onclick="selectPhotoMarkupTool('rect')">□ 方框</button>
-                <button type="button" class="photo-markup-tool" data-markup-tool="move" onclick="selectPhotoMarkupTool('move')">✋ 移动照片</button>
+                <button type="button" class="photo-markup-tool" data-markup-tool="magnifier" onclick="selectPhotoMarkupTool('magnifier')">🔍 放大镜</button>
                 <button type="button" class="photo-markup-action" onclick="undoPhotoMarkup()">↶ 撤销</button>
                 <button type="button" class="photo-markup-action" onclick="clearPhotoMarkup()">清除本次编辑</button>
             </div>
@@ -2263,6 +2263,7 @@
                 zoom: 1,
                 panX: 0,
                 panY: 0,
+                magnifier: null,
                 activeShape: null,
                 pointer: null,
                 canvasWidth: 0,
@@ -2360,8 +2361,12 @@
             event.preventDefault();
             canvas.setPointerCapture?.(event.pointerId);
             state.pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
-            if (state.tool === 'move') return;
             const point = getPhotoMarkupPoint(event);
+            if (state.tool === 'magnifier') {
+                state.magnifier = point;
+                renderPhotoMarkup();
+                return;
+            }
             state.activeShape = { type: state.tool, color: state.color, x1: point.x, y1: point.y, x2: point.x, y2: point.y };
             renderPhotoMarkup();
         }
@@ -2370,11 +2375,8 @@
             const state = photoMarkupState;
             if (!state?.pointer || state.pointer.id !== event.pointerId) return;
             event.preventDefault();
-            if (state.tool === 'move') {
-                state.panX += event.clientX - state.pointer.x;
-                state.panY += event.clientY - state.pointer.y;
-                state.pointer.x = event.clientX;
-                state.pointer.y = event.clientY;
+            if (state.tool === 'magnifier') {
+                state.magnifier = getPhotoMarkupPoint(event);
             } else if (state.activeShape) {
                 const point = getPhotoMarkupPoint(event);
                 state.activeShape.x2 = point.x;
@@ -2387,7 +2389,9 @@
             const state = photoMarkupState;
             if (!state?.pointer || state.pointer.id !== event.pointerId) return;
             event.preventDefault();
-            if (state.activeShape) {
+            if (state.tool === 'magnifier') {
+                state.magnifier = null;
+            } else if (state.activeShape) {
                 const dx = state.activeShape.x2 - state.activeShape.x1;
                 const dy = state.activeShape.y2 - state.activeShape.y1;
                 if (Math.hypot(dx, dy) > 6) state.shapes.push(state.activeShape);
@@ -2429,6 +2433,44 @@
             ctx.restore();
         }
 
+        function drawPhotoMagnifier(ctx, view) {
+            const state = photoMarkupState;
+            if (!state?.magnifier) return;
+            const radius = 72;
+            const zoom = 2.5;
+            const point = state.magnifier;
+            const centerX = view.x + point.x * view.scale;
+            const centerY = view.y + point.y * view.scale;
+            const sourceSize = Math.min(radius * 2 / (view.scale * zoom), state.image.naturalWidth, state.image.naturalHeight);
+            const sourceX = Math.max(0, Math.min(state.image.naturalWidth - sourceSize, point.x - sourceSize / 2));
+            const sourceY = Math.max(0, Math.min(state.image.naturalHeight - sourceSize, point.y - sourceSize / 2));
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(
+                state.image,
+                sourceX,
+                sourceY,
+                sourceSize,
+                sourceSize,
+                centerX - radius,
+                centerY - radius,
+                radius * 2,
+                radius * 2
+            );
+            ctx.restore();
+            ctx.save();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.shadowColor = 'rgba(15, 23, 42, 0.65)';
+            ctx.shadowBlur = 5;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
         function renderPhotoMarkup() {
             const state = photoMarkupState;
             const canvas = document.getElementById('photo-markup-canvas');
@@ -2448,6 +2490,7 @@
             state.shapes.forEach(shape => drawPhotoMarkupShape(ctx, shape, view, 4));
             if (state.activeShape) drawPhotoMarkupShape(ctx, state.activeShape, view, 4);
             ctx.restore();
+            drawPhotoMagnifier(ctx, view);
         }
 
         function selectPhotoMarkupTool(tool) {
