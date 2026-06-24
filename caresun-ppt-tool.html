@@ -322,16 +322,19 @@
         .photo-markup-header,
         .photo-markup-footer {
             display: flex;
+            flex: 0 0 auto;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
             padding: 12px 14px;
+            position: relative;
+            z-index: 2;
         }
         .photo-markup-header { border-bottom: 1px solid #e2e8f0; }
         .photo-markup-footer { border-top: 1px solid #e2e8f0; }
         .photo-markup-title { font-size: 1rem; font-weight: 700; color: #1e293b; }
         .photo-markup-tip { margin-top: 2px; font-size: 0.75rem; color: #64748b; }
-        .photo-markup-stage { flex: 1; min-height: 0; background: #0f172a; }
+        .photo-markup-stage { flex: 1; min-height: 0; overflow: hidden; position: relative; z-index: 1; background: #0f172a; }
         #photo-markup-canvas { display: block; width: 100%; height: 100%; touch-action: none; }
         .photo-markup-tools,
         .photo-markup-colors,
@@ -2471,7 +2474,7 @@
 
         function setPhotoMarkupZoom(delta) {
             if (!photoMarkupState) return;
-            photoMarkupState.zoom = Math.max(0.7, Math.min(4, Number((photoMarkupState.zoom + delta).toFixed(2))));
+            photoMarkupState.zoom = Math.max(0.7, Math.min(2, Number((photoMarkupState.zoom + delta).toFixed(2))));
             renderPhotoMarkup();
         }
 
