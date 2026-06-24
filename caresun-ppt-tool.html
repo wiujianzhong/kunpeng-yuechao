@@ -323,18 +323,20 @@
         .photo-markup-footer {
             display: flex;
             flex: 0 0 auto;
+            flex-shrink: 0;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
             padding: 12px 14px;
             position: relative;
-            z-index: 2;
+            z-index: 3;
+            background: #fff;
         }
         .photo-markup-header { border-bottom: 1px solid #e2e8f0; }
         .photo-markup-footer { border-top: 1px solid #e2e8f0; }
         .photo-markup-title { font-size: 1rem; font-weight: 700; color: #1e293b; }
         .photo-markup-tip { margin-top: 2px; font-size: 0.75rem; color: #64748b; }
-        .photo-markup-stage { flex: 1; min-height: 0; overflow: hidden; position: relative; z-index: 1; background: #0f172a; }
+        .photo-markup-stage { flex: 1; min-height: 0; overflow: hidden; position: relative; z-index: 0; background: #0f172a; isolation: isolate; }
         #photo-markup-canvas { display: block; width: 100%; height: 100%; touch-action: none; }
         .photo-markup-tools,
         .photo-markup-colors,
@@ -361,6 +363,9 @@
         }
         .photo-markup-color.active { box-shadow: 0 0 0 3px #2563eb; }
         .photo-markup-confirm { border-color: #16a34a; background: #16a34a; color: #fff; }
+        .photo-markup-size { display: flex; align-items: center; gap: 6px; min-width: 156px; font-size: 0.78rem; color: #475569; }
+        .photo-markup-size input { width: 82px; accent-color: #2563eb; }
+        .photo-markup-size-value { min-width: 34px; color: #1d4ed8; font-weight: 700; }
         @media (max-width: 767px) {
             #photo-markup-modal { padding: 0; }
             .photo-markup-card { width: 100%; height: 100%; border-radius: 0; }
@@ -368,6 +373,7 @@
             .photo-markup-footer { align-items: flex-start; flex-direction: column; }
             .photo-markup-actions { width: 100%; }
             .photo-markup-actions .photo-markup-action { flex: 1; }
+            .photo-markup-size { flex: 1 1 100%; }
         }
     </style>
 
@@ -547,6 +553,11 @@
                 <button type="button" class="photo-markup-action" onclick="clearPhotoMarkup()">清除本次编辑</button>
             </div>
             <div class="photo-markup-actions">
+                <div class="photo-markup-size">
+                    <label id="photo-markup-size-label" for="photo-markup-size">线条粗细</label>
+                    <input id="photo-markup-size" type="range" min="4" max="24" value="8" oninput="setPhotoMarkupSize(this.value)">
+                    <span id="photo-markup-size-value" class="photo-markup-size-value">8</span>
+                </div>
                 <div class="photo-markup-colors" aria-label="标记颜色">
                     <button type="button" class="photo-markup-color active" data-markup-color="#ef4444" style="background:#ef4444" aria-label="红色" onclick="selectPhotoMarkupColor('#ef4444')"></button>
                     <button type="button" class="photo-markup-color" data-markup-color="#f59e0b" style="background:#f59e0b" aria-label="黄色" onclick="selectPhotoMarkupColor('#f59e0b')"></button>
@@ -691,9 +702,9 @@
                     <div id="ppt-image-distortion-row" class="mt-3">
                         <div class="flex items-center justify-between text-sm text-gray-600">
                             <label for="ppt-image-distortion">变形量</label>
-                            <span id="ppt-image-distortion-value" class="font-semibold text-green-700">15%</span>
+                            <span id="ppt-image-distortion-value" class="font-semibold text-green-700">30%</span>
                         </div>
-                        <input id="ppt-image-distortion" type="range" min="10" max="30" value="15" class="mt-2 w-full accent-green-600" oninput="syncPPTImageFitControls()">
+                        <input id="ppt-image-distortion" type="range" min="20" max="50" value="30" class="mt-2 w-full accent-green-600" oninput="syncPPTImageFitControls()">
                     </div>
                     <p id="ppt-image-fit-tip" class="mt-2 text-xs text-gray-400"></p>
                     <p class="mt-1 text-xs text-gray-400">视频保持原样；工具内的图片预览和原图不会改变。</p>
@@ -2281,6 +2292,8 @@
                 panX: 0,
                 panY: 0,
                 magnifier: null,
+                magnifierRadius: 58,
+                shapeLineWidth: 8,
                 activeShape: null,
                 pointer: null,
                 canvasWidth: 0,
@@ -2384,7 +2397,15 @@
                 renderPhotoMarkup();
                 return;
             }
-            state.activeShape = { type: state.tool, color: state.color, x1: point.x, y1: point.y, x2: point.x, y2: point.y };
+            state.activeShape = {
+                type: state.tool,
+                color: state.color,
+                lineScale: state.shapeLineWidth / 8,
+                x1: point.x,
+                y1: point.y,
+                x2: point.x,
+                y2: point.y
+            };
             renderPhotoMarkup();
         }
 
@@ -2425,7 +2446,8 @@
             ctx.save();
             ctx.strokeStyle = shape.color;
             ctx.fillStyle = shape.color;
-            ctx.lineWidth = lineWidth;
+            const actualLineWidth = lineWidth * (shape.lineScale || 1);
+            ctx.lineWidth = actualLineWidth;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.beginPath();
@@ -2436,7 +2458,7 @@
                 ctx.strokeRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
             } else {
                 const angle = Math.atan2(y2 - y1, x2 - x1);
-                const head = Math.max(lineWidth * 4, 16);
+                const head = Math.max(actualLineWidth * 4, 16);
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
                 ctx.moveTo(x2, y2);
@@ -2448,7 +2470,7 @@
             ctx.restore();
         }
 
-        function drawPhotoMagnifier(ctx, view, radius = 58) {
+        function drawPhotoMagnifier(ctx, view, radius = photoMarkupState?.magnifierRadius || 58) {
             const state = photoMarkupState;
             if (!state?.magnifier) return;
             const zoom = 2.5;
@@ -2526,6 +2548,19 @@
             syncPhotoMarkupControls();
         }
 
+        function setPhotoMarkupSize(value) {
+            const state = photoMarkupState;
+            if (!state) return;
+            const size = Number(value);
+            if (state.tool === 'magnifier') {
+                state.magnifierRadius = Math.max(40, Math.min(100, size));
+            } else {
+                state.shapeLineWidth = Math.max(4, Math.min(24, size));
+            }
+            syncPhotoMarkupControls();
+            renderPhotoMarkup();
+        }
+
         function syncPhotoMarkupControls() {
             if (!photoMarkupState) return;
             document.querySelectorAll('[data-markup-tool]').forEach(button => {
@@ -2534,6 +2569,18 @@
             document.querySelectorAll('[data-markup-color]').forEach(button => {
                 button.classList.toggle('active', button.dataset.markupColor === photoMarkupState.color);
             });
+            const sizeInput = document.getElementById('photo-markup-size');
+            const sizeLabel = document.getElementById('photo-markup-size-label');
+            const sizeValue = document.getElementById('photo-markup-size-value');
+            const isMagnifier = photoMarkupState.tool === 'magnifier';
+            if (sizeInput && sizeLabel && sizeValue) {
+                const size = isMagnifier ? photoMarkupState.magnifierRadius : photoMarkupState.shapeLineWidth;
+                sizeInput.min = isMagnifier ? '40' : '4';
+                sizeInput.max = isMagnifier ? '100' : '24';
+                sizeInput.value = String(size);
+                sizeLabel.textContent = isMagnifier ? '放大镜大小' : '线条粗细';
+                sizeValue.textContent = String(size);
+            }
         }
 
         function setPhotoMarkupZoom(delta) {
@@ -2575,7 +2622,7 @@
                 const lineWidth = Math.max(12, Math.min(36, Math.min(output.width, output.height) * 0.012));
                 state.shapes.forEach(shape => drawPhotoMarkupShape(ctx, shape, { x: 0, y: 0, scale: 1 }, lineWidth));
                 const editView = getPhotoMarkupViewport();
-                drawPhotoMagnifier(ctx, { x: 0, y: 0, scale: 1 }, 58 / editView.scale);
+                drawPhotoMagnifier(ctx, { x: 0, y: 0, scale: 1 }, state.magnifierRadius / editView.scale);
                 const dataUrl = output.toDataURL('image/jpeg', 0.95);
                 setIssueMedia(state.issueId, state.type, 'image', dataUrl);
                 updateImagePreview(state.issueId, state.type, dataUrl, 'image');
@@ -2730,7 +2777,7 @@
         function preparePPTImage(source, targetRatio, exportOptions, cache) {
             if (!source) return Promise.resolve(null);
             const mode = exportOptions.imageFitMode || 'balanced';
-            const distortion = Math.max(10, Math.min(30, Number(exportOptions.imageDistortion) || 15));
+            const distortion = Math.max(20, Math.min(50, Number(exportOptions.imageDistortion) || 30));
             const variantKey = `${targetRatio.toFixed(4)}-${mode}-${distortion}`;
             let variants = cache.get(source);
             if (!variants) {
@@ -3081,7 +3128,7 @@
                 const input = document.getElementById('ppt-file-name');
                 input.value = defaultName;
                 document.getElementById('ppt-image-fit-mode').value = 'balanced';
-                document.getElementById('ppt-image-distortion').value = '15';
+                document.getElementById('ppt-image-distortion').value = '30';
                 syncPPTImageFitControls();
                 panel.style.transform = '';
                 panel.dataset.x = '0';
