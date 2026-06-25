@@ -1804,7 +1804,7 @@
                         const c = document.createElement('canvas');
                         c.width = Math.max(1, Math.round(img.naturalWidth * scale));
                         c.height = Math.max(1, Math.round(img.naturalHeight * scale));
-                        c.getContext('2d').drawImage(img, 0, 0);
+                        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
                         resolve(c.toDataURL('image/jpeg', UPLOAD_QUALITY));
                     };
                     img.onerror = () => reject(new Error('图片读取失败'));
