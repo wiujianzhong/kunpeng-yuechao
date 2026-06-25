@@ -2824,6 +2824,16 @@
                 const image = new Image();
                 image.onload = () => {
                     try {
+                        if (mode === 'contain') {
+                            resolve({
+                                data: source,
+                                fitMode: 'contain',
+                                width: image.naturalWidth,
+                                height: image.naturalHeight
+                            });
+                            return;
+                        }
+
                         const maxEdge = Math.min(2400, Math.max(image.naturalWidth, image.naturalHeight));
                         const canvas = document.createElement('canvas');
                         if (targetRatio >= 1) {
@@ -2839,32 +2849,20 @@
                         ctx.fillStyle = '#F1F8EF';
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                        if (mode === 'contain') {
-                            const scale = Math.min(
-                                canvas.width / image.naturalWidth,
-                                canvas.height / image.naturalHeight
-                            );
-                            const drawW = image.naturalWidth * scale;
-                            const drawH = image.naturalHeight * scale;
-                            const drawX = (canvas.width - drawW) / 2;
-                            const drawY = (canvas.height - drawH) / 2;
-                            ctx.drawImage(image, drawX, drawY, drawW, drawH);
-                        } else {
-                            let adjustedWidth = image.naturalWidth;
-                            let adjustedHeight = image.naturalHeight;
-                            if (mode === 'balanced' && Math.abs(sourceRatio - targetRatio) > 0.001) {
-                                const needed = sourceRatio > targetRatio
-                                    ? sourceRatio / targetRatio - 1
-                                    : targetRatio / sourceRatio - 1;
-                                const amount = Math.min(distortion / 100, needed);
-                                if (sourceRatio > targetRatio) adjustedHeight *= 1 + amount;
-                                else adjustedWidth *= 1 + amount;
-                            }
-                            const scale = Math.max(canvas.width / adjustedWidth, canvas.height / adjustedHeight);
-                            const drawW = adjustedWidth * scale;
-                            const drawH = adjustedHeight * scale;
-                            ctx.drawImage(image, (canvas.width - drawW) / 2, (canvas.height - drawH) / 2, drawW, drawH);
+                        let adjustedWidth = image.naturalWidth;
+                        let adjustedHeight = image.naturalHeight;
+                        if (mode === 'balanced' && Math.abs(sourceRatio - targetRatio) > 0.001) {
+                            const needed = sourceRatio > targetRatio
+                                ? sourceRatio / targetRatio - 1
+                                : targetRatio / sourceRatio - 1;
+                            const amount = Math.min(distortion / 100, needed);
+                            if (sourceRatio > targetRatio) adjustedHeight *= 1 + amount;
+                            else adjustedWidth *= 1 + amount;
                         }
+                        const scale = Math.max(canvas.width / adjustedWidth, canvas.height / adjustedHeight);
+                        const drawW = adjustedWidth * scale;
+                        const drawH = adjustedHeight * scale;
+                        ctx.drawImage(image, (canvas.width - drawW) / 2, (canvas.height - drawH) / 2, drawW, drawH);
 
                         resolve(canvas.toDataURL('image/jpeg', 0.94));
                     } catch (error) {
@@ -3065,10 +3063,34 @@
             }
 
             if (opt.img) {
-                slide.addImage({
-                    data: opt.img,
-                    x: imgX, y: imgY, w: imgW, h: imgH
-                });
+                if (typeof opt.img === 'object' && opt.img.fitMode === 'contain' && opt.img.width && opt.img.height) {
+                    const imageRatio = opt.img.width / opt.img.height;
+                    const frameRatio = imgW / imgH;
+                    let drawW = imgW;
+                    let drawH = imgH;
+                    if (imageRatio > frameRatio) {
+                        drawH = imgW / imageRatio;
+                    } else {
+                        drawW = imgH * imageRatio;
+                    }
+                    slide.addShape(pptx.ShapeType.rect, {
+                        x: imgX, y: imgY, w: imgW, h: imgH,
+                        fill: { color: 'F1F8EF' },
+                        line: { color: 'F1F8EF' }
+                    });
+                    slide.addImage({
+                        data: opt.img.data,
+                        x: imgX + (imgW - drawW) / 2,
+                        y: imgY + (imgH - drawH) / 2,
+                        w: drawW,
+                        h: drawH
+                    });
+                } else {
+                    slide.addImage({
+                        data: opt.img,
+                        x: imgX, y: imgY, w: imgW, h: imgH
+                    });
+                }
             } else if (opt.video) {
                 slide.addMedia({
                     type: 'video',
