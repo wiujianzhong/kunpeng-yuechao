@@ -739,6 +739,7 @@
         let draftSaveTimer = null;
         let isRestoringDraft = false;
         let draftAvailable = false;
+        let defaultProcessTitle = '';
         const UPLOAD_MAX_EDGE = 2400;
         const UPLOAD_QUALITY = 0.9;
         const COMPRESS_MAX_EDGE = 2400;
@@ -1084,6 +1085,7 @@
             issueCount = 0;
             importedPPTX = null;
             activePasteTarget = null;
+            defaultProcessTitle = '';
             batchImages.length = 0;
             document.getElementById('batch-prompt').classList.remove('hidden');
             document.getElementById('batch-uploaded').classList.add('hidden');
@@ -1974,12 +1976,32 @@
             return `${bytes}B`;
         }
 
-        function selectIssueProcess(issueId, value) {
-            if (!value) return;
+        function setIssueProcessValue(issueId, value) {
             const input = document.getElementById(`process-${issueId}`);
-            if (input) input.value = value;
+            if (input) input.value = value || '';
             const picker = document.getElementById(`process-picker-${issueId}`);
             if (picker) picker.value = '';
+        }
+
+        function fillProcessTitleDown(issueId) {
+            const processName = document.getElementById(`process-${issueId}`)?.value.trim() || '';
+            if (!processName) {
+                alert('请先输入或选择一个标题，再向下填充。');
+                return;
+            }
+            defaultProcessTitle = processName;
+            let shouldFill = false;
+            Array.from(document.querySelectorAll('#issues-container > [id^="issue-"]')).forEach(issue => {
+                const currentId = issue.id.replace('issue-', '');
+                if (String(currentId) === String(issueId)) shouldFill = true;
+                if (shouldFill) setIssueProcessValue(currentId, processName);
+            });
+            scheduleDraftSave();
+        }
+
+        function selectIssueProcess(issueId, value) {
+            if (!value) return;
+            setIssueProcessValue(issueId, value);
             scheduleDraftSave();
         }
 
@@ -2001,9 +2023,9 @@
                     </div>
                     
                     <div class="mb-3">
-                        <div class="flex w-full md:w-80">
+                        <div class="flex w-full md:w-96">
                             <input id="process-${issueId}" placeholder="可直接输入工序或分厂" autocomplete="off" class="min-w-0 flex-1 px-3 py-2 text-sm border border-gray-200 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
-                            <select id="process-picker-${issueId}" onchange="selectIssueProcess(${issueId}, this.value)" aria-label="选择工序或分厂" class="w-20 px-1 py-2 text-sm border border-l-0 border-gray-200 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer">
+                            <select id="process-picker-${issueId}" onchange="selectIssueProcess(${issueId}, this.value)" aria-label="选择工序或分厂" class="w-16 px-1 py-2 text-sm border border-l-0 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer">
                                 <option value="">选择</option>
                                 <option value="一分厂">一分厂</option>
                                 <option value="二分厂">二分厂</option>
@@ -2022,6 +2044,7 @@
                                 <option value="6s 检查">6s 检查</option>
                                 <option value="安全检查">安全检查</option>
                             </select>
+                            <button type="button" onclick="fillProcessTitleDown(${issueId})" class="shrink-0 px-2 py-2 text-xs border border-l-0 border-green-200 rounded-r-lg bg-green-50 text-green-700 hover:bg-green-100">向下填该标题</button>
                         </div>
                     </div>
                     
@@ -2075,6 +2098,10 @@
             
             container.insertAdjacentHTML('beforeend', issueHtml);
             setupSingleDragDrop(issueId);
+            if (restoredId === null && defaultProcessTitle) {
+                setIssueProcessValue(issueId, defaultProcessTitle);
+                scheduleDraftSave();
+            }
             ['process', 'leftDesc', 'rightDesc'].forEach(prefix => {
                 document.getElementById(`${prefix}-${issueId}`)?.addEventListener('input', () => scheduleDraftSave());
             });
