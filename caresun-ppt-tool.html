@@ -2035,7 +2035,7 @@
                     
                     <div class="mb-3">
                         <div class="flex w-full md:w-96">
-                            <input id="process-${issueId}" placeholder="可直接输入工序或分厂" autocomplete="off" class="min-w-0 flex-1 px-3 py-2 text-sm border border-gray-200 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
+                            <input id="process-${issueId}" placeholder="可直接输入工序或分厂" autocomplete="off" class="min-w-0 flex-1 px-2 py-2 text-sm border border-gray-200 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
                             <select id="process-picker-${issueId}" onchange="selectIssueProcess(${issueId}, this.value)" aria-label="选择工序或分厂" class="w-16 px-1 py-2 text-sm border border-l-0 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer">
                                 <option value="">选择</option>
                                 <option value="一分厂">一分厂</option>
@@ -2055,7 +2055,7 @@
                                 <option value="6s 检查">6s 检查</option>
                                 <option value="安全检查">安全检查</option>
                             </select>
-                            <button type="button" onclick="fillProcessTitleDown(${issueId})" class="shrink-0 px-2 py-2 text-xs border border-l-0 border-green-200 rounded-r-lg bg-green-50 text-green-700 hover:bg-green-100">向下填该标题</button>
+                            <button type="button" onclick="fillProcessTitleDown(${issueId})" class="shrink-0 whitespace-nowrap px-2 py-2 text-xs border border-l-0 border-green-200 rounded-r-lg bg-green-50 text-green-700 hover:bg-green-100">向下填充该标题</button>
                         </div>
                     </div>
                     
