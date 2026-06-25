@@ -1015,7 +1015,7 @@
             try {
                 for (const item of draft.issues) {
                     const issueId = addEmptyIssue(item.id);
-                    setIssueProcessValue(issueId, item.processName || '');
+                    document.getElementById(`process-${issueId}`).value = item.processName || '';
                     document.getElementById(`leftDesc-${issueId}`).value = item.leftDesc || '';
                     document.getElementById(`rightDesc-${issueId}`).value = item.rightDesc || '';
                     for (const type of ['left', 'right']) {
@@ -1178,7 +1178,10 @@
                     if (rightDesc) rightDesc.value = '已整改';
                     // 如果从PPT中提取到了工序，自动填入下拉框
                     if (item.processName) {
-                        setIssueProcessValue(issueId, item.processName);
+                        const processEl = document.getElementById(`process-${issueId}`);
+                        if (processEl) {
+                            processEl.value = item.processName;
+                        }
                     }
                     batchImages.push(item.image);
                     updateImagePreview(issueId, 'left', item.image);
@@ -1971,65 +1974,12 @@
             return `${bytes}B`;
         }
 
-        function isProcessApplyDownChecked(issueId) {
-            return Boolean(document.getElementById(`process-apply-down-${issueId}`)?.checked);
-        }
-
-        function syncIssueProcessTitle(issueId) {
-            const title = document.getElementById(`process-title-${issueId}`);
-            if (!title) return;
-            const processName = document.getElementById(`process-${issueId}`)?.value.trim() || '';
-            title.textContent = processName ? `小标题：${processName}` : '';
-            title.classList.toggle('hidden', !processName);
-        }
-
-        function setIssueProcessValue(issueId, value) {
-            const input = document.getElementById(`process-${issueId}`);
-            if (input) input.value = value || '';
-            const picker = document.getElementById(`process-picker-${issueId}`);
-            if (picker) picker.value = '';
-            syncIssueProcessTitle(issueId);
-        }
-
-        function applyIssueProcessDown(issueId, value, allowEmpty = false) {
-            const processName = (value || '').trim();
-            if (!processName && !allowEmpty) return;
-            let shouldApply = false;
-            Array.from(document.querySelectorAll('#issues-container > [id^="issue-"]')).forEach(issue => {
-                const currentId = issue.id.replace('issue-', '');
-                if (String(currentId) === String(issueId)) shouldApply = true;
-                if (!shouldApply) return;
-                setIssueProcessValue(currentId, processName);
-            });
-        }
-
-        function handleIssueProcessInput(issueId) {
-            const input = document.getElementById(`process-${issueId}`);
-            if (!input) return;
-            if (isProcessApplyDownChecked(issueId)) {
-                applyIssueProcessDown(issueId, input.value, true);
-            } else {
-                syncIssueProcessTitle(issueId);
-            }
-            scheduleDraftSave();
-        }
-
-        function commitIssueProcessInput(issueId) {
-            const input = document.getElementById(`process-${issueId}`);
-            if (!input) return;
-            const processName = input.value.trim();
-            setIssueProcessValue(issueId, processName);
-            if (isProcessApplyDownChecked(issueId)) applyIssueProcessDown(issueId, processName, true);
-            scheduleDraftSave();
-        }
-
         function selectIssueProcess(issueId, value) {
             if (!value) return;
-            if (isProcessApplyDownChecked(issueId)) {
-                applyIssueProcessDown(issueId, value);
-            } else {
-                setIssueProcessValue(issueId, value);
-            }
+            const input = document.getElementById(`process-${issueId}`);
+            if (input) input.value = value;
+            const picker = document.getElementById(`process-picker-${issueId}`);
+            if (picker) picker.value = '';
             scheduleDraftSave();
         }
 
@@ -2042,10 +1992,7 @@
             const issueHtml = `
                 <div id="issue-${issueId}" class="bg-white rounded-lg shadow p-4">
                     <div class="flex justify-between items-center mb-3">
-                        <div class="min-w-0">
-                            <span class="issue-page-label font-semibold text-gray-700">第 ${issueId} 页</span>
-                            <span id="process-title-${issueId}" class="hidden mt-1 block truncate text-sm font-bold text-green-600"></span>
-                        </div>
+                        <span class="issue-page-label font-semibold text-gray-700">第 ${issueId} 页</span>
                         <button onclick="removeIssue(${issueId})" class="text-red-500 hover:text-red-700 p-1">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -2054,14 +2001,10 @@
                     </div>
                     
                     <div class="mb-3">
-                        <div class="flex w-full md:w-96">
+                        <div class="flex w-full md:w-80">
                             <input id="process-${issueId}" placeholder="可直接输入工序或分厂" autocomplete="off" class="min-w-0 flex-1 px-3 py-2 text-sm border border-gray-200 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
-                            <label class="shrink-0 flex items-center gap-1 px-2 py-2 text-xs text-slate-600 border border-l-0 border-gray-200 bg-slate-50 select-none">
-                                <input type="checkbox" id="process-apply-down-${issueId}" class="w-3.5 h-3.5 accent-blue-600">
-                                <span>向下套用</span>
-                            </label>
                             <select id="process-picker-${issueId}" onchange="selectIssueProcess(${issueId}, this.value)" aria-label="选择工序或分厂" class="w-20 px-1 py-2 text-sm border border-l-0 border-gray-200 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer">
-                                <option value="">选择⌄</option>
+                                <option value="">选择</option>
                                 <option value="一分厂">一分厂</option>
                                 <option value="二分厂">二分厂</option>
                                 <option value="三分厂">三分厂</option>
@@ -2132,17 +2075,7 @@
             
             container.insertAdjacentHTML('beforeend', issueHtml);
             setupSingleDragDrop(issueId);
-            const processInput = document.getElementById(`process-${issueId}`);
-            processInput?.addEventListener('input', () => handleIssueProcessInput(issueId));
-            processInput?.addEventListener('change', () => commitIssueProcessInput(issueId));
-            processInput?.addEventListener('keydown', event => {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    commitIssueProcessInput(issueId);
-                    processInput.blur();
-                }
-            });
-            ['leftDesc', 'rightDesc'].forEach(prefix => {
+            ['process', 'leftDesc', 'rightDesc'].forEach(prefix => {
                 document.getElementById(`${prefix}-${issueId}`)?.addEventListener('input', () => scheduleDraftSave());
             });
             renumberIssues();
