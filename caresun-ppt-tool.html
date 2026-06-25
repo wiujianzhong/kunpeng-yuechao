@@ -1976,11 +1976,22 @@
             return `${bytes}B`;
         }
 
-        function setIssueProcessValue(issueId, value) {
+        function setIssueProcessFillState(issueId, isFilled) {
+            const input = document.getElementById(`process-${issueId}`);
+            const picker = document.getElementById(`process-picker-${issueId}`);
+            [input, picker].forEach(el => {
+                if (!el) return;
+                el.style.backgroundColor = isFilled ? '#ecfdf5' : '';
+                el.style.borderColor = isFilled ? '#bbf7d0' : '';
+            });
+        }
+
+        function setIssueProcessValue(issueId, value, isFilled = false) {
             const input = document.getElementById(`process-${issueId}`);
             if (input) input.value = value || '';
             const picker = document.getElementById(`process-picker-${issueId}`);
             if (picker) picker.value = '';
+            setIssueProcessFillState(issueId, isFilled);
         }
 
         function fillProcessTitleDown(issueId) {
@@ -1994,14 +2005,14 @@
             Array.from(document.querySelectorAll('#issues-container > [id^="issue-"]')).forEach(issue => {
                 const currentId = issue.id.replace('issue-', '');
                 if (String(currentId) === String(issueId)) shouldFill = true;
-                if (shouldFill) setIssueProcessValue(currentId, processName);
+                if (shouldFill) setIssueProcessValue(currentId, processName, true);
             });
             scheduleDraftSave();
         }
 
         function selectIssueProcess(issueId, value) {
             if (!value) return;
-            setIssueProcessValue(issueId, value);
+            setIssueProcessValue(issueId, value, false);
             scheduleDraftSave();
         }
 
@@ -2099,10 +2110,14 @@
             container.insertAdjacentHTML('beforeend', issueHtml);
             setupSingleDragDrop(issueId);
             if (restoredId === null && defaultProcessTitle) {
-                setIssueProcessValue(issueId, defaultProcessTitle);
+                setIssueProcessValue(issueId, defaultProcessTitle, true);
                 scheduleDraftSave();
             }
-            ['process', 'leftDesc', 'rightDesc'].forEach(prefix => {
+            document.getElementById(`process-${issueId}`)?.addEventListener('input', () => {
+                setIssueProcessFillState(issueId, false);
+                scheduleDraftSave();
+            });
+            ['leftDesc', 'rightDesc'].forEach(prefix => {
                 document.getElementById(`${prefix}-${issueId}`)?.addEventListener('input', () => scheduleDraftSave());
             });
             renumberIssues();
