@@ -2778,9 +2778,9 @@
                     
                     const slide = pptx.addSlide();
                     if (templateMode === 'company') {
-                        renderCompanySlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, imageFitMode: exportOptions.imageFitMode, pageNum, total: issues.length });
+                        renderCompanySlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
                     } else {
-                        renderDefaultSlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, imageFitMode: exportOptions.imageFitMode, pageNum, total: issues.length });
+                        renderDefaultSlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
                     }
                 }
                 
@@ -2820,12 +2820,6 @@
             }
             if (variants.has(variantKey)) return variants.get(variantKey);
 
-            if (mode === 'contain') {
-                const task = Promise.resolve(source);
-                variants.set(variantKey, task);
-                return task;
-            }
-
             const task = new Promise((resolve, reject) => {
                 const image = new Image();
                 image.onload = () => {
@@ -2846,19 +2840,15 @@
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                         if (mode === 'contain') {
-                            const inset = Math.max(4, Math.round(Math.min(canvas.width, canvas.height) * 0.02));
                             const scale = Math.min(
-                                (canvas.width - inset * 2) / image.naturalWidth,
-                                (canvas.height - inset * 2) / image.naturalHeight
+                                canvas.width / image.naturalWidth,
+                                canvas.height / image.naturalHeight
                             );
                             const drawW = image.naturalWidth * scale;
                             const drawH = image.naturalHeight * scale;
                             const drawX = (canvas.width - drawW) / 2;
                             const drawY = (canvas.height - drawH) / 2;
                             ctx.drawImage(image, drawX, drawY, drawW, drawH);
-                            ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-                            ctx.lineWidth = Math.max(2, Math.round(Math.min(canvas.width, canvas.height) * 0.008));
-                            ctx.strokeRect(drawX, drawY, drawW, drawH);
                         } else {
                             let adjustedWidth = image.naturalWidth;
                             let adjustedHeight = image.naturalHeight;
@@ -2945,8 +2935,7 @@
                 x: 0.7, y: 1.18, w: 4.15, h: 4.1,
                 color: '64748B',
                 fill: 'F8FAFC',
-                labelStyle: 'outline',
-                imageFitMode: data.imageFitMode
+                labelStyle: 'outline'
             });
             drawImagePanel(pptx, slide, {
                 label: data.rightDesc || '',
@@ -2957,8 +2946,7 @@
                 x: 5.05, y: 1.18, w: 4.15, h: 4.1,
                 color: '64748B',
                 fill: 'F8FAFC',
-                labelStyle: 'outline',
-                imageFitMode: data.imageFitMode
+                labelStyle: 'outline'
             });
 
             slide.addShape(pptx.ShapeType.rect, {
@@ -2991,8 +2979,7 @@
                 x: 0.7, y: 0.78, w: 4.15, h: 4.52,
                 color: '64748B',
                 fill: 'F8FAFC',
-                labelStyle: 'outline',
-                imageFitMode: data.imageFitMode
+                labelStyle: 'outline'
             });
             drawImagePanel(pptx, slide, {
                 label: data.rightDesc || '',
@@ -3003,8 +2990,7 @@
                 x: 5.05, y: 0.78, w: 4.15, h: 4.52,
                 color: '64748B',
                 fill: 'F8FAFC',
-                labelStyle: 'outline',
-                imageFitMode: data.imageFitMode
+                labelStyle: 'outline'
             });
 
             slide.addText(`${data.pageNum} / ${data.total}`, {
@@ -3079,23 +3065,10 @@
             }
 
             if (opt.img) {
-                const imageFitMode = opt.imageFitMode || 'contain';
-                if (imageFitMode === 'contain') {
-                    slide.addShape(pptx.ShapeType.rect, {
-                        x: imgX, y: imgY, w: imgW, h: imgH,
-                        fill: { color: 'F1F8EF' },
-                        line: { color: 'F1F8EF' }
-                    });
-                    slide.addImage({
-                        data: opt.img,
-                        sizing: { type: 'contain', x: imgX, y: imgY, w: imgW, h: imgH }
-                    });
-                } else {
-                    slide.addImage({
-                        data: opt.img,
-                        x: imgX, y: imgY, w: imgW, h: imgH
-                    });
-                }
+                slide.addImage({
+                    data: opt.img,
+                    x: imgX, y: imgY, w: imgW, h: imgH
+                });
             } else if (opt.video) {
                 slide.addMedia({
                     type: 'video',
