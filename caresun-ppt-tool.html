@@ -700,15 +700,15 @@
                 <div class="mt-5 border-t border-gray-100 pt-4">
                     <label for="ppt-image-fit-mode" class="block text-sm font-medium text-gray-600 mb-2">照片呈现（仅影响这次导出）</label>
                     <select id="ppt-image-fit-mode" class="w-full px-3 py-3 border border-gray-200 rounded-lg bg-white text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500" onchange="syncPPTImageFitControls()">
-                        <option value="contain">完整不变形</option>
-                        <option value="balanced" selected>适中调整</option>
+                        <option value="contain" selected>完整不变形</option>
+                        <option value="balanced">适中调整</option>
                     </select>
                     <div id="ppt-image-distortion-row" class="mt-3">
                         <div class="flex items-center justify-between text-sm text-gray-600">
                             <label for="ppt-image-distortion">变形量</label>
-                            <span id="ppt-image-distortion-value" class="font-semibold text-green-700">30%</span>
+                            <span id="ppt-image-distortion-value" class="font-semibold text-green-700">35%</span>
                         </div>
-                        <input id="ppt-image-distortion" type="range" min="20" max="50" value="30" class="mt-2 w-full accent-green-600" oninput="syncPPTImageFitControls()">
+                        <input id="ppt-image-distortion" type="range" min="20" max="50" value="35" class="mt-2 w-full accent-green-600" oninput="syncPPTImageFitControls()">
                     </div>
                     <p id="ppt-image-fit-tip" class="mt-2 text-xs text-gray-400"></p>
                     <p class="mt-1 text-xs text-gray-400">视频保持原样；工具内的图片预览和原图不会改变。</p>
@@ -2826,7 +2826,7 @@
         function preparePPTImage(source, targetRatio, exportOptions, cache) {
             if (!source) return Promise.resolve(null);
             const mode = exportOptions.imageFitMode || 'contain';
-            const distortion = Math.max(20, Math.min(50, Number(exportOptions.imageDistortion) || 30));
+            const distortion = Math.max(20, Math.min(50, Number(exportOptions.imageDistortion) || 35));
             const variantKey = `${targetRatio.toFixed(4)}-${mode}-${distortion}`;
             let variants = cache.get(source);
             if (!variants) {
@@ -3194,8 +3194,8 @@
                 const panel = document.getElementById('file-name-panel');
                 const input = document.getElementById('ppt-file-name');
                 input.value = defaultName;
-                document.getElementById('ppt-image-fit-mode').value = 'balanced';
-                document.getElementById('ppt-image-distortion').value = '30';
+                document.getElementById('ppt-image-fit-mode').value = 'contain';
+                document.getElementById('ppt-image-distortion').value = '35';
                 syncPPTImageFitControls();
                 panel.style.transform = '';
                 panel.dataset.x = '0';
