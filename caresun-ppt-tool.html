@@ -220,11 +220,31 @@
             height: 220px;
         }
         .issue-desc-input {
-            width: 100%;
+            flex: 1;
+            min-width: 0;
             min-height: 44px;
             resize: vertical;
             font-size: 0.875rem;
             line-height: 1.45;
+        }
+        .issue-desc-row {
+            display: flex;
+            align-items: stretch;
+            gap: 0.5rem;
+        }
+        .speech-button {
+            width: 44px;
+            min-height: 44px;
+            flex: 0 0 44px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            color: #64748b;
+            background: #ffffff;
+        }
+        .speech-button.is-listening {
+            color: #ffffff;
+            border-color: #16a34a;
+            background: #16a34a;
         }
         @media (max-width: 767px) {
             .media-drop-area {
@@ -740,6 +760,8 @@
         let isRestoringDraft = false;
         let draftAvailable = false;
         let defaultProcessTitle = '';
+        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let activeSpeechSession = null;
         const UPLOAD_MAX_EDGE = 2400;
         const UPLOAD_QUALITY = 0.9;
         const COMPRESS_MAX_EDGE = 2400;
@@ -2081,7 +2103,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <textarea id="leftDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input mt-2 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                            <div class="issue-desc-row mt-2">
+                                <textarea id="leftDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                                <button type="button" id="leftDesc-speech-${issueId}" class="speech-button hidden" aria-label="语音输入描述" aria-pressed="false" title="点击开始语音输入">
+                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="media-slot">
@@ -2101,7 +2130,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <textarea id="rightDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input mt-2 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                            <div class="issue-desc-row mt-2">
+                                <textarea id="rightDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                                <button type="button" id="rightDesc-speech-${issueId}" class="speech-button hidden" aria-label="语音输入描述" aria-pressed="false" title="点击开始语音输入">
+                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2119,9 +2155,82 @@
             });
             ['leftDesc', 'rightDesc'].forEach(prefix => {
                 document.getElementById(`${prefix}-${issueId}`)?.addEventListener('input', () => scheduleDraftSave());
+                setupSpeechButton(issueId, prefix);
             });
             renumberIssues();
             return issueId;
+        }
+
+        function setupSpeechButton(issueId, prefix) {
+            if (!SpeechRecognitionAPI) return;
+
+            const textarea = document.getElementById(`${prefix}-${issueId}`);
+            const button = document.getElementById(`${prefix}-speech-${issueId}`);
+            if (!textarea || !button) return;
+
+            button.classList.remove('hidden');
+            button.addEventListener('click', () => toggleSpeechRecognition(textarea, button));
+        }
+
+        function toggleSpeechRecognition(textarea, button) {
+            if (activeSpeechSession?.button === button) {
+                activeSpeechSession.recognition.stop();
+                return;
+            }
+
+            if (activeSpeechSession) {
+                const previousSession = activeSpeechSession;
+                previousSession.recognition.abort();
+                finishSpeechSession(previousSession);
+            }
+
+            const recognition = new SpeechRecognitionAPI();
+            const session = {
+                recognition,
+                textarea,
+                button,
+                originalText: textarea.value
+            };
+
+            recognition.lang = 'zh-CN';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 1;
+            recognition.onresult = event => {
+                let finalText = '';
+                let interimText = '';
+                for (let index = 0; index < event.results.length; index++) {
+                    const text = event.results[index][0]?.transcript || '';
+                    if (event.results[index].isFinal) {
+                        finalText += text;
+                    } else {
+                        interimText += text;
+                    }
+                }
+                textarea.value = session.originalText + finalText + interimText;
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            };
+            recognition.onerror = () => finishSpeechSession(session);
+            recognition.onend = () => finishSpeechSession(session);
+
+            activeSpeechSession = session;
+            button.classList.add('is-listening');
+            button.setAttribute('aria-pressed', 'true');
+            button.title = '正在语音输入，点击停止';
+
+            try {
+                recognition.start();
+            } catch (error) {
+                finishSpeechSession(session);
+                console.warn('语音识别启动失败', error);
+            }
+        }
+
+        function finishSpeechSession(session) {
+            session.button.classList.remove('is-listening');
+            session.button.setAttribute('aria-pressed', 'false');
+            session.button.title = '点击开始语音输入';
+            if (activeSpeechSession === session) activeSpeechSession = null;
         }
 
         // 设置单个拖拽
