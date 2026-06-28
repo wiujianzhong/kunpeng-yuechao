@@ -221,6 +221,20 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         .modal-panel {
             touch-action: none;
         }
+        .speech-button {
+            width: 44px;
+            min-height: 44px;
+            flex: 0 0 44px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            color: #64748b;
+            background: #ffffff;
+        }
+        .speech-button.is-listening {
+            color: #ffffff;
+            border-color: #16a34a;
+            background: #16a34a;
+        }
     </style>
 
 <!-- ===== 激活弹窗样式 ===== -->
@@ -434,7 +448,14 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             </div>
             <div class="p-5">
                 <label for="ppt-file-name" class="block text-sm font-medium text-gray-600 mb-2">文件名称</label>
-                <input id="ppt-file-name" type="text" class="w-full px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
+                <div class="flex gap-2">
+                    <input id="ppt-file-name" type="text" class="min-w-0 flex-1 px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
+                    <button type="button" id="ppt-file-name-speech" class="speech-button hidden" aria-label="语音输入文件名称" aria-pressed="false" title="点击开始语音输入">
+                        <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
+                        </svg>
+                    </button>
+                </div>
                 <p class="text-xs text-gray-400 mt-2">封面文字会同步这里填写的文件名称</p>
                 <div class="flex justify-end gap-3 mt-5">
                     <button onclick="cancelFileNameDialog()" class="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">取消</button>
@@ -449,6 +470,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         const batchImages = [];
         let pendingFileNameResolve = null;
         let activePasteTarget = null;
+        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let activeSpeechSession = null;
         const COMPRESS_MAX_EDGE = 2400;
         const COMPRESS_QUALITY = 0.88;
         const PPT_IMPORT_MAX_EDGE = 2800;
@@ -564,6 +587,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             });
 
             makeFileNameDialogDraggable();
+            setupSpeechInput(document.getElementById('ppt-file-name'), document.getElementById('ppt-file-name-speech'));
             document.addEventListener('paste', handleImagePaste);
             document.getElementById('ppt-file-name').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') confirmFileNameDialog();
@@ -1085,6 +1109,24 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             return `${bytes}B`;
         }
 
+        function setIssueProcessValue(issueId, value) {
+            const input = document.getElementById(`process-${issueId}`);
+            if (input) input.value = value || '';
+        }
+
+        function selectIssueProcess(issueId, value) {
+            if (!value) return;
+            setIssueProcessValue(issueId, value);
+            const menu = document.getElementById(`process-menu-${issueId}`);
+            if (menu) menu.removeAttribute('open');
+        }
+
+        function selectIssueFactoryProcess(issueId, factory, processName) {
+            setIssueProcessValue(issueId, `${factory}${processName}`);
+            const menu = document.getElementById(`process-menu-${issueId}`);
+            if (menu) menu.removeAttribute('open');
+        }
+
         // 添加空问题项
         function addEmptyIssue() {
             issueCount++;
@@ -1103,19 +1145,68 @@ https://github.com/nodeca/pako/blob/main/LICENSE
                     </div>
                     
                     <div class="mb-3">
-                        <select id="process-${issueId}" class="w-full md:w-40 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
-                            <option value="">工序（可选）</option>
-                            <option value="清梳">清梳</option>
-                            <option value="精梳">精梳</option>
-                            <option value="并条">并条</option>
-                            <option value="粗纱">粗纱</option>
-                            <option value="细纱">细纱</option>
-                            <option value="络筒">络筒</option>
-                            <option value="空调">空调</option>
-                            <option value="电器">电器</option>
-                            <option value="6s 检查">6s 检查</option>
-                            <option value="安全检查">安全检查</option>
-                        </select>
+                        <div class="flex w-full md:w-96">
+                            <input id="process-${issueId}" placeholder="可直接输入工序或分厂" autocomplete="off" class="min-w-0 flex-1 px-2 py-2 text-sm border border-gray-200 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
+                            <button type="button" id="process-speech-${issueId}" class="speech-button hidden rounded-none border-l-0" aria-label="语音输入小标题" aria-pressed="false" title="点击开始语音输入">
+                                <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
+                                </svg>
+                            </button>
+                            <details id="process-menu-${issueId}" class="relative">
+                                <summary aria-label="选择工序或分厂" class="h-full w-16 px-1 py-2 text-sm border border-l-0 rounded-r-lg border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer select-none">选择</summary>
+                                <div class="absolute right-0 z-50 mt-1 w-36 max-h-80 overflow-y-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                                    <details>
+                                        <summary class="flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-blue-50"><span>一分厂</span><span class="text-xs text-gray-400">⌄</span></summary>
+                                        <div class="bg-gray-50 py-1">
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '一分厂', '前纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">前纺</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '一分厂', '细纱')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">细纱</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '一分厂', '络筒')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">络筒</button>
+                                        </div>
+                                    </details>
+                                    <details>
+                                        <summary class="flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-blue-50"><span>二分厂</span><span class="text-xs text-gray-400">⌄</span></summary>
+                                        <div class="bg-gray-50 py-1">
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '二分厂', '前纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">前纺</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '二分厂', '细纱')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">细纱</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '二分厂', '络筒')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">络筒</button>
+                                        </div>
+                                    </details>
+                                    <details>
+                                        <summary class="flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-blue-50"><span>三分厂</span><span class="text-xs text-gray-400">⌄</span></summary>
+                                        <div class="bg-gray-50 py-1">
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '三分厂', '前纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">前纺</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '三分厂', '细纱')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">细纱</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '三分厂', '络筒')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">络筒</button>
+                                        </div>
+                                    </details>
+                                    <details>
+                                        <summary class="flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-blue-50"><span>四分厂</span><span class="text-xs text-gray-400">⌄</span></summary>
+                                        <div class="bg-gray-50 py-1">
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '四分厂', '前纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">前纺</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '四分厂', '细纱')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">细纱</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '四分厂', '络筒')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">络筒</button>
+                                        </div>
+                                    </details>
+                                    <details>
+                                        <summary class="flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-blue-50"><span>七分厂</span><span class="text-xs text-gray-400">⌄</span></summary>
+                                        <div class="bg-gray-50 py-1">
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '七分厂', '前纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">前纺</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '七分厂', '细纱')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">细纱</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '七分厂', '络筒')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">络筒</button>
+                                        </div>
+                                    </details>
+                                    <div class="my-1 border-t border-gray-100"></div>
+                                    <button type="button" onclick="selectIssueProcess(${issueId}, '清梳')" class="block w-full px-3 py-2 text-left text-sm hover:bg-blue-50">清梳</button>
+                                    <button type="button" onclick="selectIssueProcess(${issueId}, '精梳')" class="block w-full px-3 py-2 text-left text-sm hover:bg-blue-50">精梳</button>
+                                    <button type="button" onclick="selectIssueProcess(${issueId}, '并条')" class="block w-full px-3 py-2 text-left text-sm hover:bg-blue-50">并条</button>
+                                    <button type="button" onclick="selectIssueProcess(${issueId}, '粗纱')" class="block w-full px-3 py-2 text-left text-sm hover:bg-blue-50">粗纱</button>
+                                    <button type="button" onclick="selectIssueProcess(${issueId}, '空调')" class="block w-full px-3 py-2 text-left text-sm hover:bg-blue-50">空调</button>
+                                    <button type="button" onclick="selectIssueProcess(${issueId}, '电器')" class="block w-full px-3 py-2 text-left text-sm hover:bg-blue-50">电器</button>
+                                    <button type="button" onclick="selectIssueProcess(${issueId}, '6s 检查')" class="block w-full px-3 py-2 text-left text-sm hover:bg-blue-50">6s 检查</button>
+                                    <button type="button" onclick="selectIssueProcess(${issueId}, '安全检查')" class="block w-full px-3 py-2 text-left text-sm hover:bg-blue-50">安全检查</button>
+                                </div>
+                            </details>
+                        </div>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1164,8 +1255,79 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             
             container.insertAdjacentHTML('beforeend', issueHtml);
             setupSingleDragDrop(issueId);
+            setupSpeechInput(
+                document.getElementById(`process-${issueId}`),
+                document.getElementById(`process-speech-${issueId}`)
+            );
             renumberIssues();
             return issueId;
+        }
+
+        function setupSpeechInput(textarea, button) {
+            if (!SpeechRecognitionAPI || !textarea || !button) return;
+            button.classList.remove('hidden');
+            button.addEventListener('click', () => toggleSpeechRecognition(textarea, button));
+        }
+
+        function toggleSpeechRecognition(textarea, button) {
+            if (activeSpeechSession?.button === button) {
+                activeSpeechSession.recognition.stop();
+                return;
+            }
+
+            if (activeSpeechSession) {
+                const previousSession = activeSpeechSession;
+                previousSession.recognition.abort();
+                finishSpeechSession(previousSession);
+            }
+
+            const recognition = new SpeechRecognitionAPI();
+            const session = {
+                recognition,
+                textarea,
+                button,
+                originalText: textarea.value
+            };
+
+            recognition.lang = 'zh-CN';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 1;
+            recognition.onresult = event => {
+                let finalText = '';
+                let interimText = '';
+                for (let index = 0; index < event.results.length; index++) {
+                    const text = event.results[index][0]?.transcript || '';
+                    if (event.results[index].isFinal) {
+                        finalText += text;
+                    } else {
+                        interimText += text;
+                    }
+                }
+                textarea.value = session.originalText + finalText + interimText;
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            };
+            recognition.onerror = () => finishSpeechSession(session);
+            recognition.onend = () => finishSpeechSession(session);
+
+            activeSpeechSession = session;
+            button.classList.add('is-listening');
+            button.setAttribute('aria-pressed', 'true');
+            button.title = '正在语音输入，点击停止';
+
+            try {
+                recognition.start();
+            } catch (error) {
+                finishSpeechSession(session);
+                console.warn('语音识别启动失败', error);
+            }
+        }
+
+        function finishSpeechSession(session) {
+            session.button.classList.remove('is-listening');
+            session.button.setAttribute('aria-pressed', 'false');
+            session.button.title = '点击开始语音输入';
+            if (activeSpeechSession === session) activeSpeechSession = null;
         }
 
         // 设置单个拖拽

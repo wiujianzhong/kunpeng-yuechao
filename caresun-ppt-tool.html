@@ -715,7 +715,14 @@
             </div>
             <div class="p-5">
                 <label for="ppt-file-name" class="block text-sm font-medium text-gray-600 mb-2">文件名称</label>
-                <input id="ppt-file-name" type="text" class="w-full px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
+                <div class="flex gap-2">
+                    <input id="ppt-file-name" type="text" class="min-w-0 flex-1 px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
+                    <button type="button" id="ppt-file-name-speech" class="speech-button hidden" aria-label="语音输入文件名称" aria-pressed="false" title="点击开始语音输入">
+                        <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
+                        </svg>
+                    </button>
+                </div>
                 <p class="text-xs text-gray-400 mt-2">封面文字会同步这里填写的文件名称</p>
                 <div class="mt-5 border-t border-gray-100 pt-4">
                     <label for="ppt-image-fit-mode" class="block text-sm font-medium text-gray-600 mb-2">照片呈现（仅影响这次导出）</label>
@@ -879,6 +886,7 @@
             });
 
             makeFileNameDialogDraggable();
+            setupSpeechInput(document.getElementById('ppt-file-name'), document.getElementById('ppt-file-name-speech'));
             document.addEventListener('paste', handleImagePaste);
             document.getElementById('ppt-file-name').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') confirmFileNameDialog();
@@ -2067,6 +2075,11 @@
                     <div class="mb-3">
                         <div class="flex w-full md:w-96">
                             <input id="process-${issueId}" placeholder="可直接输入工序或分厂" autocomplete="off" class="min-w-0 flex-1 px-2 py-2 text-sm border border-gray-200 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
+                            <button type="button" id="process-speech-${issueId}" class="speech-button hidden rounded-none border-l-0" aria-label="语音输入小标题" aria-pressed="false" title="点击开始语音输入">
+                                <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
+                                </svg>
+                            </button>
                             <details id="process-menu-${issueId}" class="relative">
                                 <summary id="process-picker-${issueId}" aria-label="选择工序或分厂" class="h-full w-16 px-1 py-2 text-sm border border-l-0 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer select-none">选择</summary>
                                 <div class="absolute right-0 z-50 mt-1 w-36 max-h-80 overflow-y-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
@@ -2197,6 +2210,10 @@
                 setIssueProcessFillState(issueId, false);
                 scheduleDraftSave();
             });
+            setupSpeechInput(
+                document.getElementById(`process-${issueId}`),
+                document.getElementById(`process-speech-${issueId}`)
+            );
             ['leftDesc', 'rightDesc'].forEach(prefix => {
                 document.getElementById(`${prefix}-${issueId}`)?.addEventListener('input', () => scheduleDraftSave());
                 setupSpeechButton(issueId, prefix);
@@ -2206,12 +2223,14 @@
         }
 
         function setupSpeechButton(issueId, prefix) {
-            if (!SpeechRecognitionAPI) return;
+            setupSpeechInput(
+                document.getElementById(`${prefix}-${issueId}`),
+                document.getElementById(`${prefix}-speech-${issueId}`)
+            );
+        }
 
-            const textarea = document.getElementById(`${prefix}-${issueId}`);
-            const button = document.getElementById(`${prefix}-speech-${issueId}`);
-            if (!textarea || !button) return;
-
+        function setupSpeechInput(textarea, button) {
+            if (!SpeechRecognitionAPI || !textarea || !button) return;
             button.classList.remove('hidden');
             button.addEventListener('click', () => toggleSpeechRecognition(textarea, button));
         }
