@@ -510,7 +510,7 @@
 <div id="activation-overlay">
     <div class="activation-card">
         <div class="logo-area">
-            <img src="texhong-logo.jpg" alt="天虹集团">
+            <img src="texhong-logo-transparent.png" alt="天虹集团">
         </div>
         <h2>🔑 设备激活</h2>
         <p class="subtitle">请先激活后使用工具</p>
@@ -608,7 +608,7 @@
     <div class="container mx-auto px-4 py-6 max-w-5xl">
         <!-- 标题 -->
         <div class="text-center mb-6">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2"><img src="texhong-logo.jpg" style="width:109px;height:34px;object-fit:contain;vertical-align:middle;display:inline-block;margin-right:6px;" alt="Texhong"> 天虹集团问题整改PPT生成工具</h1>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2"><img src="texhong-logo-transparent.png" style="width:109px;height:34px;object-fit:contain;vertical-align:middle;display:inline-block;margin-right:6px;" alt="Texhong"> 天虹集团问题整改PPT生成工具</h1>
             <p class="text-gray-500 text-sm">纯前端本地处理 | 批量上传 | 自动排版 | 手机电脑通用</p>
             <p class="mt-2 inline-flex items-center justify-center rounded-full border border-green-200 bg-green-50 px-4 py-1 text-sm font-semibold text-green-700">
                 小伍出品 · 技术支持 19009925522
@@ -849,7 +849,7 @@
         const TEXHONG_SLIDE_W = 10;
         const TEXHONG_SLIDE_H = 7.5;
         const TEXHONG_TEMPLATE_PATHS = {
-            logo: 'texhong-logo.jpg',
+            logo: 'texhong-logo-transparent.png',
             cover: 'texhong-cover.jpg',
             header: 'texhong-header.jpg'
         };
@@ -2925,7 +2925,7 @@
                 pptx.company = 'Texhong Textile Group Limited';
                 
                 const imageFrameRatio = templateMode === 'company'
-                    ? 4.15 / (4.1 - 0.62 - 0.14)
+                    ? 4.15 / (4.38 - 0.62 - 0.1)
                     : 4.15 / (4.52 - 0.62 - 0.14);
                 const preparedImageCache = new Map();
                 if (templateMode === 'company') {
@@ -3105,10 +3105,11 @@
                 video: data.leftVideo,
                 videoName: data.leftVideoName,
                 placeholder: '图片',
-                x: 0.7, y: 1.38, w: 4.15, h: 4.1,
+                x: 0.7, y: 1.48, w: 4.15, h: 4.38,
                 color: 'F28C32',
                 fill: 'FFF7ED',
                 imageBackground: 'FFF7ED',
+                labelGap: 0.1,
                 labelStyle: 'outline'
             });
             drawImagePanel(pptx, slide, {
@@ -3117,10 +3118,11 @@
                 video: data.rightVideo,
                 videoName: data.rightVideoName,
                 placeholder: '图片',
-                x: 5.05, y: 1.38, w: 4.15, h: 4.1,
+                x: 5.05, y: 1.48, w: 4.15, h: 4.38,
                 color: 'F28C32',
                 fill: 'FFF7ED',
                 imageBackground: 'FFF7ED',
+                labelGap: 0.1,
                 labelStyle: 'outline'
             });
 
