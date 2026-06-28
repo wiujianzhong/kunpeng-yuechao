@@ -191,8 +191,8 @@
     <style>
         body {
             background:
-                radial-gradient(circle at top left, rgba(34, 197, 94, 0.10), transparent 32rem),
-                linear-gradient(180deg, #f7fafc 0%, #edf2f7 100%);
+                radial-gradient(circle at top left, rgba(249, 115, 22, 0.12), transparent 32rem),
+                linear-gradient(180deg, #fffaf5 0%, #ffedd5 100%);
         }
         .drop-zone {
             border: 2px dashed #cbd5e1;
@@ -851,7 +851,6 @@
         const TEXHONG_TEMPLATE_PATHS = {
             logo: 'texhong-logo.jpg',
             cover: 'texhong-cover.jpg',
-            motif: 'texhong-motif.jpg',
             header: 'texhong-header.jpg'
         };
         let texhongTemplateAssetsPromise = null;
@@ -2926,7 +2925,7 @@
                 pptx.company = 'Texhong Textile Group Limited';
                 
                 const imageFrameRatio = templateMode === 'company'
-                    ? 4.25 / (4.3 - 0.62 - 0.14)
+                    ? 4.15 / (4.1 - 0.62 - 0.14)
                     : 4.15 / (4.52 - 0.62 - 0.14);
                 const preparedImageCache = new Map();
                 if (templateMode === 'company') {
@@ -3086,19 +3085,17 @@
                 data: assets.header,
                 x: 0.35, y: 0.48, w: 9.3, h: 0.63
             });
-            slide.addImage({
-                data: assets.motif,
-                x: 5.35, y: 1.22, w: 4.3, h: 4.7
-            });
             if (processName) {
                 slide.addText(processName, {
-                    x: 0.65, y: 1.18, w: 8.7, h: 0.34,
+                    x: 5.0, y: 0.67, w: 2.82, h: 0.3,
                     fontFace: '微软雅黑',
-                    fontSize: 18,
-                    color: 'E67E22',
+                    fontSize: 20,
+                    color: '000000',
                     bold: true,
-                    align: 'center',
-                    valign: 'middle'
+                    align: 'right',
+                    valign: 'middle',
+                    fit: 'shrink',
+                    margin: 0
                 });
             }
 
@@ -3108,10 +3105,10 @@
                 video: data.leftVideo,
                 videoName: data.leftVideoName,
                 placeholder: '图片',
-                x: 0.6, y: 1.58, w: 4.25, h: 4.3,
+                x: 0.7, y: 1.38, w: 4.15, h: 4.1,
                 color: 'F28C32',
-                fill: 'FFFFFF',
-                imageBackground: 'FFFFFF',
+                fill: 'FFF7ED',
+                imageBackground: 'FFF7ED',
                 labelStyle: 'outline'
             });
             drawImagePanel(pptx, slide, {
@@ -3120,10 +3117,10 @@
                 video: data.rightVideo,
                 videoName: data.rightVideoName,
                 placeholder: '图片',
-                x: 5.15, y: 1.58, w: 4.25, h: 4.3,
+                x: 5.05, y: 1.38, w: 4.15, h: 4.1,
                 color: 'F28C32',
-                fill: 'FFFFFF',
-                imageBackground: 'FFFFFF',
+                fill: 'FFF7ED',
+                imageBackground: 'FFF7ED',
                 labelStyle: 'outline'
             });
 
