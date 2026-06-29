@@ -2289,6 +2289,7 @@
 
             if (activeSpeechSession) {
                 const previousSession = activeSpeechSession;
+                previousSession.alerted = true;
                 previousSession.recognition.abort();
                 finishSpeechSession(previousSession);
             }
@@ -2298,44 +2299,79 @@
                 recognition,
                 textarea,
                 button,
-                originalText: textarea.value
+                originalText: textarea.value,
+                timeoutId: null,
+                alerted: false
             };
 
             recognition.lang = 'zh-CN';
-            recognition.continuous = true;
-            recognition.interimResults = true;
+            recognition.continuous = false;
+            recognition.interimResults = false;
             recognition.maxAlternatives = 1;
+            recognition.onstart = () => {
+                button.title = '正在听，请开始说话';
+            };
             recognition.onresult = event => {
-                let finalText = '';
-                let interimText = '';
-                for (let index = 0; index < event.results.length; index++) {
+                let recognizedText = '';
+                for (let index = event.resultIndex; index < event.results.length; index++) {
                     const text = event.results[index][0]?.transcript || '';
-                    if (event.results[index].isFinal) {
-                        finalText += text;
-                    } else {
-                        interimText += text;
-                    }
+                    recognizedText += text;
                 }
-                textarea.value = session.originalText + finalText + interimText;
+                textarea.value = session.originalText + recognizedText;
                 textarea.dispatchEvent(new Event('input', { bubbles: true }));
             };
-            recognition.onerror = () => finishSpeechSession(session);
+            recognition.onnomatch = () => {
+                showSpeechFailure(session, '没有识别清楚，请靠近手机重新点击麦克风再说一次。');
+            };
+            recognition.onerror = event => {
+                showSpeechFailure(session, getSpeechErrorMessage(event.error));
+            };
             recognition.onend = () => finishSpeechSession(session);
 
             activeSpeechSession = session;
             button.classList.add('is-listening');
             button.setAttribute('aria-pressed', 'true');
-            button.title = '正在语音输入，点击停止';
+            button.title = '正在连接语音服务';
+            session.timeoutId = setTimeout(() => {
+                if (activeSpeechSession !== session) return;
+                showSpeechFailure(session, '语音服务长时间没有响应。请切换网络，或改用最新版 Safari、Chrome 直接打开网址后重试。');
+                recognition.abort();
+            }, 12000);
 
             try {
                 recognition.start();
             } catch (error) {
-                finishSpeechSession(session);
-                console.warn('语音识别启动失败', error);
+                showSpeechFailure(session, '语音识别启动失败，请关闭其他正在使用麦克风的应用后重试。');
             }
         }
 
+        function getSpeechErrorMessage(error) {
+            const standalone = navigator.standalone === true || window.matchMedia?.('(display-mode: standalone)').matches;
+            const messages = {
+                'audio-capture': '没有检测到可用麦克风，请关闭其他正在使用麦克风的应用后重试。',
+                'language-not-supported': '当前浏览器不支持中文语音识别，请改用最新版 Safari 或 Chrome。',
+                'network': '语音识别服务连接失败。该功能需要联网，请切换网络后重试。',
+                'no-speech': '没有听到语音，请靠近手机重新点击麦克风再说一次。',
+                'not-allowed': '麦克风或语音识别权限未开启，请在手机系统设置和浏览器网站设置中同时允许。',
+                'service-not-allowed': standalone
+                    ? '主屏幕网页App无法使用当前语音服务，请从 Safari 直接打开原网址后重试。'
+                    : '当前浏览器的语音识别服务不可用，请改用最新版 Safari 或 Chrome 后重试。'
+            };
+            return messages[error] || `语音识别失败（${error || '未知错误'}），请重新点击麦克风重试。`;
+        }
+
+        function showSpeechFailure(session, message) {
+            if (session.alerted) return;
+            session.alerted = true;
+            finishSpeechSession(session);
+            setTimeout(() => alert(message), 0);
+        }
+
         function finishSpeechSession(session) {
+            if (session.timeoutId) {
+                clearTimeout(session.timeoutId);
+                session.timeoutId = null;
+            }
             session.button.classList.remove('is-listening');
             session.button.setAttribute('aria-pressed', 'false');
             session.button.title = '点击开始语音输入';
