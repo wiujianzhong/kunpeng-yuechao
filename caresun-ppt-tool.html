@@ -1023,10 +1023,10 @@
             }
         }
 
-        async function saveDraftMediaData(issueId, type, kind, dataUrl, name) {
+        async function saveDraftMediaData(issueId, type, kind, dataUrl, name, overwrite = false) {
             if (!draftAvailable) return;
             const key = getDraftMediaKey(issueId, type);
-            if (draftMediaKeys.has(key)) {
+            if (draftMediaKeys.has(key) && !overwrite) {
                 scheduleDraftSave(0);
                 return;
             }
@@ -2867,7 +2867,7 @@
             renderPhotoMarkup();
         }
 
-        function confirmPhotoMarkup() {
+        async function confirmPhotoMarkup() {
             const state = photoMarkupState;
             if (!state) return;
             try {
@@ -2881,9 +2881,10 @@
                 const editView = getPhotoMarkupViewport();
                 drawPhotoMagnifier(ctx, { x: 0, y: 0, scale: 1 }, state.magnifierRadius / editView.scale);
                 const dataUrl = output.toDataURL('image/jpeg', 0.95);
-                setIssueMedia(state.issueId, state.type, 'image', dataUrl);
+                setIssueMedia(state.issueId, state.type, 'image', dataUrl, '', false);
                 updateImagePreview(state.issueId, state.type, dataUrl, 'image');
                 refreshBatchImagesFromIssues();
+                await saveDraftMediaData(state.issueId, state.type, 'image', dataUrl, '', true);
                 closePhotoMarkup();
             } catch (error) {
                 console.error(error);
