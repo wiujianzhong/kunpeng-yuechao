@@ -217,7 +217,8 @@
         }
         .media-drop-area {
             min-height: 220px;
-            height: 220px;
+            height: auto;
+            aspect-ratio: 4 / 3;
         }
         .issue-desc-input {
             flex: 1;
@@ -248,7 +249,9 @@
         }
         @media (max-width: 767px) {
             .media-drop-area {
-                height: 210px;
+                min-height: 0;
+                height: auto;
+                aspect-ratio: 4 / 3;
             }
         }
         .image-preview {
@@ -258,7 +261,7 @@
             object-position: center;
         }
         img.image-preview {
-            object-fit: contain;
+            object-fit: fill;
             background: #0f172a;
             cursor: zoom-in;
         }
@@ -701,33 +704,31 @@
             </div>
         </div>
 
-        <!-- 批量上传区 -->
+        <!-- 资料导入区 -->
         <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-                <h2 class="text-lg font-semibold text-gray-700">📸 批量上传图片</h2>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="file" id="pptx-import" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" class="hidden">
-                    <button type="button" id="import-pptx-btn" onclick="triggerPPTXImport()" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-blue-200 bg-blue-50 text-sm font-semibold text-blue-700 hover:bg-blue-100 transition-all">
-                        📂 导入PPT拆解
-                    </button>
+            <h2 class="text-lg font-semibold text-gray-700 mb-3">资料导入</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div id="batch-dropzone" data-paste-batch="true" tabindex="0" class="drop-zone rounded-lg px-3 py-4 md:p-5 text-center cursor-pointer outline-none flex items-center justify-center min-h-[82px] md:min-h-[120px]">
+                    <input type="file" id="batch-image" accept="image/*,video/*" multiple class="mobile-file-input" aria-hidden="true">
+                    <div id="batch-prompt">
+                        <svg class="w-7 h-7 md:w-9 md:h-9 mx-auto text-blue-400 mb-1 md:mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p class="text-sm font-semibold text-gray-700">上传照片</p>
+                        <p class="desktop-upload-note text-xs text-gray-400 mt-1">拖拽、粘贴或点击批量导入</p>
+                        <p class="mobile-upload-note text-xs text-gray-400 mt-1">从相册批量选择</p>
+                    </div>
+                    <div id="batch-uploaded" class="hidden">
+                        <p class="text-sm text-green-600 font-semibold">已上传 <span id="batch-count">0</span> 张</p>
+                        <div id="batch-thumbs" class="hidden md:flex flex-wrap justify-center gap-2 mt-3"></div>
+                    </div>
                 </div>
-            </div>
-            <div id="batch-dropzone" data-paste-batch="true" tabindex="0" class="drop-zone rounded-lg p-8 text-center cursor-pointer outline-none">
-                <input type="file" id="batch-image" accept="image/*,video/*" multiple class="mobile-file-input" aria-hidden="true">
-                <div id="batch-prompt">
-                    <svg class="w-14 h-14 mx-auto text-blue-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                    <p class="desktop-upload-note text-gray-600 font-medium">拖拽或粘贴图片到此处</p>
-                    <p class="mobile-upload-note text-gray-600 font-medium">点此选择相册图片</p>
-                    <p class="desktop-upload-note text-sm text-gray-400 mt-1">拖拽可一次放多张，按拖入顺序自动生成对应页数PPT</p>
-                    <p class="mobile-upload-note text-sm text-gray-400 mt-1">可一次选择多张图片，按选择顺序自动生成对应页数PPT</p>
-                    <p class="mt-3 inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-sm font-bold text-amber-700">💡 建议使用横屏照片，PPT展示效果更好</p>
-                </div>
-                <div id="batch-uploaded" class="hidden">
-                    <p class="text-green-600 font-semibold">已上传 <span id="batch-count">0</span> 张</p>
-                    <div id="batch-thumbs" class="flex flex-wrap justify-center gap-2 mt-3"></div>
-                </div>
+                <input type="file" id="pptx-import" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" class="hidden">
+                <button type="button" id="import-pptx-btn" onclick="triggerPPTXImport()" class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-4 md:p-5 text-blue-700 hover:bg-blue-100 transition-all flex flex-col items-center justify-center min-h-[82px] md:min-h-[120px]">
+                    <span class="text-2xl md:text-3xl mb-1 md:mb-2" aria-hidden="true">📂</span>
+                    <span class="text-sm font-semibold">导入PPT</span>
+                    <span class="hidden md:block text-xs font-normal text-blue-500 mt-1">拆解已有PPT继续整改</span>
+                </button>
             </div>
         </div>
 
@@ -742,11 +743,11 @@
         </div>
         <!-- 生成按钮 -->
         <div class="sticky bottom-4 z-10 mx-auto w-full max-w-2xl">
-            <button onclick="addEmptyIssue()" class="mb-3 w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-all flex items-center justify-center gap-2">
+            <button onclick="addEmptyIssue()" class="mb-3 w-full py-3 border border-blue-300 bg-blue-100 rounded-lg text-blue-700 font-semibold hover:bg-blue-200 transition-all flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
-                手动添加单页
+                添加整改页
             </button>
             <div class="mx-auto w-full max-w-lg">
                 <button onclick="generatePPT()" id="generate-btn" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-lg">
@@ -1015,12 +1016,14 @@
                 navigator.storage?.persist?.().catch(() => {});
                 const draft = await runDraftRequest(DRAFT_META_STORE, 'readonly', store => store.get(DRAFT_ID));
                 if (!draft?.issues?.length) {
+                    addEmptyIssue();
                     updateDraftStatus('💾 自动草稿已开启：照片和描述会保存到本机');
                     return;
                 }
                 await restoreLocalDraft(draft);
             } catch (error) {
                 console.warn('本机草稿不可用', error);
+                if (!document.querySelector('#issues-container > [id^="issue-"]')) addEmptyIssue();
                 updateDraftStatus('⚠️ 当前浏览器未开启本机草稿，请及时生成PPT备份');
             }
         }
@@ -1226,6 +1229,7 @@
             document.getElementById('batch-thumbs').innerHTML = '';
             document.getElementById('batch-count').textContent = '0';
             await clearStoredDraft();
+            addEmptyIssue();
             updateDraftStatus('💾 已清空全部内容；可开始新的检查');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -2205,8 +2209,11 @@
             
             const issueHtml = `
                 <div id="issue-${issueId}" class="bg-white rounded-lg shadow p-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="issue-page-label font-semibold text-gray-700">第 ${issueId} 页</span>
+                    <div class="flex justify-between items-center gap-2 mb-3">
+                        <div class="flex min-w-0 items-center gap-2">
+                            <span class="issue-page-label shrink-0 font-semibold text-gray-700">第 ${issueId} 页PPT</span>
+                            <span class="truncate text-xs font-semibold text-red-500">点击图片可放大查看</span>
+                        </div>
                         <button onclick="removeIssue(${issueId})" class="text-red-500 hover:text-red-700 p-1">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -3179,7 +3186,7 @@
         function renumberIssues() {
             document.querySelectorAll('[id^="issue-"]').forEach((issue, index) => {
                 const label = issue.querySelector('.issue-page-label');
-                if (label) label.textContent = `第 ${index + 1} 页`;
+                if (label) label.textContent = `第 ${index + 1} 页PPT`;
             });
         }
 
@@ -3187,7 +3194,7 @@
         async function generatePPT() {
             const issues = Array.from(document.querySelectorAll('[id^="issue-"]'));
             if (issues.length === 0) {
-                alert('请先上传图片，或点击“手动添加单页”。');
+                alert('请先上传图片，或点击“添加整改页”。');
                 return;
             }
 
