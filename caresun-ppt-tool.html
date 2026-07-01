@@ -1451,12 +1451,15 @@
                 ? topTexts.sort((a, b) => a.y - b.y)[0].text
                 : '';
 
-            const items = pictures
-                .sort((a, b) => a.x - b.x)
-                .map(pic => {
-                    const text = findPPTXDescriptionText(pic, texts);
-                    return { image: pic.image, title: text?.text || '', processName };
-                });
+            const orderedPictures = pictures.sort((a, b) => a.x - b.x);
+            const directTexts = orderedPictures.map(pic => findPPTXDescriptionText(pic, texts));
+            const sharedText = orderedPictures.length === 2 && directTexts.every(text => !text)
+                ? findPPTXSharedDescriptionText(orderedPictures, texts)
+                : null;
+            const items = orderedPictures.map((pic, index) => {
+                const text = directTexts[index] || sharedText;
+                return { image: pic.image, title: text?.text || '', processName };
+            });
             return {
                 items,
                 // 没有可拆解现场照片的原页，一律不进编辑界面，生成时原样保留。
@@ -1553,6 +1556,36 @@
                     const xDiff = Math.abs(a.cx - picCenterX) - Math.abs(b.cx - picCenterX);
                     if (xDiff !== 0) return xDiff;
                     return Math.abs(a.y - picBottom) - Math.abs(b.y - picBottom);
+                })[0] || null;
+        }
+
+        function findPPTXSharedDescriptionText(pictures, texts) {
+            if (!Array.isArray(pictures) || pictures.length !== 2) return null;
+            const [leftPic, rightPic] = [...pictures].sort((a, b) => a.x - b.x);
+            const leftCenterX = leftPic.x + leftPic.w / 2;
+            const rightCenterX = rightPic.x + rightPic.w / 2;
+            const leftCenterY = leftPic.y + leftPic.h / 2;
+            const rightCenterY = rightPic.y + rightPic.h / 2;
+            const rowBottom = Math.max(leftPic.y + leftPic.h, rightPic.y + rightPic.h);
+            if (Math.abs(leftCenterY - rightCenterY) > Math.max(0.5, Math.min(leftPic.h, rightPic.h) * 0.35)) {
+                return null;
+            }
+            const centerX = (leftCenterX + rightCenterX) / 2;
+            const middleMinX = leftCenterX + Math.max(0.25, (rightCenterX - leftCenterX) * 0.2);
+            const middleMaxX = rightCenterX - Math.max(0.25, (rightCenterX - leftCenterX) * 0.2);
+            return texts
+                .filter(text => {
+                    const verticalGap = text.y - rowBottom;
+                    return text.cy > rowBottom
+                        && verticalGap >= -0.1
+                        && verticalGap <= 1.4
+                        && text.cx >= middleMinX
+                        && text.cx <= middleMaxX;
+                })
+                .sort((a, b) => {
+                    const aScore = Math.abs(a.cx - centerX) * 2 + Math.max(0, a.y - rowBottom);
+                    const bScore = Math.abs(b.cx - centerX) * 2 + Math.max(0, b.y - rowBottom);
+                    return aScore - bScore;
                 })[0] || null;
         }
 
@@ -3324,6 +3357,8 @@
 
         function renderCompanySlide(pptx, slide, data) {
             const processName = (data.processName || '').trim();
+            const sharedDesc = getSharedPPTXDescription(data.leftDesc, data.rightDesc);
+            const sharedPanelHeight = sharedDesc ? 3.86 : 4.1;
             slide.background = { color: 'FFFFFF' };
 
             slide.addImage({
@@ -3354,27 +3389,40 @@
             }
 
             drawImagePanel(pptx, slide, {
-                label: data.leftDesc || '',
+                label: sharedDesc ? '' : data.leftDesc || '',
                 img: data.leftImg,
                 video: data.leftVideo,
                 videoName: data.leftVideoName,
                 placeholder: '图片',
-                x: 0.7, y: 1.18, w: 4.15, h: 4.1,
+                x: 0.7, y: 1.18, w: 4.15, h: sharedPanelHeight,
                 color: '64748B',
                 fill: 'F8FAFC',
-                labelStyle: 'outline'
+                labelStyle: 'outline',
+                hideLabel: sharedDesc
             });
             drawImagePanel(pptx, slide, {
-                label: data.rightDesc || '',
+                label: sharedDesc ? '' : data.rightDesc || '',
                 img: data.rightImg,
                 video: data.rightVideo,
                 videoName: data.rightVideoName,
                 placeholder: '图片',
-                x: 5.05, y: 1.18, w: 4.15, h: 4.1,
+                x: 5.05, y: 1.18, w: 4.15, h: sharedPanelHeight,
                 color: '64748B',
                 fill: 'F8FAFC',
-                labelStyle: 'outline'
+                labelStyle: 'outline',
+                hideLabel: sharedDesc
             });
+
+            if (sharedDesc) {
+                drawSharedDescriptionBox(pptx, slide, {
+                    text: sharedDesc,
+                    x: 1.05, y: 5.06, w: 7.9, h: 0.28,
+                    fill: 'F8FAFC',
+                    line: '64748B',
+                    textColor: '334155',
+                    textFontSize: 14
+                });
+            }
 
             slide.addShape(pptx.ShapeType.rect, {
                 x: 0, y: 5.44, w: SLIDE_W, h: 0.19,
@@ -3385,6 +3433,8 @@
 
         function renderDefaultSlide(pptx, slide, data) {
             const processName = (data.processName || '').trim();
+            const sharedDesc = getSharedPPTXDescription(data.leftDesc, data.rightDesc);
+            const sharedPanelHeight = sharedDesc ? 4.1 : 4.52;
             slide.background = { color: 'FFFFFF' };
             if (processName) {
                 drawDescriptionBox(pptx, slide, {
@@ -3398,32 +3448,51 @@
             }
 
             drawImagePanel(pptx, slide, {
-                label: data.leftDesc || '',
+                label: sharedDesc ? '' : data.leftDesc || '',
                 img: data.leftImg,
                 video: data.leftVideo,
                 videoName: data.leftVideoName,
                 placeholder: '图片',
-                x: 0.7, y: 0.78, w: 4.15, h: 4.52,
+                x: 0.7, y: 0.78, w: 4.15, h: sharedPanelHeight,
                 color: '64748B',
                 fill: 'F8FAFC',
-                labelStyle: 'outline'
+                labelStyle: 'outline',
+                hideLabel: sharedDesc
             });
             drawImagePanel(pptx, slide, {
-                label: data.rightDesc || '',
+                label: sharedDesc ? '' : data.rightDesc || '',
                 img: data.rightImg,
                 video: data.rightVideo,
                 videoName: data.rightVideoName,
                 placeholder: '图片',
-                x: 5.05, y: 0.78, w: 4.15, h: 4.52,
+                x: 5.05, y: 0.78, w: 4.15, h: sharedPanelHeight,
                 color: '64748B',
                 fill: 'F8FAFC',
-                labelStyle: 'outline'
+                labelStyle: 'outline',
+                hideLabel: sharedDesc
             });
+
+            if (sharedDesc) {
+                drawSharedDescriptionBox(pptx, slide, {
+                    text: sharedDesc,
+                    x: 1.05, y: 4.96, w: 7.9, h: 0.3,
+                    fill: 'F8FAFC',
+                    line: '64748B',
+                    textColor: '334155',
+                    textFontSize: 14
+                });
+            }
 
             slide.addText(`${data.pageNum} / ${data.total}`, {
                 x: 8.9, y: 5.38, w: 0.75, h: 0.18,
                 fontSize: 8, color: '475569', align: 'right'
             });
+        }
+
+        function getSharedPPTXDescription(leftDesc, rightDesc) {
+            const left = String(leftDesc || '').trim();
+            const right = String(rightDesc || '').trim();
+            return left && left === right ? left : '';
         }
 
         function drawDescriptionBox(pptx, slide, opt) {
@@ -3444,10 +3513,32 @@
             });
         }
 
+        function drawSharedDescriptionBox(pptx, slide, opt) {
+            const text = String(opt.text || '').trim();
+            if (!text) return;
+            slide.addShape(pptx.ShapeType.roundRect, {
+                x: opt.x, y: opt.y, w: opt.w, h: opt.h,
+                rectRadius: 0.05,
+                fill: { color: opt.fill },
+                line: { color: opt.line, width: 1.1 }
+            });
+            slide.addText(text, {
+                x: opt.x + 0.12, y: opt.y + 0.03, w: opt.w - 0.24, h: opt.h - 0.06,
+                fontSize: opt.textFontSize || 14,
+                color: opt.textColor,
+                bold: true,
+                valign: 'middle',
+                align: 'center',
+                fit: 'shrink',
+                margin: 0
+            });
+        }
+
         function drawImagePanel(pptx, slide, opt) {
+            const hideLabel = opt.hideLabel === true;
             const isOutlineLabel = opt.labelStyle === 'outline';
-            const labelH = opt.labelH ?? (isOutlineLabel ? 0.62 : 0.44);
-            const labelGap = opt.labelGap ?? (isOutlineLabel ? 0.14 : 0);
+            const labelH = hideLabel ? 0 : (opt.labelH ?? (isOutlineLabel ? 0.62 : 0.44));
+            const labelGap = hideLabel ? 0 : (opt.labelGap ?? (isOutlineLabel ? 0.14 : 0));
             const labelInset = opt.labelInset ?? 0;
             const labelX = opt.x + labelInset;
             const labelW = opt.w - labelInset * 2;
@@ -3457,37 +3548,39 @@
             const imgH = opt.h - labelH - labelGap;
             const labelY = opt.y + imgH + labelGap;
 
-            if (opt.labelStyle === 'outline') {
-                slide.addText(opt.label, {
-                    x: labelX, y: labelY, w: labelW, h: labelH,
-                    fontFace: '汉仪旗黑',
-                    fontSize: 16, color: '000000',
-                    align: 'center',
-                    valign: 'middle',
-                    fit: 'shrink'
-                });
-            } else {
-                const labelTextOpt = {
-                    x: labelX, y: labelY, w: labelW, h: labelH,
-                    fontSize: 15, color: 'FFFFFF', bold: true,
-                    align: 'center',
-                    valign: 'middle',
-                    fit: 'shrink',
-                    margin: 0
-                };
-                if (opt.labelTextBox) {
+            if (!hideLabel) {
+                if (opt.labelStyle === 'outline') {
                     slide.addText(opt.label, {
-                        ...labelTextOpt,
-                        fill: { color: opt.color },
-                        line: { color: opt.color }
+                        x: labelX, y: labelY, w: labelW, h: labelH,
+                        fontFace: '汉仪旗黑',
+                        fontSize: 16, color: '000000',
+                        align: 'center',
+                        valign: 'middle',
+                        fit: 'shrink'
                     });
                 } else {
-                    slide.addShape(pptx.ShapeType.rect, {
+                    const labelTextOpt = {
                         x: labelX, y: labelY, w: labelW, h: labelH,
-                        fill: { color: opt.color },
-                        line: { color: opt.color }
-                    });
-                    slide.addText(opt.label, labelTextOpt);
+                        fontSize: 15, color: 'FFFFFF', bold: true,
+                        align: 'center',
+                        valign: 'middle',
+                        fit: 'shrink',
+                        margin: 0
+                    };
+                    if (opt.labelTextBox) {
+                        slide.addText(opt.label, {
+                            ...labelTextOpt,
+                            fill: { color: opt.color },
+                            line: { color: opt.color }
+                        });
+                    } else {
+                        slide.addShape(pptx.ShapeType.rect, {
+                            x: labelX, y: labelY, w: labelW, h: labelH,
+                            fill: { color: opt.color },
+                            line: { color: opt.color }
+                        });
+                        slide.addText(opt.label, labelTextOpt);
+                    }
                 }
             }
 
