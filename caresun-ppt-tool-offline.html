@@ -1832,6 +1832,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 
         function renderCompanySlide(pptx, slide, data) {
             const processName = (data.processName || '').trim();
+            const sharedDesc = getSharedPPTXDescription(data.leftDesc, data.rightDesc);
+            const sharedPanelHeight = 4.1;
             slide.background = { color: 'FFFFFF' };
 
             slide.addImage({
@@ -1862,27 +1864,42 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             }
 
             drawImagePanel(pptx, slide, {
-                label: data.leftDesc || '',
+                label: sharedDesc ? '' : data.leftDesc || '',
                 img: data.leftImg,
                 video: data.leftVideo,
                 videoName: data.leftVideoName,
                 placeholder: '图片',
-                x: 0.7, y: 1.18, w: 4.15, h: 4.1,
+                x: 0.7, y: 1.18, w: 4.15, h: sharedPanelHeight,
                 color: '64748B',
                 fill: 'F8FAFC',
-                labelStyle: 'outline'
+                labelStyle: 'outline',
+                hideLabel: sharedDesc,
+                reserveLabelSpace: sharedDesc
             });
             drawImagePanel(pptx, slide, {
-                label: data.rightDesc || '',
+                label: sharedDesc ? '' : data.rightDesc || '',
                 img: data.rightImg,
                 video: data.rightVideo,
                 videoName: data.rightVideoName,
                 placeholder: '图片',
-                x: 5.05, y: 1.18, w: 4.15, h: 4.1,
+                x: 5.05, y: 1.18, w: 4.15, h: sharedPanelHeight,
                 color: '64748B',
                 fill: 'F8FAFC',
-                labelStyle: 'outline'
+                labelStyle: 'outline',
+                hideLabel: sharedDesc,
+                reserveLabelSpace: sharedDesc
             });
+
+            if (sharedDesc) {
+                drawSharedDescriptionBox(pptx, slide, {
+                    text: sharedDesc,
+                    x: 0.7, y: 4.66, w: 8.5, h: 0.62,
+                    fill: 'F8FAFC',
+                    line: '64748B',
+                    textColor: '334155',
+                    textFontSize: 14
+                });
+            }
 
             slide.addShape(pptx.ShapeType.rect, {
                 x: 0, y: 5.44, w: SLIDE_W, h: 0.19,
@@ -1894,7 +1911,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         function renderDefaultSlide(pptx, slide, data) {
             const processName = (data.processName || '').trim();
             const sharedDesc = getSharedPPTXDescription(data.leftDesc, data.rightDesc);
-            const sharedPanelHeight = sharedDesc ? 4.1 : 4.52;
+            const sharedPanelHeight = 4.52;
             slide.background = { color: 'FFFFFF' };
             if (processName) {
                 drawDescriptionBox(pptx, slide, {
@@ -1917,7 +1934,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
                 color: '64748B',
                 fill: 'F8FAFC',
                 labelStyle: 'outline',
-                hideLabel: sharedDesc
+                hideLabel: sharedDesc,
+                reserveLabelSpace: sharedDesc
             });
             drawImagePanel(pptx, slide, {
                 label: sharedDesc ? '' : data.rightDesc || '',
@@ -1929,13 +1947,14 @@ https://github.com/nodeca/pako/blob/main/LICENSE
                 color: '64748B',
                 fill: 'F8FAFC',
                 labelStyle: 'outline',
-                hideLabel: sharedDesc
+                hideLabel: sharedDesc,
+                reserveLabelSpace: sharedDesc
             });
 
             if (sharedDesc) {
                 drawSharedDescriptionBox(pptx, slide, {
                     text: sharedDesc,
-                    x: 1.05, y: 4.96, w: 7.9, h: 0.3,
+                    x: 0.7, y: 4.68, w: 8.5, h: 0.62,
                     fill: 'F8FAFC',
                     line: '64748B',
                     textColor: '334155',
@@ -1997,8 +2016,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         function drawImagePanel(pptx, slide, opt) {
             const hideLabel = opt.hideLabel === true;
             const isOutlineLabel = opt.labelStyle === 'outline';
-            const labelH = hideLabel ? 0 : (opt.labelH ?? (isOutlineLabel ? 0.62 : 0.44));
-            const labelGap = hideLabel ? 0 : (opt.labelGap ?? (isOutlineLabel ? 0.14 : 0));
+            const reserveLabelSpace = opt.reserveLabelSpace === true;
+            const labelH = hideLabel && !reserveLabelSpace ? 0 : (opt.labelH ?? (isOutlineLabel ? 0.62 : 0.44));
+            const labelGap = hideLabel && !reserveLabelSpace ? 0 : (opt.labelGap ?? (isOutlineLabel ? 0.14 : 0));
             const labelInset = opt.labelInset ?? 0;
             const labelX = opt.x + labelInset;
             const labelW = opt.w - labelInset * 2;

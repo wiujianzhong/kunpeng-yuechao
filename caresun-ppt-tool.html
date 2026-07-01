@@ -3448,7 +3448,7 @@
         function renderCompanySlide(pptx, slide, data) {
             const processName = (data.processName || '').trim();
             const sharedDesc = getSharedPPTXDescription(data.leftDesc, data.rightDesc);
-            const sharedPanelHeight = sharedDesc ? 3.86 : 4.1;
+            const sharedPanelHeight = 4.1;
             slide.background = { color: 'FFFFFF' };
 
             slide.addImage({
@@ -3488,7 +3488,8 @@
                 color: '64748B',
                 fill: 'F8FAFC',
                 labelStyle: 'outline',
-                hideLabel: sharedDesc
+                hideLabel: sharedDesc,
+                reserveLabelSpace: sharedDesc
             });
             drawImagePanel(pptx, slide, {
                 label: sharedDesc ? '' : data.rightDesc || '',
@@ -3500,13 +3501,14 @@
                 color: '64748B',
                 fill: 'F8FAFC',
                 labelStyle: 'outline',
-                hideLabel: sharedDesc
+                hideLabel: sharedDesc,
+                reserveLabelSpace: sharedDesc
             });
 
             if (sharedDesc) {
                 drawSharedDescriptionBox(pptx, slide, {
                     text: sharedDesc,
-                    x: 1.05, y: 5.06, w: 7.9, h: 0.28,
+                    x: 0.7, y: 4.66, w: 8.5, h: 0.62,
                     fill: 'F8FAFC',
                     line: '64748B',
                     textColor: '334155',
@@ -3524,7 +3526,7 @@
         function renderDefaultSlide(pptx, slide, data) {
             const processName = (data.processName || '').trim();
             const sharedDesc = getSharedPPTXDescription(data.leftDesc, data.rightDesc);
-            const sharedPanelHeight = sharedDesc ? 4.1 : 4.52;
+            const sharedPanelHeight = 4.52;
             slide.background = { color: 'FFFFFF' };
             if (processName) {
                 drawDescriptionBox(pptx, slide, {
@@ -3547,7 +3549,8 @@
                 color: '64748B',
                 fill: 'F8FAFC',
                 labelStyle: 'outline',
-                hideLabel: sharedDesc
+                hideLabel: sharedDesc,
+                reserveLabelSpace: sharedDesc
             });
             drawImagePanel(pptx, slide, {
                 label: sharedDesc ? '' : data.rightDesc || '',
@@ -3559,13 +3562,14 @@
                 color: '64748B',
                 fill: 'F8FAFC',
                 labelStyle: 'outline',
-                hideLabel: sharedDesc
+                hideLabel: sharedDesc,
+                reserveLabelSpace: sharedDesc
             });
 
             if (sharedDesc) {
                 drawSharedDescriptionBox(pptx, slide, {
                     text: sharedDesc,
-                    x: 1.05, y: 4.96, w: 7.9, h: 0.3,
+                    x: 0.7, y: 4.68, w: 8.5, h: 0.62,
                     fill: 'F8FAFC',
                     line: '64748B',
                     textColor: '334155',
@@ -3626,9 +3630,10 @@
 
         function drawImagePanel(pptx, slide, opt) {
             const hideLabel = opt.hideLabel === true;
+            const reserveLabelSpace = opt.reserveLabelSpace === true;
             const isOutlineLabel = opt.labelStyle === 'outline';
-            const labelH = hideLabel ? 0 : (opt.labelH ?? (isOutlineLabel ? 0.62 : 0.44));
-            const labelGap = hideLabel ? 0 : (opt.labelGap ?? (isOutlineLabel ? 0.14 : 0));
+            const labelH = hideLabel && !reserveLabelSpace ? 0 : (opt.labelH ?? (isOutlineLabel ? 0.62 : 0.44));
+            const labelGap = hideLabel && !reserveLabelSpace ? 0 : (opt.labelGap ?? (isOutlineLabel ? 0.14 : 0));
             const labelInset = opt.labelInset ?? 0;
             const labelX = opt.x + labelInset;
             const labelW = opt.w - labelInset * 2;
