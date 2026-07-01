@@ -230,6 +230,35 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             color: #64748b;
             background: #ffffff;
         }
+        .issue-desc-row {
+            display: flex;
+            align-items: stretch;
+            gap: 0.5rem;
+        }
+        .issue-desc-input {
+            flex: 1;
+            min-width: 0;
+            min-height: 44px;
+            resize: vertical;
+            font-size: 0.875rem;
+            line-height: 1.45;
+        }
+        .desc-merge-button {
+            width: 56px;
+            min-height: 44px;
+            flex: 0 0 56px;
+            border: 1px solid #bbf7d0;
+            border-radius: 0.5rem;
+            color: #166534;
+            background: #f0fdf4;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .desc-merge-button.is-merged {
+            color: #ffffff;
+            border-color: #16a34a;
+            background: #16a34a;
+        }
         .speech-button.is-listening {
             color: #ffffff;
             border-color: #16a34a;
@@ -472,6 +501,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         let activePasteTarget = null;
         const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
         let activeSpeechSession = null;
+        const mergedDescriptionStates = new Map();
+        const mergedDescriptionSyncLocks = new Set();
         const COMPRESS_MAX_EDGE = 2400;
         const COMPRESS_QUALITY = 0.88;
         const PPT_IMPORT_MAX_EDGE = 2800;
@@ -1262,7 +1293,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
                                     </div>
                                 </div>
                             </div>
-                            <textarea id="leftDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input mt-2 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                            <div class="issue-desc-row mt-2">
+                                <textarea id="leftDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                                <button type="button" id="leftDesc-merge-${issueId}" class="desc-merge-button" aria-label="合并左右描述" aria-pressed="false" title="点击后左右描述同步" onclick="mergeIssueDescriptions(${issueId}, 'left')">合并</button>
+                            </div>
                         </div>
                         
                         <div class="media-slot">
@@ -1280,7 +1314,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
                                     </div>
                                 </div>
                             </div>
-                            <textarea id="rightDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input mt-2 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                            <div class="issue-desc-row mt-2">
+                                <textarea id="rightDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                                <button type="button" id="rightDesc-merge-${issueId}" class="desc-merge-button" aria-label="合并左右描述" aria-pressed="false" title="点击后左右描述同步" onclick="mergeIssueDescriptions(${issueId}, 'right')">合并</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1292,6 +1329,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
                 document.getElementById(`process-${issueId}`),
                 document.getElementById(`process-speech-${issueId}`)
             );
+            ['leftDesc', 'rightDesc'].forEach(prefix => {
+                document.getElementById(`${prefix}-${issueId}`)?.addEventListener('input', () => handleIssueDescriptionInput(issueId, prefix));
+            });
+            updateIssueDescriptionMergeButtons(issueId);
             renumberIssues();
             return issueId;
         }
@@ -1300,6 +1341,63 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             if (!SpeechRecognitionAPI || !textarea || !button) return;
             button.classList.remove('hidden');
             button.addEventListener('click', () => toggleSpeechRecognition(textarea, button));
+        }
+
+        function isIssueDescriptionMerged(issueId) {
+            return mergedDescriptionStates.get(String(issueId)) === true;
+        }
+
+        function updateIssueDescriptionMergeButtons(issueId) {
+            const merged = isIssueDescriptionMerged(issueId);
+            ['left', 'right'].forEach(prefix => {
+                const button = document.getElementById(`${prefix}Desc-merge-${issueId}`);
+                if (!button) return;
+                button.classList.toggle('is-merged', merged);
+                button.setAttribute('aria-pressed', merged ? 'true' : 'false');
+                button.textContent = '合并';
+                button.title = merged ? '左右描述已同步，继续输入会自动同步' : '点击后左右描述同步';
+            });
+        }
+
+        function syncIssueDescriptions(issueId, sourcePrefix) {
+            if (!isIssueDescriptionMerged(issueId)) return;
+            const source = document.getElementById(`${sourcePrefix}Desc-${issueId}`);
+            const targetPrefix = sourcePrefix === 'left' ? 'right' : 'left';
+            const target = document.getElementById(`${targetPrefix}Desc-${issueId}`);
+            if (!source || !target) return;
+            const lockKey = String(issueId);
+            if (mergedDescriptionSyncLocks.has(lockKey)) return;
+            if (target.value === source.value) return;
+            mergedDescriptionSyncLocks.add(lockKey);
+            target.value = source.value;
+            mergedDescriptionSyncLocks.delete(lockKey);
+        }
+
+        function handleIssueDescriptionInput(issueId, prefix) {
+            syncIssueDescriptions(issueId, prefix);
+        }
+
+        function mergeIssueDescriptions(issueId, sourcePrefix) {
+            const source = document.getElementById(`${sourcePrefix}Desc-${issueId}`);
+            const targetPrefix = sourcePrefix === 'left' ? 'right' : 'left';
+            const target = document.getElementById(`${targetPrefix}Desc-${issueId}`);
+            if (!source || !target) return;
+            const mergedText = source.value || target.value || '';
+            mergedDescriptionStates.set(String(issueId), true);
+            if (source.value !== mergedText) source.value = mergedText;
+            if (target.value !== mergedText) target.value = mergedText;
+            updateIssueDescriptionMergeButtons(issueId);
+        }
+
+        function setIssueDescriptionMerged(issueId, merged, sourcePrefix = 'left') {
+            const key = String(issueId);
+            if (merged) {
+                mergedDescriptionStates.set(key, true);
+                syncIssueDescriptions(issueId, sourcePrefix);
+            } else {
+                mergedDescriptionStates.delete(key);
+            }
+            updateIssueDescriptionMergeButtons(issueId);
         }
 
         function toggleSpeechRecognition(textarea, button) {
@@ -1610,6 +1708,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         // 删除问题项
         function removeIssue(issueId) {
             document.getElementById(`issue-${issueId}`)?.remove();
+            mergedDescriptionStates.delete(String(issueId));
             clearIssueMedia(issueId, 'left');
             clearIssueMedia(issueId, 'right');
             renumberIssues();
@@ -1626,6 +1725,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
                 const leftVideo = window[`leftVideo-${issueId}`];
                 const rightVideo = window[`rightVideo-${issueId}`];
                 if (!processName && !leftDesc && !rightDesc && !leftImg && !rightImg && !leftVideo && !rightVideo) {
+                    mergedDescriptionStates.delete(String(issueId));
                     issue.remove();
                 }
             });

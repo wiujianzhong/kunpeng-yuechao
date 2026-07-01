@@ -233,6 +233,22 @@
             align-items: stretch;
             gap: 0.5rem;
         }
+        .desc-merge-button {
+            width: 56px;
+            min-height: 44px;
+            flex: 0 0 56px;
+            border: 1px solid #bbf7d0;
+            border-radius: 0.5rem;
+            color: #166534;
+            background: #f0fdf4;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .desc-merge-button.is-merged {
+            color: #ffffff;
+            border-color: #16a34a;
+            background: #16a34a;
+        }
         .speech-button {
             width: 44px;
             min-height: 44px;
@@ -822,6 +838,8 @@
         let isRestoringDraft = false;
         let draftAvailable = false;
         let defaultProcessTitle = '';
+        const mergedDescriptionStates = new Map();
+        const mergedDescriptionSyncLocks = new Set();
         const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
         let activeSpeechSession = null;
         const UPLOAD_MAX_EDGE = 2400;
@@ -1033,6 +1051,7 @@
                         processName: document.getElementById(`process-${id}`)?.value || '',
                         leftDesc: document.getElementById(`leftDesc-${id}`)?.value || '',
                         rightDesc: document.getElementById(`rightDesc-${id}`)?.value || '',
+                        descMerged: mergedDescriptionStates.get(id) === true,
                         leftKind: leftKind || '',
                         rightKind: rightKind || ''
                     };
@@ -1135,6 +1154,13 @@
                     document.getElementById(`process-${issueId}`).value = item.processName || '';
                     document.getElementById(`leftDesc-${issueId}`).value = item.leftDesc || '';
                     document.getElementById(`rightDesc-${issueId}`).value = item.rightDesc || '';
+                    const shouldMerge = typeof item.descMerged === 'boolean'
+                        ? item.descMerged
+                        : Boolean((item.leftDesc || '').trim() && (item.leftDesc || '') === (item.rightDesc || ''));
+                    const mergeSourcePrefix = (item.leftDesc || '').trim()
+                        ? 'left'
+                        : ((item.rightDesc || '').trim() ? 'right' : 'left');
+                    setIssueDescriptionMerged(issueId, shouldMerge, mergeSourcePrefix);
                     for (const type of ['left', 'right']) {
                         const record = await runDraftRequest(DRAFT_MEDIA_STORE, 'readonly', store => store.get(getDraftMediaKey(item.id, type)));
                         if (!record?.blob) continue;
@@ -2303,6 +2329,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
                                     </svg>
                                 </button>
+                                <button type="button" id="leftDesc-merge-${issueId}" class="desc-merge-button" aria-label="合并左右描述" aria-pressed="false" title="点击后左右描述同步" onclick="mergeIssueDescriptions(${issueId}, 'left')">合并</button>
                             </div>
                         </div>
                         
@@ -2330,6 +2357,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
                                     </svg>
                                 </button>
+                                <button type="button" id="rightDesc-merge-${issueId}" class="desc-merge-button" aria-label="合并左右描述" aria-pressed="false" title="点击后左右描述同步" onclick="mergeIssueDescriptions(${issueId}, 'right')">合并</button>
                             </div>
                         </div>
                     </div>
@@ -2351,9 +2379,10 @@
                 document.getElementById(`process-speech-${issueId}`)
             );
             ['leftDesc', 'rightDesc'].forEach(prefix => {
-                document.getElementById(`${prefix}-${issueId}`)?.addEventListener('input', () => scheduleDraftSave());
+                document.getElementById(`${prefix}-${issueId}`)?.addEventListener('input', () => handleIssueDescriptionInput(issueId, prefix));
                 setupSpeechButton(issueId, prefix);
             });
+            updateIssueDescriptionMergeButtons(issueId);
             renumberIssues();
             return issueId;
         }
@@ -2363,6 +2392,65 @@
                 document.getElementById(`${prefix}-${issueId}`),
                 document.getElementById(`${prefix}-speech-${issueId}`)
             );
+        }
+
+        function isIssueDescriptionMerged(issueId) {
+            return mergedDescriptionStates.get(String(issueId)) === true;
+        }
+
+        function updateIssueDescriptionMergeButtons(issueId) {
+            const merged = isIssueDescriptionMerged(issueId);
+            ['left', 'right'].forEach(prefix => {
+                const button = document.getElementById(`${prefix}Desc-merge-${issueId}`);
+                if (!button) return;
+                button.classList.toggle('is-merged', merged);
+                button.setAttribute('aria-pressed', merged ? 'true' : 'false');
+                button.textContent = '合并';
+                button.title = merged ? '左右描述已同步，继续输入会自动同步' : '点击后左右描述同步';
+            });
+        }
+
+        function syncIssueDescriptions(issueId, sourcePrefix) {
+            if (!isIssueDescriptionMerged(issueId)) return;
+            const source = document.getElementById(`${sourcePrefix}Desc-${issueId}`);
+            const targetPrefix = sourcePrefix === 'left' ? 'right' : 'left';
+            const target = document.getElementById(`${targetPrefix}Desc-${issueId}`);
+            if (!source || !target) return;
+            const lockKey = String(issueId);
+            if (mergedDescriptionSyncLocks.has(lockKey)) return;
+            if (target.value === source.value) return;
+            mergedDescriptionSyncLocks.add(lockKey);
+            target.value = source.value;
+            mergedDescriptionSyncLocks.delete(lockKey);
+        }
+
+        function handleIssueDescriptionInput(issueId, prefix) {
+            syncIssueDescriptions(issueId, prefix);
+            scheduleDraftSave();
+        }
+
+        function setIssueDescriptionMerged(issueId, merged, sourcePrefix = 'left') {
+            const key = String(issueId);
+            if (merged) {
+                mergedDescriptionStates.set(key, true);
+                syncIssueDescriptions(issueId, sourcePrefix);
+            } else {
+                mergedDescriptionStates.delete(key);
+            }
+            updateIssueDescriptionMergeButtons(issueId);
+        }
+
+        function mergeIssueDescriptions(issueId, sourcePrefix) {
+            const source = document.getElementById(`${sourcePrefix}Desc-${issueId}`);
+            const targetPrefix = sourcePrefix === 'left' ? 'right' : 'left';
+            const target = document.getElementById(`${targetPrefix}Desc-${issueId}`);
+            if (!source || !target) return;
+            const mergedText = source.value || target.value || '';
+            mergedDescriptionStates.set(String(issueId), true);
+            if (source.value !== mergedText) source.value = mergedText;
+            if (target.value !== mergedText) target.value = mergedText;
+            updateIssueDescriptionMergeButtons(issueId);
+            scheduleDraftSave();
         }
 
         function setupSpeechInput(textarea, button) {
@@ -3146,6 +3234,7 @@
         // 删除问题项
         function removeIssue(issueId) {
             document.getElementById(`issue-${issueId}`)?.remove();
+            mergedDescriptionStates.delete(String(issueId));
             clearIssueMedia(issueId, 'left');
             clearIssueMedia(issueId, 'right');
             renumberIssues();
@@ -3163,6 +3252,7 @@
                 const leftVideo = window[`leftVideo-${issueId}`];
                 const rightVideo = window[`rightVideo-${issueId}`];
                 if (!processName && !leftDesc && !rightDesc && !leftImg && !rightImg && !leftVideo && !rightVideo) {
+                    mergedDescriptionStates.delete(String(issueId));
                     issue.remove();
                 }
             });
