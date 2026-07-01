@@ -257,6 +257,11 @@
             object-fit: cover;
             object-position: center;
         }
+        img.image-preview {
+            object-fit: contain;
+            background: #0f172a;
+            cursor: zoom-in;
+        }
         .single-preview {
             position: absolute;
             inset: 0;
@@ -317,6 +322,48 @@
         }
         .modal-panel {
             touch-action: none;
+        }
+        #photo-viewer-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 100002;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.94);
+            cursor: zoom-out;
+        }
+        #photo-viewer-modal.open { display: flex; }
+        #photo-viewer-image {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+        .photo-viewer-close {
+            position: absolute;
+            top: max(14px, env(safe-area-inset-top));
+            right: 14px;
+            width: 42px;
+            height: 42px;
+            border: 0;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+            font-size: 28px;
+            line-height: 1;
+        }
+        .photo-viewer-tip {
+            position: absolute;
+            bottom: max(18px, env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+            white-space: nowrap;
         }
         #photo-markup-modal {
             position: fixed;
@@ -545,6 +592,12 @@
         <p id="purchase-plan-note" style="margin:0 0 8px;color:#15803d;font-weight:700;">当前选择：月卡 · ¥5 · 30天</p>
         <p class="purchase-note">扫码付款后，请将页面上的机器码发送给管理员 19009925522，领取对应时长的激活码。</p>
     </div>
+</div>
+<!-- ===== 照片全屏查看 ===== -->
+<div id="photo-viewer-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="查看完整照片" onclick="closePhotoViewer(event)">
+    <button type="button" class="photo-viewer-close" aria-label="关闭完整照片">×</button>
+    <img id="photo-viewer-image" alt="完整照片">
+    <div class="photo-viewer-tip">再次点击即可返回</div>
 </div>
 <!-- ===== 照片标记 ===== -->
 <div id="photo-markup-modal" aria-hidden="true">
@@ -2240,7 +2293,7 @@
                                     <p class="mt-2 text-xs font-bold text-amber-600">建议使用横屏照片</p>
                                 </div>
                                 <div id="left-preview-${issueId}" class="hidden single-preview">
-                                    <img id="left-img-${issueId}" class="image-preview">
+                                    <img id="left-img-${issueId}" class="image-preview" onclick="openPhotoViewer(event, ${issueId}, 'left')" title="点击查看完整照片">
                                     <video id="left-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
                                     <div class="preview-actions">
                                         <p class="preview-status text-xs text-slate-600 font-semibold">已上传</p>
@@ -2267,7 +2320,7 @@
                                     <p class="mt-2 text-xs font-bold text-amber-600">建议使用横屏照片</p>
                                 </div>
                                 <div id="right-preview-${issueId}" class="hidden single-preview">
-                                    <img id="right-img-${issueId}" class="image-preview">
+                                    <img id="right-img-${issueId}" class="image-preview" onclick="openPhotoViewer(event, ${issueId}, 'right')" title="点击查看完整照片">
                                     <video id="right-video-${issueId}" class="image-preview hidden" controls muted playsinline></video>
                                     <div class="preview-actions">
                                         <p class="preview-status text-xs text-slate-600 font-semibold">已上传</p>
@@ -2595,6 +2648,26 @@
                 }
             }
             document.getElementById(`${type}-zone-${issueId}`).classList.add('uploaded');
+        }
+
+        function openPhotoViewer(event, issueId, type) {
+            event.preventDefault();
+            event.stopPropagation();
+            const source = window[`${type}Image-${issueId}`];
+            if (!source) return;
+            const modal = document.getElementById('photo-viewer-modal');
+            document.getElementById('photo-viewer-image').src = source;
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closePhotoViewer(event) {
+            event?.preventDefault();
+            event?.stopPropagation();
+            const modal = document.getElementById('photo-viewer-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.getElementById('photo-viewer-image').removeAttribute('src');
         }
 
         function clearSingleImage(event, issueId, type) {
