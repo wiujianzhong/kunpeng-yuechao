@@ -552,7 +552,7 @@
         <div class="photo-markup-header">
             <div>
                 <div id="photo-markup-title" class="photo-markup-title">编辑照片</div>
-                <div class="photo-markup-tip">选好工具后在大图上拖动；点“放大镜”后，它会出现在图片中间，可用手指拖动位置。</div>
+                <div class="photo-markup-tip">选好工具后在大图上拖动；点已有的箭头、圆圈、方框或放大镜，可直接拖动位置。</div>
             </div>
             <div class="photo-markup-actions">
                 <button type="button" class="photo-markup-action" onclick="setPhotoMarkupZoom(-0.25)">− 缩小</button>
@@ -753,6 +753,7 @@
         const batchImages = [];
         let batchUploadQueue = Promise.resolve();
         let photoMarkupState = null;
+        const savedPhotoMarkups = new Map();
         let importedPPTX = null;
         let pendingFileNameResolve = null;
         let activePasteTarget = null;
@@ -1049,6 +1050,35 @@
             }
         }
 
+        async function saveDraftMarkupMedia(issueId, type, dataUrl, markup) {
+            if (!draftAvailable) return;
+            const key = getDraftMediaKey(issueId, type);
+            try {
+                const [blob, sourceBlob] = await Promise.all([
+                    fetch(dataUrl).then(response => response.blob()),
+                    fetch(markup.source).then(response => response.blob())
+                ]);
+                await runDraftRequest(DRAFT_MEDIA_STORE, 'readwrite', store => store.put({
+                    key,
+                    kind: 'image',
+                    name: '',
+                    blob,
+                    sourceBlob,
+                    markup: {
+                        shapes: markup.shapes,
+                        magnifier: markup.magnifier,
+                        magnifierRadius: markup.magnifierRadius,
+                        shapeLineWidth: markup.shapeLineWidth
+                    }
+                }));
+                draftMediaKeys.add(key);
+                scheduleDraftSave(0);
+            } catch (error) {
+                console.warn('标记草稿保存失败', error);
+                updateDraftStatus('⚠️ 照片标记保存失败，请尽快生成PPT备份');
+            }
+        }
+
         async function restoreLocalDraft(draft) {
             isRestoringDraft = true;
             try {
@@ -1063,7 +1093,17 @@
                         const dataUrl = await readDraftBlob(record.blob);
                         setIssueMedia(issueId, type, record.kind, dataUrl, record.name || '', false);
                         updateImagePreview(issueId, type, dataUrl, record.kind);
-                        draftMediaKeys.add(getDraftMediaKey(issueId, type));
+                        const key = getDraftMediaKey(issueId, type);
+                        if (record.markup && record.sourceBlob) {
+                            savedPhotoMarkups.set(key, {
+                                source: await readDraftBlob(record.sourceBlob),
+                                shapes: Array.isArray(record.markup.shapes) ? record.markup.shapes : [],
+                                magnifier: record.markup.magnifier || null,
+                                magnifierRadius: record.markup.magnifierRadius || 58,
+                                shapeLineWidth: record.markup.shapeLineWidth || 8
+                            });
+                        }
+                        draftMediaKeys.add(key);
                     }
                 }
                 refreshBatchImagesFromIssues();
@@ -1086,6 +1126,7 @@
             const key = getDraftMediaKey(issueId, type);
             draftPendingMedia.delete(key);
             draftMediaKeys.delete(key);
+            savedPhotoMarkups.delete(key);
             if (!draftAvailable) return;
             try {
                 await runDraftRequest(DRAFT_MEDIA_STORE, 'readwrite', store => store.delete(key));
@@ -1103,6 +1144,7 @@
                 ]);
                 draftMediaKeys.clear();
                 draftPendingMedia.clear();
+                savedPhotoMarkups.clear();
             } catch (error) {
                 console.warn('草稿清空失败', error);
             }
@@ -1928,6 +1970,7 @@
         }
 
         function setIssueMedia(issueId, type, kind, dataUrl, name = '', shouldSaveDraft = true) {
+            savedPhotoMarkups.delete(getDraftMediaKey(issueId, type));
             if (kind === 'video') {
                 delete window[`${type}Image-${issueId}`];
                 window[`${type}Video-${issueId}`] = dataUrl;
@@ -2576,27 +2619,30 @@
         function openPhotoMarkup(event, issueId, type) {
             event.preventDefault();
             event.stopPropagation();
-            const source = window[`${type}Image-${issueId}`];
-            if (!source) {
+            const currentImage = window[`${type}Image-${issueId}`];
+            if (!currentImage) {
                 alert('目前只能标记照片，视频暂不支持。');
                 return;
             }
 
+            const savedMarkup = savedPhotoMarkups.get(getDraftMediaKey(issueId, type));
+            const source = savedMarkup?.source || currentImage;
             const modal = document.getElementById('photo-markup-modal');
             const image = new Image();
             photoMarkupState = {
                 issueId,
                 type,
                 image,
-                shapes: [],
+                source,
+                shapes: savedMarkup?.shapes?.map(shape => ({ ...shape })) || [],
                 tool: 'arrow',
                 color: '#ef4444',
                 zoom: 1,
                 panX: 0,
                 panY: 0,
-                magnifier: null,
-                magnifierRadius: 58,
-                shapeLineWidth: 8,
+                magnifier: savedMarkup?.magnifier ? { ...savedMarkup.magnifier } : null,
+                magnifierRadius: savedMarkup?.magnifierRadius || 58,
+                shapeLineWidth: savedMarkup?.shapeLineWidth || 8,
                 activeShape: null,
                 pointer: null,
                 canvasWidth: 0,
@@ -2687,19 +2733,73 @@
                 && y >= view.y && y <= view.y + state.image.naturalHeight * view.scale;
         }
 
+        function distanceToPhotoMarkupSegment(point, shape) {
+            const dx = shape.x2 - shape.x1;
+            const dy = shape.y2 - shape.y1;
+            const lengthSquared = dx * dx + dy * dy;
+            if (!lengthSquared) return Math.hypot(point.x - shape.x1, point.y - shape.y1);
+            const t = Math.max(0, Math.min(1, ((point.x - shape.x1) * dx + (point.y - shape.y1) * dy) / lengthSquared));
+            return Math.hypot(point.x - (shape.x1 + t * dx), point.y - (shape.y1 + t * dy));
+        }
+
+        function isPhotoMarkupShapeHit(point, shape, tolerance) {
+            const minX = Math.min(shape.x1, shape.x2);
+            const maxX = Math.max(shape.x1, shape.x2);
+            const minY = Math.min(shape.y1, shape.y2);
+            const maxY = Math.max(shape.y1, shape.y2);
+            if (shape.type === 'arrow') return distanceToPhotoMarkupSegment(point, shape) <= tolerance;
+            if (shape.type === 'rect') {
+                const insideX = point.x >= minX - tolerance && point.x <= maxX + tolerance;
+                const insideY = point.y >= minY - tolerance && point.y <= maxY + tolerance;
+                return (insideX && Math.min(Math.abs(point.y - minY), Math.abs(point.y - maxY)) <= tolerance)
+                    || (insideY && Math.min(Math.abs(point.x - minX), Math.abs(point.x - maxX)) <= tolerance);
+            }
+            const radiusX = Math.max((maxX - minX) / 2, 1);
+            const radiusY = Math.max((maxY - minY) / 2, 1);
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+            const edgeDistance = Math.abs(Math.hypot((point.x - centerX) / radiusX, (point.y - centerY) / radiusY) - 1)
+                * Math.min(radiusX, radiusY);
+            return edgeDistance <= tolerance;
+        }
+
+        function findPhotoMarkupTarget(point) {
+            const state = photoMarkupState;
+            const view = getPhotoMarkupViewport();
+            if (state.magnifier && Math.hypot(point.x - state.magnifier.x, point.y - state.magnifier.y) * view.scale <= state.magnifierRadius + 12) {
+                return { type: 'magnifier' };
+            }
+            const tolerance = 18 / view.scale;
+            for (let index = state.shapes.length - 1; index >= 0; index--) {
+                if (isPhotoMarkupShapeHit(point, state.shapes[index], tolerance)) return { type: 'shape', index };
+            }
+            return null;
+        }
+
         function startPhotoMarkupPointer(event) {
             const state = photoMarkupState;
             const canvas = document.getElementById('photo-markup-canvas');
             if (!state || !isPhotoMarkupPointInImage(event)) return;
             event.preventDefault();
             canvas.setPointerCapture?.(event.pointerId);
-            state.pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
             const point = getPhotoMarkupPoint(event);
+            const target = findPhotoMarkupTarget(point);
+            if (target?.type === 'shape') {
+                const shape = state.shapes[target.index];
+                state.pointer = { id: event.pointerId, mode: 'move-shape', start: point, index: target.index, original: { ...shape } };
+                return;
+            }
+            if (target?.type === 'magnifier') {
+                state.pointer = { id: event.pointerId, mode: 'move-magnifier', start: point, original: { ...state.magnifier } };
+                return;
+            }
             if (state.tool === 'magnifier') {
                 state.magnifier = point;
+                state.pointer = { id: event.pointerId, mode: 'move-magnifier', start: point, original: { ...point } };
                 renderPhotoMarkup();
                 return;
             }
+            state.pointer = { id: event.pointerId, mode: 'draw-shape' };
             state.activeShape = {
                 type: state.tool,
                 color: state.color,
@@ -2716,10 +2816,27 @@
             const state = photoMarkupState;
             if (!state?.pointer || state.pointer.id !== event.pointerId) return;
             event.preventDefault();
-            if (state.tool === 'magnifier') {
-                state.magnifier = getPhotoMarkupPoint(event);
+            const point = getPhotoMarkupPoint(event);
+            if (state.pointer.mode === 'move-shape') {
+                const original = state.pointer.original;
+                const minX = Math.min(original.x1, original.x2);
+                const maxX = Math.max(original.x1, original.x2);
+                const minY = Math.min(original.y1, original.y2);
+                const maxY = Math.max(original.y1, original.y2);
+                const dx = Math.max(-minX, Math.min(state.image.naturalWidth - maxX, point.x - state.pointer.start.x));
+                const dy = Math.max(-minY, Math.min(state.image.naturalHeight - maxY, point.y - state.pointer.start.y));
+                Object.assign(state.shapes[state.pointer.index], {
+                    x1: original.x1 + dx,
+                    y1: original.y1 + dy,
+                    x2: original.x2 + dx,
+                    y2: original.y2 + dy
+                });
+            } else if (state.pointer.mode === 'move-magnifier') {
+                state.magnifier = {
+                    x: Math.max(0, Math.min(state.image.naturalWidth, state.pointer.original.x + point.x - state.pointer.start.x)),
+                    y: Math.max(0, Math.min(state.image.naturalHeight, state.pointer.original.y + point.y - state.pointer.start.y))
+                };
             } else if (state.activeShape) {
-                const point = getPhotoMarkupPoint(event);
                 state.activeShape.x2 = point.x;
                 state.activeShape.y2 = point.y;
             }
@@ -2730,7 +2847,7 @@
             const state = photoMarkupState;
             if (!state?.pointer || state.pointer.id !== event.pointerId) return;
             event.preventDefault();
-            if (state.tool !== 'magnifier' && state.activeShape) {
+            if (state.pointer.mode === 'draw-shape' && state.activeShape) {
                 const dx = state.activeShape.x2 - state.activeShape.x1;
                 const dy = state.activeShape.y2 - state.activeShape.y1;
                 if (Math.hypot(dx, dy) > 6) state.shapes.push(state.activeShape);
@@ -2928,9 +3045,17 @@
                 drawPhotoMagnifier(ctx, { x: 0, y: 0, scale: 1 }, state.magnifierRadius / editView.scale);
                 const dataUrl = output.toDataURL('image/jpeg', 0.95);
                 setIssueMedia(state.issueId, state.type, 'image', dataUrl, '', false);
+                const markup = {
+                    source: state.source,
+                    shapes: state.shapes.map(shape => ({ ...shape })),
+                    magnifier: state.magnifier ? { ...state.magnifier } : null,
+                    magnifierRadius: state.magnifierRadius,
+                    shapeLineWidth: state.shapeLineWidth
+                };
+                savedPhotoMarkups.set(getDraftMediaKey(state.issueId, state.type), markup);
                 updateImagePreview(state.issueId, state.type, dataUrl, 'image');
                 refreshBatchImagesFromIssues();
-                await saveDraftMediaData(state.issueId, state.type, 'image', dataUrl, '', true);
+                await saveDraftMarkupMedia(state.issueId, state.type, dataUrl, markup);
                 closePhotoMarkup();
             } catch (error) {
                 console.error(error);
