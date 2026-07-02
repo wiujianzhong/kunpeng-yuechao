@@ -3610,12 +3610,6 @@
         function drawSharedDescriptionBox(pptx, slide, opt) {
             const text = String(opt.text || '').trim();
             if (!text) return;
-            slide.addShape(pptx.ShapeType.roundRect, {
-                x: opt.x, y: opt.y, w: opt.w, h: opt.h,
-                rectRadius: 0.05,
-                fill: { color: opt.fill },
-                line: { color: opt.line, width: 1.1 }
-            });
             slide.addText(text, {
                 x: opt.x + 0.12, y: opt.y + 0.03, w: opt.w - 0.24, h: opt.h - 0.06,
                 fontSize: opt.textFontSize || 14,
