@@ -1215,6 +1215,7 @@
                     isWanderFlight ? (-135 + Math.random() * 170) : (Math.random() - 0.5) * 60
                 ),
                 velocity: new THREE.Vector3((Math.random()-0.5)*2, (Math.random()-0.5)*2, (Math.random()-0.5)*2),
+                targetVelocity: new THREE.Vector3(),
                 phase: Math.random() * Math.PI * 2,
                 randScale: 0.85 + Math.random() * 0.35,
                 isGreen: Math.random() > 0.5,
@@ -1365,48 +1366,85 @@
         const stableGiantAnchor = new THREE.Vector3();
         let hasStableCoreAnchor = false;
         let hasStableGiantAnchor = false;
+        const FLOW_GRID_SIZE = 16;
+        const flowGrid = new Map();
+        const flowSeparation = new THREE.Vector3();
+        const flowAlignment = new THREE.Vector3();
+        const flowCohesion = new THREE.Vector3();
+        const flowDelta = new THREE.Vector3();
+
+        function getFlowGridKey(x, y, z) {
+            return `${x}|${y}|${z}`;
+        }
+
+        function rebuildFlowGrid() {
+            flowGrid.clear();
+            for (let i = 0; i < TOTAL_SWORDS; i++) {
+                const position = boids[i].position;
+                const x = Math.floor(position.x / FLOW_GRID_SIZE);
+                const y = Math.floor(position.y / FLOW_GRID_SIZE);
+                const z = Math.floor(position.z / FLOW_GRID_SIZE);
+                const key = getFlowGridKey(x, y, z);
+                let cell = flowGrid.get(key);
+                if (!cell) {
+                    cell = [];
+                    flowGrid.set(key, cell);
+                }
+                cell.push(i);
+            }
+        }
 
         function addFlowBoidForce(index, boid, targetVel) {
             if (currentState === STATES.GIANT) return;
 
-            const separation = new THREE.Vector3();
-            const alignment = new THREE.Vector3();
-            const cohesion = new THREE.Vector3();
+            const separation = flowSeparation.set(0, 0, 0);
+            const alignment = flowAlignment.set(0, 0, 0);
+            const cohesion = flowCohesion.set(0, 0, 0);
             let count = 0;
 
             const isAttackFlow = currentState === STATES.ATTACK;
-            const activeLimit = TOTAL_SWORDS;
             const flowStep = isAttackFlow ? 4 : 1;
             const startJ = isAttackFlow ? index % flowStep : 0;
 
-            for (let j = startJ; j < activeLimit; j += flowStep) {
-                if (j === index) continue;
-                const other = boids[j];
-                const distSq = boid.position.distanceToSquared(other.position);
-                
-                const maxDistSq = isAttackFlow ? 42 : (currentState === STATES.CORE ? 12 : 220);
-                if (distSq > 0.01 && distSq < maxDistSq) {
-                    if (currentState === STATES.CORE || currentState === STATES.SPIRAL) {
-                        const push = boid.position.clone().sub(other.position);
-                        const dist = Math.sqrt(distSq);
-                        const strength = Math.pow(Math.max(0, 2.5 - dist), 2) * 1.3;
-                        separation.add(push.normalize().multiplyScalar(strength));
+            const cellX = Math.floor(boid.position.x / FLOW_GRID_SIZE);
+            const cellY = Math.floor(boid.position.y / FLOW_GRID_SIZE);
+            const cellZ = Math.floor(boid.position.z / FLOW_GRID_SIZE);
+            const maxDistSq = isAttackFlow ? 42 : (currentState === STATES.CORE ? 12 : 220);
 
-                        if (dist < 1.45) {
-                            cumulativeClashProximity += (1.45 - dist);
-                            if (Math.random() < 0.06) { 
-                                AudioEngine.triggerClashTink((1.45 - dist) * 1.5);
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    for (let dz = -1; dz <= 1; dz++) {
+                        const cell = flowGrid.get(getFlowGridKey(cellX + dx, cellY + dy, cellZ + dz));
+                        if (!cell) continue;
+                        for (const j of cell) {
+                            if (j === index || (isAttackFlow && j % flowStep !== startJ)) continue;
+                            const other = boids[j];
+                            const distSq = boid.position.distanceToSquared(other.position);
+                            if (distSq <= 0.01 || distSq >= maxDistSq) continue;
+
+                            flowDelta.copy(boid.position).sub(other.position);
+                            if (currentState === STATES.CORE || currentState === STATES.SPIRAL) {
+                                const dist = Math.sqrt(distSq);
+                                const strength = Math.pow(Math.max(0, 2.5 - dist), 2) * 1.3;
+                                separation.add(flowDelta.normalize().multiplyScalar(strength));
+
+                                if (dist < 1.45) {
+                                    cumulativeClashProximity += (1.45 - dist);
+                                    if (Math.random() < 0.06) {
+                                        AudioEngine.triggerClashTink((1.45 - dist) * 1.5);
+                                    }
+                                }
+                            } else {
+                                separation.add(flowDelta.multiplyScalar(1 / distSq));
                             }
+
+                            if (currentState !== STATES.ATTACK && currentState !== STATES.CORE) {
+                                alignment.add(other.velocity);
+                                cohesion.add(other.position);
+                            }
+                            count++;
                         }
-                    } else {
-                        separation.add(boid.position.clone().sub(other.position).multiplyScalar(1 / distSq));
                     }
-                    
-                    if (currentState !== STATES.ATTACK && currentState !== STATES.CORE) {
-                        alignment.add(other.velocity);
-                        cohesion.add(other.position);
-                    }
-                    count++;
                 }
             }
 
@@ -1490,10 +1528,11 @@
             } else {
                 hasStableGiantAnchor = false;
             }
+            rebuildFlowGrid();
 
             for (let i = 0; i < TOTAL_SWORDS; i++) {
                 const boid = boids[i];
-                let targetVel = new THREE.Vector3();
+                const targetVel = boid.targetVelocity.set(0, 0, 0);
                 let targetScaleFactor = 1.0; 
                 let boidTwistAngle = 0; 
 
@@ -2337,7 +2376,7 @@
             bgPlane.position.copy(currentBgPos);
 
             updateBoidsLogic();
-            if (currentState === STATES.ATTACK) {
+            if (currentState === STATES.ATTACK || DEVICE_PROFILE.lowPower) {
                 renderer.render(scene, camera);
             } else {
                 composer.render();
