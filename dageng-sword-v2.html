@@ -352,9 +352,9 @@
         <div class="ctrl-group">
             <label>飞剑数目 (刷新后生效)</label>
             <select id="sword-count-select" onchange="localStorage.setItem('swCount', this.value)">
-                <option value="500" selected>500 把 (筑基 / 默认)</option>
-                <option value="800">800 把 (结丹)</option>
-                <option value="1000">1000 把 (元神极盛)</option>
+                <option value="300" selected>300 把 (流畅 / 默认)</option>
+                <option value="500">500 把 (均衡)</option>
+                <option value="800">800 把 (高性能设备)</option>
             </select>
         </div>
 
@@ -661,8 +661,8 @@
             }, 500);
         }
 
-        const ALLOWED_SWORD_COUNTS = ['500', '800', '1000'];
-        if(!ALLOWED_SWORD_COUNTS.includes(localStorage.getItem('swCount'))) localStorage.setItem('swCount', '500');
+        const ALLOWED_SWORD_COUNTS = ['300', '500', '800'];
+        if(!ALLOWED_SWORD_COUNTS.includes(localStorage.getItem('swCount'))) localStorage.setItem('swCount', '300');
         document.getElementById('sword-count-select').value = localStorage.getItem('swCount');
         
         const TOTAL_SWORDS = parseInt(localStorage.getItem('swCount'));
@@ -694,17 +694,17 @@
                 lowPower: mobile || memory <= 4 || cores <= 4
             };
         })();
-        const CAMERA_FRAME_INTERVAL = DEVICE_PROFILE.lowPower ? 72 : 50;
+        const CAMERA_FRAME_INTERVAL = DEVICE_PROFILE.lowPower ? 84 : 66;
         function getRenderPixelRatio() {
             const nativeRatio = Math.min(window.devicePixelRatio || 1, 2);
             const screenPixels = Math.max(1, window.innerWidth * window.innerHeight);
-            const maxPixels = DEVICE_PROFILE.lowPower ? 1500000 : 3200000;
+            const maxPixels = DEVICE_PROFILE.lowPower ? 1100000 : 2000000;
             const pixelCap = Math.sqrt(maxPixels / screenPixels);
-            const deviceCap = DEVICE_PROFILE.mobile ? 1.35 : 1.6;
+            const deviceCap = DEVICE_PROFILE.mobile ? 1.15 : 1.35;
             return Math.max(1, Math.min(nativeRatio, pixelCap, deviceCap));
         }
         function getBloomPixelRatio(renderRatio) {
-            return Math.max(1, Math.min(renderRatio, DEVICE_PROFILE.lowPower ? 1 : 1.2));
+            return Math.max(0.8, Math.min(renderRatio, DEVICE_PROFILE.lowPower ? 0.8 : 1));
         }
         const urlParams = new URLSearchParams(location.search);
         const requestedMode = urlParams.get('mode');
@@ -1013,7 +1013,7 @@
 
         const particleTexture = createSpiritualGlowTexture();
 
-        const starCount = 800;
+        const starCount = DEVICE_PROFILE.lowPower ? 320 : 500;
         const starGeo = new THREE.BufferGeometry();
         const starPositions = new Float32Array(starCount * 3);
         const starPhases = []; 
@@ -1292,7 +1292,7 @@
         scene.add(haloMesh);
         haloMesh.visible = false;
 
-        const haloSparkCount = 400; 
+        const haloSparkCount = DEVICE_PROFILE.lowPower ? 160 : 240;
         const haloSparkGeo = new THREE.BufferGeometry();
         const haloSparkPositions = new Float32Array(haloSparkCount * 3);
         const haloSparkColors = new Float32Array(haloSparkCount * 3);
@@ -1339,7 +1339,7 @@
             { radius: 17.7, width: 0.20, color: 0xffc452, opacity: 0.13, speed: -0.10 },
             { radius: 25.2, width: 0.14, color: 0xf8fff0, opacity: 0.07, speed: 0.05 }
         ].forEach(cfg => {
-            const ringGeo = new THREE.RingGeometry(cfg.radius - cfg.width, cfg.radius + cfg.width, 160);
+            const ringGeo = new THREE.RingGeometry(cfg.radius - cfg.width, cfg.radius + cfg.width, DEVICE_PROFILE.lowPower ? 64 : 96);
             const ringMat = new THREE.MeshBasicMaterial({
                 color: cfg.color,
                 transparent: true,
@@ -2368,15 +2368,20 @@
             }, true);
         }
 
-        function animate() {
+        let lastLogicFrameTime = 0;
+        function animate(now = 0) {
             requestAnimationFrame(animate);
 
             // WebGL 3D 背景板的弹性视差平滑更新插值 (毫秒级响应，零卡顿)
             currentBgPos.lerp(targetBgPos, 0.05);
             bgPlane.position.copy(currentBgPos);
 
-            updateBoidsLogic();
-            if (currentState === STATES.ATTACK || DEVICE_PROFILE.lowPower) {
+            const logicInterval = controlMode === CONTROL_MODES.CAMERA || DEVICE_PROFILE.lowPower ? 32 : 16;
+            if (now - lastLogicFrameTime >= logicInterval) {
+                updateBoidsLogic();
+                lastLogicFrameTime = now;
+            }
+            if (currentState === STATES.ATTACK || DEVICE_PROFILE.lowPower || controlMode === CONTROL_MODES.CAMERA) {
                 renderer.render(scene, camera);
             } else {
                 composer.render();
