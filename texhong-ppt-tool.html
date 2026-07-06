@@ -250,20 +250,6 @@
             border-color: #16a34a;
             background: #16a34a;
         }
-        .speech-button {
-            width: 44px;
-            min-height: 44px;
-            flex: 0 0 44px;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            color: #64748b;
-            background: #ffffff;
-        }
-        .speech-button.is-listening {
-            color: #ffffff;
-            border-color: #16a34a;
-            background: #16a34a;
-        }
         @media (max-width: 767px) {
             .media-drop-area {
                 min-height: 0;
@@ -724,7 +710,7 @@
         <!-- 资料导入区 -->
         <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-700 mb-3">资料导入</h2>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-3 gap-3">
                 <div id="batch-dropzone" data-paste-batch="true" tabindex="0" class="drop-zone rounded-lg px-3 py-4 md:p-5 text-center cursor-pointer outline-none flex items-center justify-center min-h-[82px] md:min-h-[120px]">
                     <input type="file" id="batch-image" accept="image/*,video/*" multiple class="mobile-file-input" aria-hidden="true">
                     <div id="batch-prompt">
@@ -746,6 +732,34 @@
                     <span class="text-sm font-semibold">导入PPT</span>
                     <span class="hidden md:block text-xs font-normal text-blue-500 mt-1">拆解已有PPT继续整改</span>
                 </button>
+                <input type="file" id="pptx-text-extract" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" class="hidden">
+                <button type="button" id="extract-pptx-text-btn" onclick="triggerPPTXTextExtract()" class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-4 md:p-5 text-amber-700 hover:bg-amber-100 transition-all flex flex-col items-center justify-center min-h-[82px] md:min-h-[120px]">
+                    <span class="text-2xl md:text-3xl mb-1 md:mb-2" aria-hidden="true">🧾</span>
+                    <span class="text-sm font-semibold">提取文字</span>
+                    <span class="hidden md:block text-xs font-normal text-amber-600 mt-1">只提取问题描述</span>
+                </button>
+            </div>
+            <div id="pptx-text-result" class="hidden mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                <div class="mb-2 flex items-center justify-between gap-2">
+                    <div>
+                        <p class="text-sm font-semibold text-amber-800">PPT文字提取结果</p>
+                        <p id="pptx-text-result-count" class="text-xs text-amber-600"></p>
+                    </div>
+                    <button type="button" onclick="copyPPTXTextTable()" class="shrink-0 rounded-lg border border-amber-300 bg-white px-3 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-100">复制表格</button>
+                </div>
+                <div class="max-h-72 overflow-auto rounded-lg border border-amber-100 bg-white">
+                    <table class="w-full min-w-[560px] text-left text-sm">
+                        <thead class="bg-amber-100 text-amber-800">
+                            <tr>
+                                <th class="w-14 px-3 py-2">序号</th>
+                                <th class="w-20 px-3 py-2">页码</th>
+                                <th class="w-24 px-3 py-2">位置</th>
+                                <th class="px-3 py-2">问题描述</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pptx-text-result-body" class="divide-y divide-amber-100"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -788,11 +802,6 @@
                 <label for="ppt-file-name" class="block text-sm font-medium text-gray-600 mb-2">文件名称</label>
                 <div class="flex gap-2">
                     <input id="ppt-file-name" type="text" class="min-w-0 flex-1 px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
-                    <button type="button" id="ppt-file-name-speech" class="speech-button hidden" aria-label="语音输入文件名称" aria-pressed="false" title="点击开始语音输入">
-                        <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
-                        </svg>
-                    </button>
                 </div>
                 <p class="text-xs text-gray-400 mt-2">封面文字会同步这里填写的文件名称</p>
                 <div class="mt-5 border-t border-gray-100 pt-4">
@@ -841,8 +850,7 @@
         let defaultProcessTitle = '';
         const mergedDescriptionStates = new Map();
         const mergedDescriptionSyncLocks = new Set();
-        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let activeSpeechSession = null;
+        let extractedPPTXTextRows = [];
         const UPLOAD_MAX_EDGE = 2400;
         const UPLOAD_QUALITY = 0.9;
         const COMPRESS_MAX_EDGE = 2400;
@@ -945,6 +953,7 @@
             const batchZone = document.getElementById('batch-dropzone');
             const batchInput = document.getElementById('batch-image');
             const pptxInput = document.getElementById('pptx-import');
+            const pptxTextInput = document.getElementById('pptx-text-extract');
             batchInput.addEventListener('change', () => {
                 handleBatchUpload(batchInput.files);
                 batchInput.value = '';
@@ -952,6 +961,10 @@
             pptxInput.addEventListener('change', () => {
                 handlePPTXImport(pptxInput.files?.[0]);
                 pptxInput.value = '';
+            });
+            pptxTextInput.addEventListener('change', () => {
+                handlePPTXTextExtract(pptxTextInput.files?.[0]);
+                pptxTextInput.value = '';
             });
             setupDropZone(batchZone, (files) => {
                 const mediaFiles = files.filter(isImageOrVideoFile);
@@ -968,7 +981,6 @@
             });
 
             makeFileNameDialogDraggable();
-            setupSpeechInput(document.getElementById('ppt-file-name'), document.getElementById('ppt-file-name-speech'));
             document.addEventListener('paste', handleImagePaste);
             document.getElementById('ppt-file-name').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') confirmFileNameDialog();
@@ -1301,6 +1313,172 @@
                 return;
             }
             document.getElementById('pptx-import')?.click();
+        }
+
+        function triggerPPTXTextExtract() {
+            if (!window.JSZip) {
+                alert('PPT文字提取组件加载失败，请检查网络后刷新页面。');
+                return;
+            }
+            document.getElementById('pptx-text-extract')?.click();
+        }
+
+        async function handlePPTXTextExtract(file) {
+            if (!file) return;
+            if (!/\.pptx$/i.test(file.name || '')) {
+                alert('请选择PPTX文件');
+                return;
+            }
+
+            const btn = document.getElementById('extract-pptx-text-btn');
+            const oldText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '正在提取...';
+
+            try {
+                const rows = await extractPPTXDescriptionRows(file);
+                extractedPPTXTextRows = rows;
+                renderPPTXTextTable(rows);
+                if (rows.length === 0) {
+                    alert('未提取到图片下方或中间的问题描述文字');
+                } else {
+                    alert(`提取完成，共${rows.length}条问题描述`);
+                }
+            } catch (error) {
+                console.error(error);
+                const message = error?.message === '请选择PPTX文件'
+                    ? '请选择PPTX文件'
+                    : '文字提取失败，请确认是有效的PPTX文件';
+                alert(message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = oldText;
+            }
+        }
+
+        function renderPPTXTextTable(rows) {
+            const panel = document.getElementById('pptx-text-result');
+            const count = document.getElementById('pptx-text-result-count');
+            const body = document.getElementById('pptx-text-result-body');
+            if (!panel || !count || !body) return;
+            body.innerHTML = rows.map(row => `
+                <tr>
+                    <td class="px-3 py-2 text-gray-500">${row.no}</td>
+                    <td class="px-3 py-2 text-gray-500">第${row.page}页</td>
+                    <td class="px-3 py-2 text-gray-500">${escapeHTML(row.position)}</td>
+                    <td class="px-3 py-2 text-gray-800">${escapeHTML(row.text)}</td>
+                </tr>
+            `).join('');
+            count.textContent = rows.length > 0 ? `共提取 ${rows.length} 条，可复制到表格` : '未提取到可用描述';
+            panel.classList.remove('hidden');
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        async function copyPPTXTextTable() {
+            if (!extractedPPTXTextRows.length) {
+                alert('暂无可复制的提取结果');
+                return;
+            }
+            const tableText = [
+                '序号\t页码\t位置\t问题描述',
+                ...extractedPPTXTextRows.map(row => `${row.no}\t第${row.page}页\t${row.position}\t${row.text}`)
+            ].join('\n');
+            try {
+                await navigator.clipboard.writeText(tableText);
+                alert('已复制表格，可直接粘贴到Excel或微信');
+            } catch (error) {
+                const textarea = document.createElement('textarea');
+                textarea.value = tableText;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                textarea.remove();
+                alert('已复制表格，可直接粘贴到Excel或微信');
+            }
+        }
+
+        async function extractPPTXDescriptionRows(file) {
+            const zip = await JSZip.loadAsync(file);
+            const contentFile = zip.file('[Content_Types].xml');
+            const contentText = contentFile ? await contentFile.async('text') : '';
+            if (!contentText.includes('presentationml.presentation')) {
+                throw new Error('请选择PPTX文件');
+            }
+
+            const [slidePaths, slideSize] = await Promise.all([
+                getPPTXSlidePaths(zip),
+                getPPTXSlideSize(zip)
+            ]);
+            const rows = [];
+            for (const [slideIndex, slidePath] of slidePaths.entries()) {
+                try {
+                    rows.push(...await extractPPTXDescriptionRowsFromSlide(zip, slidePath, slideIndex + 1, slideSize));
+                } catch (error) {
+                    console.warn(`跳过无法提取文字的页面：${slidePath}`, error);
+                }
+            }
+            return rows.map((row, index) => ({ no: index + 1, ...row }));
+        }
+
+        async function extractPPTXDescriptionRowsFromSlide(zip, slidePath, page, slideSize) {
+            const slideFile = zip.file(slidePath);
+            if (!slideFile) return [];
+
+            const slideDoc = parsePPTXXml(await slideFile.async('text'));
+            const slideDir = slidePath.slice(0, slidePath.lastIndexOf('/') + 1);
+            const slideName = slidePath.slice(slidePath.lastIndexOf('/') + 1);
+            const relsPath = `${slideDir}_rels/${slideName}.rels`;
+            const relsFile = zip.file(relsPath);
+            const rels = relsFile ? parsePPTXRels(await relsFile.async('text'), slideDir) : {};
+            const texts = collectPPTXTextBoxes(slideDoc);
+            const pictures = [];
+
+            for (const pic of getPPTXNodes(slideDoc, 'pic')) {
+                const blip = getPPTXFirstNode(pic, 'blip');
+                const relId = getPPTXRelationshipId(blip);
+                if (!rels[relId]) continue;
+                const box = parsePPTXXfrm(pic);
+                if (box.w < 1 && box.h < 1) continue;
+                if (!isPPTXBoxOnSlide(box, slideSize)) continue;
+                if (box.w >= (slideSize?.width || SLIDE_W) * 0.9
+                    && box.h >= (slideSize?.height || SLIDE_H) * 0.9) continue;
+                pictures.push(box);
+            }
+
+            const orderedPictures = pictures.sort((a, b) => a.x - b.x);
+            const directTexts = orderedPictures.map(pic => findPPTXDescriptionText(pic, texts));
+            const sharedText = orderedPictures.length === 2 && directTexts.every(text => !text)
+                ? findPPTXSharedDescriptionText(orderedPictures, texts)
+                : null;
+
+            if (sharedText) {
+                return [{ page, position: '中间共用', text: sharedText.text }];
+            }
+
+            return directTexts
+                .map((text, index) => text ? {
+                    page,
+                    position: getPPTXPicturePosition(index, orderedPictures.length),
+                    text: text.text
+                } : null)
+                .filter(Boolean);
+        }
+
+        function getPPTXPicturePosition(index, total) {
+            if (total === 2) return index === 0 ? '左图' : '右图';
+            return `第${index + 1}图`;
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
         }
 
         // 拆解完成后写入现有问题列表
@@ -2284,11 +2462,6 @@
                     <div class="mb-3">
                         <div class="flex w-full md:w-96">
                             <input id="process-${issueId}" placeholder="可直接输入工序或分厂" autocomplete="off" class="min-w-0 flex-1 px-2 py-2 text-sm border border-gray-200 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
-                            <button type="button" id="process-speech-${issueId}" class="speech-button hidden rounded-none border-l-0" aria-label="语音输入小标题" aria-pressed="false" title="点击开始语音输入">
-                                <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
-                                </svg>
-                            </button>
                             <details id="process-menu-${issueId}" class="relative">
                                 <summary id="process-picker-${issueId}" aria-label="选择工序或分厂" class="h-full w-16 px-1 py-2 text-sm border border-l-0 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer select-none">选择</summary>
                                 <div class="absolute right-0 z-50 mt-1 w-36 max-h-80 overflow-y-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
@@ -2371,11 +2544,6 @@
                             </div>
                             <div class="issue-desc-row mt-2">
                                 <textarea id="leftDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
-                                <button type="button" id="leftDesc-speech-${issueId}" class="speech-button hidden" aria-label="语音输入描述" aria-pressed="false" title="点击开始语音输入">
-                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
-                                    </svg>
-                                </button>
                                 <button type="button" id="leftDesc-merge-${issueId}" class="desc-merge-button" aria-label="合并左右描述" aria-pressed="false" title="点击后左右描述同步" onclick="mergeIssueDescriptions(${issueId}, 'left')">合并</button>
                             </div>
                         </div>
@@ -2399,11 +2567,6 @@
                             </div>
                             <div class="issue-desc-row mt-2">
                                 <textarea id="rightDesc-${issueId}" placeholder="描述（可选）" class="issue-desc-input px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
-                                <button type="button" id="rightDesc-speech-${issueId}" class="speech-button hidden" aria-label="语音输入描述" aria-pressed="false" title="点击开始语音输入">
-                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm7 10a7 7 0 01-14 0m7 7v3m-4 0h8"></path>
-                                    </svg>
-                                </button>
                                 <button type="button" id="rightDesc-merge-${issueId}" class="desc-merge-button" aria-label="合并左右描述" aria-pressed="false" title="点击后左右描述同步" onclick="mergeIssueDescriptions(${issueId}, 'right')">合并</button>
                             </div>
                         </div>
@@ -2421,24 +2584,12 @@
                 setIssueProcessFillState(issueId, false);
                 scheduleDraftSave();
             });
-            setupSpeechInput(
-                document.getElementById(`process-${issueId}`),
-                document.getElementById(`process-speech-${issueId}`)
-            );
             ['leftDesc', 'rightDesc'].forEach(prefix => {
                 document.getElementById(`${prefix}-${issueId}`)?.addEventListener('input', () => handleIssueDescriptionInput(issueId, prefix));
-                setupSpeechButton(issueId, prefix);
             });
             updateIssueDescriptionMergeButtons(issueId);
             renumberIssues();
             return issueId;
-        }
-
-        function setupSpeechButton(issueId, prefix) {
-            setupSpeechInput(
-                document.getElementById(`${prefix}-${issueId}`),
-                document.getElementById(`${prefix}-speech-${issueId}`)
-            );
         }
 
         function isIssueDescriptionMerged(issueId) {
@@ -2498,109 +2649,6 @@
             if (target.value !== mergedText) target.value = mergedText;
             updateIssueDescriptionMergeButtons(issueId);
             scheduleDraftSave();
-        }
-
-        function setupSpeechInput(textarea, button) {
-            if (!SpeechRecognitionAPI || !textarea || !button) return;
-            button.classList.remove('hidden');
-            button.addEventListener('click', () => toggleSpeechRecognition(textarea, button));
-        }
-
-        function toggleSpeechRecognition(textarea, button) {
-            if (activeSpeechSession?.button === button) {
-                activeSpeechSession.recognition.stop();
-                return;
-            }
-
-            if (activeSpeechSession) {
-                const previousSession = activeSpeechSession;
-                previousSession.alerted = true;
-                previousSession.recognition.abort();
-                finishSpeechSession(previousSession);
-            }
-
-            const recognition = new SpeechRecognitionAPI();
-            const session = {
-                recognition,
-                textarea,
-                button,
-                originalText: textarea.value,
-                timeoutId: null,
-                alerted: false
-            };
-
-            recognition.lang = 'zh-CN';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-            recognition.onstart = () => {
-                button.title = '正在听，请开始说话';
-            };
-            recognition.onresult = event => {
-                let recognizedText = '';
-                for (let index = event.resultIndex; index < event.results.length; index++) {
-                    const text = event.results[index][0]?.transcript || '';
-                    recognizedText += text;
-                }
-                textarea.value = session.originalText + recognizedText;
-                textarea.dispatchEvent(new Event('input', { bubbles: true }));
-            };
-            recognition.onnomatch = () => {
-                showSpeechFailure(session, '没有识别清楚，请靠近手机重新点击麦克风再说一次。');
-            };
-            recognition.onerror = event => {
-                showSpeechFailure(session, getSpeechErrorMessage(event.error));
-            };
-            recognition.onend = () => finishSpeechSession(session);
-
-            activeSpeechSession = session;
-            button.classList.add('is-listening');
-            button.setAttribute('aria-pressed', 'true');
-            button.title = '正在连接语音服务';
-            session.timeoutId = setTimeout(() => {
-                if (activeSpeechSession !== session) return;
-                showSpeechFailure(session, '语音服务长时间没有响应。请切换网络，或改用最新版 Safari、Chrome 直接打开网址后重试。');
-                recognition.abort();
-            }, 12000);
-
-            try {
-                recognition.start();
-            } catch (error) {
-                showSpeechFailure(session, '语音识别启动失败，请关闭其他正在使用麦克风的应用后重试。');
-            }
-        }
-
-        function getSpeechErrorMessage(error) {
-            const standalone = navigator.standalone === true || window.matchMedia?.('(display-mode: standalone)').matches;
-            const messages = {
-                'audio-capture': '没有检测到可用麦克风，请关闭其他正在使用麦克风的应用后重试。',
-                'language-not-supported': '当前浏览器不支持中文语音识别，请改用最新版 Safari 或 Chrome。',
-                'network': '语音识别服务连接失败。该功能需要联网，请切换网络后重试。',
-                'no-speech': '没有听到语音，请靠近手机重新点击麦克风再说一次。',
-                'not-allowed': '麦克风或语音识别权限未开启，请在手机系统设置和浏览器网站设置中同时允许。',
-                'service-not-allowed': standalone
-                    ? '主屏幕网页App无法使用当前语音服务，请从 Safari 直接打开原网址后重试。'
-                    : '当前浏览器的语音识别服务不可用，请改用最新版 Safari 或 Chrome 后重试。'
-            };
-            return messages[error] || `语音识别失败（${error || '未知错误'}），请重新点击麦克风重试。`;
-        }
-
-        function showSpeechFailure(session, message) {
-            if (session.alerted) return;
-            session.alerted = true;
-            finishSpeechSession(session);
-            setTimeout(() => alert(message), 0);
-        }
-
-        function finishSpeechSession(session) {
-            if (session.timeoutId) {
-                clearTimeout(session.timeoutId);
-                session.timeoutId = null;
-            }
-            session.button.classList.remove('is-listening');
-            session.button.setAttribute('aria-pressed', 'false');
-            session.button.title = '点击开始语音输入';
-            if (activeSpeechSession === session) activeSpeechSession = null;
         }
 
         // 设置单个拖拽
