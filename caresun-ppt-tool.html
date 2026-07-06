@@ -1260,9 +1260,16 @@
 
             const orderedPictures = pictures.sort((a, b) => a.x - b.x);
             const directTexts = orderedPictures.map(pic => findPPTXDescriptionText(pic, texts));
+            const singleText = orderedPictures.length === 1 && !directTexts[0]
+                ? findPPTXSinglePictureDescriptionText(orderedPictures[0], texts)
+                : null;
             const sharedText = orderedPictures.length === 2 && directTexts.every(text => !text)
                 ? findPPTXSharedDescriptionText(orderedPictures, texts)
                 : null;
+
+            if (singleText) {
+                return [{ page, position: '第1图', text: singleText.text }];
+            }
 
             if (sharedText) {
                 return [{ page, position: '中间共用', text: sharedText.text }];
@@ -1477,11 +1484,14 @@
 
             const orderedPictures = pictures.sort((a, b) => a.x - b.x);
             const directTexts = orderedPictures.map(pic => findPPTXDescriptionText(pic, texts));
+            const singleText = orderedPictures.length === 1 && !directTexts[0]
+                ? findPPTXSinglePictureDescriptionText(orderedPictures[0], texts)
+                : null;
             const sharedText = orderedPictures.length === 2 && directTexts.every(text => !text)
                 ? findPPTXSharedDescriptionText(orderedPictures, texts)
                 : null;
             const items = orderedPictures.map((pic, index) => {
-                const text = directTexts[index] || sharedText;
+                const text = directTexts[index] || singleText || sharedText;
                 return { image: pic.image, title: text?.text || '', processName };
             });
             return {
@@ -1580,6 +1590,29 @@
                     const xDiff = Math.abs(a.cx - picCenterX) - Math.abs(b.cx - picCenterX);
                     if (xDiff !== 0) return xDiff;
                     return Math.abs(a.y - picBottom) - Math.abs(b.y - picBottom);
+                })[0] || null;
+        }
+
+        function findPPTXSinglePictureDescriptionText(pic, texts) {
+            const picBottom = pic.y + pic.h;
+            const picLeft = pic.x;
+            const picRight = pic.x + pic.w;
+            return texts
+                .filter(text => {
+                    const verticalGap = text.y - picBottom;
+                    const textLeft = text.x;
+                    const textRight = text.x + text.w;
+                    const overlap = Math.min(picRight, textRight) - Math.max(picLeft, textLeft);
+                    return text.cy > picBottom
+                        && verticalGap >= -0.1
+                        && verticalGap <= 1.4
+                        && overlap >= Math.min(pic.w * 0.35, 1);
+                })
+                .sort((a, b) => {
+                    const aGap = Math.abs(a.y - picBottom);
+                    const bGap = Math.abs(b.y - picBottom);
+                    if (aGap !== bGap) return aGap - bGap;
+                    return b.w - a.w;
                 })[0] || null;
         }
 
