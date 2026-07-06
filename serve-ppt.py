@@ -114,7 +114,9 @@ def db():
     return connection
 
 
-def register_or_check(code, installation_id):
+def register_or_check(code, installation_id, current_machine):
+    if not code or not current_machine:
+        return None, "请求缺少机器码"
     code_hash = hashlib.sha256(code.encode()).hexdigest()
     with db() as connection:
         row = connection.execute(
@@ -127,10 +129,12 @@ def register_or_check(code, installation_id):
         else:
             verified = verify_code(code)
             if not verified:
-                return None
+                return None, "激活码无效或已过期"
             machine_code, expiry, code_type = verified
             if code_type == "legacy" and now_ms() > LEGACY_MIGRATION_DEADLINE:
-                return None
+                return None, "旧激活码已超过迁移期限"
+        if machine_code != current_machine:
+            return None, "激活码不匹配此设备"
         installations = []
         if row:
             installations = json.loads(row[2] or "[]")
@@ -147,7 +151,7 @@ def register_or_check(code, installation_id):
             """,
             (code_hash, expiry, machine_code, json.dumps(installations), now_ms()),
         )
-    return expiry
+    return expiry, ""
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -193,12 +197,13 @@ class Handler(SimpleHTTPRequestHandler):
         if self.path == "/api/license/check":
             try:
                 payload = self.read_json()
-                expiry = register_or_check(
+                expiry, message = register_or_check(
                     str(payload.get("code", "")).strip(),
                     str(payload.get("installationId", "")).strip(),
+                    str(payload.get("machineCode", "")).strip(),
                 )
                 if not expiry:
-                    self.send_json(200, {"valid": False})
+                    self.send_json(200, {"valid": False, "message": message})
                     return
                 self.send_json(200, {"valid": True, "expiry": expiry})
             except (ValueError, json.JSONDecodeError):
