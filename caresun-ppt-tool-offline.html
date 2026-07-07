@@ -2135,14 +2135,6 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            // 方法B：新窗口打开（兼容iOS桌面快捷方式独立模式，作为后备）
-            setTimeout(() => {
-                const w = window.open(url, '_blank');
-                if (!w) {
-                    // 如果弹窗被拦截，用 location.href 降级
-                    // 注意：只有用户主动操作触发的才行
-                }
-            }, 200);
             setTimeout(() => URL.revokeObjectURL(url), 10000);
         }
 
