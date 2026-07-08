@@ -67,6 +67,7 @@ button {
 .visual-panel,
 .formula-panel,
 .quiz-panel,
+.knowledge-panel,
 .practice-panel,
 .practice-card,
 .wrong-panel {
@@ -165,7 +166,8 @@ h2 {
 .quiz-actions,
 .stepper-row,
 .stat-row,
-.practice-actions {
+.practice-actions,
+.category-row {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
@@ -206,6 +208,7 @@ h2 {
 .visual-panel,
 .formula-panel,
 .quiz-panel,
+.knowledge-panel,
 .practice-panel,
 .practice-card,
 .wrong-panel {
@@ -433,6 +436,46 @@ h2 {
   color: #8a3d2f;
 }
 
+.knowledge-panel {
+  margin-top: 18px;
+}
+
+.knowledge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.knowledge-card {
+  min-height: 170px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f8fbfc;
+}
+
+.knowledge-card strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.knowledge-card p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.knowledge-card span {
+  display: block;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--teal);
+  font-weight: 900;
+  line-height: 1.5;
+}
+
 .practice-panel {
   margin-top: 18px;
 }
@@ -460,6 +503,26 @@ h2 {
   display: block;
   color: var(--ink);
   font-size: 24px;
+}
+
+.category-row {
+  margin-bottom: 16px;
+}
+
+.category-btn {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  padding: 9px 13px;
+  font-weight: 900;
+}
+
+.category-btn.active {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
 }
 
 .practice-layout {
@@ -579,6 +642,7 @@ h2 {
   .hero,
   .workbench,
   .quiz-panel,
+  .knowledge-grid,
   .practice-layout {
     grid-template-columns: 1fr;
   }
@@ -607,6 +671,7 @@ h2 {
   .visual-panel,
   .formula-panel,
   .quiz-panel,
+  .knowledge-panel,
   .practice-panel,
   .practice-card,
   .wrong-panel {
@@ -722,6 +787,30 @@ h2 {
         <div class="answer-box" id="answerBox">先判断：顺序一换，结果算不算变？</div>
       </section>
 
+      <section class="knowledge-panel">
+        <div class="panel-title">
+          <p class="eyebrow">做题前先看</p>
+          <h2>别让题目突然冒出来</h2>
+        </div>
+        <div class="knowledge-grid">
+          <article class="knowledge-card">
+            <strong>数列：先看“每一步”</strong>
+            <p>等差：每次加同一个数。等比：每次乘同一个数。隔项：奇数位一组、偶数位一组。</p>
+            <span>例：4，7，10，13，每次 +3。</span>
+          </article>
+          <article class="knowledge-card">
+            <strong>排列组合：先问顺序</strong>
+            <p>排队、排名、分职位，顺序重要，用排列。选人、组队、抽题，顺序不重要，用组合。</p>
+            <span>组合要除掉重复顺序。</span>
+          </article>
+          <article class="knowledge-card">
+            <strong>系数题：先写通项</strong>
+            <p>(a + b)^n 的通项是 C(n,k) a^(n-k) b^k。要 x 的几次，就让 x 的指数等于几。</p>
+            <span>例：找 x³ 系数，就令 x 的指数 = 3。</span>
+          </article>
+        </div>
+      </section>
+
       <section class="practice-panel" id="practicePanel">
         <div class="practice-head">
           <div>
@@ -733,6 +822,13 @@ h2 {
             <span><strong id="practiceRate">0%</strong> 正确率</span>
             <span><strong id="practiceWrong">0</strong> 错题</span>
           </div>
+        </div>
+
+        <div class="category-row" aria-label="练习范围">
+          <button class="category-btn active" type="button" data-practice-category="pc">排列组合</button>
+          <button class="category-btn" type="button" data-practice-category="seq">数列基础</button>
+          <button class="category-btn" type="button" data-practice-category="binom">系数专项</button>
+          <button class="category-btn" type="button" data-practice-category="all">混合训练</button>
         </div>
 
         <div class="practice-layout">
@@ -792,6 +888,7 @@ const quizList = [
 const practiceQuestions = [
   {
     id: "pc-judge-1",
+    category: "pc",
     type: "先判断",
     title: "排队还是选人",
     text: "从 5 名同学里选 3 名排成一排，这题用什么？",
@@ -801,6 +898,7 @@ const practiceQuestions = [
   },
   {
     id: "pc-judge-2",
+    category: "pc",
     type: "先判断",
     title: "只选代表",
     text: "从 6 名同学里选 2 名当代表，不分职位，这题用什么？",
@@ -810,6 +908,7 @@ const practiceQuestions = [
   },
   {
     id: "pc-calc-1",
+    category: "pc",
     type: "计算",
     title: "排列计算",
     text: "4 名同学中选 2 名排成一排，一共有多少种？",
@@ -819,6 +918,7 @@ const practiceQuestions = [
   },
   {
     id: "pc-calc-2",
+    category: "pc",
     type: "计算",
     title: "组合计算",
     text: "5 名同学中选 2 名参加活动，不分先后，一共有多少种？",
@@ -828,6 +928,7 @@ const practiceQuestions = [
   },
   {
     id: "pc-divide",
+    category: "pc",
     type: "理解",
     title: "为什么要除",
     text: "组合 C(5,3) 为什么要除以 3 × 2 × 1？",
@@ -837,6 +938,7 @@ const practiceQuestions = [
   },
   {
     id: "pc-role",
+    category: "pc",
     type: "应用",
     title: "分职位",
     text: "7 人中选班长、学习委员、体育委员各 1 人，一共有多少种安排？",
@@ -845,7 +947,68 @@ const practiceQuestions = [
     explain: "职位不同，顺序重要。班长 7 种，学习委员 6 种，体育委员 5 种，7 × 6 × 5 = 210。",
   },
   {
+    id: "pc-rank",
+    category: "pc",
+    type: "应用",
+    title: "前三名",
+    text: "8 名同学赛跑，只看前 3 名名次，一共有多少种结果？",
+    choices: ["56", "168", "336", "512"],
+    answer: "336",
+    explain: "第一名 8 种，第二名剩 7 种，第三名剩 6 种，所以 8 × 7 × 6 = 336。",
+  },
+  {
+    id: "pc-team",
+    category: "pc",
+    type: "应用",
+    title: "选小组",
+    text: "8 人中选 3 人组成学习小组，不分职位，一共有多少种？",
+    choices: ["24", "56", "168", "336"],
+    answer: "56",
+    explain: "只看哪 3 个人被选中，顺序不重要。C(8,3)=8×7×6÷(3×2×1)=56。",
+  },
+  {
+    id: "pc-book",
+    category: "pc",
+    type: "应用",
+    title: "摆书",
+    text: "6 本不同的书中选 3 本摆成一排，一共有多少种摆法？",
+    choices: ["20", "60", "120", "216"],
+    answer: "120",
+    explain: "摆成一排有位置，顺序重要。6 × 5 × 4 = 120。",
+  },
+  {
+    id: "pc-topic",
+    category: "pc",
+    type: "应用",
+    title: "选题",
+    text: "10 道题里任选 2 道做，不分先后，一共有多少种选法？",
+    choices: ["20", "45", "90", "100"],
+    answer: "45",
+    explain: "任选两道题，题 1 + 题 2 和题 2 + 题 1 是同一组，所以 C(10,2)=45。",
+  },
+  {
+    id: "pc-password",
+    category: "pc",
+    type: "理解",
+    title: "三位密码",
+    text: "用 1、2、3、4 中不重复地选 3 个数字组成三位密码，有多少种？",
+    choices: ["12", "24", "36", "64"],
+    answer: "24",
+    explain: "密码 123 和 321 不一样，顺序重要。4 × 3 × 2 = 24。",
+  },
+  {
+    id: "pc-chair",
+    category: "pc",
+    type: "理解",
+    title: "选椅子",
+    text: "5 个座位中选 2 个给两名同学坐，甲坐左边和乙坐左边算不算不同？",
+    choices: ["不同，用排列", "相同，用组合", "只看座位数", "无法判断"],
+    answer: "不同，用排列",
+    explain: "座位和人绑定，谁坐哪个位置不一样，所以顺序重要，用排列。",
+  },
+  {
     id: "seq-1",
+    category: "seq",
     type: "数列加餐",
     title: "等差找下一项",
     text: "4，7，10，13，？",
@@ -855,6 +1018,7 @@ const practiceQuestions = [
   },
   {
     id: "seq-2",
+    category: "seq",
     type: "数列加餐",
     title: "等比找下一项",
     text: "3，6，12，24，？",
@@ -864,6 +1028,7 @@ const practiceQuestions = [
   },
   {
     id: "seq-3",
+    category: "seq",
     type: "数列加餐",
     title: "隔项看规律",
     text: "7，10，8，11，9，12，？",
@@ -873,12 +1038,213 @@ const practiceQuestions = [
   },
   {
     id: "seq-4",
+    category: "seq",
     type: "数列加餐",
     title: "第 n 项",
     text: "等差数列首项 2，公差 5，第 8 项是多少？",
     choices: ["32", "35", "37", "42"],
     answer: "37",
     explain: "第 n 项 = 首项 + (n - 1) × 公差，所以 2 + 7 × 5 = 37。",
+  },
+  {
+    id: "seq-5",
+    category: "seq",
+    type: "等差",
+    title: "判断公差",
+    text: "9，14，19，24，... 这个数列的公差是多少？",
+    choices: ["3", "4", "5", "6"],
+    answer: "5",
+    explain: "14-9=5，19-14=5，24-19=5，所以公差是 5。",
+  },
+  {
+    id: "seq-6",
+    category: "seq",
+    type: "等差",
+    title: "等差求和",
+    text: "等差数列 1，4，7，...，28，一共 10 项，和是多少？",
+    choices: ["125", "135", "145", "155"],
+    answer: "145",
+    explain: "等差求和 = (首项 + 末项) × 项数 ÷ 2，所以 (1+28)×10÷2=145。",
+  },
+  {
+    id: "seq-7",
+    category: "seq",
+    type: "等比",
+    title: "判断公比",
+    text: "5，15，45，135，... 这个数列的公比是多少？",
+    choices: ["2", "3", "5", "10"],
+    answer: "3",
+    explain: "15÷5=3，45÷15=3，所以公比是 3。",
+  },
+  {
+    id: "seq-8",
+    category: "seq",
+    type: "等比",
+    title: "等比第 n 项",
+    text: "等比数列首项 2，公比 3，第 5 项是多少？",
+    choices: ["54", "81", "162", "243"],
+    answer: "162",
+    explain: "第 5 项 = 2 × 3^(5-1)=2×81=162。",
+  },
+  {
+    id: "seq-9",
+    category: "seq",
+    type: "隔项",
+    title: "拆成两组",
+    text: "2，9，4，12，6，15，？",
+    choices: ["8", "9", "16", "18"],
+    answer: "8",
+    explain: "奇数位是 2、4、6、8；偶数位是 9、12、15。答案是 8。",
+  },
+  {
+    id: "seq-10",
+    category: "seq",
+    type: "找规律",
+    title: "平方数列",
+    text: "1，4，9，16，25，？",
+    choices: ["30", "36", "42", "49"],
+    answer: "36",
+    explain: "这是 1²、2²、3²、4²、5²，下一项是 6²=36。",
+  },
+  {
+    id: "seq-11",
+    category: "seq",
+    type: "找规律",
+    title: "差值再变",
+    text: "3，6，11，18，27，？",
+    choices: ["36", "38", "40", "42"],
+    answer: "38",
+    explain: "差值是 +3、+5、+7、+9，下一次 +11，所以 27+11=38。",
+  },
+  {
+    id: "seq-12",
+    category: "seq",
+    type: "等差",
+    title: "反推项数",
+    text: "等差数列首项 3，公差 4，哪一项是 31？",
+    choices: ["第 6 项", "第 7 项", "第 8 项", "第 9 项"],
+    answer: "第 8 项",
+    explain: "3+(n-1)×4=31，(n-1)×4=28，所以 n=8。",
+  },
+  {
+    id: "binom-1",
+    category: "binom",
+    type: "系数专项",
+    title: "先写通项",
+    text: "(x + 1)^5 展开式中，x³ 的系数是多少？",
+    choices: ["5", "10", "15", "20"],
+    answer: "10",
+    explain: "通项 C(5,k)x^(5-k)。要 x³，就令 5-k=3，k=2，系数 C(5,2)=10。",
+  },
+  {
+    id: "binom-2",
+    category: "binom",
+    type: "系数专项",
+    title: "常数也要算",
+    text: "(x + 2)^4 展开式中，x² 的系数是多少？",
+    choices: ["12", "16", "24", "32"],
+    answer: "24",
+    explain: "取 x² 时，另两次取 2。系数 C(4,2)×2²=6×4=24。",
+  },
+  {
+    id: "binom-3",
+    category: "binom",
+    type: "系数专项",
+    title: "前面有 2x",
+    text: "(2x + 1)^3 展开式中，x² 的系数是多少？",
+    choices: ["6", "8", "12", "24"],
+    answer: "12",
+    explain: "取两个 2x、一个 1，系数 C(3,2)×2²=3×4=12。",
+  },
+  {
+    id: "binom-4",
+    category: "binom",
+    type: "系数专项",
+    title: "简单组合数",
+    text: "(1 + x)^6 展开式中，x⁴ 的系数是多少？",
+    choices: ["10", "15", "20", "24"],
+    answer: "15",
+    explain: "这是标准二项式，x⁴ 系数就是 C(6,4)=15。",
+  },
+  {
+    id: "binom-5",
+    category: "binom",
+    type: "系数专项",
+    title: "注意负号",
+    text: "(3x - 1)^4 展开式中，x³ 的系数是多少？",
+    choices: ["108", "-108", "81", "-81"],
+    answer: "-108",
+    explain: "取三个 3x、一个 -1，系数 C(4,3)×3³×(-1)=4×27×(-1)=-108。",
+  },
+  {
+    id: "binom-6",
+    category: "binom",
+    type: "系数专项",
+    title: "x² 的幂",
+    text: "(x² + 1)^5 展开式中，x⁶ 的系数是多少？",
+    choices: ["5", "10", "15", "20"],
+    answer: "10",
+    explain: "x² 取 3 次才是 x⁶，所以系数 C(5,3)=10。",
+  },
+  {
+    id: "binom-7",
+    category: "binom",
+    type: "系数专项",
+    title: "一次项系数",
+    text: "(2x + 3)^3 展开式中，x 的系数是多少？",
+    choices: ["18", "36", "54", "72"],
+    answer: "54",
+    explain: "取一个 2x、两个 3，系数 C(3,1)×2×3²=3×2×9=54。",
+  },
+  {
+    id: "binom-8",
+    category: "binom",
+    type: "系数专项",
+    title: "负数常数",
+    text: "(x - 2)^5 展开式中，x⁴ 的系数是多少？",
+    choices: ["10", "-10", "5", "-5"],
+    answer: "-10",
+    explain: "取四个 x、一个 -2，系数 C(5,4)×(-2)=5×(-2)=-10。",
+  },
+  {
+    id: "binom-9",
+    category: "binom",
+    type: "系数专项",
+    title: "2x 的三次",
+    text: "(1 + 2x)^4 展开式中，x³ 的系数是多少？",
+    choices: ["16", "24", "32", "48"],
+    answer: "32",
+    explain: "取三个 2x、一个 1，系数 C(4,3)×2³=4×8=32。",
+  },
+  {
+    id: "binom-10",
+    category: "binom",
+    type: "系数专项",
+    title: "x² 系数",
+    text: "(x + 3)^3 展开式中，x² 的系数是多少？",
+    choices: ["3", "6", "9", "12"],
+    answer: "9",
+    explain: "取两个 x、一个 3，系数 C(3,2)×3=3×3=9。",
+  },
+  {
+    id: "binom-11",
+    category: "binom",
+    type: "系数专项",
+    title: "负号和 2x",
+    text: "(2x - 1)^5 展开式中，x² 的系数是多少？",
+    choices: ["40", "-40", "80", "-80"],
+    answer: "-40",
+    explain: "取两个 2x、三个 -1，系数 C(5,2)×2²×(-1)³=10×4×(-1)=-40。",
+  },
+  {
+    id: "binom-12",
+    category: "binom",
+    type: "系数专项",
+    title: "高次项",
+    text: "(x + 1)^8 展开式中，x⁷ 的系数是多少？",
+    choices: ["7", "8", "28", "56"],
+    answer: "8",
+    explain: "取七个 x、一个 1，系数 C(8,7)=8。",
   },
 ];
 
@@ -1032,12 +1398,13 @@ function loadPracticeState() {
       index: Number(saved.index) || 0,
       done: Number(saved.done) || 0,
       right: Number(saved.right) || 0,
+      category: saved.category || "pc",
       wrongIds: Array.isArray(saved.wrongIds) ? saved.wrongIds : [],
       wrongMode: false,
       answered: false,
     };
   } catch (error) {
-    return { index: 0, done: 0, right: 0, wrongIds: [], wrongMode: false, answered: false };
+    return { index: 0, done: 0, right: 0, category: "pc", wrongIds: [], wrongMode: false, answered: false };
   }
 }
 
@@ -1048,16 +1415,19 @@ function savePracticeState() {
       index: practiceState.index,
       done: practiceState.done,
       right: practiceState.right,
+      category: practiceState.category,
       wrongIds: practiceState.wrongIds,
     })
   );
 }
 
 function getPracticePool() {
-  if (!practiceState.wrongMode || practiceState.wrongIds.length === 0) return practiceQuestions;
-  return practiceState.wrongIds
-    .map((id) => practiceQuestions.find((question) => question.id === id))
-    .filter(Boolean);
+  const categoryPool =
+    practiceState.category === "all"
+      ? practiceQuestions
+      : practiceQuestions.filter((question) => question.category === practiceState.category);
+  if (!practiceState.wrongMode || practiceState.wrongIds.length === 0) return categoryPool;
+  return categoryPool.filter((question) => practiceState.wrongIds.includes(question.id));
 }
 
 function getCurrentPractice() {
@@ -1077,7 +1447,11 @@ function renderPractice() {
     practiceState.wrongMode = false;
   }
   practiceState.answered = false;
-  const pool = getPracticePool();
+  let pool = getPracticePool();
+  if (pool.length === 0) {
+    practiceState.wrongMode = false;
+    pool = getPracticePool();
+  }
   const question = getCurrentPractice();
   $("#practiceTag").textContent = `${practiceState.wrongMode ? "错题" : "第"} ${practiceState.index + 1} / ${pool.length}`;
   $("#practiceType").textContent = question.type;
@@ -1086,6 +1460,9 @@ function renderPractice() {
   $("#practiceFeedback").className = "answer-box";
   $("#practiceFeedback").textContent = "先判断题型，再点答案。";
   $("#wrongModeBtn").textContent = practiceState.wrongMode ? "返回全部题" : "只练错题";
+  $$(".category-btn").forEach((button) => {
+    button.classList.toggle("active", button.dataset.practiceCategory === practiceState.category);
+  });
   $("#practiceChoices").innerHTML = question.choices
     .map((choice) => `<button class="practice-choice" type="button" data-practice-choice="${choice}">${choice}</button>`)
     .join("");
@@ -1128,6 +1505,14 @@ function nextPractice() {
   renderPractice();
 }
 
+function switchPracticeCategory(category) {
+  practiceState.category = category;
+  practiceState.wrongMode = false;
+  practiceState.index = 0;
+  savePracticeState();
+  renderPractice();
+}
+
 function toggleWrongMode() {
   practiceState.wrongMode = !practiceState.wrongMode;
   practiceState.index = 0;
@@ -1135,7 +1520,7 @@ function toggleWrongMode() {
 }
 
 function resetPractice() {
-  practiceState = { index: 0, done: 0, right: 0, wrongIds: [], wrongMode: false, answered: false };
+  practiceState = { index: 0, done: 0, right: 0, category: practiceState.category || "pc", wrongIds: [], wrongMode: false, answered: false };
   savePracticeState();
   renderPractice();
 }
@@ -1187,6 +1572,10 @@ $("#playBtn").addEventListener("click", playDemo);
 
 $$("[data-judge]").forEach((button) => {
   button.addEventListener("click", () => judgeQuiz(button.dataset.judge));
+});
+
+$$("[data-practice-category]").forEach((button) => {
+  button.addEventListener("click", () => switchPracticeCategory(button.dataset.practiceCategory));
 });
 
 $("#nextQuizBtn").addEventListener("click", () => {
