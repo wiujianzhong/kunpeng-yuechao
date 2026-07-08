@@ -3859,7 +3859,7 @@
                     const file = new File([blob], fileName, {
                         type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
                     });
-                    await navigator.share({ files: [file], title: fileName });
+                    await navigator.share({ files: [file] });
                     alert(`已生成：${fileName}`);
                     return;
                 } catch (e) {
