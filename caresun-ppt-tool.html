@@ -1198,8 +1198,8 @@
                 return;
             }
             try {
-                const blob = await createPPTXTextExcelBlob(extractedPPTXTextRows);
                 const fileName = buildPPTXTextExcelFileName(extractedPPTXTextSourceName);
+                const blob = await createPPTXTextExcelBlob(extractedPPTXTextRows, fileName.replace(/\.xlsx$/i, ''));
                 downloadBlob(blob, fileName);
                 alert(`已生成：${fileName}`);
             } catch (error) {
@@ -1208,9 +1208,9 @@
             }
         }
 
-        async function createPPTXTextExcelBlob(rows) {
+        async function createPPTXTextExcelBlob(rows, title) {
             const zip = new JSZip();
-            const rowCount = rows.length + 1;
+            const rowCount = rows.length + 2;
             zip.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`);
             zip.file('_rels/.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -1220,27 +1220,30 @@
             zip.file('xl/workbook.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="检查问题汇总描述" sheetId="1" r:id="rId1"/></sheets></workbook>`);
             zip.file('xl/styles.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><color rgb="FF111827"/><name val="Microsoft YaHei"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Microsoft YaHei"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF59E0B"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFE5E7EB"/></left><right style="thin"><color rgb="FFE5E7EB"/></right><top style="thin"><color rgb="FFE5E7EB"/></top><bottom style="thin"><color rgb="FFE5E7EB"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment vertical="center"/></xf><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment vertical="top" wrapText="1"/></xf></cellXfs><cellStyles count="1"><cellStyle name="常规" xfId="0" builtinId="0"/></cellStyles></styleSheet>`);
-            zip.file('xl/worksheets/sheet1.xml', buildPPTXTextWorksheetXML(rows, rowCount));
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="3"><font><sz val="11"/><color rgb="FF111827"/><name val="Microsoft YaHei"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Microsoft YaHei"/></font><font><b/><sz val="16"/><color rgb="FF111827"/><name val="Microsoft YaHei"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF38BDF8"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFE5E7EB"/></left><right style="thin"><color rgb="FFE5E7EB"/></right><top style="thin"><color rgb="FFE5E7EB"/></top><bottom style="thin"><color rgb="FFE5E7EB"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1"><alignment horizontal="center" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="常规" xfId="0" builtinId="0"/></cellStyles></styleSheet>`);
+            zip.file('xl/worksheets/sheet1.xml', buildPPTXTextWorksheetXML(rows, rowCount, title));
             return await zip.generateAsync({
                 type: 'blob',
                 mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             });
         }
 
-        function buildPPTXTextWorksheetXML(rows, rowCount) {
+        function buildPPTXTextWorksheetXML(rows, rowCount, title) {
             const header = ['序号', '页码', '位置', '问题描述'];
+            const columnWidths = getPPTXTextColumnWidths(rows);
             const rowXML = [
-                buildExcelRow(1, header, 1, 24),
-                ...rows.map((row, index) => buildExcelRow(index + 2, [
+                buildExcelRow(1, [title], 4, 32),
+                buildExcelRow(2, header, 1, 24),
+                ...rows.map((row, index) => buildExcelRow(index + 3, [
                     row.no,
                     `第${row.page}页`,
                     row.position,
                     row.text
-                ], null, Math.min(120, Math.max(28, Math.ceil(String(row.text || '').length / 32) * 18))))
+                ], null, getPPTXTextRowHeight(row.text, columnWidths[3])))
             ].join('');
+            const colXML = columnWidths.map((width, index) => `<col min="${index + 1}" max="${index + 1}" width="${width}" customWidth="1"/>`).join('');
             return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="A1:D${rowCount}"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="20"/><cols><col min="1" max="1" width="10" customWidth="1"/><col min="2" max="2" width="14" customWidth="1"/><col min="3" max="3" width="14" customWidth="1"/><col min="4" max="4" width="80" customWidth="1"/></cols><sheetData>${rowXML}</sheetData><autoFilter ref="A1:D${rowCount}"/><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`;
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="A1:D${rowCount}"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="2" topLeftCell="A3" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="20"/><cols>${colXML}</cols><sheetData>${rowXML}</sheetData><mergeCells count="1"><mergeCell ref="A1:D1"/></mergeCells><autoFilter ref="A2:D${rowCount}"/><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`;
         }
 
         function buildExcelRow(rowNumber, values, fixedStyle, height) {
@@ -1252,12 +1255,44 @@
             return `<row r="${rowNumber}" ht="${height}" customHeight="1">${cells}</row>`;
         }
 
+        function getPPTXTextColumnWidths(rows) {
+            return [
+                getExcelColumnWidth(['序号', ...rows.map(row => row.no)], 6, 10),
+                getExcelColumnWidth(['页码', ...rows.map(row => `第${row.page}页`)], 7, 12),
+                getExcelColumnWidth(['位置', ...rows.map(row => row.position)], 7, 18),
+                getExcelColumnWidth(['问题描述', ...rows.map(row => row.text)], 16, 72)
+            ];
+        }
+
+        function getExcelColumnWidth(values, minWidth, maxWidth) {
+            const maxTextWidth = Math.max(...values.map(getExcelTextWidth), 0);
+            return Math.min(maxWidth, Math.max(minWidth, Math.ceil(maxTextWidth + 2)));
+        }
+
+        function getExcelTextWidth(value) {
+            return Array.from(String(value ?? '')).reduce((total, char) => {
+                return total + (/[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFE10-\uFE19\uFE30-\uFE6F\uFF00-\uFFEF]/.test(char) ? 2 : 1);
+            }, 0);
+        }
+
+        function getPPTXTextRowHeight(text, width) {
+            const lines = Math.max(1, Math.ceil(getExcelTextWidth(text) / Math.max(12, width - 2)));
+            return Math.min(120, Math.max(28, lines * 18));
+        }
+
         function buildPPTXTextExcelFileName(sourceName) {
-            const baseName = String(sourceName || 'PPT文字提取结果')
+            const baseName = removeFileNameBrackets(String(sourceName || 'PPT文字提取结果')
                 .replace(/\.[^.]+$/i, '')
                 .replace(/[<>:"/\\|?*\u0000-\u001F]/g, '')
-                .trim() || 'PPT文字提取结果';
+                .trim()) || 'PPT文字提取结果';
             return `${baseName}_检查问题汇总描述.xlsx`;
+        }
+
+        function removeFileNameBrackets(name) {
+            return String(name ?? '')
+                .replace(/\s*[（(]\s*\d+\s*[）)]\s*$/g, '')
+                .replace(/[()（）]/g, '')
+                .trim();
         }
 
         function escapeXML(value) {
@@ -3825,8 +3860,8 @@
         }
 
         function cleanFileName(name) {
-            const safeName = name.replace(/[<>:"/\\|?*\u0000-\u001F]/g, '').trim();
-            return safeName.replace(/\.pptx$/i, '') || `问题整改汇总_${formatTodayCompact()}`;
+            const safeName = name.replace(/[<>:"/\\|?*\u0000-\u001F]/g, '').trim().replace(/\.pptx$/i, '');
+            return removeFileNameBrackets(safeName) || `问题整改汇总_${formatTodayCompact()}`;
         }
 
         function buildDefaultFileName(issues) {
@@ -3837,7 +3872,7 @@
                 })
                 .find(Boolean);
             const dateText = formatTodayCompact();
-            return processName ? `(${processName})问题整改汇总_${dateText}` : `问题整改汇总_${dateText}`;
+            return processName ? `${processName}问题整改汇总_${dateText}` : `问题整改汇总_${dateText}`;
         }
 
         function formatTodayCompact() {
