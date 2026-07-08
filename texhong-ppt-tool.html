@@ -564,7 +564,10 @@
                         <p class="text-sm font-semibold text-amber-800">PPT文字提取结果</p>
                         <p id="pptx-text-result-count" class="text-xs text-amber-600"></p>
                     </div>
-                    <button type="button" onclick="downloadPPTXTextExcel()" class="shrink-0 rounded-lg border border-amber-300 bg-white px-3 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-100">下载Excel</button>
+                    <div class="shrink-0 flex gap-2">
+                        <button type="button" onclick="copyPPTXTextOnly()" class="rounded-lg border border-amber-300 bg-white px-3 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-100">复制文字</button>
+                        <button type="button" onclick="downloadPPTXTextExcel()" class="rounded-lg border border-amber-300 bg-white px-3 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-100">下载Excel</button>
+                    </div>
                 </div>
                 <div class="max-h-72 overflow-auto rounded-lg border border-amber-100 bg-white">
                     <table class="w-full min-w-[560px] text-left text-sm">
@@ -1195,9 +1198,31 @@
                     <td class="px-3 py-2 text-gray-800">${escapeHTML(row.text)}</td>
                 </tr>
             `).join('');
-            count.textContent = rows.length > 0 ? `共提取 ${rows.length} 条，可下载Excel` : '未提取到可用描述';
+            count.textContent = rows.length > 0 ? `共提取 ${rows.length} 条，可复制文字或下载Excel` : '未提取到可用描述';
             panel.classList.remove('hidden');
             panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        async function copyPPTXTextOnly() {
+            if (!extractedPPTXTextRows.length) {
+                alert('暂无可复制的提取结果');
+                return;
+            }
+            const text = extractedPPTXTextRows.map(row => row.text).join('\n');
+            try {
+                await navigator.clipboard.writeText(text);
+                alert('已复制文字');
+            } catch (error) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                textarea.remove();
+                alert('已复制文字');
+            }
         }
 
         async function downloadPPTXTextExcel() {
@@ -1226,7 +1251,7 @@
             zip.file('xl/_rels/workbook.xml.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`);
             zip.file('xl/workbook.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="检查问题汇总描述" sheetId="1" r:id="rId1"/></sheets></workbook>`);
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="描述" sheetId="1" r:id="rId1"/></sheets></workbook>`);
             zip.file('xl/styles.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="3"><font><sz val="11"/><color rgb="FF111827"/><name val="Microsoft YaHei"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Microsoft YaHei"/></font><font><b/><sz val="16"/><color rgb="FF111827"/><name val="Microsoft YaHei"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF38BDF8"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFE5E7EB"/></left><right style="thin"><color rgb="FFE5E7EB"/></right><top style="thin"><color rgb="FFE5E7EB"/></top><bottom style="thin"><color rgb="FFE5E7EB"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1"><alignment horizontal="center" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="常规" xfId="0" builtinId="0"/></cellStyles></styleSheet>`);
             zip.file('xl/worksheets/sheet1.xml', buildPPTXTextWorksheetXML(rows, rowCount, title));
@@ -1240,7 +1265,7 @@
             const header = ['序号', '页码', '位置', '问题描述'];
             const columnWidths = getPPTXTextColumnWidths(rows);
             const rowXML = [
-                buildExcelRow(1, [title], 4, 32),
+                buildExcelRow(1, [title, '', '', ''], 4, 32),
                 buildExcelRow(2, header, 1, 24),
                 ...rows.map((row, index) => buildExcelRow(index + 3, [
                     row.no,
@@ -1293,7 +1318,7 @@
                 .replace(/\.[^.]+$/i, '')
                 .replace(/[<>:"/\\|?*\u0000-\u001F]/g, '')
                 .trim()) || 'PPT文字提取结果';
-            return `${baseName}_检查问题汇总描述.xlsx`;
+            return `${baseName}描述.xlsx`;
         }
 
         function removeFileNameBrackets(name) {
@@ -3889,7 +3914,7 @@
 
         function confirmFileNameDialog() {
             const input = document.getElementById('ppt-file-name');
-            const fileName = cleanFileName(input.value || `问题整改汇总_${formatTodayCompact()}`);
+            const fileName = cleanFileName(input.value || '问题整改汇总');
             const imageFitMode = document.getElementById('ppt-image-fit-mode').value;
             const imageDistortion = Number(document.getElementById('ppt-image-distortion').value);
             closeFileNameDialog({ fileName, imageFitMode, imageDistortion });
@@ -3955,7 +3980,7 @@
 
         function cleanFileName(name) {
             const safeName = name.replace(/[<>:"/\\|?*\u0000-\u001F]/g, '').trim().replace(/\.pptx$/i, '');
-            return removeFileNameBrackets(safeName) || `问题整改汇总_${formatTodayCompact()}`;
+            return removeFileNameBrackets(safeName) || '问题整改汇总';
         }
 
         function buildDefaultFileName(issues) {
@@ -3965,8 +3990,7 @@
                     return document.getElementById(`process-${issueId}`)?.value.trim() || '';
                 })
                 .find(Boolean);
-            const dateText = formatTodayCompact();
-            return processName ? `${processName}问题整改汇总_${dateText}` : `问题整改汇总_${dateText}`;
+            return processName ? `${processName}问题整改汇总` : '问题整改汇总';
         }
 
         function formatTodayCompact() {
