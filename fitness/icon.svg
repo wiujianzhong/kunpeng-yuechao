@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="88" fill="#17212b"/>
+  <path d="M92 308h328v44H92zM126 252h260v44H126zM168 196h176v44H168z" fill="#f5f7f2"/>
+  <circle cx="142" cy="152" r="42" fill="#e4573d"/>
+  <circle cx="370" cy="152" r="42" fill="#1aa68a"/>
+  <text x="256" y="424" text-anchor="middle" font-size="126" font-weight="900" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#f5f7f2">伍</text>
+</svg>
