@@ -311,8 +311,8 @@
             欢迎来到剑仙领域！本阵法已完成灵音、视觉以及手势重构：
             <br><br>
             ⚔️ <b>手势御剑说明：</b>
-            <br>• <b>摄像头手势</b>：识别到手后统一保持「寻敌游弋态」，由飞剑拼成<b>「剑来」书法大字</b>，不再切换飞梭、球阵、巨剑等复杂形态。
-            <br>• <b>手部离开画面 / 自动</b>：继续保持「剑来」书法剑阵，外围由二十把飞剑围成完美剑圈，其余飞剑进行雄浑复杂的错综乱飞盘旋。
+            <br>• <b>摄像头手势</b>：拳头、单指、剑指、三指、张掌会分别驱动球阵、飞梭、巨剑、旋阵、同心剑环。
+            <br>• <b>手部离开画面 / 自动</b>：保持「剑来」书法剑阵，外围由二十把飞剑围成完美剑圈，其余飞剑进行雄浑复杂的错综乱飞盘旋。
             <br><br>
             🔊 <b>声音重绘说明：</b>已默认将主音量优雅设置为 30%，保留灵动空灵的碰撞与风啸音效，防御态自带浑厚低鸣。
         </div>
@@ -686,7 +686,7 @@
                 lowPower: mobile || memory <= 4 || cores <= 4
             };
         })();
-        const CAMERA_FRAME_INTERVAL = DEVICE_PROFILE.lowPower ? 84 : 66;
+        const CAMERA_FRAME_INTERVAL = DEVICE_PROFILE.lowPower ? 66 : 45;
         function getRenderPixelRatio() {
             if (DEVICE_PROFILE.mobile) return 1;
             const nativeRatio = Math.min(window.devicePixelRatio || 1, 2);
@@ -2158,7 +2158,20 @@
             if (pinkyOpen) openCount++;
             cameraHandOpenRatio = THREE.MathUtils.clamp(openCount / 4, 0, 1);
 
-            const nextState = STATES.WANDER;
+            const isSwordGesture = indexOpen && middleOpen && !ringOpen && !pinkyOpen && (getDistance2D(landmarks[8], landmarks[12]) < handScale * 0.28);
+
+            let nextState = STATES.WANDER;
+            if (openCount === 0) {
+                nextState = STATES.CORE;
+            } else if (isSwordGesture) {
+                nextState = STATES.GIANT;
+            } else if (openCount === 1) {
+                nextState = STATES.ATTACK;
+            } else if (openCount === 3) {
+                nextState = STATES.SPIRAL;
+            } else if (openCount >= 4) {
+                nextState = STATES.SHIELD;
+            }
 
             gestureHistory.push(nextState);
             if (gestureHistory.length > GESTURE_FILTER_WINDOW) {
@@ -2178,8 +2191,8 @@
 
             if(majorityState !== currentState) {
                 setFormationState(majorityState);
-            } else if (majorityState === STATES.WANDER) {
-                statusText.innerText = "当前阵法: 剑来手势响应中";
+            } else if (STATE_LABELS[majorityState]) {
+                statusText.innerText = STATE_LABELS[majorityState];
             }
 
             updateVirtualHand(landmarks, majorityState, {
@@ -2194,7 +2207,7 @@
         const hands = typeof Hands !== 'undefined' ? new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` }) : null;
         const isMobileDevice = DEVICE_PROFILE.mobile;
         if (hands) {
-            hands.setOptions({ maxNumHands: 1, modelComplexity: isMobileDevice ? 0 : 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+            hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: 0.55, minTrackingConfidence: 0.55 });
             hands.onResults(onResults);
         }
 
