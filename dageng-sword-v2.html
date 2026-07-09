@@ -688,16 +688,10 @@
         })();
         const CAMERA_FRAME_INTERVAL = DEVICE_PROFILE.lowPower ? 66 : 45;
         function getRenderPixelRatio() {
-            if (DEVICE_PROFILE.mobile) return 1;
-            const nativeRatio = Math.min(window.devicePixelRatio || 1, 2);
-            const screenPixels = Math.max(1, window.innerWidth * window.innerHeight);
-            const maxPixels = DEVICE_PROFILE.lowPower ? 1100000 : 2000000;
-            const pixelCap = Math.sqrt(maxPixels / screenPixels);
-            const deviceCap = DEVICE_PROFILE.mobile ? 1.15 : 1.35;
-            return Math.max(1, Math.min(nativeRatio, pixelCap, deviceCap));
+            return 1;
         }
         function getBloomPixelRatio(renderRatio) {
-            return Math.max(0.8, Math.min(renderRatio, DEVICE_PROFILE.lowPower ? 0.8 : 1));
+            return 1;
         }
         const urlParams = new URLSearchParams(location.search);
         const requestedMode = urlParams.get('mode');
@@ -2518,19 +2512,14 @@
             }, true);
         }
 
-        let lastLogicFrameTime = 0;
-        function animate(now = 0) {
+        function animate() {
             requestAnimationFrame(animate);
 
             // WebGL 3D 背景板的弹性视差平滑更新插值 (毫秒级响应，零卡顿)
             currentBgPos.lerp(targetBgPos, 0.05);
             bgPlane.position.copy(currentBgPos);
 
-            const logicInterval = controlMode === CONTROL_MODES.CAMERA || DEVICE_PROFILE.lowPower ? 32 : 16;
-            if (now - lastLogicFrameTime >= logicInterval) {
-                updateBoidsLogic();
-                lastLogicFrameTime = now;
-            }
+            updateBoidsLogic();
             if (currentState === STATES.ATTACK || DEVICE_PROFILE.lowPower || controlMode === CONTROL_MODES.CAMERA) {
                 renderer.render(scene, camera);
             } else {
