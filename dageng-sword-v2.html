@@ -403,7 +403,7 @@
         <button class="cam-toggle" id="cam-retry-btn" onclick="retryCamera()" style="display:none;">重试天眼</button>
         <button class="cam-toggle" id="cam-toggle-btn" onclick="toggleCam()">隐藏天眼画面</button>
         <div id="video-container">
-            <video id="webcam" autoplay muted playsinline></video>
+            <video id="webcam" autoplay muted playsinline webkit-playsinline></video>
         </div>
     </div>
 
@@ -709,7 +709,15 @@
         const urlParams = new URLSearchParams(location.search);
         const requestedMode = urlParams.get('mode');
         const isDesktopShell = urlParams.get('desktop') === '1';
-        let controlMode = isDesktopShell ? CONTROL_MODES.MOUSE : (requestedMode === CONTROL_MODES.MOUSE || requestedMode === CONTROL_MODES.CAMERA ? requestedMode : (localStorage.getItem('controlMode') || CONTROL_MODES.CAMERA));
+        const storedMode = localStorage.getItem('controlMode');
+        let controlMode = CONTROL_MODES.CAMERA;
+        if (isDesktopShell) {
+            controlMode = CONTROL_MODES.MOUSE;
+        } else if (requestedMode === CONTROL_MODES.MOUSE || requestedMode === CONTROL_MODES.CAMERA) {
+            controlMode = requestedMode;
+        } else if (!DEVICE_PROFILE.mobile && (storedMode === CONTROL_MODES.MOUSE || storedMode === CONTROL_MODES.CAMERA)) {
+            controlMode = storedMode;
+        }
         if (controlMode !== CONTROL_MODES.MOUSE && controlMode !== CONTROL_MODES.CAMERA) controlMode = CONTROL_MODES.CAMERA;
         let mouseBaseState = STATES.WANDER;
         let mouseOverrideState = null;
@@ -2179,19 +2187,43 @@
             const retryBtn = document.getElementById('cam-retry-btn');
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 finishLoading("当前阵法: 当前环境不支持摄像头，自动游弋");
-                retryBtn.style.display = 'inline-block';
+                if (retryBtn) retryBtn.style.display = 'inline-block';
                 return;
             }
 
             try {
                 stopCamera();
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 320, height: 240, facingMode: "user" },
-                    audio: false
-                });
+                const cameraAttempts = [
+                    { video: { facingMode: { ideal: "user" }, width: { ideal: 360 }, height: { ideal: 270 } }, audio: false },
+                    { video: { facingMode: { ideal: "user" } }, audio: false },
+                    { video: { width: { ideal: 320 }, height: { ideal: 240 } }, audio: false },
+                    { video: true, audio: false }
+                ];
+                let stream = null;
+                let lastError = null;
+                for (const constraints of cameraAttempts) {
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia(constraints);
+                        break;
+                    } catch (err) {
+                        lastError = err;
+                    }
+                }
+                if (!stream) throw lastError || new Error('camera unavailable');
+                videoElement.muted = true;
+                videoElement.setAttribute('playsinline', '');
+                videoElement.setAttribute('webkit-playsinline', '');
                 videoElement.srcObject = stream;
+                await new Promise((resolve) => {
+                    if (videoElement.readyState >= 1) {
+                        resolve();
+                        return;
+                    }
+                    videoElement.onloadedmetadata = resolve;
+                    setTimeout(resolve, 600);
+                });
                 await videoElement.play();
-                retryBtn.style.display = 'none';
+                if (retryBtn) retryBtn.style.display = 'none';
                 cameraFrameLoopActive = true;
                 let lastCameraFrameTime = 0;
                 let cameraFrameBusy = false;
@@ -2223,7 +2255,7 @@
                     msg = "当前阵法: 本地文件无法用摄像头，请用 Web 服务器打开运行";
                 }
                 finishLoading(msg);
-                retryBtn.style.display = 'inline-block';
+                if (retryBtn) retryBtn.style.display = 'inline-block';
             }
         }
 
