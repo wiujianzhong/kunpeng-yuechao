@@ -309,12 +309,8 @@
             欢迎来到剑仙领域！本阵法已完成灵音、视觉以及手势重构：
             <br><br>
             ⚔️ <b>手势御剑说明：</b>
-            <br>• <b>伸出食指 (1指)</b>：触发「游龙往复飞梭」，带领漫天飞剑翱翔。双色如麻绳般交织，缠绕缓慢、紧密整齐。
-            <br>• <b>双指合并 (剑指)</b>：触发「剑指 · 开天合一」，飞剑瞬间合炼为一柄开天劈地的<b>黄金倒持金剑</b>（离镜头更近，完全静止不动）！
-            <br>• <b>三指张开 (3指)</b>：触发「太乙天诛剑阵」，飞剑进入大尺度狂暴旋转，并伴随电荷雷暴链接。
-            <br>• <b>五掌张开 (5指)</b>：触发「青元戮魔阵」，在身体前方稍远位置形成多重同心流动战环。
-            <br>• <b>五指紧握 (拳头)</b>：触发「大成立体球剑阵」，<b>就近快速归拢</b>为完全静止不摇晃的贴身守护球（恒定占据屏幕 1/3 大小），并带有强力力场嗡鸣。
-            <br>• <b>手部离开画面 / 自动</b>：进入「寻敌游弋态」—— 由飞剑精妙拼成<b>「剑来」书法大字，外围由二十把飞剑围成完美剑圈</b>，其余飞剑进行雄浑复杂的错综乱飞盘旋。
+            <br>• <b>摄像头手势</b>：识别到手后统一保持「寻敌游弋态」，由飞剑拼成<b>「剑来」书法大字</b>，不再切换飞梭、球阵、巨剑等复杂形态。
+            <br>• <b>手部离开画面 / 自动</b>：继续保持「剑来」书法剑阵，外围由二十把飞剑围成完美剑圈，其余飞剑进行雄浑复杂的错综乱飞盘旋。
             <br><br>
             🔊 <b>声音重绘说明：</b>已默认将主音量优雅设置为 30%，保留灵动空灵的碰撞与风啸音效，防御态自带浑厚低鸣。
         </div>
@@ -2128,21 +2124,7 @@
             if (ringOpen) openCount++;
             if (pinkyOpen) openCount++;
 
-            const isSwordGesture = indexOpen && middleOpen && !ringOpen && !pinkyOpen && (getDistance2D(landmarks[8], landmarks[12]) < handScale * 0.28);
-
-            let nextState = STATES.WANDER;
-
-            if (openCount === 0) {
-                nextState = STATES.CORE;
-            } else if (isSwordGesture) {
-                nextState = STATES.GIANT;
-            } else if (openCount === 1) {
-                nextState = STATES.ATTACK;
-            } else if (openCount === 3) {
-                nextState = STATES.SPIRAL;
-            } else if (openCount >= 4) {
-                nextState = STATES.SHIELD;
-            }
+            const nextState = STATES.WANDER;
 
             gestureHistory.push(nextState);
             if (gestureHistory.length > GESTURE_FILTER_WINDOW) {
@@ -2195,7 +2177,7 @@
             if (!hands || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 finishLoading("当前阵法: 当前环境不支持摄像头，自动游弋");
                 if (retryBtn) retryBtn.style.display = 'inline-block';
-                enableTouchFallback("当前阵法: 触屏御剑已启动");
+                enableTouchFallback("当前阵法: 天眼权限未开启，保持剑来游弋");
                 return;
             }
 
@@ -2258,7 +2240,7 @@
                 setTimeout(() => {
                     if (loadingText.style.display !== 'none') finishLoading("当前阵法: 天眼启动中，自动游弋");
                     if (!latestLandmarks && controlMode === CONTROL_MODES.CAMERA) {
-                        enableTouchFallback("当前阵法: 天眼找手中，可先触屏御剑");
+                        finishLoading("当前阵法: 天眼开启，等待手势入阵");
                     }
                 }, 2500);
             } catch (err) {
@@ -2269,7 +2251,7 @@
                 }
                 finishLoading(msg);
                 if (retryBtn) retryBtn.style.display = 'inline-block';
-                enableTouchFallback("当前阵法: 触屏御剑已启动");
+                enableTouchFallback("当前阵法: 天眼权限未开启，保持剑来游弋");
             }
         }
 
@@ -2307,6 +2289,7 @@
         }
 
         function getMouseOverrideState(e) {
+            if (touchFallbackActive && controlMode === CONTROL_MODES.CAMERA) return null;
             if (e.shiftKey) return STATES.SHIELD;
             if (e.altKey) return STATES.SPIRAL;
             if (e.buttons & 2) return STATES.CORE;
@@ -2358,6 +2341,7 @@
 
         document.addEventListener('dblclick', (e) => {
             if (!isPointerControlActive() || isControlElement(e.target)) return;
+            if (touchFallbackActive && controlMode === CONTROL_MODES.CAMERA) return;
             updateMouseTarget(e);
             setMouseFormation(STATES.GIANT);
         });
