@@ -2,11 +2,12 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Magic Holiday - Custom Text</title>
     <!-- 引入多种字体：Great Vibes(英手写), Ma Shan Zheng(中毛笔), Long Cang(中草书) -->
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Ma+Shan+Zheng&family=Long+Cang&family=Noto+Sans+SC:wght@700&display=swap" rel="stylesheet">
     <style>
+        html, body { touch-action: none; }
         body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Segoe UI', sans-serif; transition: background 1s ease; }
         
         /* 背景样式 */
@@ -169,7 +170,7 @@
     </div>
 
     <button id="toggle-btn">⚙️</button>
-    <video id="input_video" class="hidden-cam"></video>
+    <video id="input_video" class="hidden-cam" autoplay muted playsinline webkit-playsinline></video>
 
     <!-- 控制面板 -->
     <div id="ui-panel">
@@ -312,6 +313,7 @@ const PRELOADED_IMAGES = [
         let hands, cameraUtils, cameraRunning = false, handFrameBusy = false;
         let photoPickerOpen = false, photoPickerProcessing = false, resumeCameraAfterPicker = false;
         let resumeCameraOnVisible = false;
+        let lastHandSeenAt = 0;
         const pinchGesture = {
             armed: false,
             closeFrames: 0,
@@ -476,6 +478,7 @@ const PRELOADED_IMAGES = [
             camera.position.set(0, 30, 105); camera.lookAt(0, 30, 0);
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.domElement.style.touchAction = 'none';
             document.body.appendChild(renderer.domElement);
             treeGroup = new THREE.Group(); scene.add(treeGroup);
             
@@ -672,47 +675,94 @@ const PRELOADED_IMAGES = [
 
         async function startHandTracking() {
             try {
-                if(typeof Hands === "undefined" || typeof Camera === "undefined" || !navigator.mediaDevices) throw new Error("hand tracking unavailable");
+                if(typeof Hands === "undefined" || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("hand tracking unavailable");
                 const video = document.getElementById('input_video');
                 stopHandCamera();
                 if (!hands) {
+                    const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
                     hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-                    hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.65, minTrackingConfidence: 0.65 });
+                    hands.setOptions({ maxNumHands: 2, modelComplexity: mobile ? 0 : 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
                     hands.onResults(results => {
                     let leftFound = false;
                     let rightFound = false;
                     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                        for (let i = 0; i < results.multiHandedness.length; i++) {
-                            const handedness = results.multiHandedness[i];
+                        lastHandSeenAt = performance.now();
+                        for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+                            const handedness = results.multiHandedness?.[i] || {};
                             const label = handedness.label; const lm = results.multiHandLandmarks[i];
                             if (label === 'Left') {
                                 leftFound = true; const d = Math.hypot(lm[4].x - lm[20].x, lm[4].y - lm[20].y);
                                 state.targetExplosion = Math.min(Math.max((d - 0.15) * 4, 0), 1);
                             }
-                            if (label === 'Right' && (handedness.score ?? 1) >= 0.75) {
+                            if (label === 'Right' && (handedness.score ?? 1) >= 0.45) {
                                 rightFound = true;
                                 const action = updatePinchGesture(lm);
                                 if (action === 'show') showRandomPhoto();
                                 if (action === 'close') document.getElementById('photo-modal').classList.remove('active');
                             }
                         }
+                        const fallbackHand = results.multiHandLandmarks[0];
+                        if (!leftFound && fallbackHand) {
+                            leftFound = true;
+                            const d = Math.hypot(fallbackHand[4].x - fallbackHand[20].x, fallbackHand[4].y - fallbackHand[20].y);
+                            state.targetExplosion = Math.min(Math.max((d - 0.15) * 4, 0), 1);
+                        }
+                        if (!rightFound && fallbackHand) {
+                            rightFound = true;
+                            const action = updatePinchGesture(fallbackHand);
+                            if (action === 'show') showRandomPhoto();
+                            if (action === 'close') document.getElementById('photo-modal').classList.remove('active');
+                        }
                     }
                     if (!leftFound) state.targetExplosion = 0;
                     if (!rightFound) resetPinchGesture();
                     });
                 }
-                cameraUtils = new Camera(video, {
-                    onFrame: async () => {
-                        if (!cameraRunning || handFrameBusy || video.readyState < 2) return;
+                if (typeof hands.initialize === 'function') await hands.initialize();
+                const cameraAttempts = [
+                    { video: { facingMode: { ideal: "user" }, width: { ideal: 360 }, height: { ideal: 270 } }, audio: false },
+                    { video: { facingMode: { ideal: "user" } }, audio: false },
+                    { video: { width: { ideal: 320 }, height: { ideal: 240 } }, audio: false },
+                    { video: true, audio: false }
+                ];
+                let stream = null;
+                let lastError = null;
+                for (const constraints of cameraAttempts) {
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia(constraints);
+                        break;
+                    } catch (err) {
+                        lastError = err;
+                    }
+                }
+                if (!stream) throw lastError || new Error("camera unavailable");
+                video.muted = true;
+                video.setAttribute('playsinline', '');
+                video.setAttribute('webkit-playsinline', '');
+                video.srcObject = stream;
+                await new Promise((resolve) => {
+                    if (video.readyState >= 1) {
+                        resolve();
+                        return;
+                    }
+                    video.onloadedmetadata = resolve;
+                    setTimeout(resolve, 800);
+                });
+                await video.play();
+                cameraRunning = true;
+                const sendFrame = async () => {
+                    if (!cameraRunning) return;
+                    if (!handFrameBusy && video.readyState >= 2) {
                         handFrameBusy = true;
                         try { await hands.send({image: video}); }
                         finally { handFrameBusy = false; }
-                    },
-                    width: 320,
-                    height: 240
-                });
-                await cameraUtils.start();
-                cameraRunning = true;
+                    }
+                    requestAnimationFrame(sendFrame);
+                };
+                requestAnimationFrame(sendFrame);
+                setTimeout(() => {
+                    if (cameraRunning && performance.now() - lastHandSeenAt > 2600) setupPointerInteraction();
+                }, 2800);
             } catch (err) {
                 stopHandCamera();
                 setupPointerInteraction();
@@ -777,6 +827,11 @@ const PRELOADED_IMAGES = [
             window.addEventListener('pointermove', (e) => {
                 state.targetExplosion = Math.max(0, Math.min(1, 1 - e.clientY / window.innerHeight));
             });
+            window.addEventListener('pointerdown', (e) => {
+                if(e.target.closest('#ui-panel, #toggle-btn, #start-screen')) return;
+                state.targetExplosion = Math.max(0, Math.min(1, 1 - e.clientY / window.innerHeight));
+            });
+            window.addEventListener('pointerup', () => state.targetExplosion = 0);
             window.addEventListener('pointerleave', () => state.targetExplosion = 0);
             window.addEventListener('click', (e) => {
                 if(e.target.closest('#ui-panel, #toggle-btn, #start-screen')) return;
