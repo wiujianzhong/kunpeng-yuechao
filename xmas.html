@@ -330,13 +330,14 @@ const PRELOADED_IMAGES = [
             if (experienceStarted) return;
             experienceStarted = true;
             const screen = document.getElementById('start-screen');
+            screen.style.pointerEvents = 'none';
             screen.style.opacity = 0; setTimeout(() => screen.remove(), 1000);
             document.getElementById('main-title').style.opacity = 1;
-            document.getElementById('input_video').classList.remove('hidden-cam');
-            startHandTracking();
-            await initAudio();
             initThree(); setupUI();
             loadPreloadedImages();
+            setupPointerInteraction();
+            startHandTracking();
+            initAudio().catch(() => {});
         });
 
         async function initAudio() {
@@ -731,15 +732,14 @@ const PRELOADED_IMAGES = [
         async function requestCameraStream() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("camera unavailable");
             const cameraAttempts = [
-                { video: { facingMode: { ideal: "user" }, width: { ideal: 320 }, height: { ideal: 240 }, frameRate: { ideal: 15, max: 24 } }, audio: false },
-                { video: { facingMode: { ideal: "user" }, width: { ideal: 320 }, height: { ideal: 240 } }, audio: false },
-                { video: { facingMode: { ideal: "user" } }, audio: false },
+                { video: { facingMode: "user", width: { ideal: 320 }, height: { ideal: 240 } }, audio: false },
+                { video: { facingMode: "user" }, audio: false },
                 { video: true, audio: false }
             ];
             let lastError = null;
             for (const constraints of cameraAttempts) {
                 try {
-                    return await withTimeout(navigator.mediaDevices.getUserMedia(constraints), 9000, "camera timeout");
+                    return await navigator.mediaDevices.getUserMedia(constraints);
                 } catch (err) {
                     lastError = err;
                 }
@@ -938,7 +938,11 @@ const PRELOADED_IMAGES = [
             const fsBtn = document.getElementById('btn-fullscreen');
             if (window.innerWidth <= 640) document.getElementById('ui-panel').classList.add('hidden');
             fsBtn.addEventListener('click', () => { if(!document.fullscreenElement) { document.documentElement.requestFullscreen(); fsBtn.innerText="❌ 退出全屏模式"; } else { document.exitFullscreen(); fsBtn.innerText="⛶ 全屏模式"; } });
-            document.getElementById('btn-toggle-cam').addEventListener('click', () => { document.getElementById('input_video').classList.toggle('hidden-cam'); });
+            document.getElementById('btn-toggle-cam').addEventListener('click', () => {
+                const video = document.getElementById('input_video');
+                if (!video.srcObject) startHandTracking();
+                else video.classList.toggle('hidden-cam');
+            });
             document.getElementById('bg-select').addEventListener('change', (e) => document.body.className = 'bg-'+e.target.value);
             document.getElementById('toggle-btn').addEventListener('click', () => document.getElementById('ui-panel').classList.toggle('hidden'));
             
