@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>大庚剑阵 · 灵音重构版</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -266,7 +269,6 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-    <script src="./virtual-hand-renderer.js"></script>
 </head>
 <body>
 
@@ -624,6 +626,7 @@
         }
 
         function awakenSwordFormation() {
+            appAwakened = true;
             document.getElementById('start-portal').style.transform = 'translateY(-100%)';
             setTimeout(() => {
                 document.getElementById('start-portal').style.display = 'none';
@@ -674,14 +677,6 @@
             SHIELD: "当前阵法: 五掌 · 青元戮魔阵 (同心进攻波环)"
         };
         const CONTROL_MODES = { CAMERA: 'camera', MOUSE: 'mouse' };
-        const VIRTUAL_HAND_CONFIG = {
-            showVirtualHand: false,
-            virtualHandScale: 1,
-            virtualHandOpacity: 0.86,
-            virtualHandPosition: { x: 0.5, y: 0.86 },
-            mirror: true
-        };
-        window.VIRTUAL_HAND_CONFIG = Object.assign({}, window.VIRTUAL_HAND_CONFIG || {}, VIRTUAL_HAND_CONFIG);
         const DEVICE_PROFILE = (() => {
             const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
             const memory = navigator.deviceMemory || 8;
@@ -720,6 +715,10 @@
         let mouseBaseState = STATES.WANDER;
         let mouseOverrideState = null;
         let cameraFrameLoopActive = false;
+        let cameraLoopToken = 0;
+        let cameraFrameBusy = false;
+        let cameraStartPromise = null;
+        let appAwakened = false;
         let touchFallbackActive = false;
         let currentState = STATES.WANDER;
         let targetPoint = new THREE.Vector3(0, 0, 0);
@@ -887,20 +886,16 @@
         window.setMouseFormation = setMouseFormation;
         syncControlModeUI();
 
-        const virtualHandRenderer = window.VirtualHandRenderer && window.VIRTUAL_HAND_CONFIG.showVirtualHand ? new window.VirtualHandRenderer(window.VIRTUAL_HAND_CONFIG) : null;
-        window.virtualHandRenderer = virtualHandRenderer;
+        const virtualHandRenderer = null;
+        window.virtualHandRenderer = null;
 
         function hideVirtualHand() {
-            if (virtualHandRenderer) virtualHandRenderer.hide();
+            const staleCanvas = document.getElementById('virtual-hand-canvas');
+            if (staleCanvas) staleCanvas.remove();
         }
 
         function updateVirtualHand(landmarks, state, gestureInfo) {
-            if (!virtualHandRenderer || controlMode !== CONTROL_MODES.CAMERA) return;
-            virtualHandRenderer.update({
-                landmarks,
-                state,
-                openCount: gestureInfo.openCount
-            });
+            hideVirtualHand();
         }
 
         const container = document.getElementById('webgl-container');
@@ -2162,29 +2157,53 @@
             hands.onResults(onResults);
         }
 
-        function stopCamera() {
-            cameraFrameLoopActive = false;
+        function releaseCameraStream() {
             hideVirtualHand();
+            videoElement.onloadedmetadata = null;
             if (videoElement.srcObject) {
                 videoElement.srcObject.getTracks().forEach(track => track.stop());
                 videoElement.srcObject = null;
             }
+            videoElement.pause();
+        }
+
+        function stopCamera() {
+            cameraLoopToken++;
+            cameraFrameLoopActive = false;
+            cameraStartPromise = null;
+            touchFallbackActive = false;
+            releaseCameraStream();
         }
 
         async function startCamera() {
             if (controlMode !== CONTROL_MODES.CAMERA) return;
+            if (cameraStartPromise) return cameraStartPromise;
+            const promise = startCameraInternal();
+            cameraStartPromise = promise;
+            promise.finally(() => {
+                if (cameraStartPromise === promise) cameraStartPromise = null;
+            });
+            return promise;
+        }
+
+        async function startCameraInternal() {
+            if (controlMode !== CONTROL_MODES.CAMERA) return;
+            const startToken = ++cameraLoopToken;
             const retryBtn = document.getElementById('cam-retry-btn');
             if (!hands || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                finishLoading("当前阵法: 当前环境不支持摄像头，自动游弋");
+                touchFallbackActive = false;
+                setFormationState(STATES.WANDER);
+                finishLoading("当前阵法: 当前环境不支持摄像头，保持剑来游弋");
                 if (retryBtn) retryBtn.style.display = 'inline-block';
-                enableTouchFallback("当前阵法: 天眼权限未开启，保持剑来游弋");
                 return;
             }
 
             try {
-                stopCamera();
+                cameraFrameLoopActive = false;
+                releaseCameraStream();
                 touchFallbackActive = false;
-                if (typeof hands.initialize === 'function') await hands.initialize();
+                latestLandmarks = null;
+                gestureHistory.length = 0;
                 const cameraAttempts = [
                     { video: { facingMode: { ideal: "user" }, width: { ideal: 360 }, height: { ideal: 270 } }, audio: false },
                     { video: { facingMode: { ideal: "user" } }, audio: false },
@@ -2202,6 +2221,10 @@
                     }
                 }
                 if (!stream) throw lastError || new Error('camera unavailable');
+                if (startToken !== cameraLoopToken || controlMode !== CONTROL_MODES.CAMERA) {
+                    stream.getTracks().forEach(track => track.stop());
+                    return;
+                }
                 videoElement.muted = true;
                 videoElement.setAttribute('playsinline', '');
                 videoElement.setAttribute('webkit-playsinline', '');
@@ -2215,13 +2238,16 @@
                     setTimeout(resolve, 600);
                 });
                 await videoElement.play();
+                if (startToken !== cameraLoopToken || controlMode !== CONTROL_MODES.CAMERA) {
+                    releaseCameraStream();
+                    return;
+                }
                 if (retryBtn) retryBtn.style.display = 'none';
                 cameraFrameLoopActive = true;
                 let lastCameraFrameTime = 0;
-                let cameraFrameBusy = false;
 
                 const sendFrame = async (now) => {
-                    if (!cameraFrameLoopActive || controlMode !== CONTROL_MODES.CAMERA) return;
+                    if (!cameraFrameLoopActive || startToken !== cameraLoopToken || controlMode !== CONTROL_MODES.CAMERA) return;
                     if (!cameraFrameBusy && videoElement.readyState >= 2 && now - lastCameraFrameTime >= CAMERA_FRAME_INTERVAL) {
                         cameraFrameBusy = true;
                         lastCameraFrameTime = now;
@@ -2238,12 +2264,14 @@
                 requestAnimationFrame(sendFrame);
 
                 setTimeout(() => {
+                    if (startToken !== cameraLoopToken || controlMode !== CONTROL_MODES.CAMERA) return;
                     if (loadingText.style.display !== 'none') finishLoading("当前阵法: 天眼启动中，自动游弋");
                     if (!latestLandmarks && controlMode === CONTROL_MODES.CAMERA) {
                         finishLoading("当前阵法: 天眼开启，等待手势入阵");
                     }
                 }, 2500);
             } catch (err) {
+                if (startToken !== cameraLoopToken || controlMode !== CONTROL_MODES.CAMERA) return;
                 console.error(err);
                 let msg = "当前阵法: 无天眼权限，自动游弋";
                 if (location.protocol === 'file:') {
@@ -2251,15 +2279,9 @@
                 }
                 finishLoading(msg);
                 if (retryBtn) retryBtn.style.display = 'inline-block';
-                enableTouchFallback("当前阵法: 天眼权限未开启，保持剑来游弋");
+                touchFallbackActive = false;
+                setFormationState(STATES.WANDER);
             }
-        }
-
-        function enableTouchFallback(text) {
-            touchFallbackActive = true;
-            setFormationState(mouseOverrideState || mouseBaseState);
-            if (text) statusText.innerText = text;
-            if (DEVICE_PROFILE.mobile) toggleUI(true);
         }
 
         async function retryCamera() {
@@ -2272,6 +2294,33 @@
             loadingText.innerText = '重新开启天眼...';
             await startCamera();
         }
+
+        function shouldResumeCamera() {
+            return appAwakened && controlMode === CONTROL_MODES.CAMERA && document.visibilityState !== 'hidden';
+        }
+
+        function resumeCameraAfterRestore() {
+            if (!shouldResumeCamera()) return;
+            loadingText.style.display = 'block';
+            loadingText.innerText = '恢复法阵天眼...';
+            startCamera();
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                stopCamera();
+            } else {
+                resumeCameraAfterRestore();
+            }
+        });
+
+        window.addEventListener('pagehide', () => {
+            if (controlMode === CONTROL_MODES.CAMERA) stopCamera();
+        });
+
+        window.addEventListener('pageshow', () => {
+            resumeCameraAfterRestore();
+        });
 
         function updateMouseTarget(e) {
             if (controlMode !== CONTROL_MODES.MOUSE && !touchFallbackActive) return;
