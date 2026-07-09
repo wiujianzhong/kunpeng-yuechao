@@ -6,7 +6,7 @@
     <title>大庚剑阵 · 灵音重构版</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #020202; font-family: 'PingFang SC', sans-serif; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #020202; font-family: 'PingFang SC', sans-serif; touch-action: none; }
         
         /* 交互控制台 */
         #ui-overlay {
@@ -722,6 +722,7 @@
         let mouseBaseState = STATES.WANDER;
         let mouseOverrideState = null;
         let cameraFrameLoopActive = false;
+        let touchFallbackActive = false;
         let currentState = STATES.WANDER;
         let targetPoint = new THREE.Vector3(0, 0, 0);
         let fingerTipPoint = new THREE.Vector3(0, 0, 0);
@@ -916,6 +917,7 @@
         const renderer = new THREE.WebGLRenderer({ antialias: !DEVICE_PROFILE.lowPower, alpha: true, powerPreference: "high-performance" });
         renderer.setPixelRatio(activeRenderPixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.domElement.style.touchAction = 'none';
         renderer.toneMapping = THREE.ReinhardToneMapping;
         renderer.toneMappingExposure = 1.6;
         renderer.setClearColor(0x000000, 0); 
@@ -1502,7 +1504,7 @@
                 const dy = -(pKnuckle.y - pWrist.y);
                 const dz = -(pKnuckle.z - pWrist.z) * 1.5;
                 handDir.set(dx, dy, dz).normalize();
-            } else if (controlMode === CONTROL_MODES.MOUSE) {
+            } else if (controlMode === CONTROL_MODES.MOUSE || touchFallbackActive) {
                 handDir.copy(mouseHandDir);
             }
             smoothedHandDir.lerp(handDir, currentState === STATES.GIANT ? 0.10 : 0.28).normalize();
@@ -2093,6 +2095,7 @@
 
             const landmarks = results.multiHandLandmarks[0];
             latestLandmarks = landmarks; 
+            touchFallbackActive = false;
             
             const nX = -(landmarks[9].x - 0.5) * 2 * 75;
             const nY = -(landmarks[9].y - 0.5) * 2 * 55;
@@ -2168,10 +2171,12 @@
             });
         }
 
-        const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+        const hands = typeof Hands !== 'undefined' ? new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` }) : null;
         const isMobileDevice = DEVICE_PROFILE.mobile;
-        hands.setOptions({ maxNumHands: 1, modelComplexity: isMobileDevice ? 0 : 1, minDetectionConfidence: 0.55, minTrackingConfidence: 0.55 });
-        hands.onResults(onResults);
+        if (hands) {
+            hands.setOptions({ maxNumHands: 1, modelComplexity: isMobileDevice ? 0 : 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+            hands.onResults(onResults);
+        }
 
         function stopCamera() {
             cameraFrameLoopActive = false;
@@ -2185,14 +2190,17 @@
         async function startCamera() {
             if (controlMode !== CONTROL_MODES.CAMERA) return;
             const retryBtn = document.getElementById('cam-retry-btn');
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            if (!hands || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 finishLoading("当前阵法: 当前环境不支持摄像头，自动游弋");
                 if (retryBtn) retryBtn.style.display = 'inline-block';
+                enableTouchFallback("当前阵法: 触屏御剑已启动");
                 return;
             }
 
             try {
                 stopCamera();
+                touchFallbackActive = false;
+                if (typeof hands.initialize === 'function') await hands.initialize();
                 const cameraAttempts = [
                     { video: { facingMode: { ideal: "user" }, width: { ideal: 360 }, height: { ideal: 270 } }, audio: false },
                     { video: { facingMode: { ideal: "user" } }, audio: false },
@@ -2247,6 +2255,9 @@
 
                 setTimeout(() => {
                     if (loadingText.style.display !== 'none') finishLoading("当前阵法: 天眼启动中，自动游弋");
+                    if (!latestLandmarks && controlMode === CONTROL_MODES.CAMERA) {
+                        enableTouchFallback("当前阵法: 天眼找手中，可先触屏御剑");
+                    }
                 }, 2500);
             } catch (err) {
                 console.error(err);
@@ -2256,7 +2267,14 @@
                 }
                 finishLoading(msg);
                 if (retryBtn) retryBtn.style.display = 'inline-block';
+                enableTouchFallback("当前阵法: 触屏御剑已启动");
             }
+        }
+
+        function enableTouchFallback(text) {
+            touchFallbackActive = true;
+            setFormationState(mouseOverrideState || mouseBaseState);
+            if (text) statusText.innerText = text;
         }
 
         async function retryCamera() {
@@ -2271,7 +2289,7 @@
         }
 
         function updateMouseTarget(e) {
-            if (controlMode !== CONTROL_MODES.MOUSE) return;
+            if (controlMode !== CONTROL_MODES.MOUSE && !touchFallbackActive) return;
             const next = new THREE.Vector3(
                 (e.clientX / window.innerWidth - 0.5) * 150,
                 -(e.clientY / window.innerHeight - 0.5) * 110,
@@ -2295,7 +2313,7 @@
         }
 
         function applyMouseOverride(e) {
-            if (controlMode !== CONTROL_MODES.MOUSE) return;
+            if (controlMode !== CONTROL_MODES.MOUSE && !touchFallbackActive) return;
             const nextOverride = getMouseOverrideState(e);
             if (nextOverride !== mouseOverrideState) {
                 mouseOverrideState = nextOverride;
