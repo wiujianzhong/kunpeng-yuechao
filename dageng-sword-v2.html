@@ -2072,6 +2072,7 @@
             if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
                 latestLandmarks = null;
                 hideVirtualHand();
+                if (touchFallbackActive) return;
                 
                 gestureHistory.push(STATES.WANDER);
                 if(gestureHistory.length > GESTURE_FILTER_WINDOW) gestureHistory.shift();
@@ -2275,6 +2276,7 @@
             touchFallbackActive = true;
             setFormationState(mouseOverrideState || mouseBaseState);
             if (text) statusText.innerText = text;
+            if (DEVICE_PROFILE.mobile) toggleUI(true);
         }
 
         async function retryCamera() {
@@ -2321,6 +2323,10 @@
             }
         }
 
+        function isPointerControlActive() {
+            return controlMode === CONTROL_MODES.MOUSE || touchFallbackActive;
+        }
+
         function isControlElement(target) {
             return target && target.closest && target.closest('#ui-overlay, #video-wrapper, #start-portal');
         }
@@ -2332,25 +2338,31 @@
         }, { passive: true });
 
         document.addEventListener('pointerdown', (e) => {
-            if (controlMode !== CONTROL_MODES.MOUSE || isControlElement(e.target)) return;
+            if (!isPointerControlActive() || isControlElement(e.target)) return;
             updateMouseTarget(e);
             applyMouseOverride(e);
         });
 
         document.addEventListener('pointerup', (e) => {
-            if (controlMode !== CONTROL_MODES.MOUSE) return;
+            if (!isPointerControlActive()) return;
             updateMouseTarget(e);
             applyMouseOverride(e);
         });
 
+        document.addEventListener('pointercancel', (e) => {
+            if (!isPointerControlActive()) return;
+            mouseOverrideState = null;
+            setFormationState(mouseBaseState);
+        });
+
         document.addEventListener('dblclick', (e) => {
-            if (controlMode !== CONTROL_MODES.MOUSE || isControlElement(e.target)) return;
+            if (!isPointerControlActive() || isControlElement(e.target)) return;
             updateMouseTarget(e);
             setMouseFormation(STATES.GIANT);
         });
 
         document.addEventListener('contextmenu', (e) => {
-            if (controlMode === CONTROL_MODES.MOUSE && !isControlElement(e.target)) e.preventDefault();
+            if (isPointerControlActive() && !isControlElement(e.target)) e.preventDefault();
         });
 
         document.addEventListener('keydown', (e) => {
