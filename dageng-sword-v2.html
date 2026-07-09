@@ -732,6 +732,10 @@
         let currentAverageSpeed = 0;
         let cumulativeClashProximity = 0; 
         let latestLandmarks = null; 
+        let cameraHandOpenRatio = 0;
+        let wanderGesturePresence = 0;
+        const wanderGestureOffset = new THREE.Vector3();
+        const wanderGestureTargetOffset = new THREE.Vector3();
 
         const jianLaiPoints = [];
         const jianLaiRotations = [];
@@ -1363,6 +1367,8 @@
         const dummy = new THREE.Object3D();
         dummy.rotation.order = 'XYZ'; 
         const wanderLookTarget = new THREE.Vector3();
+        const wanderGlowTarget = new THREE.Vector3();
+        const wanderGlowScale = new THREE.Vector3(1, 1, 1);
         const smoothedHandDir = new THREE.Vector3(0, 1, 0);
         const stableCoreAnchor = new THREE.Vector3();
         const stableGiantAnchor = new THREE.Vector3();
@@ -1510,6 +1516,20 @@
             const unifiedShakeZ = Math.sin(time * (defenseShakeFreq * 1.1)) * defenseShakeAmp;
 
             const calligraphyCount = jianLaiPoints.length; 
+            const hasCameraHand = controlMode === CONTROL_MODES.CAMERA && !!latestLandmarks;
+            wanderGesturePresence = THREE.MathUtils.lerp(
+                wanderGesturePresence,
+                hasCameraHand ? 1 : 0,
+                hasCameraHand ? 0.18 : 0.08
+            );
+            wanderGestureTargetOffset.set(
+                THREE.MathUtils.clamp(targetPoint.x * 0.12, -9, 9),
+                THREE.MathUtils.clamp(targetPoint.y * 0.11, -7, 7),
+                THREE.MathUtils.clamp(fingerTipPoint.z * 0.08, -4, 4)
+            );
+            wanderGestureOffset.lerp(wanderGestureTargetOffset, 0.16);
+            const wanderGestureEnergy = wanderGesturePresence * cameraHandOpenRatio;
+            const wanderGestureScale = 1.0 + wanderGestureEnergy * 0.12;
             if (currentState === STATES.CORE) {
                 if (!hasStableCoreAnchor) {
                     stableCoreAnchor.copy(fingerTipPoint);
@@ -1563,7 +1583,14 @@
                                 screenTarget.z += Math.sin(time * 1.15 + i * 0.08) * 0.38;
                                 targetScaleFactor = 0.70;
                             }
-                            targetVel.subVectors(screenTarget, boid.position).multiplyScalar((isCircleSword ? 0.105 : 0.092) * wanderSpd);
+                            const gestureOffsetX = wanderGestureOffset.x * wanderGesturePresence;
+                            const gestureOffsetY = wanderGestureOffset.y * wanderGesturePresence;
+                            const gestureOffsetZ = wanderGestureOffset.z * wanderGesturePresence;
+                            screenTarget.x = circleCenterX + (screenTarget.x - circleCenterX) * wanderGestureScale + gestureOffsetX;
+                            screenTarget.y = circleCenterY + (screenTarget.y - circleCenterY) * wanderGestureScale + gestureOffsetY;
+                            screenTarget.z += gestureOffsetZ + Math.sin(time * 4.0 + i * 0.33) * wanderGestureEnergy * 1.25;
+                            targetScaleFactor *= 1.0 + wanderGestureEnergy * 0.12;
+                            targetVel.subVectors(screenTarget, boid.position).multiplyScalar((isCircleSword ? 0.112 : 0.098) * wanderSpd * (1.0 + wanderGesturePresence * 0.22));
                         } else {
                             targetScaleFactor = 0.88;
                             // 其余飞剑：由远及近、由近及远地进行极其肆意混沌的穿梭乱飞，不形成任何有规律的围绕轨迹
@@ -1572,7 +1599,7 @@
                             const freqY = 0.25 + (i % 7) * 0.08;
                             const freqZ = 0.45 + (i % 4) * 0.18;
                             
-                            const speedScale = wanderSpd * 1.45; 
+                            const speedScale = wanderSpd * (1.45 + wanderGestureEnergy * 0.35);
                             
                             // 分离近景飞剑与远景飞剑：整体拉远、拉宽，只保留少量近景掠过
                             let zRangeMin, zRangeMax;
@@ -1593,8 +1620,8 @@
                             const xBound = 26.0 + depthFactor * 78.0;
                             const yBound = 16.0 + depthFactor * 50.0;
 
-                            const xPath = Math.sin(time * freqX + seed) * (xBound + Math.cos(time * 0.15 + seed) * (xBound * 0.35));
-                            const yPath = Math.cos(time * freqY + seed * 1.3) * (yBound + Math.sin(time * 0.25 + seed) * (yBound * 0.35));
+                            const xPath = Math.sin(time * freqX + seed) * (xBound + Math.cos(time * 0.15 + seed) * (xBound * 0.35)) + wanderGestureOffset.x * wanderGesturePresence * 0.65;
+                            const yPath = Math.cos(time * freqY + seed * 1.3) * (yBound + Math.sin(time * 0.25 + seed) * (yBound * 0.35)) + wanderGestureOffset.y * wanderGesturePresence * 0.55;
 
                             targetVel.set(xPath - boid.position.x, yPath - boid.position.y, zPath - boid.position.z).multiplyScalar(0.085 * speedScale);
                         }
@@ -2000,10 +2027,18 @@
 
             wanderGlowGroup.visible = currentState === STATES.WANDER;
             if (wanderGlowGroup.visible) {
+                wanderGlowTarget.copy(wanderGestureOffset).multiplyScalar(wanderGesturePresence);
+                wanderGlowGroup.position.lerp(wanderGlowTarget, 0.18);
+                const glowScale = 1.0 + wanderGestureEnergy * 0.15;
+                wanderGlowScale.set(glowScale, glowScale, 1);
+                wanderGlowGroup.scale.lerp(wanderGlowScale, 0.16);
                 wanderGlowRings.forEach((ring, idx) => {
-                    ring.rotation.z = time * ring.userData.speed + idx * 0.16;
-                    ring.material.opacity = ring.userData.baseOpacity * (0.78 + Math.sin(time * 1.4 + idx * 1.7) * 0.22);
+                    ring.rotation.z = time * (ring.userData.speed + wanderGesturePresence * 0.08) + idx * 0.16;
+                    ring.material.opacity = ring.userData.baseOpacity * (0.78 + Math.sin(time * (1.4 + wanderGesturePresence * 1.2) + idx * 1.7) * 0.22) * (1.0 + wanderGesturePresence * 0.55);
                 });
+            } else {
+                wanderGlowGroup.position.set(0, 0, 0);
+                wanderGlowGroup.scale.set(1, 1, 1);
             }
 
             const starArr = starGeo.attributes.position.array;
@@ -2063,6 +2098,7 @@
 
             if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
                 latestLandmarks = null;
+                cameraHandOpenRatio = 0;
                 hideVirtualHand();
                 if (touchFallbackActive) return;
                 
@@ -2082,6 +2118,8 @@
 
                 if(majorityState !== currentState) {
                     setFormationState(majorityState);
+                } else if (currentState === STATES.WANDER) {
+                    statusText.innerText = STATE_LABELS.WANDER;
                 }
                 return;
             }
@@ -2118,6 +2156,7 @@
             if (middleOpen) openCount++;
             if (ringOpen) openCount++;
             if (pinkyOpen) openCount++;
+            cameraHandOpenRatio = THREE.MathUtils.clamp(openCount / 4, 0, 1);
 
             const nextState = STATES.WANDER;
 
@@ -2139,6 +2178,8 @@
 
             if(majorityState !== currentState) {
                 setFormationState(majorityState);
+            } else if (majorityState === STATES.WANDER) {
+                statusText.innerText = "当前阵法: 剑来手势响应中";
             }
 
             updateVirtualHand(landmarks, majorityState, {
