@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#123f46">
   <title>雅新纺织有限公司用电抄表分析工具</title>
-  <link rel="stylesheet" href="styles.css?v=20260710v3">
+  <link rel="stylesheet" href="styles.css?v=20260711v4">
 </head>
 <body>
   <header class="masthead">
@@ -59,7 +59,7 @@
   <section id="reportCenter" class="report-center" aria-labelledby="reportCenterTitle">
     <div class="report-heading">
       <div>
-        <p class="section-kicker">任意组合 · 自动出表</p>
+        <p class="section-kicker">选择口径 · 自动出表</p>
         <h2 id="reportCenterTitle">报表中心</h2>
       </div>
       <span class="report-rule">周报固定：上周五 → 本周四，周五提交</span>
@@ -93,16 +93,34 @@
       </div>
     </div>
 
-    <div class="report-filter-grid">
-      <fieldset>
+    <fieldset class="report-mode-picker">
+      <legend>汇总方式 <small>三选一，同一方式内可多选</small></legend>
+      <div class="report-mode-options">
+        <label>
+          <input type="radio" name="reportMode" value="factory" checked>
+          <span><strong>整厂汇总</strong><small>看所选分厂总用电</small></span>
+        </label>
+        <label>
+          <input type="radio" name="reportMode" value="process">
+          <span><strong>按工序</strong><small>分厂 + 一个或多个工序</small></span>
+        </label>
+        <label>
+          <input type="radio" name="reportMode" value="room">
+          <span><strong>按配电室</strong><small>分厂 + 一个或多个配电室</small></span>
+        </label>
+      </div>
+    </fieldset>
+
+    <div id="reportFilterGrid" class="report-filter-grid" data-mode="factory">
+      <fieldset id="reportFactoryFieldset">
         <legend>分厂 <small>可多选</small></legend>
         <div id="reportFactories" class="filter-chips"></div>
       </fieldset>
-      <fieldset>
+      <fieldset id="reportProcessFieldset" hidden>
         <legend>工序 <small>可多选</small></legend>
         <div id="reportProcesses" class="filter-chips filter-chips-scroll"></div>
       </fieldset>
-      <fieldset>
+      <fieldset id="reportRoomFieldset" hidden>
         <legend>配电室 <small>可多选</small></legend>
         <div id="reportRooms" class="filter-chips filter-chips-scroll"></div>
       </fieldset>
@@ -110,8 +128,8 @@
 
     <div class="report-runner">
       <div>
-        <strong id="reportSelectionSummary">全部分厂 · 全部工序 · 全部配电室</strong>
-        <small id="reportBasisHint">未选择配电室时，优先采用原表正式汇总口径。</small>
+        <strong id="reportSelectionSummary">全部分厂 · 整厂汇总</strong>
+        <small id="reportBasisHint">整厂汇总采用原表正式汇总口径。</small>
       </div>
       <div class="report-download-actions">
         <button id="weeklyHistoryButton" type="button" disabled>下载周报历史总簿</button>
@@ -281,8 +299,8 @@
     </article>
   </template>
 
-  <script src="data-import.js?v=20260710v3" defer></script>
-  <script src="xlsx-export.js?v=20260710v3" defer></script>
-  <script src="app.js?v=20260710v3" defer></script>
+  <script src="data-import.js?v=20260711v4" defer></script>
+  <script src="xlsx-export.js?v=20260711v4" defer></script>
+  <script src="app.js?v=20260711v4" defer></script>
 </body>
 </html>

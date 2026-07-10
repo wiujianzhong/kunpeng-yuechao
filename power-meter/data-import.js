@@ -100,8 +100,11 @@
     return `${number}号配电室${matched[2] || ""}`;
   }
 
-  function officialProcessNames() {
-    return [...new Set(Object.values(OFFICIAL_PROCESS_CELLS).flat().map(([process]) => process))];
+  function officialProcessNames(factoryId = null) {
+    const rows = factoryId
+      ? (OFFICIAL_PROCESS_CELLS[factoryId] || [])
+      : Object.values(OFFICIAL_PROCESS_CELLS).flat();
+    return [...new Set(rows.map(([process]) => process))];
   }
 
   function requestResult(request) {

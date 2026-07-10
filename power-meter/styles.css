@@ -431,11 +431,85 @@ input:focus-visible {
   font-size: 15px;
 }
 
+.report-mode-picker {
+  margin: 12px 0 0;
+  padding: 10px 12px 12px;
+  background: #edf5f4;
+  border: 1px solid #c6d9da;
+}
+
+.report-mode-picker legend {
+  padding: 0 7px;
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.report-mode-picker legend small {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.report-mode-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.report-mode-options label {
+  position: relative;
+  min-width: 0;
+}
+
+.report-mode-options input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.report-mode-options span {
+  display: grid;
+  gap: 2px;
+  min-height: 48px;
+  padding: 8px 11px;
+  color: #47666b;
+  background: #fff;
+  border: 1px solid #b9ced0;
+  cursor: pointer;
+}
+
+.report-mode-options strong {
+  color: var(--teal);
+  font-size: 13px;
+}
+
+.report-mode-options small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.report-mode-options input:checked + span {
+  color: #fff;
+  background: var(--teal);
+  border-color: var(--teal);
+  box-shadow: inset 4px 0 0 var(--amber);
+}
+
+.report-mode-options input:checked + span strong,
+.report-mode-options input:checked + span small {
+  color: #fff;
+}
+
 .report-filter-grid {
   display: grid;
-  grid-template-columns: 0.75fr 1.25fr 1.25fr;
+  grid-template-columns: 0.75fr 1.25fr;
   gap: 12px;
   margin-top: 12px;
+}
+
+.report-filter-grid[data-mode="factory"] {
+  grid-template-columns: 1fr;
 }
 
 .report-filter-grid fieldset {
@@ -1377,10 +1451,6 @@ button:disabled {
     grid-template-columns: 1fr 1fr;
   }
 
-  .report-filter-grid fieldset:last-child {
-    grid-column: 1 / -1;
-  }
-
   .status-item:nth-child(2) {
     border-right: 0;
   }
@@ -1501,8 +1571,8 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
-  .report-filter-grid fieldset:last-child {
-    grid-column: auto;
+  .report-mode-options {
+    grid-template-columns: 1fr;
   }
 
   .report-download-actions,
