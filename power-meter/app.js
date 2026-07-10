@@ -55,6 +55,7 @@ const el = {
   reportRooms: document.querySelector("#reportRooms"),
   reportSelectionSummary: document.querySelector("#reportSelectionSummary"),
   reportBasisHint: document.querySelector("#reportBasisHint"),
+  weeklyHistoryButton: document.querySelector("#weeklyHistoryButton"),
   generateReportButton: document.querySelector("#generateReportButton"),
   factoryTabs: document.querySelector("#factoryTabs"),
   factoryLedgerLabel: document.querySelector("#factoryLedgerLabel"),
@@ -255,8 +256,9 @@ function shortDate(date) {
 
 function renderHistoryStatus() {
   const meta = state.importMeta;
-  const ready = Boolean(meta?.schemaVersion >= 2);
+  const ready = Boolean(meta?.schemaVersion >= 3);
   el.masterDownloadButton.disabled = !ready;
+  el.weeklyHistoryButton.disabled = !ready;
   el.generateReportButton.disabled = !ready;
   if (!meta) {
     el.historyStatus.textContent = "尚未导入原始 Excel";
@@ -266,7 +268,7 @@ function renderHistoryStatus() {
   }
   if (!ready) {
     el.historyStatus.textContent = "历史数据需要升级一次";
-    el.historyDetail.textContent = "请重新导入原始 Excel，系统会补齐正式工序汇总口径。";
+    el.historyDetail.textContent = "请重新导入原始 Excel，系统会补齐四分厂气流纺、涡流纺和周报总簿口径。";
     el.historyProgressBar.style.width = "0";
     el.historyImportButton.textContent = "重新导入升级";
     return;
@@ -294,6 +296,7 @@ async function importHistoryFile(file) {
   if (!file || !window.PowerMeterData?.importWorkbook) return;
   el.historyImportButton.disabled = true;
   el.masterDownloadButton.disabled = true;
+  el.weeklyHistoryButton.disabled = true;
   el.generateReportButton.disabled = true;
   el.historyImportButton.textContent = "正在整理…";
   el.historyStatus.textContent = "正在读取原始工作表";
@@ -367,6 +370,41 @@ function datesBetween(startDate, endDate) {
     dates.push(dateText(current));
   }
   return dates;
+}
+
+async function buildWeeklyHistoryReport() {
+  const records = (await window.PowerMeterData.getRange(state.importMeta.firstDate, state.importMeta.completedThrough))
+    .filter((record) => record.completed);
+  const { units, weeks } = window.PowerMeterData.buildWeeklyHistory(records, state.importMeta);
+  return {
+    company: "雅新纺织有限公司",
+    throughDate: state.importMeta.completedThrough,
+    units,
+    weeks,
+    totalWeeks: weeks.length,
+    fileName: `雅新纺织-用电周报历史总簿-截至${state.importMeta.completedThrough}.xlsx`,
+  };
+}
+
+async function downloadWeeklyHistoryWorkbook() {
+  if (state.importMeta?.schemaVersion < 3 || !window.PowerMeterXlsx?.downloadWeeklyHistory) {
+    showToast("请重新导入原始历史 Excel，升级周报总簿口径");
+    return;
+  }
+  el.weeklyHistoryButton.disabled = true;
+  el.weeklyHistoryButton.textContent = "正在整理全部周报…";
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+  try {
+    const report = await buildWeeklyHistoryReport();
+    if (!report.weeks.length) throw new Error("没有找到完整的周五至周四数据周期");
+    await window.PowerMeterXlsx.downloadWeeklyHistory(report);
+    showToast(`周报历史总簿已生成，共 ${report.totalWeeks} 周`);
+  } catch (error) {
+    showToast(`周报总簿生成失败：${error.message}`);
+  } finally {
+    el.weeklyHistoryButton.disabled = false;
+    el.weeklyHistoryButton.textContent = "下载周报历史总簿";
+  }
 }
 
 
@@ -1573,6 +1611,7 @@ el.exitTestModeButton.addEventListener("click", () => setTestMode(false));
 el.historyImportButton.addEventListener("click", () => el.historyFileInput.click());
 el.historyFileInput.addEventListener("change", () => importHistoryFile(el.historyFileInput.files?.[0]));
 el.masterDownloadButton.addEventListener("click", downloadMasterWorkbook);
+el.weeklyHistoryButton.addEventListener("click", downloadWeeklyHistoryWorkbook);
 el.generateReportButton.addEventListener("click", () => createPeriodReport().catch((error) => showToast(`报表生成失败：${error.message}`)));
 [el.reportType, el.reportReferenceDate, el.reportStartDate, el.reportEndDate].forEach((control) => {
   control.addEventListener("change", refreshReportUi);

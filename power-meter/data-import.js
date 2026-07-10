@@ -42,6 +42,24 @@
     "factory-4": ["L22", "L23"],
     "factory-7": [...cellRange("R", 4, 15), "D14", "B20", "R77"],
   };
+  const OFFICIAL_UNIT_CELLS = {
+    "factory-4": [["气流纺", "L22"], ["涡流纺", "L23"]],
+  };
+  const FACTORY_NAMES = {
+    "factory-1": "一分厂",
+    "factory-2": "二分厂",
+    "factory-3": "三分厂",
+    "factory-4": "四分厂",
+    "factory-7": "七分厂",
+  };
+  const WEEKLY_REPORT_UNITS = [
+    { id: "factory-1", name: "一分厂", factoryId: "factory-1" },
+    { id: "factory-2", name: "二分厂", factoryId: "factory-2" },
+    { id: "factory-3", name: "三分厂", factoryId: "factory-3" },
+    { id: "factory-4-air", name: "四分厂气流纺", factoryId: "factory-4", unitName: "气流纺" },
+    { id: "factory-4-vortex", name: "四分厂涡流纺", factoryId: "factory-4", unitName: "涡流纺" },
+    { id: "factory-7", name: "七分厂", factoryId: "factory-7" },
+  ];
 
   function cellRange(column, start, end) {
     return Array.from({ length: end - start + 1 }, (_, index) => `${column}${start + index}`);
@@ -169,6 +187,85 @@
     }
   }
 
+  function buildWeeklyHistory(records, meta) {
+    const completeRecords = records.filter((record) => record.completed);
+    const factoryIds = [...new Set(WEEKLY_REPORT_UNITS.map((unit) => unit.factoryId))];
+    const recordsByKey = new Map(completeRecords.map((record) => [`${record.date}|${record.factoryId}`, record]));
+    const addDays = (value, days) => {
+      const date = new Date(`${value}T00:00:00Z`);
+      date.setUTCDate(date.getUTCDate() + days);
+      return date.toISOString().slice(0, 10);
+    };
+    const weekEnd = (value) => {
+      const date = new Date(`${value}T00:00:00Z`);
+      return addDays(value, (4 - date.getUTCDay() + 7) % 7);
+    };
+    const datesBetween = (startDate, endDate) => {
+      const dates = [];
+      for (let date = startDate; date <= endDate; date = addDays(date, 1)) dates.push(date);
+      return dates;
+    };
+    const unitValue = (record, unit) => {
+      if (unit.factoryId !== "factory-4") return finiteNumber(record.officialTotal) || 0;
+      const units = new Map((record.officialUnits || []).map(([name, usage]) => [name, finiteNumber(usage) || 0]));
+      return units.get(unit.unitName) || 0;
+    };
+    const weeks = [];
+    let monthKey = "";
+    let monthRunning = Object.fromEntries(WEEKLY_REPORT_UNITS.map((unit) => [unit.id, 0]));
+    const weekEnds = [...new Set(completeRecords.map((record) => weekEnd(record.date)))].sort();
+
+    weekEnds.forEach((endDate) => {
+      if (endDate > meta.completedThrough) return;
+      const startDate = addDays(endDate, -6);
+      const dates = datesBetween(startDate, endDate);
+      if (!dates.every((date) => factoryIds.every((factoryId) => recordsByKey.has(`${date}|${factoryId}`)))) return;
+      const unitTotals = Object.fromEntries(WEEKLY_REPORT_UNITS.map((unit) => [unit.id, 0]));
+      const processTotals = new Map();
+      const dailyRows = dates.map((date) => {
+        const units = {};
+        WEEKLY_REPORT_UNITS.forEach((unit) => {
+          const usage = unitValue(recordsByKey.get(`${date}|${unit.factoryId}`), unit);
+          units[unit.id] = usage;
+          unitTotals[unit.id] += usage;
+        });
+        factoryIds.forEach((factoryId) => {
+          const record = recordsByKey.get(`${date}|${factoryId}`);
+          const pairs = Array.isArray(record.officialRows)
+            ? record.officialRows.map(([process, usage]) => [process, finiteNumber(usage) || 0])
+            : [];
+          const processTotal = pairs.reduce((sum, [, usage]) => sum + usage, 0);
+          const residual = (finiteNumber(record.officialTotal) ?? processTotal) - processTotal;
+          if (Math.abs(residual) >= 0.01) pairs.push(["汇总口径调整", residual]);
+          pairs.forEach(([process, usage]) => processTotals.set(process, (processTotals.get(process) || 0) + usage));
+        });
+        return { date, units, totalUsage: Object.values(units).reduce((sum, usage) => sum + usage, 0) };
+      });
+      const currentMonth = endDate.slice(0, 7);
+      if (currentMonth !== monthKey) {
+        monthKey = currentMonth;
+        monthRunning = Object.fromEntries(WEEKLY_REPORT_UNITS.map((unit) => [unit.id, 0]));
+      }
+      WEEKLY_REPORT_UNITS.forEach((unit) => { monthRunning[unit.id] += unitTotals[unit.id]; });
+      const totalUsage = Object.values(unitTotals).reduce((sum, usage) => sum + usage, 0);
+      const previous = weeks.at(-1);
+      weeks.push({
+        startDate,
+        endDate,
+        sheetName: `${startDate.slice(2).replaceAll("-", ".")}-${endDate.slice(5).replaceAll("-", ".")}`,
+        unitTotals,
+        monthTotals: { ...monthRunning },
+        totalUsage,
+        previousChange: previous?.totalUsage ? (totalUsage - previous.totalUsage) / previous.totalUsage : null,
+        dailyRows,
+        processes: [...processTotals.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .map(([process, usage]) => ({ process, usage, share: totalUsage ? usage / totalUsage : 0 })),
+      });
+    });
+    return { units: WEEKLY_REPORT_UNITS, weeks };
+  }
+
   function compactRows(date, factoryId, rows, source = "manual") {
     const readings = rows.map((row) => [
       finiteNumber(row.start),
@@ -183,6 +280,22 @@
       const process = standardProcess(row);
       processTotals.set(process, (processTotals.get(process) || 0) + usage);
     });
+    let officialUnits = [[FACTORY_NAMES[factoryId] || factoryId, totalUsage]];
+    if (factoryId === "factory-4") {
+      const gasUsage = [...processTotals.entries()]
+        .filter(([process]) => process.startsWith("气流纺"))
+        .reduce((sum, [, usage]) => sum + usage, 0);
+      const vortexUsage = [...processTotals.entries()]
+        .filter(([process]) => process.startsWith("涡流纺"))
+        .reduce((sum, [, usage]) => sum + usage, 0);
+      const sharedUsage = totalUsage - gasUsage - vortexUsage;
+      const namedTotal = gasUsage + vortexUsage;
+      const gasShare = namedTotal > 0 ? sharedUsage * gasUsage / namedTotal : sharedUsage;
+      officialUnits = [
+        ["气流纺", gasUsage + gasShare],
+        ["涡流纺", vortexUsage + sharedUsage - gasShare],
+      ];
+    }
     return {
       key: `${date}|${factoryId}`,
       date,
@@ -193,6 +306,7 @@
       totalUsage,
       officialTotal: totalUsage,
       officialRows: [...processTotals.entries()],
+      officialUnits,
       updatedAt: new Date().toISOString(),
     };
   }
@@ -386,6 +500,7 @@
     const addresses = new Set(mapping.flatMap((factory) => factory.meters.flatMap((item) => [item.startAddress, item.endAddress])));
     Object.values(OFFICIAL_PROCESS_CELLS).flat().forEach(([, address]) => addresses.add(address));
     Object.values(OFFICIAL_TOTAL_CELLS).flat().forEach((address) => addresses.add(address));
+    Object.values(OFFICIAL_UNIT_CELLS).flat().forEach(([, address]) => addresses.add(address));
     const byDate = new Map();
 
     for (let index = 0; index < sheets.length; index += 1) {
@@ -410,6 +525,9 @@
           .filter(([, usage]) => usage !== null);
         const officialTotal = (OFFICIAL_TOTAL_CELLS[factory.id] || [])
           .reduce((sum, address) => sum + (cells.get(address) || 0), 0);
+        const officialUnits = factory.id === "factory-4"
+          ? OFFICIAL_UNIT_CELLS[factory.id].map(([name, address]) => [name, cells.get(address) || 0])
+          : [[factory.name, officialTotal || officialRows.reduce((sum, [, usage]) => sum + usage, 0) || totalUsage]];
         records.push({
           key: `${sheet.date}|${factory.id}`,
           date: sheet.date,
@@ -420,6 +538,7 @@
           totalUsage,
           officialTotal: officialTotal || officialRows.reduce((sum, [, usage]) => sum + usage, 0) || totalUsage,
           officialRows,
+          officialUnits,
         });
       });
       const previous = byDate.get(sheet.date);
@@ -428,8 +547,9 @@
     }
 
     const ordered = [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-    ordered.forEach(([, day]) => {
-      if (day.positiveCount > 0) return;
+    const completedThrough = [...ordered].reverse().find(([, day]) => day.positiveCount > 0)?.[0] || null;
+    ordered.forEach(([date, day]) => {
+      if (day.positiveCount > 0 || (completedThrough && date <= completedThrough)) return;
       day.records.forEach((record) => {
         record.completed = false;
         record.totalUsage = 0;
@@ -445,11 +565,11 @@
         importedAt: new Date().toISOString(),
         firstDate: ordered[0][0],
         lastDate: ordered.at(-1)[0],
-        completedThrough: [...ordered].reverse().find(([, day]) => day.positiveCount > 0)?.[0] || null,
+        completedThrough,
         dayCount: ordered.length,
         sheetCount: sheets.length,
         meterCount: (companyData.factories || []).reduce((sum, factory) => sum + factory.meters.length, 0),
-        schemaVersion: 2,
+        schemaVersion: 3,
         reportBasis: "原表正式汇总区",
       },
     };
@@ -463,7 +583,7 @@
       const factoryById = new Map((companyData.factories || []).map((factory) => [factory.id, factory]));
       const manual = existing.filter((record) => record.source === "manual").map((record) => {
         const factory = factoryById.get(record.factoryId);
-        if (!factory || Array.isArray(record.officialRows)) return record;
+        if (!factory || (Array.isArray(record.officialRows) && Array.isArray(record.officialUnits))) return record;
         return compactRows(record.date, record.factoryId, expandRecord(record, factory), "manual");
       });
       const importedDates = new Set(parsed.records.map((record) => record.date));
@@ -522,6 +642,7 @@
   }
 
   global.PowerMeterData = {
+    buildWeeklyHistory,
     compactRows,
     expandRecord,
     getDate,

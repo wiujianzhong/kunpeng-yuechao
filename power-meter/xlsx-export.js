@@ -625,8 +625,100 @@
     });
   }
 
+  function buildWeeklyOverviewSheet(report) {
+    const sheet = new SheetBuilder();
+    sheet.merge(1, 1, 11, `${report.company}用电周报历史总簿`, 1, 34);
+    sheet.merge(2, 1, 11, `完整周报 ${report.totalWeeks} 周｜固定周期：周五至次周四｜数据截至 ${report.throughDate}`, 2, 24);
+    const headers = ["周序", "开始日期", "截止日期", ...report.units.map((unit) => unit.name), "全公司合计", "较上周变化"];
+    headers.forEach((header, index) => sheet.add(4, index + 1, header, 3));
+    report.weeks.forEach((week, index) => {
+      const row = index + 5;
+      sheet.add(row, 1, index + 1, 12, { type: "number" });
+      sheet.add(row, 2, week.startDate, 12);
+      sheet.add(row, 3, week.endDate, 12);
+      report.units.forEach((unit, unitIndex) => sheet.add(row, 4 + unitIndex, week.unitTotals[unit.id] || 0, 5, { type: "number" }));
+      sheet.add(row, 10, week.totalUsage, 15, { type: "number" });
+      sheet.add(row, 11, week.previousChange, 10, { type: week.previousChange === null ? "text" : "number" });
+      sheet.setHeight(row, 22);
+    });
+    const noteRow = report.weeks.length + 6;
+    sheet.merge(noteRow, 1, 11, "说明：周报只收录数据齐全的周五至周四周期；四分厂按原表 L22 气流纺、L23 涡流纺分别统计。", 13, 28);
+    return sheet.xml({
+      columns: [
+        { width: 8 }, { width: 13 }, { width: 13 }, { width: 16 }, { width: 16 }, { width: 16 },
+        { width: 18 }, { width: 18 }, { width: 16 }, { width: 18 }, { width: 14 },
+      ],
+      freezeRow: 4,
+      autoFilter: report.weeks.length ? `A4:K${report.weeks.length + 4}` : "",
+    });
+  }
+
+  function buildWeeklyLedgerSheet(week, report) {
+    const sheet = new SheetBuilder();
+    sheet.merge(1, 1, 9, `${report.company}用电周报`, 1, 34);
+    sheet.merge(2, 1, 9, `${week.startDate} 至 ${week.endDate}｜周五至周四｜原始基础表正式汇总口径`, 2, 24);
+    sheet.merge(3, 1, 9, "四分厂已拆分为气流纺、涡流纺；异常只提示复核，不人工估算缺失电量。", 9, 24);
+
+    sheet.merge(5, 1, 2, "统计项目", 3, 26);
+    report.units.forEach((unit, index) => sheet.add(5, index + 3, unit.name, 3));
+    sheet.add(5, 9, "全公司合计", 3);
+    const monthTotal = Object.values(week.monthTotals).reduce((sum, usage) => sum + usage, 0);
+    const summaryRows = [
+      ["本周用电量", week.unitTotals, week.totalUsage, 5],
+      ["本月累计用电量", week.monthTotals, monthTotal, 5],
+      ["本周日均用电量", Object.fromEntries(report.units.map((unit) => [unit.id, (week.unitTotals[unit.id] || 0) / 7])), week.totalUsage / 7, 5],
+      ["本周结构占比", Object.fromEntries(report.units.map((unit) => [unit.id, week.totalUsage ? (week.unitTotals[unit.id] || 0) / week.totalUsage : 0])), week.totalUsage ? 1 : 0, 10],
+    ];
+    summaryRows.forEach(([label, values, total, style], index) => {
+      const row = index + 6;
+      sheet.merge(row, 1, 2, label, index === 0 ? 7 : 4, 24);
+      report.units.forEach((unit, unitIndex) => sheet.add(row, unitIndex + 3, values[unit.id] || 0, style, { type: "number" }));
+      sheet.add(row, 9, total, index === 0 ? 8 : style, { type: "number" });
+    });
+
+    sheet.merge(11, 1, 9, "每日用电明细", 9, 24);
+    ["日期", "星期", ...report.units.map((unit) => unit.name), "当日合计"].forEach((header, index) => sheet.add(12, index + 1, header, 3));
+    week.dailyRows.forEach((day, index) => {
+      const row = index + 13;
+      sheet.add(row, 1, day.date, 12);
+      sheet.add(row, 2, weekdayName(day.date), 12);
+      report.units.forEach((unit, unitIndex) => sheet.add(row, unitIndex + 3, day.units[unit.id] || 0, 5, { type: "number" }));
+      sheet.add(row, 9, day.totalUsage, 15, { type: "number" });
+      sheet.setHeight(row, 22);
+    });
+    sheet.merge(20, 1, 2, "本周合计", 7, 24);
+    report.units.forEach((unit, unitIndex) => sheet.add(20, unitIndex + 3, week.unitTotals[unit.id] || 0, 15, { type: "number" }));
+    sheet.add(20, 9, week.totalUsage, 8, { type: "number" });
+
+    sheet.merge(22, 1, 9, "工序用电分析", 9, 24);
+    sheet.merge(23, 1, 3, "工序", 3, 26);
+    sheet.merge(23, 4, 6, "周用电量(kWh)", 3, 26);
+    sheet.merge(23, 7, 9, "占全公司比例", 3, 26);
+    week.processes.slice(0, 18).forEach((item, index) => {
+      const row = index + 24;
+      sheet.merge(row, 1, 3, item.process, 4, 22);
+      sheet.merge(row, 4, 6, item.usage, 5, 22);
+      sheet.merge(row, 7, 9, item.share, 10, 22);
+    });
+    const noteRow = 25 + Math.min(week.processes.length, 18);
+    sheet.merge(noteRow, 1, 9, "本月累计按每张周报的截止月份归集，并在进入新月份时自动重新累计。", 13, 28);
+    return sheet.xml({
+      columns: [
+        { width: 14 }, { width: 10 }, { width: 16 }, { width: 16 }, { width: 16 },
+        { width: 18 }, { width: 18 }, { width: 16 }, { width: 18 },
+      ],
+      freezeRow: 12,
+      autoFilter: "A12:I19",
+    });
+  }
+
   function workbookFiles(report, options = {}) {
-    const sheets = options.master
+    const sheets = options.weeklyHistory
+      ? [
+          { name: "周报总览", xml: buildWeeklyOverviewSheet(report) },
+          ...report.weeks.map((week) => ({ name: week.sheetName, xml: buildWeeklyLedgerSheet(week, report) })),
+        ]
+      : options.master
       ? [
           { name: "数据明细", xml: buildMasterDetailSheet(report) },
           { name: "正式工序汇总", xml: buildMasterOfficialSheet(report) },
@@ -642,7 +734,9 @@
             { name: "用电日报", xml: buildDailySheet(report) },
             { name: "分析表", xml: buildAnalysisSheet(report) },
           ];
-    const documentTitle = options.master
+    const documentTitle = options.weeklyHistory
+      ? `${report.company}用电周报历史总簿`
+      : options.master
       ? `${report.company}用电全量数据底表`
       : options.period ? `${report.company}用电${report.label}` : `${report.company}用电日报`;
     const now = new Date().toISOString();
@@ -709,6 +803,11 @@ ${sheetRelations}
     return new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
   }
 
+  async function createWeeklyHistoryWorkbookBlob(report) {
+    const bytes = await createZipCompressed(workbookFiles(report, { weeklyHistory: true }));
+    return new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  }
+
   function downloadBlob(blob, fileName) {
     const link = document.createElement("a");
     const objectUrl = URL.createObjectURL(blob);
@@ -732,12 +831,18 @@ ${sheetRelations}
     downloadBlob(await createMasterWorkbookBlob(report), report.fileName);
   }
 
+  async function downloadWeeklyHistory(report) {
+    downloadBlob(await createWeeklyHistoryWorkbookBlob(report), report.fileName);
+  }
+
   global.PowerMeterXlsx = {
     createMasterWorkbookBlob,
     createPeriodWorkbookBlob,
     createWorkbookBlob,
+    createWeeklyHistoryWorkbookBlob,
     download,
     downloadMaster,
     downloadPeriod,
+    downloadWeeklyHistory,
   };
-})(window);
+})(typeof window === "undefined" ? globalThis : window);

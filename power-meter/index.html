@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#123f46">
   <title>雅新纺织有限公司用电抄表分析工具</title>
-  <link rel="stylesheet" href="styles.css?v=20260710v2b">
+  <link rel="stylesheet" href="styles.css?v=20260710v3">
 </head>
 <body>
   <header class="masthead">
@@ -113,7 +113,10 @@
         <strong id="reportSelectionSummary">全部分厂 · 全部工序 · 全部配电室</strong>
         <small id="reportBasisHint">未选择配电室时，优先采用原表正式汇总口径。</small>
       </div>
-      <button id="generateReportButton" class="primary-button" type="button" disabled>生成并下载美化报表</button>
+      <div class="report-download-actions">
+        <button id="weeklyHistoryButton" type="button" disabled>下载周报历史总簿</button>
+        <button id="generateReportButton" class="primary-button" type="button" disabled>生成并下载美化报表</button>
+      </div>
     </div>
   </section>
 
@@ -278,8 +281,8 @@
     </article>
   </template>
 
-  <script src="data-import.js?v=20260710v2b" defer></script>
-  <script src="xlsx-export.js?v=20260710v2b" defer></script>
-  <script src="app.js?v=20260710v2b" defer></script>
+  <script src="data-import.js?v=20260710v3" defer></script>
+  <script src="xlsx-export.js?v=20260710v3" defer></script>
+  <script src="app.js?v=20260710v3" defer></script>
 </body>
 </html>

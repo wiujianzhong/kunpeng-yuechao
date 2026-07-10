@@ -535,6 +535,18 @@ input:focus-visible {
   border-color: var(--amber);
 }
 
+.report-download-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.report-download-actions button {
+  min-width: 180px;
+}
+
 .status-dot {
   width: 9px;
   height: 9px;
@@ -1493,6 +1505,8 @@ button:disabled {
     grid-column: auto;
   }
 
+  .report-download-actions,
+  .report-download-actions button,
   .report-runner .primary-button {
     width: 100%;
   }
