@@ -2,10 +2,22 @@
 
 const STATIC_MODE = location.hostname.endsWith("github.io") || new URLSearchParams(location.search).has("static");
 const STATIC_STORAGE_KEY = "power-meter-pages-records-v2";
+const TEST_STORAGE_KEY = "power-meter-pages-test-records-v1";
+const BASELINE_DATE = "2026-07-10";
+const EXCEPTION_LABELS = {
+  normal: "正常",
+  broken: "表坏/无显示",
+  recovered: "表计恢复/更换",
+  temporary_high: "临时加电",
+  stopped: "停用/停电",
+  other: "其他情况",
+};
 const state = {
   date: "",
   companyData: null,
+  historyData: null,
   factoryId: "",
+  testMode: false,
   rows: [],
   saved: false,
   apiConfigured: false,
@@ -15,6 +27,9 @@ const state = {
 
 const el = {
   readingDate: document.querySelector("#readingDate"),
+  testModeButton: document.querySelector("#testModeButton"),
+  testBanner: document.querySelector("#testBanner"),
+  exitTestModeButton: document.querySelector("#exitTestModeButton"),
   factoryTabs: document.querySelector("#factoryTabs"),
   factoryLedgerLabel: document.querySelector("#factoryLedgerLabel"),
   ledgerTitle: document.querySelector("#ledgerTitle"),
@@ -25,6 +40,7 @@ const el = {
   progressBar: document.querySelector("#progressBar"),
   totalUsage: document.querySelector("#totalUsage"),
   classifiedUsage: document.querySelector("#classifiedUsage"),
+  companyTotalLabel: document.querySelector("#companyTotalLabel"),
   errorCount: document.querySelector("#errorCount"),
   balancePanel: document.querySelector(".balance-panel"),
   balanceValue: document.querySelector("#balanceValue"),
@@ -107,6 +123,15 @@ function staticRecords() {
 }
 
 
+function testRecords() {
+  try {
+    return JSON.parse(localStorage.getItem(TEST_STORAGE_KEY) || "{}");
+  } catch (_) {
+    return {};
+  }
+}
+
+
 function selectedFactory() {
   return state.companyData?.factories?.find((factory) => factory.id === state.factoryId) || null;
 }
@@ -114,6 +139,43 @@ function selectedFactory() {
 
 function staticFactoryRecord(records, readingDate, factoryId = state.factoryId) {
   return records[readingDate]?.[factoryId] || null;
+}
+
+
+function testFactoryRecord(records, readingDate, factoryId = state.factoryId) {
+  return records[readingDate]?.[factoryId] || null;
+}
+
+
+function historicalStart(readingDate, factoryId, meter) {
+  const value = state.historyData?.baselines?.[readingDate]?.[factoryId]?.[meter.meter_id];
+  if (value !== undefined) return value;
+  if (readingDate > BASELINE_DATE) return meter.source_end ?? meter.seed ?? null;
+  if (readingDate === BASELINE_DATE) return meter.seed ?? null;
+  return null;
+}
+
+
+function referenceDifference(factoryId, meterId) {
+  const dates = Object.keys(state.historyData?.baselines || {}).sort();
+  if (dates.length < 2) return null;
+  const earlier = toNumber(state.historyData.baselines[dates.at(-2)]?.[factoryId]?.[meterId]);
+  const later = toNumber(state.historyData.baselines[dates.at(-1)]?.[factoryId]?.[meterId]);
+  if (earlier === null || later === null || later <= earlier) return null;
+  return later - earlier;
+}
+
+
+function anomalyWarning(row, difference) {
+  const reference = referenceDifference(state.factoryId, row.meter_id);
+  if (reference === null || difference === null) return "";
+  if (difference > Math.max(reference * 3, reference + 20)) {
+    return `差数 ${formatNumber(difference)} 明显高于参考日 ${formatNumber(reference)}，已保留；请核对是否临时加电`;
+  }
+  if (reference >= 5 && difference < reference * 0.2) {
+    return `差数 ${formatNumber(difference)} 明显低于参考日 ${formatNumber(reference)}，已保留；请核对是否停用或停电`;
+  }
+  return "";
 }
 
 
@@ -129,7 +191,31 @@ function staticCompanyTotal(readingDate) {
 
 function updateCompanyTotal() {
   if (!STATIC_MODE) return;
+  el.companyTotalLabel.textContent = state.testMode ? "正式合计（测试不计入）" : "全公司已保存合计";
   el.classifiedUsage.textContent = formatNumber(staticCompanyTotal(state.date));
+}
+
+
+function updateModeUi() {
+  document.body.classList.toggle("test-mode", state.testMode);
+  el.testBanner.hidden = !state.testMode;
+  el.testModeButton.textContent = state.testMode ? "正在测试" : "进入测试模式";
+  el.testModeButton.setAttribute("aria-pressed", state.testMode ? "true" : "false");
+  updateCompanyTotal();
+}
+
+
+async function setTestMode(enabled) {
+  if (!STATIC_MODE) {
+    showToast("测试模式目前用于GitHub试用版");
+    return;
+  }
+  if (state.testMode === enabled) return;
+  saveDraft();
+  state.testMode = enabled;
+  updateModeUi();
+  await loadDate(state.date || el.readingDate.value);
+  showToast(enabled ? "已进入测试模式，测试数据与正式记录隔离" : "已退出测试模式，恢复正式数据");
 }
 
 
@@ -187,12 +273,27 @@ function staticBaseRows(readingDate, factoryId = state.factoryId) {
   if (!factory) throw new Error("未找到分厂基础数据");
   return factory.meters.map((meter) => {
     const { meter_id, order_no, name, category, panel, ratio_text, multiplier, seed, required } = meter;
-    const start = previous.has(meter_id) ? previous.get(meter_id) : seed;
+    const start = previous.has(meter_id) ? previous.get(meter_id) : historicalStart(readingDate, factoryId, meter);
     return {
       meter_id, order_no, name, category, panel, ratio_text, multiplier, required,
-      expected_start: start, start, end: null, difference: null, usage: null, warning: "",
+      expected_start: start, start, end: null, difference: null, usage: null, warning: "", status_code: "normal",
     };
   });
+}
+
+
+function testBaseRows(readingDate, factoryId = state.factoryId) {
+  const records = testRecords();
+  const saved = testFactoryRecord(records, readingDate, factoryId);
+  if (saved?.rows) return saved.rows.map((row) => ({ ...row }));
+  return staticBaseRows(readingDate, factoryId).map((row) => ({
+    ...row,
+    end: null,
+    difference: null,
+    usage: null,
+    warning: "",
+    status_code: "normal",
+  }));
 }
 
 
@@ -226,7 +327,7 @@ function staticLocalAnalysis(calculation) {
   return {
     overview: total === null
       ? "浏览器本地分析已生成。"
-      : `${selectedFactory()?.name || "当前分厂"}本日计量点合计 ${formatNumber(total)} kWh，数据只保存在当前浏览器。`,
+      : `${state.testMode ? "测试预览：" : ""}${selectedFactory()?.name || "当前分厂"}本日计量点合计 ${formatNumber(total)} kWh，数据只保存在当前浏览器。`,
     risk_level: calculation.warnings.length ? "需复核" : "正常",
     top_meters,
     rule_warnings: calculation.warnings,
@@ -239,12 +340,15 @@ async function staticRequest(url, options = {}) {
   const readingDate = parsed.searchParams.get("date") || state.date || todayLocal();
   const records = staticRecords();
   if (parsed.pathname.endsWith("/api/bootstrap")) {
-    const saved = staticFactoryRecord(records, readingDate);
+    const saved = state.testMode
+      ? testFactoryRecord(testRecords(), readingDate)
+      : staticFactoryRecord(records, readingDate);
     return {
       date: readingDate,
-      rows: staticBaseRows(readingDate),
+      rows: state.testMode ? testBaseRows(readingDate) : staticBaseRows(readingDate),
       warnings: [],
       report: saved?.report || null,
+      saved: Boolean(saved),
       api_configured: false,
       static_mode: true,
     };
@@ -256,15 +360,21 @@ async function staticRequest(url, options = {}) {
     const warnings = [];
     const rows = staticBaseRows(payload.date).map((row) => {
       const item = submitted.get(row.meter_id) || {};
+      const statusCode = EXCEPTION_LABELS[item.status_code] ? item.status_code : "normal";
+      const hasException = statusCode !== "normal";
       const start = toNumber(item.start);
       let end = toNumber(item.end);
-      if (end === null && !row.required) end = start;
-      if (end === null) errors.push({ meter_id: row.meter_id, message: "请填写今日读数" });
-      if (start === null) errors.push({ meter_id: row.meter_id, message: "请补充昨日读数" });
-      if (start !== null && end !== null && end < start) errors.push({ meter_id: row.meter_id, message: "今日读数不能小于昨日读数" });
+      if (end === null && !row.required && !hasException) end = start;
+      if (end === null && row.required && !hasException) errors.push({ meter_id: row.meter_id, message: "请填写今日读数或选择现场情况" });
+      if (start === null && end !== null && !hasException) errors.push({ meter_id: row.meter_id, message: "请补充昨日读数" });
+      if (start !== null && end !== null && end < start && !hasException) errors.push({ meter_id: row.meter_id, message: "今日读数不能小于昨日读数；如属实请选择现场情况" });
       const difference = start !== null && end !== null && end >= start ? end - start : null;
       const usage = difference === null ? null : difference * row.multiplier;
-      return { ...row, start, end, difference, usage, warning: "" };
+      const warning = hasException
+        ? `现场情况：${EXCEPTION_LABELS[statusCode]}`
+        : anomalyWarning(row, difference);
+      if (warning) warnings.push({ meter_id: row.meter_id, message: warning });
+      return { ...row, start, end, difference, usage, warning, status_code: statusCode };
     });
     if (errors.length) {
       const error = new Error("请先处理错误读数");
@@ -303,7 +413,8 @@ function showToast(message) {
 
 
 function draftKey() {
-  return `power-meter-draft-${state.factoryId || "local"}-${state.date}`;
+  const mode = state.testMode ? "test" : "formal";
+  return `power-meter-draft-${mode}-${state.factoryId || "local"}-${state.date}`;
 }
 
 
@@ -313,6 +424,7 @@ function saveDraft() {
     meter_id: row.meter_id,
     start: row.start,
     end: row.end,
+    status_code: row.status_code || "normal",
   }));
   localStorage.setItem(draftKey(), JSON.stringify(rows));
 }
@@ -342,7 +454,7 @@ async function loadDate(readingDate) {
   try {
     const payload = await request(`/api/bootstrap?date=${encodeURIComponent(readingDate)}`);
     state.rows = mergeDraft(payload.rows);
-    state.saved = Boolean(payload.rows.some((row) => row.end !== null && row.end !== ""));
+    state.saved = Boolean(payload.saved ?? payload.rows.some((row) => row.end !== null && row.end !== ""));
     state.apiConfigured = payload.api_configured;
     (payload.warnings || []).forEach((item) => state.serverWarnings.set(item.meter_id, item.message));
     renderRows();
@@ -384,14 +496,29 @@ function renderRows() {
     const previousInput = node.querySelector(".previous-input");
     const currentInput = node.querySelector(".current-input");
     const editButton = node.querySelector(".edit-previous");
+    const exceptionSelect = node.querySelector(".exception-select");
+    row.status_code = EXCEPTION_LABELS[row.status_code] ? row.status_code : "normal";
+    exceptionSelect.value = row.status_code;
+    node.classList.toggle("exception", row.status_code !== "normal");
     previousInput.value = row.start ?? "";
     currentInput.value = row.end ?? "";
-    previousInput.readOnly = row.start !== null && row.start !== undefined;
+    previousInput.readOnly = !state.testMode && row.start !== null && row.start !== undefined;
+    editButton.hidden = state.testMode;
     editButton.textContent = previousInput.readOnly ? "修正" : "首次补录";
+
+    exceptionSelect.addEventListener("change", () => {
+      row.status_code = exceptionSelect.value;
+      node.classList.toggle("exception", row.status_code !== "normal");
+      state.saved = false;
+      resetAnalysisText();
+      calculateClient();
+      saveDraft();
+    });
 
     previousInput.addEventListener("input", () => {
       row.start = previousInput.value;
       state.saved = false;
+      resetAnalysisText();
       calculateClient();
       saveDraft();
     });
@@ -412,6 +539,7 @@ function renderRows() {
       row.end = currentInput.value;
       state.saved = false;
       state.serverWarnings.delete(row.meter_id);
+      resetAnalysisText();
       calculateClient();
       saveDraft();
     });
@@ -450,37 +578,74 @@ function calculateClient() {
     const node = state.rowElements.get(row.meter_id);
     const start = toNumber(row.start);
     const end = toNumber(row.end);
+    const statusCode = EXCEPTION_LABELS[row.status_code] ? row.status_code : "normal";
+    const hasException = statusCode !== "normal";
+    const exceptionLabel = EXCEPTION_LABELS[statusCode];
     let message = state.serverWarnings.get(row.meter_id) || "";
     let status = message ? "warning" : "";
     let difference = null;
     let usage = null;
 
     if (end === null) {
-      if (!row.required) {
+      if (hasException) {
+        completed += 1;
+        ready += 1;
+        message = `已记录：${exceptionLabel}，本日不计入自动合计`;
+        status = "warning";
+      } else if (state.testMode) {
+        message = "";
+        status = "";
+      } else if (!row.required) {
         ready += 1;
       } else {
-        message = "请填写今日读数";
+        message = "请填写今日读数，或选择实际现场情况";
         status = "invalid";
         errors += 1;
       }
     } else if (start === null) {
-      message = "首次使用请补充昨日读数";
-      status = "invalid";
-      errors += 1;
+      if (hasException) {
+        completed += 1;
+        ready += 1;
+        message = `已记录：${exceptionLabel}；缺少起点，本日不计入自动合计`;
+        status = "warning";
+      } else {
+        message = "首次使用请补充昨日读数";
+        status = "invalid";
+        errors += 1;
+      }
     } else if (end < start) {
-      message = `今日读数不能小于昨日读数 ${formatNumber(start)}`;
-      status = "invalid";
-      errors += 1;
+      if (hasException) {
+        completed += 1;
+        ready += 1;
+        message = `已记录：${exceptionLabel}；读数倒退，本日不计入自动合计`;
+        status = "warning";
+      } else {
+        message = `今日读数不能小于昨日读数 ${formatNumber(start)}；如属实请选择现场情况`;
+        status = "invalid";
+        errors += 1;
+      }
     } else {
       completed += 1;
       ready += 1;
       difference = end - start;
       usage = difference * Number(row.multiplier);
-      if (!status) status = "completed";
+      if (hasException) {
+        message = `已记录：${exceptionLabel}，读数照常计算`;
+        status = "warning";
+      } else {
+        const anomaly = anomalyWarning(row, difference);
+        if (anomaly) {
+          message = anomaly;
+          status = "warning";
+        } else if (!status) {
+          status = "completed";
+        }
+      }
       if (STATIC_MODE) {
         totalUsage = (totalUsage || 0) + usage;
         categories.set(row.category, (categories.get(row.category) || 0) + usage);
         classifiedUsage += usage;
+        ranking.push({ name: row.name, category: row.category, usage });
       } else if (row.category === "总表") {
         totalUsage = usage;
       } else {
@@ -525,7 +690,11 @@ function renderBalance(balance) {
   el.balanceValue.textContent = formatNumber(balance, balance === null ? "" : " kWh");
   if (STATIC_MODE) {
     el.balancePanel.classList.remove("danger");
-    el.balanceHint.textContent = balance === null ? "录入后自动按原表分区汇总。" : "已按当前分厂原表分类自动汇总。";
+    if (state.testMode) {
+      el.balanceHint.textContent = balance === null ? "填写任意几项即可生成测试汇总。" : "测试合计不计入正式记录。";
+    } else {
+      el.balanceHint.textContent = balance === null ? "录入后自动按原表分区汇总。" : "已按当前分厂原表分类自动汇总。";
+    }
     return;
   }
   el.balancePanel.classList.toggle("danger", balance !== null && balance < 0);
@@ -600,6 +769,22 @@ function renderTopMeters(ranking) {
 function updateDock({ completed, ready, totalRows, errors, firstError }) {
   el.saveButton.disabled = false;
   el.saveButton.dataset.firstError = firstError ? "yes" : "no";
+  el.saveButton.textContent = state.testMode ? "生成测试分析" : "保存并生成分析";
+  if (state.testMode) {
+    if (errors > 0) {
+      el.dockIcon.textContent = "!";
+      el.dockText.textContent = `测试数据还有 ${errors} 项需要处理`;
+    } else if (completed === 0) {
+      el.dockIcon.textContent = "T";
+      el.dockText.textContent = "测试模式：随便填写1项即可生成分析和导出";
+    } else {
+      el.dockIcon.textContent = "T";
+      el.dockText.textContent = state.saved
+        ? `测试分析已生成，共 ${completed} 项，不计入正式数据`
+        : `已填写 ${completed} 项，可以生成测试分析`;
+    }
+    return;
+  }
   if (errors > 0) {
     el.dockIcon.textContent = "!";
     el.dockText.textContent = `还有 ${errors} 项未填写或有错误`;
@@ -614,7 +799,9 @@ function updateDock({ completed, ready, totalRows, errors, firstError }) {
 
 
 function updateSavedState() {
-  el.saveState.textContent = state.saved ? "已保存" : "尚未保存";
+  el.saveState.textContent = state.testMode
+    ? (state.saved ? "测试分析已生成" : "测试未生成")
+    : (state.saved ? "已保存" : "尚未保存");
   el.saveState.classList.toggle("saved", state.saved);
   el.exportButton.disabled = !state.saved;
   el.printButton.disabled = !state.saved;
@@ -636,20 +823,33 @@ function updateApiStatus() {
 
 function staticExportCsv() {
   const factoryName = selectedFactory()?.name || "分厂";
-  const rows = state.rows.map((row) => ({
+  const allRows = state.rows.map((row) => ({
     ...row,
     difference: row._difference,
     usage: row._usage,
   }));
+  const rows = state.testMode
+    ? allRows.filter((row) => toNumber(row.end) !== null || (row.status_code || "normal") !== "normal")
+    : allRows;
   const summary = staticSummary(rows);
   const lines = [
-    ["雅新纺织有限公司用电日报", state.date, factoryName],
-    ["序号", "计量点", "分类", "变比", "昨日读数", "今日读数", "差数", "用电量(kWh)"],
-    ...rows.map((row) => [row.order_no, row.name, row.category, row.ratio_text, row.start, row.end ?? row.start, row.difference ?? 0, row.usage ?? 0]),
+    [state.testMode ? "雅新纺织有限公司用电测试预览（不计入正式记录）" : "雅新纺织有限公司用电日报", state.date, factoryName],
+    ["序号", "计量点", "分类", "变比", "昨日读数", "今日读数", "差数", "用电量(kWh)", "现场情况"],
+    ...rows.map((row) => [
+      row.order_no,
+      row.name,
+      row.category,
+      row.ratio_text,
+      row.start,
+      row.end,
+      row.difference,
+      row.usage,
+      EXCEPTION_LABELS[row.status_code || "normal"],
+    ]),
     [],
     ["分类汇总", "用电量(kWh)"],
     ...summary.categories.map((item) => [item.category, item.usage]),
-    ["本分厂计量点合计", summary.total_usage],
+    [state.testMode ? "测试计量点合计" : "本分厂计量点合计", summary.total_usage],
   ];
   const csv = "\ufeff" + lines.map((line) => line.map((cell) => {
     const text = String(cell ?? "");
@@ -657,7 +857,8 @@ function staticExportCsv() {
   }).join(",")).join("\r\n");
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-  link.download = `雅新纺织-${factoryName}用电日报-${state.date}.csv`;
+  const fileType = state.testMode ? "用电测试预览" : "用电日报";
+  link.download = `雅新纺织-${factoryName}${fileType}-${state.date}.csv`;
   document.body.appendChild(link);
   link.click();
   const objectUrl = link.href;
@@ -676,10 +877,77 @@ function setAiState(status) {
 
 
 function resetAnalysisText() {
+  if (state.testMode) {
+    setAiState("测试模式");
+    el.aiOverview.textContent = "填写任意几项即可生成测试分析，未填写项目不会报错。";
+    el.aiAnomalies.replaceChildren();
+    el.aiConclusion.textContent = "测试数据只保存在当前浏览器，不计入正式记录和公司合计。";
+    return;
+  }
   setAiState("等待保存");
   el.aiOverview.textContent = "系统先精确计算，DeepSeek再解释趋势和异常。";
   el.aiAnomalies.replaceChildren();
   el.aiConclusion.textContent = "";
+}
+
+
+async function saveTestAnalysis() {
+  const client = calculateClient();
+  if (client.errors > 0 || client.completed === 0) {
+    client.firstError?.focus();
+    client.firstError?.scrollIntoView({ behavior: "smooth", block: "center" });
+    showToast(client.completed === 0 ? "测试模式至少填写1项，或选择1项现场情况" : "请先处理已填写项目中的错误");
+    return;
+  }
+
+  el.saveButton.disabled = true;
+  el.saveButton.textContent = "正在生成…";
+  try {
+    const warnings = [];
+    const rows = state.rows.map((row) => {
+      const statusCode = EXCEPTION_LABELS[row.status_code] ? row.status_code : "normal";
+      const warning = statusCode !== "normal"
+        ? `现场情况：${EXCEPTION_LABELS[statusCode]}`
+        : anomalyWarning(row, row._difference);
+      if (warning) warnings.push({ meter_id: row.meter_id, message: warning });
+      return {
+        ...row,
+        start: toNumber(row.start),
+        end: toNumber(row.end),
+        difference: row._difference,
+        usage: row._usage,
+        warning,
+        status_code: statusCode,
+      };
+    });
+    const calculation = {
+      date: state.date,
+      rows,
+      summary: staticSummary(rows),
+      errors: [],
+      warnings,
+      valid: true,
+    };
+    const local = staticLocalAnalysis(calculation);
+    const records = testRecords();
+    records[state.date] ||= {};
+    records[state.date][state.factoryId] = {
+      rows,
+      report: { local, ai: null, ai_status: "测试模式" },
+    };
+    localStorage.setItem(TEST_STORAGE_KEY, JSON.stringify(records));
+    localStorage.removeItem(draftKey());
+    state.saved = true;
+    renderLocalAnalysis(local);
+    setAiState("测试模式");
+    el.aiConclusion.textContent = "测试数据只用于预览，不计入正式记录和公司合计。";
+    calculateClient();
+    updateSavedState();
+    showToast("测试分析已生成，可以导出预览");
+  } finally {
+    el.saveButton.disabled = false;
+    el.saveButton.textContent = "生成测试分析";
+  }
 }
 
 
@@ -715,6 +983,10 @@ function renderAiAnalysis(analysis, status = "成功") {
 
 
 async function saveAndAnalyze() {
+  if (state.testMode) {
+    await saveTestAnalysis();
+    return;
+  }
   const client = calculateClient();
   if (client.errors > 0 || client.ready < client.totalRows) {
     client.firstError?.focus();
@@ -729,6 +1001,7 @@ async function saveAndAnalyze() {
     meter_id: row.meter_id,
     start: toNumber(row.start),
     end: toNumber(row.end),
+    status_code: row.status_code || "normal",
   }));
   try {
     const saved = await request("/api/save", {
@@ -753,7 +1026,7 @@ async function saveAndAnalyze() {
     showToast(error.message);
   } finally {
     el.saveButton.disabled = false;
-    el.saveButton.textContent = "保存并生成分析";
+    el.saveButton.textContent = state.testMode ? "生成测试分析" : "保存并生成分析";
   }
 }
 
@@ -781,6 +1054,8 @@ async function runAiAnalysis() {
 
 
 el.readingDate.addEventListener("change", () => loadDate(el.readingDate.value));
+el.testModeButton.addEventListener("click", () => setTestMode(!state.testMode));
+el.exitTestModeButton.addEventListener("click", () => setTestMode(false));
 el.saveButton.addEventListener("click", saveAndAnalyze);
 el.exportButton.addEventListener("click", () => {
   if (STATIC_MODE) {
@@ -826,13 +1101,21 @@ el.apiForm.addEventListener("submit", async (event) => {
 async function initialize() {
   el.readingDate.value = todayLocal();
   if (STATIC_MODE) {
-    const response = await fetch("meters.json", { cache: "no-store" });
-    if (!response.ok) throw new Error("五分厂基础数据加载失败");
-    state.companyData = await response.json();
+    const [meterResponse, historyResponse] = await Promise.all([
+      fetch("meters.json", { cache: "no-store" }),
+      fetch("history.json", { cache: "no-store" }),
+    ]);
+    if (!meterResponse.ok) throw new Error("五分厂基础数据加载失败");
+    if (!historyResponse.ok) throw new Error("历史起点数据加载失败");
+    state.companyData = await meterResponse.json();
+    state.historyData = await historyResponse.json();
     state.factoryId = state.companyData.factories?.[0]?.id || "";
     renderFactoryTabs();
+    updateModeUi();
   } else {
     el.factoryTabs.hidden = true;
+    el.testModeButton.hidden = true;
+    el.testBanner.hidden = true;
   }
   await loadDate(el.readingDate.value);
 }

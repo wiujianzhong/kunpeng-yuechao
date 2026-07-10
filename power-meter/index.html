@@ -26,8 +26,17 @@
         <span id="apiStatusDot" class="status-dot"></span>
         DeepSeek 设置
       </button>
+      <button id="testModeButton" class="utility-button test-mode-button" type="button">进入测试模式</button>
     </div>
   </header>
+
+  <section id="testBanner" class="test-banner" hidden>
+    <div>
+      <strong>测试模式</strong>
+      <span>可以只填几项、修改起点并导出预览；测试数据不计入正式记录和公司合计。</span>
+    </div>
+    <button id="exitTestModeButton" type="button">退出测试模式</button>
+  </section>
 
   <section class="status-strip" aria-label="录入状态">
     <div class="status-item status-progress">
@@ -41,7 +50,7 @@
       <small>kWh</small>
     </div>
     <div class="status-item">
-      <span class="status-label">全公司已保存合计</span>
+      <span id="companyTotalLabel" class="status-label">全公司已保存合计</span>
       <strong id="classifiedUsage">—</strong>
       <small>kWh</small>
     </div>
@@ -165,6 +174,14 @@
         <div>
           <strong class="meter-name"></strong>
           <span class="meter-category"></span>
+          <select class="exception-select" aria-label="现场情况">
+            <option value="normal">现场情况：正常</option>
+            <option value="broken">表坏/无显示</option>
+            <option value="recovered">表计恢复/更换</option>
+            <option value="temporary_high">临时加电</option>
+            <option value="stopped">停用/停电</option>
+            <option value="other">其他情况</option>
+          </select>
         </div>
       </div>
       <span class="ratio-plate"></span>
