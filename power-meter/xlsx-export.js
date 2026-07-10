@@ -248,7 +248,7 @@
     <border><left style="thin"><color rgb="FFBBC8CA"/></left><right style="thin"><color rgb="FFBBC8CA"/></right><top style="thin"><color rgb="FFBBC8CA"/></top><bottom style="thin"><color rgb="FFBBC8CA"/></bottom><diagonal/></border>
   </borders>
   <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
-  <cellXfs count="16">
+  <cellXfs count="17">
     <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
     <xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
     <xf numFmtId="0" fontId="3" fillId="4" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
@@ -265,6 +265,7 @@
     <xf numFmtId="0" fontId="7" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
     <xf numFmtId="0" fontId="6" fillId="7" borderId="1" xfId="0" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
     <xf numFmtId="164" fontId="0" fillId="0" borderId="2" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="164" fontId="6" fillId="7" borderId="1" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
   </cellXfs>
   <cellStyles count="1"><cellStyle name="常规" xfId="0" builtinId="0"/></cellStyles>
   <dxfs count="0"/><tableStyles count="0" defaultTableStyle="TableStyleMedium2" defaultPivotStyle="PivotStyleLight16"/>
@@ -425,8 +426,9 @@
 
   function buildPeriodSummarySheet(report) {
     const sheet = new SheetBuilder();
-    sheet.merge(1, 1, 8, `${report.company}用电${report.label}`, 1, 34);
-    sheet.merge(2, 1, 8, `${report.startDate} 至 ${report.endDate}｜${report.selection || "全部数据"}`, 2, 24);
+    const lastColumn = Math.max(8, 3 + report.factories.length);
+    sheet.merge(1, 1, lastColumn, `${report.company}用电${report.label}`, 1, 34);
+    sheet.merge(2, 1, lastColumn, `${report.startDate} 至 ${report.endDate}｜${report.selection || "全部数据"}`, 2, 24);
     sheet.merge(4, 1, 2, "筛选周期总用电", 7, 28);
     sheet.merge(4, 3, 4, report.totalUsage, 8, 28);
     sheet.merge(4, 5, 6, "有数据天数", 7, 28);
@@ -449,21 +451,36 @@
       sheet.setHeight(row, 22);
     });
     const totalRow = 8 + report.dailyRows.length;
-    sheet.add(totalRow, 1, "周期合计", 7);
+    sheet.add(totalRow, 1, "自动计算合计", 7);
     sheet.add(totalRow, 2, "", 7);
     sheet.add(totalRow, 3, report.totalUsage, 8, { type: "number" });
     report.factories.forEach((factory, index) => {
       const summary = report.factorySummaries.find((item) => item.factoryId === factory.id);
       sheet.add(totalRow, 4 + index, summary?.usage || 0, 15, { type: "number" });
     });
-    sheet.merge(totalRow + 2, 1, 8, `数据口径：${report.basis || "计量点明细口径"}。周报固定为上周五至本周四，周五提交。`, 13, 28);
+    let noteRow = totalRow + 2;
+    if (report.referenceAudit?.items?.length) {
+      const referenceByUnit = new Map(report.referenceAudit.items.map((item) => [item.unitId, item]));
+      const historicalTotal = report.referenceAudit.items.reduce((sum, item) => sum + item.historical, 0);
+      const differenceTotal = report.referenceAudit.items.reduce((sum, item) => sum + item.difference, 0);
+      sheet.add(totalRow + 1, 1, report.referenceAudit.type === "week" ? "历史提交合计" : "历史生产区合计", 4);
+      sheet.add(totalRow + 1, 2, "", 4);
+      sheet.add(totalRow + 1, 3, historicalTotal, 5, { type: "number" });
+      sheet.add(totalRow + 2, 1, "历史差额", 14);
+      sheet.add(totalRow + 2, 2, "", 14);
+      sheet.add(totalRow + 2, 3, differenceTotal, 16, { type: "number" });
+      report.factories.forEach((factory, index) => {
+        const item = referenceByUnit.get(factory.id);
+        sheet.add(totalRow + 1, 4 + index, item?.historical || 0, 5, { type: "number" });
+        sheet.add(totalRow + 2, 4 + index, item?.difference || 0, 16, { type: "number" });
+      });
+      noteRow = totalRow + 4;
+    }
+    sheet.merge(noteRow, 1, lastColumn, `数据口径：${report.basis || "计量点明细口径"}。周报固定为上周五至本周四，周五提交。`, 13, 28);
     return sheet.xml({
-      columns: [
-        { width: 14 }, { width: 10 }, { width: 20 }, { width: 16 },
-        { width: 16 }, { width: 16 }, { width: 16 }, { width: 16 },
-      ],
+      columns: [{ width: 14 }, { width: 10 }, { width: 24 }, ...report.factories.map(() => ({ width: 18 }))],
       freezeRow: 7,
-      autoFilter: `A7:H${Math.max(7, totalRow - 1)}`,
+      autoFilter: `A7:${columnName(lastColumn)}${Math.max(7, totalRow - 1)}`,
     });
   }
 
@@ -519,6 +536,68 @@
         { width: 16 }, { width: 16 }, { width: 18 }, { width: 13 },
       ],
       freezeRow: 5,
+    });
+  }
+
+  function buildReferenceAuditSheet(report) {
+    const audit = report.referenceAudit;
+    const sheet = new SheetBuilder();
+    sheet.merge(1, 1, 7, `${report.company}${audit.title}`, 1, 34);
+    sheet.merge(2, 1, 7, `${report.startDate} 至 ${report.endDate}｜来源：${audit.sourceFile || "历史报表"}${audit.sourceSheet ? ` / ${audit.sourceSheet}` : ""}`, 2, 24);
+    sheet.merge(3, 1, 7, audit.status, 9, 24);
+    ["核算单元", "自动计算（生产区）", "历史报表", "差额", "差异率", "识别结论", "处理原则"].forEach((header, index) => sheet.add(5, index + 1, header, 3));
+    audit.items.forEach((item, index) => {
+      const row = 6 + index;
+      sheet.add(row, 1, item.unitName, 4);
+      sheet.add(row, 2, item.calculated, 5, { type: "number" });
+      sheet.add(row, 3, item.historical, 5, { type: "number" });
+      sheet.add(row, 4, item.difference, Math.abs(item.difference) <= 1 ? 5 : 16, { type: "number" });
+      sheet.add(row, 5, item.calculated ? item.difference / item.calculated : 0, 10, { type: "number" });
+      sheet.add(row, 6, item.conclusion, Math.abs(item.difference) <= 1 ? 4 : 14);
+      sheet.add(row, 7, item.conclusion === "历史周报统一公摊" ? "保留历史提交值并单列公摊" : item.conclusion === "一致" ? "无需处理" : "提示复核，不覆盖原始日数据", 4);
+      sheet.setHeight(row, 24);
+    });
+    const totalRow = 6 + audit.items.length;
+    const calculatedTotal = audit.items.reduce((sum, item) => sum + item.calculated, 0);
+    const historicalTotal = audit.items.reduce((sum, item) => sum + item.historical, 0);
+    sheet.add(totalRow, 1, "合计", 7);
+    sheet.add(totalRow, 2, calculatedTotal, 15, { type: "number" });
+    sheet.add(totalRow, 3, historicalTotal, 15, { type: "number" });
+    sheet.add(totalRow, 4, historicalTotal - calculatedTotal, 15, { type: "number" });
+    sheet.add(totalRow, 5, calculatedTotal ? (historicalTotal - calculatedTotal) / calculatedTotal : 0, 10, { type: "number" });
+    sheet.merge(totalRow, 6, 7, audit.status, 7);
+
+    let summaryRow = totalRow + 2;
+    if (audit.type === "week") {
+      sheet.add(summaryRow, 1, "统一公摊/单元", 7);
+      sheet.add(summaryRow, 2, audit.commonAdjustment || 0, 8, { type: "number" });
+      sheet.add(summaryRow, 3, "各单元差额离散", 7);
+      sheet.add(summaryRow, 4, audit.spread || 0, 8, { type: "number" });
+      sheet.merge(summaryRow, 5, 7, audit.spread <= 1 ? "规则完全一致" : "存在个别原表修订或人工差异", audit.spread <= 1 ? 4 : 14);
+      summaryRow += 2;
+    } else {
+      const monthlyRows = [
+        ["管理区用电", audit.managementTotal || 0, "按五个分厂平均分摊"],
+        ["每分厂管理分摊", audit.managementShare || 0, "四分厂合并后只分一份"],
+        ["开松间单列", audit.openingRoom || 0, "不并入三分厂生产区"],
+        ["历史全公司月用电", audit.historicalCompanyTotal || 0, "生产区 + 管理区 + 开松间"],
+      ];
+      monthlyRows.forEach(([label, value, note], index) => {
+        const row = summaryRow + index;
+        sheet.add(row, 1, label, 7);
+        sheet.add(row, 2, value, 8, { type: "number" });
+        sheet.merge(row, 3, 7, note, 4);
+      });
+      summaryRow += monthlyRows.length + 1;
+    }
+    sheet.merge(summaryRow, 1, 7, audit.note, 13, 38);
+    return sheet.xml({
+      columns: [
+        { width: 20 }, { width: 26 }, { width: 26 }, { width: 20 },
+        { width: 14 }, { width: 28 }, { width: 34 },
+      ],
+      freezeRow: 5,
+      autoFilter: audit.items.length ? `A5:G${totalRow - 1}` : "",
     });
   }
 
@@ -728,6 +807,7 @@
         ? [
             { name: "周期汇总", xml: buildPeriodSummarySheet(report) },
             { name: "分析表", xml: buildPeriodAnalysisSheet(report) },
+            ...(report.referenceAudit ? [{ name: "历史对账", xml: buildReferenceAuditSheet(report) }] : []),
             { name: "筛选数据明细", xml: buildPeriodDetailSheet(report) },
           ]
         : [

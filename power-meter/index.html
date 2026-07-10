@@ -46,12 +46,12 @@
     <div class="history-copy">
       <span class="history-label">本机历史数据</span>
       <strong id="historyStatus">尚未导入原始 Excel</strong>
-      <small id="historyDetail">首次使用导入一次，系统自动整理全部日期；文件不会上传。</small>
+      <small id="historyDetail">首次导入日报；周报、月报可一起多选用于历史对账，文件不会上传。</small>
       <span class="history-progress"><span id="historyProgressBar"></span></span>
     </div>
     <div class="history-actions">
-      <input id="historyFileInput" type="file" accept=".xlsx" hidden>
-      <button id="historyImportButton" class="history-primary" type="button">导入历史 Excel</button>
+      <input id="historyFileInput" type="file" accept=".xlsx" multiple hidden>
+      <button id="historyImportButton" class="history-primary" type="button">导入历史资料</button>
       <button id="masterDownloadButton" type="button" disabled>下载全量数据底表</button>
     </div>
   </section>
@@ -299,8 +299,8 @@
     </article>
   </template>
 
-  <script src="data-import.js?v=20260711v4" defer></script>
-  <script src="xlsx-export.js?v=20260711v4" defer></script>
-  <script src="app.js?v=20260711v4" defer></script>
+  <script src="data-import.js?v=20260711v5" defer></script>
+  <script src="xlsx-export.js?v=20260711v5" defer></script>
+  <script src="app.js?v=20260711v5" defer></script>
 </body>
 </html>
