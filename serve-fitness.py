@@ -7,6 +7,12 @@ from urllib.parse import urlsplit
 
 
 class FitnessHandler(SimpleHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
+        self.send_header("X-Frame-Options", "SAMEORIGIN")
+        super().end_headers()
+
     def do_GET(self):
         request_path = urlsplit(self.path).path
         if request_path == "/health":
