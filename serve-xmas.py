@@ -8,7 +8,10 @@ from urllib.request import Request, urlopen
 
 
 GESTURE_ASSET_PREFIX = "/vendor/mediapipe/hands/"
-GESTURE_ASSET_SOURCE = "https://wiujianzhong.github.io/kunpeng-yuechao/vendor/mediapipe/hands/"
+GESTURE_ASSET_SOURCES = (
+    "https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/",
+    "https://wiujianzhong.github.io/kunpeng-yuechao/vendor/mediapipe/hands/",
+)
 GESTURE_ASSET_FILES = {
     "hand_landmark_lite.tflite",
     "hands.binarypb",
@@ -35,12 +38,20 @@ def ensure_gesture_asset(request_path):
         return
     target.parent.mkdir(parents=True, exist_ok=True)
     temp_target = target.with_name(f"{target.name}.download")
-    request = Request(
-        f"{GESTURE_ASSET_SOURCE}{filename}?v=hands-local-v1",
-        headers={"User-Agent": "XiaowuGestureCache/1.0"},
-    )
-    with urlopen(request, timeout=180) as response:
-        temp_target.write_bytes(response.read())
+    last_error = None
+    for source in GESTURE_ASSET_SOURCES:
+        request = Request(
+            f"{source}{filename}?v=hands-local-v1",
+            headers={"User-Agent": "XiaowuGestureCache/1.0"},
+        )
+        try:
+            with urlopen(request, timeout=180) as response:
+                temp_target.write_bytes(response.read())
+            break
+        except OSError as error:
+            last_error = error
+    else:
+        raise OSError(f"手势资源下载失败：{filename}") from last_error
     if temp_target.stat().st_size <= 0:
         raise OSError(f"手势资源下载失败：{filename}")
     temp_target.replace(target)
