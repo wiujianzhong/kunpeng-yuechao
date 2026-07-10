@@ -2,11 +2,14 @@
 import argparse
 import json
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from urllib.parse import urlsplit
 
 
 class FitnessHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
-        if self.path == "/health":
+        request_path = urlsplit(self.path).path
+        if request_path == "/health":
             body = json.dumps(
                 {"ok": True, "service": "xiaowu-fitness-library"},
                 ensure_ascii=False,
@@ -18,6 +21,24 @@ class FitnessHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
+
+        if (
+            request_path == "/data/exercises.json"
+            and "gzip" in self.headers.get("Accept-Encoding", "")
+        ):
+            gzip_path = Path(self.directory) / "data" / "exercises.json.gz"
+            if gzip_path.is_file():
+                size = gzip_path.stat().st_size
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Encoding", "gzip")
+                self.send_header("Content-Length", str(size))
+                self.send_header("Cache-Control", "public, max-age=3600")
+                self.send_header("Vary", "Accept-Encoding")
+                self.end_headers()
+                with gzip_path.open("rb") as source:
+                    self.copyfile(source, self.wfile)
+                return
         super().do_GET()
 
 
