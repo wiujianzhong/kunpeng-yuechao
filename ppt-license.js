@@ -7,7 +7,7 @@
     const INSTALLATION_KEY = 'jx_ppt_installation_id';
     const TRIAL_KEY = 'jx_ppt_trial';
     const TRIAL_FINGERPRINT_PREFIX = 'trialFingerprint-';
-    const LICENSE_API = 'https://ppt-license.xiaowustudio.cn/api/license';
+    const LICENSE_API = 'https://pptsq.xiaowustudio.cn/api/license';
     const GRACE_MS = 7 * 24 * 60 * 60 * 1000;
 
     function storageGet(key) {
