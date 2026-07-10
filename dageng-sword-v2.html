@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="gesture-runtime" content="hands-local-v1">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -267,8 +268,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js" integrity="sha384-nhO9toQuMo5osCuA0l+YFpSqscZWxDu251Bnho2gD3kSPv1neEwHg0LyEmrA+mPj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js" integrity="sha384-mY+ii969jnDCI2HjRHftH2NZVkIO5ZGUkcnGCg3oVJ3kVstWQXwerYWBg+nbUG4R" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js" integrity="sha384-aVQ2QnWkoxhOefDB0YZB64OPVzujvccydpcC7UqMDJUK0ChwA382zOHmrWHGDRRa" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js" integrity="sha384-q1KhAZhJcJXr3zfC3Tz07pBqQSabwFIZhXlmlUAB8s0zk4ETWERkIKGBCFQ5Jc3e" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js" integrity="sha384-oHwoZ9HyKv5ark5VOH+XWdbNfmhYtptAOBuV8plz6mAfXvTA6d8fULuYllWouEK2" crossorigin="anonymous"></script>
+    <script src="vendor/mediapipe/hands/hands.js?v=hands-local-v1"></script>
 </head>
 <body>
 
@@ -628,6 +628,10 @@
         function awakenSwordFormation() {
             appAwakened = true;
             document.getElementById('start-portal').style.transform = 'translateY(-100%)';
+            if (controlMode === CONTROL_MODES.CAMERA) {
+                document.getElementById('video-wrapper').style.display = 'block';
+                startCamera();
+            }
             setTimeout(() => {
                 document.getElementById('start-portal').style.display = 'none';
                 document.getElementById('ui-overlay').style.display = 'block';
@@ -652,7 +656,6 @@
                 if (DEVICE_PROFILE.mobile) toggleUI(true);
                 if (controlMode === CONTROL_MODES.CAMERA) {
                     document.getElementById('video-wrapper').style.display = 'block';
-                    startCamera();
                 } else {
                     stopCamera();
                     finishLoading("当前阵法: 鼠标御剑已启动");
@@ -2082,6 +2085,13 @@
             if (text) statusText.innerText = text;
         }
 
+        function cameraTaskWithTimeout(promise, ms, message) {
+            return Promise.race([
+                promise,
+                new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms))
+            ]);
+        }
+
         function getDistance2D(p1, p2) {
             return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
         }
@@ -2198,7 +2208,7 @@
             });
         }
 
-        const hands = typeof Hands !== 'undefined' ? new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}` }) : null;
+        const hands = typeof Hands !== 'undefined' ? new Hands({ locateFile: (file) => `vendor/mediapipe/hands/${file}?v=hands-local-v1` }) : null;
         const isMobileDevice = DEVICE_PROFILE.mobile;
         if (hands) {
             hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: 0.55, minTrackingConfidence: 0.55 });
@@ -2290,9 +2300,14 @@
                     releaseCameraStream();
                     return;
                 }
+                loadingText.innerText = '加载本地手势模型…';
+                if (typeof hands.initialize === 'function') {
+                    await cameraTaskWithTimeout(hands.initialize(), 15000, 'hand tracking init timeout');
+                }
                 if (retryBtn) retryBtn.style.display = 'none';
                 cameraFrameLoopActive = true;
                 let lastCameraFrameTime = 0;
+                let cameraFrameErrors = 0;
 
                 const sendFrame = async (now) => {
                     if (!cameraFrameLoopActive || startToken !== cameraLoopToken || controlMode !== CONTROL_MODES.CAMERA) return;
@@ -2301,13 +2316,20 @@
                         lastCameraFrameTime = now;
                         try {
                             await hands.send({ image: videoElement });
+                            cameraFrameErrors = 0;
                         } catch (err) {
                             console.error(err);
+                            cameraFrameErrors += 1;
+                            if (cameraFrameErrors >= 3) {
+                                cameraFrameLoopActive = false;
+                                finishLoading('当前阵法: 手势模型运行失败，请重试天眼');
+                                if (retryBtn) retryBtn.style.display = 'inline-block';
+                            }
                         } finally {
                             cameraFrameBusy = false;
                         }
                     }
-                    requestAnimationFrame(sendFrame);
+                    if (cameraFrameLoopActive) requestAnimationFrame(sendFrame);
                 };
                 requestAnimationFrame(sendFrame);
 
@@ -2321,7 +2343,10 @@
             } catch (err) {
                 if (startToken !== cameraLoopToken || controlMode !== CONTROL_MODES.CAMERA) return;
                 console.error(err);
-                let msg = "当前阵法: 无天眼权限，自动游弋";
+                let msg = "当前阵法: 天眼启动失败，请重试";
+                if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+                    msg = "当前阵法: 请在微信右上角为本页开启摄像头";
+                }
                 if (location.protocol === 'file:') {
                     msg = "当前阵法: 本地文件无法用摄像头，请用 Web 服务器打开运行";
                 }
