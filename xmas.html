@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="gesture-runtime" content="hands-local-v1">
     <title>Magic Holiday - Custom Text</title>
     <!-- 引入多种字体：Great Vibes(英手写), Ma Shan Zheng(中毛笔), Long Cang(中草书) -->
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Ma+Shan+Zheng&family=Long+Cang&family=Noto+Sans+SC:wght@700&display=swap" rel="stylesheet">
@@ -102,6 +103,17 @@
         }
         #input_video.hidden-cam { opacity: 0; pointer-events: none; }
 
+        #camera-status {
+            position: absolute; right: 14px; bottom: 14px; left: 14px; z-index: 102;
+            width: fit-content; max-width: calc(100vw - 28px); margin: 0 auto; padding: 9px 14px;
+            border: 1px solid rgba(255, 215, 0, .28); border-radius: 999px;
+            color: #fff3ad; background: rgba(5, 10, 16, .82); font-size: 12px; text-align: center;
+            opacity: 0; transform: translateY(8px); pointer-events: none;
+            transition: opacity .22s ease, transform .22s ease;
+        }
+        #camera-status.visible { opacity: 1; transform: translateY(0); }
+        #camera-status.error { border-color: rgba(255, 110, 110, .44); color: #ffd0d0; }
+
         /* 设置按钮 */
         #toggle-btn {
             position: absolute; top: 20px; right: 20px; width: 40px; height: 40px;
@@ -147,8 +159,7 @@
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js" integrity="sha384-q1KhAZhJcJXr3zfC3Tz07pBqQSabwFIZhXlmlUAB8s0zk4ETWERkIKGBCFQ5Jc3e" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js" integrity="sha384-oHwoZ9HyKv5ark5VOH+XWdbNfmhYtptAOBuV8plz6mAfXvTA6d8fULuYllWouEK2" crossorigin="anonymous"></script>
+    <script src="vendor/mediapipe/hands/hands.js?v=hands-local-v1"></script>
 </head>
 <body class="bg-black">
 
@@ -171,6 +182,7 @@
 
     <button id="toggle-btn">⚙️</button>
     <video id="input_video" class="hidden-cam" autoplay muted playsinline webkit-playsinline></video>
+    <div id="camera-status" role="status" aria-live="polite"></div>
 
     <!-- 控制面板 -->
     <div id="ui-panel">
@@ -325,6 +337,17 @@ const PRELOADED_IMAGES = [
         };
         let pointerInteractionReady = false;
         let isGeneratedMusic = true;
+        let cameraStatusTimer = 0;
+
+        function updateCameraStatus(text, isError = false, autoHide = false) {
+            const status = document.getElementById('camera-status');
+            if (!status) return;
+            clearTimeout(cameraStatusTimer);
+            status.textContent = text;
+            status.classList.toggle('error', isError);
+            status.classList.add('visible');
+            if (autoHide) cameraStatusTimer = setTimeout(() => status.classList.remove('visible'), 2200);
+        }
         
         document.getElementById('btn-start').addEventListener('click', async () => {
             if (experienceStarted) return;
@@ -690,8 +713,8 @@ const PRELOADED_IMAGES = [
 
         function initHandsDetector() {
             const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-            hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`});
-            hands.setOptions({ maxNumHands: 2, modelComplexity: mobile ? 0 : 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+            hands = new Hands({locateFile: (file) => `vendor/mediapipe/hands/${file}?v=hands-local-v1`});
+            hands.setOptions({ maxNumHands: 2, modelComplexity: 0, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
             hands.onResults(results => {
                 let leftFound = false;
                 let rightFound = false;
@@ -773,7 +796,7 @@ const PRELOADED_IMAGES = [
             if (!hands) initHandsDetector();
             try {
                 if (typeof hands.initialize === 'function') {
-                    await withTimeout(hands.initialize(), 6500, "hand tracking init timeout");
+                    await withTimeout(hands.initialize(), 15000, "hand tracking init timeout");
                 }
             } catch (err) {
                 hands = null;
@@ -809,6 +832,7 @@ const PRELOADED_IMAGES = [
             stopHandCamera();
             const token = handLoopToken;
             let stream = null;
+            updateCameraStatus('正在请求摄像头权限…');
             try {
                 stream = await requestCameraStream();
                 if (token !== handLoopToken) {
@@ -819,11 +843,14 @@ const PRELOADED_IMAGES = [
                 if (token !== handLoopToken) return;
                 cameraRunning = true;
                 document.getElementById('input_video').classList.remove('hidden-cam');
+                updateCameraStatus('摄像头已开启，正在加载手势模型…');
             } catch (err) {
                 if (stream) stream.getTracks().forEach(track => track.stop());
                 stopHandCamera();
                 setupPointerInteraction();
                 document.getElementById('input_video').classList.add('hidden-cam');
+                const denied = err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError');
+                updateCameraStatus(denied ? '摄像头未授权，请在微信右上角为本页开启摄像头' : '摄像头启动失败，点右上角设置重试', true);
                 return;
             }
 
@@ -832,11 +859,13 @@ const PRELOADED_IMAGES = [
                 if (token !== handLoopToken || !cameraRunning) return;
                 lastHandSeenAt = performance.now();
                 startHandLoop(video, token);
+                updateCameraStatus('手势识别已开启', false, true);
                 setTimeout(() => {
                     if (cameraRunning && token === handLoopToken && performance.now() - lastHandSeenAt > 2600) setupPointerInteraction();
                 }, 2800);
             } catch (err) {
                 setupPointerInteraction();
+                updateCameraStatus('手势模型加载失败，点右上角设置重试', true);
             }
         }
 
