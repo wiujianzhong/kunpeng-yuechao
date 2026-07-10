@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#123f46">
   <title>雅新纺织有限公司用电抄表分析工具</title>
-  <link rel="stylesheet" href="styles.css?v=20260710e">
+  <link rel="stylesheet" href="styles.css?v=20260710g">
 </head>
 <body>
   <header class="masthead">
@@ -36,6 +36,25 @@
       <span>可以只填几项、修改起点并导出预览；测试数据不计入正式记录和公司合计。</span>
     </div>
     <button id="exitTestModeButton" type="button">退出测试模式</button>
+  </section>
+
+  <section id="historyPanel" class="history-panel" aria-label="历史数据与周期报表">
+    <div class="history-ledger-mark" aria-hidden="true">
+      <span>HISTORY</span>
+      <strong>历史台账</strong>
+    </div>
+    <div class="history-copy">
+      <span class="history-label">本机历史数据</span>
+      <strong id="historyStatus">尚未导入原始 Excel</strong>
+      <small id="historyDetail">首次使用导入一次，系统自动整理全部日期；文件不会上传。</small>
+      <span class="history-progress"><span id="historyProgressBar"></span></span>
+    </div>
+    <div class="history-actions">
+      <input id="historyFileInput" type="file" accept=".xlsx" hidden>
+      <button id="historyImportButton" class="history-primary" type="button">导入历史 Excel</button>
+      <button id="weeklyReportButton" type="button" disabled>下载周报</button>
+      <button id="monthlyReportButton" type="button" disabled>下载月报</button>
+    </div>
   </section>
 
   <section class="status-strip" aria-label="录入状态">
@@ -199,7 +218,8 @@
     </article>
   </template>
 
-  <script src="xlsx-export.js?v=20260710e" defer></script>
-  <script src="app.js?v=20260710e" defer></script>
+  <script src="data-import.js?v=20260710g" defer></script>
+  <script src="xlsx-export.js?v=20260710g" defer></script>
+  <script src="app.js?v=20260710g" defer></script>
 </body>
 </html>

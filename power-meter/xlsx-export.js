@@ -378,9 +378,116 @@
     });
   }
 
-  function workbookFiles(report) {
-    const dailySheet = buildDailySheet(report);
-    const analysisSheet = buildAnalysisSheet(report);
+  function weekdayName(dateText) {
+    return ["周日", "周一", "周二", "周三", "周四", "周五", "周六"][new Date(`${dateText}T00:00:00Z`).getUTCDay()];
+  }
+
+  function buildPeriodSummarySheet(report) {
+    const sheet = new SheetBuilder();
+    sheet.merge(1, 1, 8, `${report.company}用电${report.label}`, 1, 34);
+    sheet.merge(2, 1, 8, `${report.startDate} 至 ${report.endDate}｜自动汇总已保存历史数据`, 2, 24);
+    sheet.merge(4, 1, 2, "周期总用电", 7, 28);
+    sheet.merge(4, 3, 4, report.totalUsage, 8, 28);
+    sheet.merge(4, 5, 6, "有数据天数", 7, 28);
+    sheet.merge(4, 7, 8, report.daysWithData, 8, 28);
+    sheet.merge(5, 1, 2, "日均用电", 7, 28);
+    sheet.merge(5, 3, 4, report.daysWithData ? report.totalUsage / report.daysWithData : 0, 8, 28);
+    sheet.merge(5, 5, 6, "现场异常记录", 7, 28);
+    sheet.merge(5, 7, 8, report.warningCount, 8, 28);
+
+    const headers = ["日期", "星期", "全公司合计(kWh)", ...report.factories.map((factory) => factory.name)];
+    headers.forEach((header, index) => sheet.add(7, index + 1, header, 3));
+    report.dailyRows.forEach((item, index) => {
+      const row = 8 + index;
+      sheet.add(row, 1, item.date, 12);
+      sheet.add(row, 2, weekdayName(item.date), 12);
+      sheet.add(row, 3, item.totalUsage, 5, { type: "number" });
+      report.factories.forEach((factory, factoryIndex) => {
+        sheet.add(row, 4 + factoryIndex, item.factories[factory.id] || 0, 5, { type: "number" });
+      });
+      sheet.setHeight(row, 22);
+    });
+    const totalRow = 8 + report.dailyRows.length;
+    sheet.add(totalRow, 1, "周期合计", 7);
+    sheet.add(totalRow, 2, "", 7);
+    sheet.add(totalRow, 3, report.totalUsage, 8, { type: "number" });
+    report.factories.forEach((factory, index) => {
+      const summary = report.factorySummaries.find((item) => item.factoryId === factory.id);
+      sheet.add(totalRow, 4 + index, summary?.usage || 0, 15, { type: "number" });
+    });
+    sheet.merge(totalRow + 2, 1, 8, "口径：周报为上周五至本周四；月报为自然月内已有数据。空白日期不参与日均计算。", 13, 28);
+    return sheet.xml({
+      columns: [
+        { width: 14 }, { width: 10 }, { width: 20 }, { width: 16 },
+        { width: 16 }, { width: 16 }, { width: 16 }, { width: 16 },
+      ],
+      freezeRow: 7,
+      autoFilter: `A7:H${Math.max(7, totalRow - 1)}`,
+    });
+  }
+
+  function buildPeriodAnalysisSheet(report) {
+    const sheet = new SheetBuilder();
+    sheet.merge(1, 1, 9, `${report.company}用电${report.label}分析表`, 1, 34);
+    sheet.merge(2, 1, 9, `${report.startDate} 至 ${report.endDate}｜五分厂统一分析`, 2, 24);
+
+    sheet.merge(4, 1, 6, "分厂汇总", 9, 24);
+    sheet.merge(4, 7, 9, "分类用电", 9, 24);
+    ["分厂", "用电量(kWh)", "占比", "日均", "峰值日期", "峰值用电"].forEach((header, index) => sheet.add(5, index + 1, header, 3));
+    ["分类", "用电量(kWh)", "占比"].forEach((header, index) => sheet.add(5, index + 7, header, 3));
+    const upperRows = Math.max(report.factorySummaries.length, report.categories.length, 1);
+    for (let index = 0; index < upperRows; index += 1) {
+      const row = 6 + index;
+      const factory = report.factorySummaries[index];
+      const category = report.categories[index];
+      if (factory) {
+        sheet.add(row, 1, factory.factoryName, 4);
+        sheet.add(row, 2, factory.usage, 5, { type: "number" });
+        sheet.add(row, 3, factory.share, 10, { type: "number" });
+        sheet.add(row, 4, factory.dailyAverage, 5, { type: "number" });
+        sheet.add(row, 5, factory.peakDate, 12);
+        sheet.add(row, 6, factory.peakUsage, 5, { type: "number" });
+      }
+      if (category) {
+        sheet.add(row, 7, category.category, 4);
+        sheet.add(row, 8, category.usage, 5, { type: "number" });
+        sheet.add(row, 9, category.share, 10, { type: "number" });
+      }
+    }
+
+    const topTitleRow = 7 + upperRows;
+    sheet.merge(topTitleRow, 1, 9, "周期用电最高计量点", 9, 24);
+    sheet.add(topTitleRow + 1, 1, "排名", 3);
+    sheet.add(topTitleRow + 1, 2, "分厂", 3);
+    sheet.merge(topTitleRow + 1, 3, 4, "计量点", 3);
+    sheet.merge(topTitleRow + 1, 5, 7, "分类", 3);
+    sheet.merge(topTitleRow + 1, 8, 9, "周期用电量(kWh)", 3);
+    report.topMeters.forEach((item, index) => {
+      const row = topTitleRow + 2 + index;
+      sheet.add(row, 1, index + 1, 12, { type: "number" });
+      sheet.add(row, 2, item.factoryName, 4);
+      sheet.merge(row, 3, 4, item.name, 4, 22);
+      sheet.merge(row, 5, 7, item.category, 4, 22);
+      sheet.merge(row, 8, 9, item.usage, 5, 22);
+    });
+    const noteRow = topTitleRow + 3 + report.topMeters.length;
+    sheet.merge(noteRow, 1, 9, "分析说明：排行按周期累计实际电量计算；异常记录只提示复核，不凭空估算缺失电量。", 13, 28);
+    return sheet.xml({
+      columns: [
+        { width: 10 }, { width: 16 }, { width: 13 }, { width: 13 }, { width: 15 },
+        { width: 16 }, { width: 16 }, { width: 18 }, { width: 13 },
+      ],
+      freezeRow: 5,
+    });
+  }
+
+  function workbookFiles(report, options = {}) {
+    const period = Boolean(options.period);
+    const dailySheet = period ? buildPeriodSummarySheet(report) : buildDailySheet(report);
+    const analysisSheet = period ? buildPeriodAnalysisSheet(report) : buildAnalysisSheet(report);
+    const firstSheetName = period ? "周期汇总" : "用电日报";
+    const secondSheetName = "分析表";
+    const documentTitle = period ? `${report.company}用电${report.label}` : `${report.company}用电日报`;
     const now = new Date().toISOString();
     return [
       { name: "[Content_Types].xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -402,19 +509,19 @@
 </Relationships>` },
       { name: "docProps/core.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <dc:title>${xmlEscape(report.company)}用电日报</dc:title><dc:creator>雅新纺织有限公司</dc:creator>
+  <dc:title>${xmlEscape(documentTitle)}</dc:title><dc:creator>雅新纺织有限公司</dc:creator>
   <dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified>
 </cp:coreProperties>` },
       { name: "docProps/app.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
   <Application>雅新纺织用电抄表分析工具</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop>
   <HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>工作表</vt:lpstr></vt:variant><vt:variant><vt:i4>2</vt:i4></vt:variant></vt:vector></HeadingPairs>
-  <TitlesOfParts><vt:vector size="2" baseType="lpstr"><vt:lpstr>用电日报</vt:lpstr><vt:lpstr>分析表</vt:lpstr></vt:vector></TitlesOfParts>
+  <TitlesOfParts><vt:vector size="2" baseType="lpstr"><vt:lpstr>${xmlEscape(firstSheetName)}</vt:lpstr><vt:lpstr>${xmlEscape(secondSheetName)}</vt:lpstr></vt:vector></TitlesOfParts>
 </Properties>` },
       { name: "xl/workbook.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
   <bookViews><workbookView xWindow="0" yWindow="0" windowWidth="24000" windowHeight="14000"/></bookViews>
-  <sheets><sheet name="用电日报" sheetId="1" r:id="rId1"/><sheet name="分析表" sheetId="2" r:id="rId2"/></sheets>
+  <sheets><sheet name="${xmlEscape(firstSheetName)}" sheetId="1" r:id="rId1"/><sheet name="${xmlEscape(secondSheetName)}" sheetId="2" r:id="rId2"/></sheets>
   <calcPr calcId="191029" calcMode="auto" fullCalcOnLoad="1" forceFullCalc="1"/>
 </workbook>` },
       { name: "xl/_rels/workbook.xml.rels", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -434,17 +541,29 @@
     return new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
   }
 
-  function download(report) {
-    const blob = createWorkbookBlob(report);
+  function createPeriodWorkbookBlob(report) {
+    const bytes = createZip(workbookFiles(report, { period: true }));
+    return new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  }
+
+  function downloadBlob(blob, fileName) {
     const link = document.createElement("a");
     const objectUrl = URL.createObjectURL(blob);
     link.href = objectUrl;
-    link.download = report.fileName;
+    link.download = fileName;
     document.body.appendChild(link);
     link.click();
     link.remove();
     window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
   }
 
-  global.PowerMeterXlsx = { createWorkbookBlob, download };
+  function download(report) {
+    downloadBlob(createWorkbookBlob(report), report.fileName);
+  }
+
+  function downloadPeriod(report) {
+    downloadBlob(createPeriodWorkbookBlob(report), report.fileName);
+  }
+
+  global.PowerMeterXlsx = { createPeriodWorkbookBlob, createWorkbookBlob, download, downloadPeriod };
 })(window);

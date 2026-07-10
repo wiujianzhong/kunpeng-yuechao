@@ -21,6 +21,9 @@ const state = {
   rows: [],
   saved: false,
   apiConfigured: false,
+  importMeta: null,
+  importedTotals: new Map(),
+  referenceDifferences: new Map(),
   serverWarnings: new Map(),
   rowElements: new Map(),
 };
@@ -30,6 +33,14 @@ const el = {
   testModeButton: document.querySelector("#testModeButton"),
   testBanner: document.querySelector("#testBanner"),
   exitTestModeButton: document.querySelector("#exitTestModeButton"),
+  historyPanel: document.querySelector("#historyPanel"),
+  historyStatus: document.querySelector("#historyStatus"),
+  historyDetail: document.querySelector("#historyDetail"),
+  historyProgressBar: document.querySelector("#historyProgressBar"),
+  historyFileInput: document.querySelector("#historyFileInput"),
+  historyImportButton: document.querySelector("#historyImportButton"),
+  weeklyReportButton: document.querySelector("#weeklyReportButton"),
+  monthlyReportButton: document.querySelector("#monthlyReportButton"),
   factoryTabs: document.querySelector("#factoryTabs"),
   factoryLedgerLabel: document.querySelector("#factoryLedgerLabel"),
   ledgerTitle: document.querySelector("#ledgerTitle"),
@@ -157,6 +168,8 @@ function historicalStart(readingDate, factoryId, meter) {
 
 
 function referenceDifference(factoryId, meterId) {
+  const imported = state.referenceDifferences.get(meterId);
+  if (imported !== undefined) return imported;
   const dates = Object.keys(state.historyData?.baselines || {}).sort();
   if (dates.length < 2) return null;
   const earlier = toNumber(state.historyData.baselines[dates.at(-2)]?.[factoryId]?.[meterId]);
@@ -183,8 +196,8 @@ function staticCompanyTotal(readingDate) {
   const records = staticRecords();
   return (state.companyData?.factories || []).reduce((total, factory) => {
     const saved = staticFactoryRecord(records, readingDate, factory.id);
-    if (!saved?.rows) return total;
-    return total + Number(staticSummary(saved.rows).total_usage || 0);
+    if (saved?.rows) return total + Number(staticSummary(saved.rows).total_usage || 0);
+    return total + Number(state.importedTotals.get(factory.id) || 0);
   }, 0);
 }
 
@@ -216,6 +229,206 @@ async function setTestMode(enabled) {
   updateModeUi();
   await loadDate(state.date || el.readingDate.value);
   showToast(enabled ? "已进入测试模式，测试数据与正式记录隔离" : "已退出测试模式，恢复正式数据");
+}
+
+
+function shortDate(date) {
+  const matched = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date || "");
+  return matched ? `${Number(matched[2])}月${Number(matched[3])}日` : date;
+}
+
+
+function renderHistoryStatus() {
+  const meta = state.importMeta;
+  const ready = Boolean(meta);
+  el.weeklyReportButton.disabled = !ready;
+  el.monthlyReportButton.disabled = !ready;
+  if (!meta) {
+    el.historyStatus.textContent = "尚未导入原始 Excel";
+    el.historyDetail.textContent = "首次使用导入一次，系统自动整理全部日期；文件不会上传。";
+    el.historyProgressBar.style.width = "0";
+    return;
+  }
+  el.historyStatus.textContent = `已整理 ${meta.dayCount} 天 · 有效数据到 ${shortDate(meta.completedThrough)}`;
+  el.historyDetail.textContent = `${meta.fileName}｜${meta.meterCount} 个计量点｜仅保存在当前浏览器`;
+  el.historyProgressBar.style.width = "100%";
+  el.historyImportButton.textContent = "更新历史 Excel";
+}
+
+
+async function syncSavedRecordsToHistory() {
+  if (!STATIC_MODE || !window.PowerMeterData?.saveRows) return;
+  const records = staticRecords();
+  for (const [date, factories] of Object.entries(records)) {
+    for (const [factoryId, record] of Object.entries(factories || {})) {
+      if (Array.isArray(record?.rows)) await window.PowerMeterData.saveRows(date, factoryId, record.rows, "manual");
+    }
+  }
+}
+
+
+async function importHistoryFile(file) {
+  if (!file || !window.PowerMeterData?.importWorkbook) return;
+  el.historyImportButton.disabled = true;
+  el.weeklyReportButton.disabled = true;
+  el.monthlyReportButton.disabled = true;
+  el.historyImportButton.textContent = "正在整理…";
+  el.historyStatus.textContent = "正在读取原始工作表";
+  el.historyDetail.textContent = "请保持当前页面打开，数据只在本机处理。";
+  try {
+    await syncSavedRecordsToHistory();
+    state.importMeta = await window.PowerMeterData.importWorkbook(file, state.companyData, (progress) => {
+      el.historyStatus.textContent = `正在整理 ${progress.current} / ${progress.total} 张日表`;
+      el.historyDetail.textContent = `当前日期 ${shortDate(progress.date)}｜${progress.percent}%`;
+      el.historyProgressBar.style.width = `${progress.percent}%`;
+    });
+    renderHistoryStatus();
+    await loadDate(state.date || el.readingDate.value);
+    showToast(`历史数据导入完成：${state.importMeta.dayCount} 天，${state.importMeta.meterCount} 个计量点`);
+  } catch (error) {
+    renderHistoryStatus();
+    showToast(`导入失败：${error.message}`);
+  } finally {
+    el.historyImportButton.disabled = false;
+    el.historyImportButton.textContent = state.importMeta ? "更新历史 Excel" : "导入历史 Excel";
+    el.historyFileInput.value = "";
+  }
+}
+
+
+function dateAtUtc(value) {
+  return new Date(`${value}T00:00:00Z`);
+}
+
+
+function dateText(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+
+function addDays(value, days) {
+  const date = typeof value === "string" ? dateAtUtc(value) : new Date(value.getTime());
+  date.setUTCDate(date.getUTCDate() + days);
+  return date;
+}
+
+
+function periodBounds(type) {
+  const selected = dateAtUtc(state.date || todayLocal());
+  const completedThrough = state.importMeta?.completedThrough ? dateAtUtc(state.importMeta.completedThrough) : selected;
+  if (type === "week") {
+    const selectedThursday = addDays(selected, -((selected.getUTCDay() - 4 + 7) % 7));
+    const completedThursday = addDays(completedThrough, -((completedThrough.getUTCDay() - 4 + 7) % 7));
+    const end = selectedThursday < completedThursday ? selectedThursday : completedThursday;
+    return { start: dateText(addDays(end, -6)), end: dateText(end), label: "周报" };
+  }
+  const start = new Date(Date.UTC(selected.getUTCFullYear(), selected.getUTCMonth(), 1));
+  let end = selected < completedThrough ? selected : completedThrough;
+  if (end < start) end = addDays(new Date(Date.UTC(selected.getUTCFullYear(), selected.getUTCMonth() + 1, 1)), -1);
+  return { start: dateText(start), end: dateText(end), label: "月报" };
+}
+
+
+function datesBetween(startDate, endDate) {
+  const dates = [];
+  for (let current = dateAtUtc(startDate); current <= dateAtUtc(endDate); current = addDays(current, 1)) {
+    dates.push(dateText(current));
+  }
+  return dates;
+}
+
+
+async function createPeriodReport(type) {
+  if (!state.importMeta || !window.PowerMeterData || !window.PowerMeterXlsx?.downloadPeriod) {
+    showToast("请先导入原始历史 Excel");
+    return;
+  }
+  const bounds = periodBounds(type);
+  if (bounds.end < bounds.start) {
+    showToast("所选月份还没有可汇总的数据");
+    return;
+  }
+  const records = (await window.PowerMeterData.getRange(bounds.start, bounds.end)).filter((record) => record.completed);
+  if (!records.length) {
+    showToast("这个时间段还没有已完成的数据");
+    return;
+  }
+
+  const factories = new Map(state.companyData.factories.map((factory) => [factory.id, factory]));
+  const daily = new Map(datesBetween(bounds.start, bounds.end).map((date) => [date, {
+    date,
+    totalUsage: 0,
+    factories: Object.fromEntries(state.companyData.factories.map((factory) => [factory.id, 0])),
+    completedFactories: 0,
+  }]));
+  const factoryTotals = new Map(state.companyData.factories.map((factory) => [factory.id, 0]));
+  const factoryPeaks = new Map();
+  const categories = new Map();
+  const meterTotals = new Map();
+  let warningCount = 0;
+
+  records.forEach((record) => {
+    const factory = factories.get(record.factoryId);
+    if (!factory) return;
+    const rows = window.PowerMeterData.expandRecord(record, factory);
+    const day = daily.get(record.date);
+    const usage = rows.reduce((sum, row) => sum + (toNumber(row.usage) || 0), 0);
+    day.totalUsage += usage;
+    day.factories[factory.id] = usage;
+    day.completedFactories += 1;
+    factoryTotals.set(factory.id, (factoryTotals.get(factory.id) || 0) + usage);
+    const peak = factoryPeaks.get(factory.id);
+    if (!peak || usage > peak.usage) factoryPeaks.set(factory.id, { date: record.date, usage });
+    rows.forEach((row) => {
+      const rowUsage = toNumber(row.usage);
+      if (row.status_code && row.status_code !== "normal") warningCount += 1;
+      if (rowUsage === null || rowUsage <= 0) return;
+      categories.set(row.category, (categories.get(row.category) || 0) + rowUsage);
+      const key = `${factory.id}|${row.meter_id}`;
+      const current = meterTotals.get(key) || { name: row.name, factoryName: factory.name, category: row.category, usage: 0 };
+      current.usage += rowUsage;
+      meterTotals.set(key, current);
+    });
+  });
+
+  const dailyRows = [...daily.values()];
+  const daysWithData = dailyRows.filter((item) => item.completedFactories > 0).length;
+  const totalUsage = dailyRows.reduce((sum, item) => sum + item.totalUsage, 0);
+  const factorySummaries = state.companyData.factories.map((factory) => {
+    const usage = factoryTotals.get(factory.id) || 0;
+    const peak = factoryPeaks.get(factory.id) || { date: "—", usage: 0 };
+    return {
+      factoryId: factory.id,
+      factoryName: factory.name,
+      usage,
+      share: totalUsage ? usage / totalUsage : 0,
+      dailyAverage: daysWithData ? usage / daysWithData : 0,
+      peakDate: peak.date,
+      peakUsage: peak.usage,
+    };
+  });
+  const categoryRows = [...categories.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([category, usage]) => ({ category, usage, share: totalUsage ? usage / totalUsage : 0 }));
+  const topMeters = [...meterTotals.values()].sort((a, b) => b.usage - a.usage).slice(0, 20);
+
+  window.PowerMeterXlsx.downloadPeriod({
+    company: "雅新纺织有限公司",
+    type,
+    label: bounds.label,
+    startDate: bounds.start,
+    endDate: bounds.end,
+    dailyRows,
+    factories: state.companyData.factories.map((factory) => ({ id: factory.id, name: factory.name })),
+    factorySummaries,
+    categories: categoryRows,
+    topMeters,
+    totalUsage,
+    daysWithData,
+    warningCount,
+    fileName: `雅新纺织-用电${bounds.label}-${bounds.start}至${bounds.end}.xlsx`,
+  });
+  showToast(`${bounds.label}已生成：${shortDate(bounds.start)}至${shortDate(bounds.end)}`);
 }
 
 
@@ -259,18 +472,23 @@ function updateFactoryHeading() {
 }
 
 
-function staticBaseRows(readingDate, factoryId = state.factoryId) {
+async function staticBaseRows(readingDate, factoryId = state.factoryId) {
   const records = staticRecords();
   const saved = staticFactoryRecord(records, readingDate, factoryId);
   if (saved?.rows) return saved.rows.map((row) => ({ ...row }));
+  const factory = state.companyData?.factories?.find((item) => item.id === factoryId);
+  if (!factory) throw new Error("未找到分厂基础数据");
+  const imported = await window.PowerMeterData?.getDay(readingDate, factoryId);
+  if (imported) return window.PowerMeterData.expandRecord(imported, factory);
   const previousDate = Object.keys(records)
     .filter((item) => item < readingDate && staticFactoryRecord(records, item, factoryId)?.rows)
     .sort()
     .at(-1);
   const previousRows = previousDate ? staticFactoryRecord(records, previousDate, factoryId)?.rows || [] : [];
-  const previous = new Map(previousRows.map((row) => [row.meter_id, row.end]));
-  const factory = state.companyData?.factories?.find((item) => item.id === factoryId);
-  if (!factory) throw new Error("未找到分厂基础数据");
+  const importedPrevious = previousRows.length ? null : await window.PowerMeterData?.getLatestBefore(readingDate, factoryId);
+  const importedRows = importedPrevious ? window.PowerMeterData.expandRecord(importedPrevious, factory) : [];
+  const sourceRows = previousRows.length ? previousRows : importedRows;
+  const previous = new Map(sourceRows.map((row) => [row.meter_id, toNumber(row.end) ?? toNumber(row.start)]));
   return factory.meters.map((meter) => {
     const { meter_id, order_no, name, category, panel, ratio_text, multiplier, seed, required } = meter;
     const start = previous.has(meter_id) ? previous.get(meter_id) : historicalStart(readingDate, factoryId, meter);
@@ -282,11 +500,11 @@ function staticBaseRows(readingDate, factoryId = state.factoryId) {
 }
 
 
-function testBaseRows(readingDate, factoryId = state.factoryId) {
+async function testBaseRows(readingDate, factoryId = state.factoryId) {
   const records = testRecords();
   const saved = testFactoryRecord(records, readingDate, factoryId);
   if (saved?.rows) return saved.rows.map((row) => ({ ...row }));
-  return staticBaseRows(readingDate, factoryId).map((row) => ({
+  return (await staticBaseRows(readingDate, factoryId)).map((row) => ({
     ...row,
     end: null,
     difference: null,
@@ -340,15 +558,16 @@ async function staticRequest(url, options = {}) {
   const readingDate = parsed.searchParams.get("date") || state.date || todayLocal();
   const records = staticRecords();
   if (parsed.pathname.endsWith("/api/bootstrap")) {
+    const imported = state.testMode ? null : await window.PowerMeterData?.getDay(readingDate, state.factoryId);
     const saved = state.testMode
       ? testFactoryRecord(testRecords(), readingDate)
       : staticFactoryRecord(records, readingDate);
     return {
       date: readingDate,
-      rows: state.testMode ? testBaseRows(readingDate) : staticBaseRows(readingDate),
+      rows: state.testMode ? await testBaseRows(readingDate) : await staticBaseRows(readingDate),
       warnings: [],
       report: saved?.report || null,
-      saved: Boolean(saved),
+      saved: Boolean(saved || imported?.completed),
       api_configured: false,
       static_mode: true,
     };
@@ -358,7 +577,7 @@ async function staticRequest(url, options = {}) {
     const submitted = new Map((payload.rows || []).map((row) => [row.meter_id, row]));
     const errors = [];
     const warnings = [];
-    const rows = staticBaseRows(payload.date).map((row) => {
+    const rows = (await staticBaseRows(payload.date)).map((row) => {
       const item = submitted.get(row.meter_id) || {};
       const statusCode = EXCEPTION_LABELS[item.status_code] ? item.status_code : "normal";
       const hasException = statusCode !== "normal";
@@ -386,6 +605,10 @@ async function staticRequest(url, options = {}) {
     records[payload.date] ||= {};
     records[payload.date][state.factoryId] = { rows, report: { local, ai: null, ai_status: "GitHub试用版" } };
     localStorage.setItem(STATIC_STORAGE_KEY, JSON.stringify(records));
+    if (window.PowerMeterData?.saveRows) {
+      await window.PowerMeterData.saveRows(payload.date, state.factoryId, rows, "manual");
+      state.importedTotals.set(state.factoryId, Number(calculation.summary.total_usage || 0));
+    }
     return { ...calculation, local_analysis: local };
   }
   if (parsed.pathname.endsWith("/api/analyze")) {
@@ -448,6 +671,16 @@ async function loadDate(readingDate) {
   state.date = readingDate;
   state.saved = false;
   state.serverWarnings.clear();
+  if (STATIC_MODE && window.PowerMeterData) {
+    const importedForDate = await window.PowerMeterData.getDate(readingDate);
+    state.importedTotals = new Map(importedForDate.filter((item) => item.completed).map((item) => [item.factoryId, item.totalUsage]));
+    const previous = await window.PowerMeterData.getLatestBefore(readingDate, state.factoryId);
+    const factory = selectedFactory();
+    const previousRows = previous && factory ? window.PowerMeterData.expandRecord(previous, factory) : [];
+    state.referenceDifferences = new Map(previousRows
+      .filter((row) => toNumber(row.difference) !== null && Number(row.difference) > 0)
+      .map((row) => [row.meter_id, Number(row.difference)]));
+  }
   updateFactoryHeading();
   updateCompanyTotal();
   el.meterRows.innerHTML = '<p class="loading-row">正在读取昨日数据…</p>';
@@ -1084,6 +1317,10 @@ async function runAiAnalysis() {
 el.readingDate.addEventListener("change", () => loadDate(el.readingDate.value));
 el.testModeButton.addEventListener("click", () => setTestMode(!state.testMode));
 el.exitTestModeButton.addEventListener("click", () => setTestMode(false));
+el.historyImportButton.addEventListener("click", () => el.historyFileInput.click());
+el.historyFileInput.addEventListener("change", () => importHistoryFile(el.historyFileInput.files?.[0]));
+el.weeklyReportButton.addEventListener("click", () => createPeriodReport("week"));
+el.monthlyReportButton.addEventListener("click", () => createPeriodReport("month"));
 el.saveButton.addEventListener("click", saveAndAnalyze);
 el.exportButton.addEventListener("click", () => {
   if (STATIC_MODE) {
@@ -1137,11 +1374,15 @@ async function initialize() {
     if (!historyResponse.ok) throw new Error("历史起点数据加载失败");
     state.companyData = await meterResponse.json();
     state.historyData = await historyResponse.json();
+    state.importMeta = await window.PowerMeterData?.getMeta().catch(() => null) || null;
+    await syncSavedRecordsToHistory();
     state.factoryId = state.companyData.factories?.[0]?.id || "";
     renderFactoryTabs();
     updateModeUi();
+    renderHistoryStatus();
   } else {
     el.factoryTabs.hidden = true;
+    el.historyPanel.hidden = true;
     el.testModeButton.hidden = true;
     el.testBanner.hidden = true;
   }
