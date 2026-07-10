@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123f46">
+  <title>一厂用电抄表分析工具</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand-block">
+      <p class="eyebrow">雅新纺织 · 一分厂</p>
+      <div class="brand-line">
+        <span class="pulse-mark" aria-hidden="true"></span>
+        <h1>用电抄表台账</h1>
+      </div>
+      <p class="brand-note">按纸质表顺序录入，剩下的交给系统。</p>
+    </div>
+    <div class="header-controls">
+      <label class="date-control">
+        <span>抄表日期</span>
+        <input id="readingDate" type="date">
+      </label>
+      <button id="apiSettingsButton" class="utility-button" type="button">
+        <span id="apiStatusDot" class="status-dot"></span>
+        DeepSeek 设置
+      </button>
+    </div>
+  </header>
+
+  <section class="status-strip" aria-label="录入状态">
+    <div class="status-item status-progress">
+      <span class="status-label">录入进度</span>
+      <strong id="progressValue">0 / 40</strong>
+      <span class="progress-track"><span id="progressBar"></span></span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">低压总表</span>
+      <strong id="totalUsage">—</strong>
+      <small>kWh</small>
+    </div>
+    <div class="status-item">
+      <span class="status-label">分类合计</span>
+      <strong id="classifiedUsage">—</strong>
+      <small>kWh</small>
+    </div>
+    <div class="status-item status-alert">
+      <span class="status-label">需要处理</span>
+      <strong id="errorCount">0</strong>
+      <small>项</small>
+    </div>
+  </section>
+
+  <main class="workspace">
+    <section class="ledger-panel" aria-labelledby="ledgerTitle">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">纸质顺序 01—40</p>
+          <h2 id="ledgerTitle">今日读数</h2>
+        </div>
+        <p class="keyboard-tip"><kbd>Enter</kbd> 跳到下一格</p>
+      </div>
+
+      <div class="ledger-header" aria-hidden="true">
+        <span>序号 / 计量点</span>
+        <span>变比</span>
+        <span>昨日读数</span>
+        <span>今日读数</span>
+        <span>差数</span>
+        <span>实际电量</span>
+      </div>
+      <div id="meterRows" class="meter-rows" aria-live="polite"></div>
+    </section>
+
+    <aside class="analysis-panel" aria-labelledby="analysisTitle">
+      <div class="analysis-heading">
+        <div>
+          <p class="section-kicker">自动生成</p>
+          <h2 id="analysisTitle">分析表</h2>
+        </div>
+        <span id="saveState" class="save-state">尚未保存</span>
+      </div>
+
+      <section class="balance-panel">
+        <div class="balance-title">
+          <span>总表与分类差额</span>
+          <strong id="balanceValue">—</strong>
+        </div>
+        <p id="balanceHint">填完读数后自动核对。</p>
+      </section>
+
+      <section class="analysis-section">
+        <div class="minor-heading">
+          <h3>分类用电</h3>
+          <span>kWh</span>
+        </div>
+        <div id="categoryBars" class="category-bars empty-state">等待录入数据</div>
+      </section>
+
+      <section class="analysis-section">
+        <div class="minor-heading">
+          <h3>用电最高计量点</h3>
+          <span>前 5 项</span>
+        </div>
+        <ol id="topMeters" class="top-meters empty-state"><li>保存后生成排行</li></ol>
+      </section>
+
+      <section class="ai-section">
+        <div class="ai-title-row">
+          <div>
+            <span class="ai-badge">AI</span>
+            <h3>DeepSeek 分析结论</h3>
+          </div>
+          <span id="aiState" class="ai-state">等待保存</span>
+        </div>
+        <p id="aiOverview" class="ai-overview">系统先精确计算，DeepSeek再解释趋势和异常。</p>
+        <div id="aiAnomalies" class="ai-anomalies"></div>
+        <p id="aiConclusion" class="ai-conclusion"></p>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="action-dock">
+    <div class="dock-message">
+      <span id="dockIcon" class="dock-icon">!</span>
+      <span id="dockText">请从第1项开始填写今日读数</span>
+    </div>
+    <div class="dock-actions">
+      <button id="exportButton" class="secondary-button" type="button" disabled>导出日报 CSV</button>
+      <button id="printButton" class="secondary-button" type="button" disabled>打印分析表</button>
+      <button id="saveButton" class="primary-button" type="button">保存并生成分析</button>
+    </div>
+  </footer>
+
+  <dialog id="apiDialog" class="api-dialog">
+    <form method="dialog" id="apiForm">
+      <div class="dialog-heading">
+        <div>
+          <p class="section-kicker">只保存在本机</p>
+          <h2>DeepSeek API</h2>
+        </div>
+        <button id="closeApiDialog" class="close-button" type="button" aria-label="关闭">×</button>
+      </div>
+      <p class="dialog-copy">模型只接收分类汇总和异常数据，不接收整份Excel。未配置或断网时，本地报表照常生成。</p>
+      <label class="api-key-field">
+        <span>API Key</span>
+        <input id="apiKeyInput" type="password" autocomplete="off" placeholder="sk-..." required>
+      </label>
+      <div class="dialog-actions">
+        <button id="cancelApiDialog" class="secondary-button" type="button">取消</button>
+        <button id="saveApiKeyButton" class="primary-button" type="submit">保存到本机</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <template id="meterRowTemplate">
+    <article class="meter-row">
+      <div class="meter-identity">
+        <span class="meter-order"></span>
+        <div>
+          <strong class="meter-name"></strong>
+          <span class="meter-category"></span>
+        </div>
+      </div>
+      <span class="ratio-plate"></span>
+      <div class="previous-box">
+        <input class="previous-input digital-input" type="number" step="any" inputmode="decimal" aria-label="昨日读数">
+        <button class="edit-previous" type="button">修正</button>
+      </div>
+      <div class="current-box">
+        <input class="current-input digital-input" type="number" step="any" inputmode="decimal" autocomplete="off" aria-label="今日读数">
+        <span class="input-ruler" aria-hidden="true"></span>
+      </div>
+      <output class="difference-value">—</output>
+      <output class="usage-value">—</output>
+      <p class="row-message"></p>
+    </article>
+  </template>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
