@@ -814,56 +814,84 @@ function updateApiStatus() {
     el.apiSettingsButton.textContent = "GitHub 试用版";
     el.apiSettingsButton.disabled = true;
     el.apiSettingsButton.title = "数据只保存在当前浏览器，DeepSeek将在服务器版启用";
+    el.exportButton.textContent = "导出美化 Excel";
     return;
   }
   el.apiStatusDot.classList.toggle("connected", state.apiConfigured);
   el.apiSettingsButton.title = state.apiConfigured ? "DeepSeek已配置" : "尚未配置DeepSeek API Key";
+  el.exportButton.textContent = "导出日报 CSV";
 }
 
 
-function staticExportCsv() {
+function exportStyledWorkbook() {
   const factoryName = selectedFactory()?.name || "分厂";
-  const allRows = state.rows.map((row) => ({
-    ...row,
-    difference: row._difference,
-    usage: row._usage,
-  }));
+  const allRows = state.rows.map((row) => {
+    const statusCode = EXCEPTION_LABELS[row.status_code] ? row.status_code : "normal";
+    const start = toNumber(row.start);
+    const end = toNumber(row.end);
+    let note = state.serverWarnings.get(row.meter_id) || "";
+    if (statusCode !== "normal") {
+      if (end === null) note = `现场情况：${EXCEPTION_LABELS[statusCode]}；今日无可靠读数，本项不自动计入合计`;
+      else if (start === null) note = `现场情况：${EXCEPTION_LABELS[statusCode]}；缺少起点，本项不自动计入合计`;
+      else if (end < start) note = `现场情况：${EXCEPTION_LABELS[statusCode]}；读数倒退，本项不自动计入合计`;
+      else note = `现场情况：${EXCEPTION_LABELS[statusCode]}；读数照常计算`;
+    } else if (!note) {
+      note = anomalyWarning(row, row._difference);
+    }
+    return {
+      meterId: row.meter_id,
+      orderNo: row.order_no,
+      name: row.name,
+      category: row.category,
+      ratioText: row.ratio_text,
+      multiplier: Number(row.multiplier),
+      start,
+      end,
+      difference: row._difference,
+      usage: row._usage,
+      statusCode,
+      statusLabel: EXCEPTION_LABELS[statusCode],
+      note,
+    };
+  });
   const rows = state.testMode
-    ? allRows.filter((row) => toNumber(row.end) !== null || (row.status_code || "normal") !== "normal")
+    ? allRows.filter((row) => row.end !== null || row.statusCode !== "normal")
     : allRows;
   const summary = staticSummary(rows);
-  const lines = [
-    [state.testMode ? "雅新纺织有限公司用电测试预览（不计入正式记录）" : "雅新纺织有限公司用电日报", state.date, factoryName],
-    ["序号", "计量点", "分类", "变比", "昨日读数", "今日读数", "差数", "用电量(kWh)", "现场情况"],
-    ...rows.map((row) => [
-      row.order_no,
-      row.name,
-      row.category,
-      row.ratio_text,
-      row.start,
-      row.end,
-      row.difference,
-      row.usage,
-      EXCEPTION_LABELS[row.status_code || "normal"],
-    ]),
-    [],
-    ["分类汇总", "用电量(kWh)"],
-    ...summary.categories.map((item) => [item.category, item.usage]),
-    [state.testMode ? "测试计量点合计" : "本分厂计量点合计", summary.total_usage],
-  ];
-  const csv = "\ufeff" + lines.map((line) => line.map((cell) => {
-    const text = String(cell ?? "");
-    return `"${text.replaceAll('"', '""')}"`;
-  }).join(",")).join("\r\n");
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const totalUsage = Number(summary.total_usage || 0);
+  const categories = summary.categories.map((item) => ({
+    category: item.category,
+    usage: Number(item.usage || 0),
+    share: totalUsage > 0 ? Number(item.usage || 0) / totalUsage : 0,
+  }));
+  const topMeters = rows
+    .filter((row) => toNumber(row.usage) !== null && Number(row.usage) > 0)
+    .sort((a, b) => Number(b.usage) - Number(a.usage))
+    .slice(0, 10);
+  const warnings = rows.filter((row) => row.note).map((row) => ({
+    name: row.name,
+    statusLabel: row.statusLabel,
+    note: row.note,
+  }));
   const fileType = state.testMode ? "用电测试预览" : "用电日报";
-  link.download = `雅新纺织-${factoryName}${fileType}-${state.date}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  const objectUrl = link.href;
-  link.remove();
-  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  if (!window.PowerMeterXlsx?.download) {
+    showToast("Excel导出组件加载失败，请刷新页面重试");
+    return;
+  }
+  window.PowerMeterXlsx.download({
+    company: "雅新纺织有限公司",
+    testMode: state.testMode,
+    date: state.date,
+    factoryName,
+    rows,
+    categories,
+    topMeters,
+    warnings,
+    totalUsage,
+    calculatedCount: rows.filter((row) => toNumber(row.usage) !== null).length,
+    companyTotal: staticCompanyTotal(state.date),
+    fileName: `雅新纺织-${factoryName}${fileType}-${state.date}.xlsx`,
+  });
 }
 
 
@@ -1059,7 +1087,7 @@ el.exitTestModeButton.addEventListener("click", () => setTestMode(false));
 el.saveButton.addEventListener("click", saveAndAnalyze);
 el.exportButton.addEventListener("click", () => {
   if (STATIC_MODE) {
-    staticExportCsv();
+    exportStyledWorkbook();
     return;
   }
   window.location.href = `/api/export?date=${encodeURIComponent(state.date)}`;
