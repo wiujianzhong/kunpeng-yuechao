@@ -256,6 +256,52 @@ input:focus-visible {
   color: var(--fault);
 }
 
+.factory-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  gap: 8px;
+  max-width: 1680px;
+  margin: 18px auto 0;
+  padding: 0 clamp(20px, 4vw, 64px);
+}
+
+.factory-tab {
+  min-height: 54px;
+  padding: 8px 14px;
+  color: var(--teal);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--line);
+  font-weight: 800;
+  text-align: left;
+}
+
+.factory-tab span,
+.factory-tab small {
+  display: block;
+}
+
+.factory-tab small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.factory-tab:hover {
+  border-color: var(--teal-2);
+}
+
+.factory-tab.active {
+  color: #fff;
+  background: var(--teal);
+  border-color: var(--teal);
+  box-shadow: inset 0 -4px 0 var(--amber);
+}
+
+.factory-tab.active small {
+  color: rgba(255, 255, 255, 0.68);
+}
+
 .workspace {
   display: grid;
   grid-template-columns: minmax(730px, 1.7fr) minmax(300px, 0.75fr);
@@ -986,10 +1032,22 @@ button:disabled {
   }
 
   .status-strip,
+  .factory-tabs,
   .workspace {
     margin-right: 12px;
     margin-left: 12px;
     padding: 0;
+  }
+
+  .factory-tabs {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .factory-tab {
+    flex: 0 0 128px;
   }
 
   .status-strip {

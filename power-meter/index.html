@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#123f46">
-  <title>一厂用电抄表分析工具</title>
+  <title>雅新纺织有限公司用电抄表分析工具</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="masthead">
     <div class="brand-block">
-      <p class="eyebrow">雅新纺织 · 一分厂</p>
+      <p class="eyebrow">雅新纺织有限公司</p>
       <div class="brand-line">
         <span class="pulse-mark" aria-hidden="true"></span>
-        <h1>用电抄表台账</h1>
+        <h1>用电抄表分析工具</h1>
       </div>
-      <p class="brand-note">按纸质表顺序录入，剩下的交给系统。</p>
+      <p class="brand-note">一、二、三、四、七分厂统一录入，自动汇总分析。</p>
     </div>
     <div class="header-controls">
       <label class="date-control">
@@ -32,16 +32,16 @@
   <section class="status-strip" aria-label="录入状态">
     <div class="status-item status-progress">
       <span class="status-label">录入进度</span>
-      <strong id="progressValue">0 / 40</strong>
+      <strong id="progressValue">0 / —</strong>
       <span class="progress-track"><span id="progressBar"></span></span>
     </div>
     <div class="status-item">
-      <span class="status-label">低压总表</span>
+      <span class="status-label">当前分厂合计</span>
       <strong id="totalUsage">—</strong>
       <small>kWh</small>
     </div>
     <div class="status-item">
-      <span class="status-label">分类合计</span>
+      <span class="status-label">全公司已保存合计</span>
       <strong id="classifiedUsage">—</strong>
       <small>kWh</small>
     </div>
@@ -52,11 +52,13 @@
     </div>
   </section>
 
+  <nav id="factoryTabs" class="factory-tabs" aria-label="选择分厂"></nav>
+
   <main class="workspace">
     <section class="ledger-panel" aria-labelledby="ledgerTitle">
       <div class="section-heading">
         <div>
-          <p class="section-kicker">纸质顺序 01—40</p>
+          <p id="factoryLedgerLabel" class="section-kicker">按原表顺序录入</p>
           <h2 id="ledgerTitle">今日读数</h2>
         </div>
         <p class="keyboard-tip"><kbd>Enter</kbd> 跳到下一格</p>
@@ -77,17 +79,17 @@
       <div class="analysis-heading">
         <div>
           <p class="section-kicker">自动生成</p>
-          <h2 id="analysisTitle">分析表</h2>
+          <h2 id="analysisTitle">分厂分析表</h2>
         </div>
         <span id="saveState" class="save-state">尚未保存</span>
       </div>
 
       <section class="balance-panel">
         <div class="balance-title">
-          <span>总表与分类差额</span>
+          <span>当前分厂分类合计</span>
           <strong id="balanceValue">—</strong>
         </div>
-        <p id="balanceHint">填完读数后自动核对。</p>
+        <p id="balanceHint">录入后自动按原表分区汇总。</p>
       </section>
 
       <section class="analysis-section">
@@ -124,7 +126,7 @@
   <footer class="action-dock">
     <div class="dock-message">
       <span id="dockIcon" class="dock-icon">!</span>
-      <span id="dockText">请从第1项开始填写今日读数</span>
+      <span id="dockText">请选择分厂并填写今日读数</span>
     </div>
     <div class="dock-actions">
       <button id="exportButton" class="secondary-button" type="button" disabled>导出日报 CSV</button>

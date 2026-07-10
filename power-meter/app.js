@@ -1,52 +1,11 @@
 "use strict";
 
 const STATIC_MODE = location.hostname.endsWith("github.io") || new URLSearchParams(location.search).has("static");
-const STATIC_STORAGE_KEY = "power-meter-pages-records-v1";
-const STATIC_METERS = [
-  ["M001", 1, "低压总表", "总表", "4000/5", 800, 13816, true],
-  ["M002", 2, "清花1", "清花", "200/5", 40, 6140, true],
-  ["M003", 3, "清花2", "清花", "200/5", 40, 83972, true],
-  ["M004", 4, "梳棉1", "梳棉", "250/5", 50, 87803, true],
-  ["M005", 5, "梳棉2", "梳棉", "250/5", 50, 76858, true],
-  ["M006", 6, "梳棉3", "梳棉", "250/5", 50, 75704, true],
-  ["M007", 7, "梳棉4", "梳棉", "250/5", 50, 93379, true],
-  ["M008", 8, "梳棉5", "梳棉", "250/5", 50, 91601, true],
-  ["M009", 9, "梳棉6", "梳棉", "250/5", 50, 90713, true],
-  ["M010", 10, "梳棉7", "梳棉", "250/5", 50, 45, true],
-  ["M011", 11, "精梳1", "精梳", "100/5", 20, 54760, true],
-  ["M012", 12, "精梳2", "精梳", "100/5", 20, 53909, true],
-  ["M013", 13, "精梳3", "精梳", "100/5", 20, 62644, true],
-  ["M014", 14, "精梳4", "精梳", "100/5", 20, 60950, true],
-  ["M015", 15, "精梳5", "精梳", "100/5", 20, 47935, true],
-  ["M016", 16, "精梳6", "精梳", "100/5", 20, 29121, true],
-  ["M017", 17, "尾纱1", "尾纱", "250/5", 50, 30022, true],
-  ["M018", 18, "尾纱2", "尾纱", "250/5", 50, 29075, true],
-  ["M019", 19, "前并条", "前并", "150/5", 30, 99725, true],
-  ["M020", 20, "条并卷", "条并卷", "200/5", 40, 41027, true],
-  ["M021", 21, "并条机", "并条", "250/5", 50, 29297, true],
-  ["M022", 22, "后并条", "后并", "150/5", 30, 56045, true],
-  ["M023", 23, "清花除尘1", "清花除尘", "300/5", 60, 64871, true],
-  ["M024", 24, "清花除尘2", "清花除尘", "300/5", 60, 60833, true],
-  ["M025", 25, "梳棉除尘1", "梳棉除尘", "300/5", 60, 60224, true],
-  ["M026", 26, "梳棉除尘2", "梳棉除尘", "300/5", 60, 57439, true],
-  ["M027", 27, "精梳除尘1", "精梳除尘", "300/5", 60, 37830, true],
-  ["M028", 28, "精梳除尘2", "精梳除尘", "300/5", 60, 63344, true],
-  ["M029", 29, "1#清花空调", "空调", "250/5", 50, 58675, true],
-  ["M030", 30, "3#梳棉空调", "空调", "250/5", 50, 49184, true],
-  ["M031", 31, "5#精梳空调", "空调", "250/5", 50, 63623, true],
-  ["M032", 32, "清尾照明", "照明", "100/5", 20, 23218, true],
-  ["M033", 33, "前纺照明", "照明", "200/5", 40, 30183, true],
-  ["M034", 34, "应急照明1", "照明", "40/5", 8, 26837, true],
-  ["M035", 35, "应急照明2", "照明", "40/5", 8, 1856, true],
-  ["M036", 36, "一厂南路灯", "照明", "300/5", 60, 17564, true],
-  ["M037", 37, "一厂南水井", "水井", "300/5", 60, 0, false],
-  ["M038", 38, "联络线（1-7）", "联络线", "400/5", 80, 10035, true],
-  ["M039", 39, "1-3排烟风机", "排烟风机", "50/5", 10, 63, true],
-  ["M040", 40, "新装梳棉动力柜", "梳棉", "250/5", 50, 59419, true],
-];
-
+const STATIC_STORAGE_KEY = "power-meter-pages-records-v2";
 const state = {
   date: "",
+  companyData: null,
+  factoryId: "",
   rows: [],
   saved: false,
   apiConfigured: false,
@@ -56,6 +15,10 @@ const state = {
 
 const el = {
   readingDate: document.querySelector("#readingDate"),
+  factoryTabs: document.querySelector("#factoryTabs"),
+  factoryLedgerLabel: document.querySelector("#factoryLedgerLabel"),
+  ledgerTitle: document.querySelector("#ledgerTitle"),
+  analysisTitle: document.querySelector("#analysisTitle"),
   meterRows: document.querySelector("#meterRows"),
   template: document.querySelector("#meterRowTemplate"),
   progressValue: document.querySelector("#progressValue"),
@@ -144,15 +107,89 @@ function staticRecords() {
 }
 
 
-function staticBaseRows(readingDate) {
+function selectedFactory() {
+  return state.companyData?.factories?.find((factory) => factory.id === state.factoryId) || null;
+}
+
+
+function staticFactoryRecord(records, readingDate, factoryId = state.factoryId) {
+  return records[readingDate]?.[factoryId] || null;
+}
+
+
+function staticCompanyTotal(readingDate) {
   const records = staticRecords();
-  if (records[readingDate]?.rows) return records[readingDate].rows.map((row) => ({ ...row }));
-  const previousDate = Object.keys(records).filter((item) => item < readingDate).sort().at(-1);
-  const previous = new Map((records[previousDate]?.rows || []).map((row) => [row.meter_id, row.end]));
-  return STATIC_METERS.map(([meter_id, order_no, name, category, ratio_text, multiplier, seed, required]) => {
+  return (state.companyData?.factories || []).reduce((total, factory) => {
+    const saved = staticFactoryRecord(records, readingDate, factory.id);
+    if (!saved?.rows) return total;
+    return total + Number(staticSummary(saved.rows).total_usage || 0);
+  }, 0);
+}
+
+
+function updateCompanyTotal() {
+  if (!STATIC_MODE) return;
+  el.classifiedUsage.textContent = formatNumber(staticCompanyTotal(state.date));
+}
+
+
+function renderFactoryTabs() {
+  if (!STATIC_MODE || !state.companyData) {
+    el.factoryTabs.hidden = true;
+    return;
+  }
+  el.factoryTabs.hidden = false;
+  el.factoryTabs.replaceChildren();
+  state.companyData.factories.forEach((factory) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "factory-tab";
+    button.classList.toggle("active", factory.id === state.factoryId);
+    button.setAttribute("aria-pressed", factory.id === state.factoryId ? "true" : "false");
+    const name = document.createElement("span");
+    name.textContent = factory.name;
+    const count = document.createElement("small");
+    count.textContent = `${factory.meters.length} 个计量点`;
+    button.append(name, count);
+    button.addEventListener("click", async () => {
+      if (factory.id === state.factoryId) return;
+      saveDraft();
+      state.factoryId = factory.id;
+      renderFactoryTabs();
+      await loadDate(state.date || el.readingDate.value);
+      window.scrollTo({ top: el.factoryTabs.offsetTop - 12, behavior: "smooth" });
+    });
+    el.factoryTabs.appendChild(button);
+  });
+}
+
+
+function updateFactoryHeading() {
+  const factory = selectedFactory();
+  if (!factory) return;
+  el.factoryLedgerLabel.textContent = `${factory.name} · 原表顺序 01—${factory.meters.length}`;
+  el.ledgerTitle.textContent = `${factory.name}今日读数`;
+  el.analysisTitle.textContent = `${factory.name}分析表`;
+}
+
+
+function staticBaseRows(readingDate, factoryId = state.factoryId) {
+  const records = staticRecords();
+  const saved = staticFactoryRecord(records, readingDate, factoryId);
+  if (saved?.rows) return saved.rows.map((row) => ({ ...row }));
+  const previousDate = Object.keys(records)
+    .filter((item) => item < readingDate && staticFactoryRecord(records, item, factoryId)?.rows)
+    .sort()
+    .at(-1);
+  const previousRows = previousDate ? staticFactoryRecord(records, previousDate, factoryId)?.rows || [] : [];
+  const previous = new Map(previousRows.map((row) => [row.meter_id, row.end]));
+  const factory = state.companyData?.factories?.find((item) => item.id === factoryId);
+  if (!factory) throw new Error("未找到分厂基础数据");
+  return factory.meters.map((meter) => {
+    const { meter_id, order_no, name, category, panel, ratio_text, multiplier, seed, required } = meter;
     const start = previous.has(meter_id) ? previous.get(meter_id) : seed;
     return {
-      meter_id, order_no, name, category, ratio_text, multiplier, required,
+      meter_id, order_no, name, category, panel, ratio_text, multiplier, required,
       expected_start: start, start, end: null, difference: null, usage: null, warning: "",
     };
   });
@@ -161,21 +198,17 @@ function staticBaseRows(readingDate) {
 
 function staticSummary(rows) {
   const categories = new Map();
-  let totalUsage = null;
-  let classifiedUsage = 0;
+  let totalUsage = 0;
   rows.forEach((row) => {
     const usage = toNumber(row.usage);
     if (usage === null) return;
-    if (row.category === "总表") totalUsage = usage;
-    else {
-      categories.set(row.category, (categories.get(row.category) || 0) + usage);
-      classifiedUsage += usage;
-    }
+    categories.set(row.category, (categories.get(row.category) || 0) + usage);
+    totalUsage += usage;
   });
   return {
     total_usage: totalUsage,
-    classified_usage: classifiedUsage,
-    balance: totalUsage === null ? null : totalUsage - classifiedUsage,
+    classified_usage: totalUsage,
+    balance: 0,
     completed: rows.filter((row) => row.end !== null && row.end !== "").length,
     total_meters: rows.length,
     categories: [...categories.entries()].sort((a, b) => b[1] - a[1]).map(([category, usage]) => ({ category, usage })),
@@ -193,7 +226,7 @@ function staticLocalAnalysis(calculation) {
   return {
     overview: total === null
       ? "浏览器本地分析已生成。"
-      : `本日总表用电 ${formatNumber(total)} kWh，数据只保存在当前浏览器。`,
+      : `${selectedFactory()?.name || "当前分厂"}本日计量点合计 ${formatNumber(total)} kWh，数据只保存在当前浏览器。`,
     risk_level: calculation.warnings.length ? "需复核" : "正常",
     top_meters,
     rule_warnings: calculation.warnings,
@@ -206,7 +239,7 @@ async function staticRequest(url, options = {}) {
   const readingDate = parsed.searchParams.get("date") || state.date || todayLocal();
   const records = staticRecords();
   if (parsed.pathname.endsWith("/api/bootstrap")) {
-    const saved = records[readingDate];
+    const saved = staticFactoryRecord(records, readingDate);
     return {
       date: readingDate,
       rows: staticBaseRows(readingDate),
@@ -240,12 +273,13 @@ async function staticRequest(url, options = {}) {
     }
     const calculation = { date: payload.date, rows, summary: staticSummary(rows), errors, warnings, valid: true };
     const local = staticLocalAnalysis(calculation);
-    records[payload.date] = { rows, report: { local, ai: null, ai_status: "GitHub试用版" } };
+    records[payload.date] ||= {};
+    records[payload.date][state.factoryId] = { rows, report: { local, ai: null, ai_status: "GitHub试用版" } };
     localStorage.setItem(STATIC_STORAGE_KEY, JSON.stringify(records));
     return { ...calculation, local_analysis: local };
   }
   if (parsed.pathname.endsWith("/api/analyze")) {
-    const saved = records[payload.date];
+    const saved = staticFactoryRecord(records, payload.date);
     const calculation = saved
       ? { date: payload.date, rows: saved.rows, summary: staticSummary(saved.rows), warnings: [] }
       : { date: payload.date, rows: [], summary: {}, warnings: [] };
@@ -269,7 +303,7 @@ function showToast(message) {
 
 
 function draftKey() {
-  return `power-meter-draft-${state.date}`;
+  return `power-meter-draft-${state.factoryId || "local"}-${state.date}`;
 }
 
 
@@ -302,6 +336,8 @@ async function loadDate(readingDate) {
   state.date = readingDate;
   state.saved = false;
   state.serverWarnings.clear();
+  updateFactoryHeading();
+  updateCompanyTotal();
   el.meterRows.innerHTML = '<p class="loading-row">正在读取昨日数据…</p>';
   try {
     const payload = await request(`/api/bootstrap?date=${encodeURIComponent(readingDate)}`);
@@ -313,6 +349,7 @@ async function loadDate(readingDate) {
     updateApiStatus();
     updateSavedState();
     calculateClient();
+    updateCompanyTotal();
     if (payload.report) {
       renderLocalAnalysis(payload.report.local);
       if (payload.report.ai) {
@@ -340,7 +377,8 @@ function renderRows() {
     node.dataset.meterId = row.meter_id;
     node.querySelector(".meter-order").textContent = String(row.order_no).padStart(2, "0");
     node.querySelector(".meter-name").textContent = row.name;
-    node.querySelector(".meter-category").textContent = row.required ? row.category : `${row.category} · 可留空`;
+    const locationText = [row.category, row.panel].filter(Boolean).join(" · ");
+    node.querySelector(".meter-category").textContent = row.required ? locationText : `${locationText} · 备用可留空`;
     node.querySelector(".ratio-plate").textContent = row.ratio_text;
 
     const previousInput = node.querySelector(".previous-input");
@@ -439,7 +477,11 @@ function calculateClient() {
       difference = end - start;
       usage = difference * Number(row.multiplier);
       if (!status) status = "completed";
-      if (row.category === "总表") {
+      if (STATIC_MODE) {
+        totalUsage = (totalUsage || 0) + usage;
+        categories.set(row.category, (categories.get(row.category) || 0) + usage);
+        classifiedUsage += usage;
+      } else if (row.category === "总表") {
         totalUsage = usage;
       } else {
         categories.set(row.category, (categories.get(row.category) || 0) + usage);
@@ -466,11 +508,11 @@ function calculateClient() {
   el.progressValue.textContent = `${completed} / ${totalRows}`;
   el.progressBar.style.width = `${Math.min(100, (completed / totalRows) * 100)}%`;
   el.totalUsage.textContent = formatNumber(totalUsage);
-  el.classifiedUsage.textContent = formatNumber(classifiedUsage);
+  el.classifiedUsage.textContent = formatNumber(STATIC_MODE ? staticCompanyTotal(state.date) : classifiedUsage);
   el.errorCount.textContent = String(errors);
 
   const balance = totalUsage === null ? null : totalUsage - classifiedUsage;
-  renderBalance(balance);
+  renderBalance(STATIC_MODE ? totalUsage : balance);
   renderCategoryBars(categories);
   renderTopMeters(ranking);
   updateDock({ completed, ready, totalRows, errors, firstError });
@@ -481,6 +523,11 @@ function calculateClient() {
 
 function renderBalance(balance) {
   el.balanceValue.textContent = formatNumber(balance, balance === null ? "" : " kWh");
+  if (STATIC_MODE) {
+    el.balancePanel.classList.remove("danger");
+    el.balanceHint.textContent = balance === null ? "录入后自动按原表分区汇总。" : "已按当前分厂原表分类自动汇总。";
+    return;
+  }
   el.balancePanel.classList.toggle("danger", balance !== null && balance < 0);
   if (balance === null) {
     el.balanceHint.textContent = "填完读数后自动核对。";
@@ -588,6 +635,7 @@ function updateApiStatus() {
 
 
 function staticExportCsv() {
+  const factoryName = selectedFactory()?.name || "分厂";
   const rows = state.rows.map((row) => ({
     ...row,
     difference: row._difference,
@@ -595,15 +643,13 @@ function staticExportCsv() {
   }));
   const summary = staticSummary(rows);
   const lines = [
-    ["一分厂用电日报", state.date],
+    ["雅新纺织有限公司用电日报", state.date, factoryName],
     ["序号", "计量点", "分类", "变比", "昨日读数", "今日读数", "差数", "用电量(kWh)"],
     ...rows.map((row) => [row.order_no, row.name, row.category, row.ratio_text, row.start, row.end ?? row.start, row.difference ?? 0, row.usage ?? 0]),
     [],
     ["分类汇总", "用电量(kWh)"],
     ...summary.categories.map((item) => [item.category, item.usage]),
-    ["低压总表", summary.total_usage],
-    ["分类合计", summary.classified_usage],
-    ["未分类差额", summary.balance],
+    ["本分厂计量点合计", summary.total_usage],
   ];
   const csv = "\ufeff" + lines.map((line) => line.map((cell) => {
     const text = String(cell ?? "");
@@ -611,7 +657,7 @@ function staticExportCsv() {
   }).join(",")).join("\r\n");
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-  link.download = `一分厂用电日报-${state.date}.csv`;
+  link.download = `雅新纺织-${factoryName}用电日报-${state.date}.csv`;
   document.body.appendChild(link);
   link.click();
   const objectUrl = link.href;
@@ -777,5 +823,22 @@ el.apiForm.addEventListener("submit", async (event) => {
 });
 
 
-el.readingDate.value = todayLocal();
-loadDate(el.readingDate.value);
+async function initialize() {
+  el.readingDate.value = todayLocal();
+  if (STATIC_MODE) {
+    const response = await fetch("meters.json", { cache: "no-store" });
+    if (!response.ok) throw new Error("五分厂基础数据加载失败");
+    state.companyData = await response.json();
+    state.factoryId = state.companyData.factories?.[0]?.id || "";
+    renderFactoryTabs();
+  } else {
+    el.factoryTabs.hidden = true;
+  }
+  await loadDate(el.readingDate.value);
+}
+
+
+initialize().catch((error) => {
+  el.meterRows.innerHTML = `<p class="loading-row">启动失败：${error.message}</p>`;
+  showToast(error.message);
+});
