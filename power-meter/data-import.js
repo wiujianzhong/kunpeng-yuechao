@@ -6,6 +6,85 @@
   const DAILY_STORE = "daily";
   const META_STORE = "meta";
   const decoder = new TextDecoder("utf-8");
+  const OFFICIAL_PROCESS_CELLS = {
+    "factory-1": [
+      ["清梳联", "C69"], ["清梳联除尘", "C70"], ["精梳", "C71"], ["精梳除尘", "C72"],
+      ["条并卷", "C73"], ["粗纱", "C74"], ["细纱", "C75"], ["络筒", "C76"],
+      ["空调", "C77"], ["空压", "C78"], ["照明", "C79"], ["细络联", "C80"],
+    ],
+    "factory-2": [
+      ["清梳联", "F69"], ["清梳联除尘", "F70"], ["精梳", "F71"], ["精梳除尘", "F72"],
+      ["条并卷", "F73"], ["粗纱", "F74"], ["细纱", "F75"], ["络筒", "F76"],
+      ["空调", "F77"], ["空压", "F78"], ["照明", "F79"], ["细络联", "F80"],
+    ],
+    "factory-3": [
+      ["清梳联", "I69"], ["清梳联除尘", "I70"], ["精梳", "I71"], ["精梳除尘", "I72"],
+      ["条并卷", "I73"], ["粗纱", "I74"], ["细纱", "I75"], ["络筒", "I76"],
+      ["空调", "I77"], ["空压", "I78"], ["照明", "I79"], ["开松间", "I80"], ["细络联", "I81"],
+    ],
+    "factory-4": [
+      ["气流纺清梳联", "L69"], ["气流纺清梳联除尘", "L70"], ["气流纺并条", "L71"],
+      ["气流纺主机", "L72"], ["气流纺空调", "L73"], ["气流纺空压", "L74"], ["气流纺照明", "L75"],
+      ["涡流纺清梳联", "O69"], ["涡流纺清梳联除尘", "O70"], ["涡流纺精梳", "O71"],
+      ["涡流纺精梳除尘", "O72"], ["涡流纺并条", "O73"], ["涡流纺主机", "O74"],
+      ["涡流纺空调", "O75"], ["涡流纺空压", "O76"], ["涡流纺照明", "O77"],
+    ],
+    "factory-7": [
+      ["清梳联", "R69"], ["清梳联除尘", "R70"], ["条卷精梳", "R71"], ["精梳除尘", "R72"],
+      ["粗纱", "R73"], ["细纱", "R74"], ["络筒", "R75"], ["空调", "R76"],
+      ["空压", "R77"], ["照明", "R78"],
+    ],
+  };
+  const OFFICIAL_TOTAL_CELLS = {
+    "factory-1": [...cellRange("B", 4, 14), "D11", "D18", "B17"],
+    "factory-2": [...cellRange("F", 4, 16), "D12", "G18", "B18"],
+    "factory-3": [...cellRange("J", 4, 16), "D13", "J18", "B19"],
+    "factory-4": ["L22", "L23"],
+    "factory-7": [...cellRange("R", 4, 15), "D14", "B20", "R77"],
+  };
+
+  function cellRange(column, start, end) {
+    return Array.from({ length: end - start + 1 }, (_, index) => `${column}${start + index}`);
+  }
+
+  function standardProcess(item = {}) {
+    const text = `${item.category || ""} ${item.name || ""}`.replace(/\s+/g, "");
+    const prefix = /气流纺/.test(text) ? "气流纺" : /涡流纺/.test(text) ? "涡流纺" : "";
+    let process = "其他";
+    if (/照明/.test(text)) process = "照明";
+    else if (/空压/.test(text)) process = "空压";
+    else if (/空调/.test(text)) process = "空调";
+    else if (/除尘/.test(text) && /精梳/.test(text)) process = "精梳除尘";
+    else if (/除尘/.test(text)) process = "清梳联除尘";
+    else if (/清花|梳棉|清梳/.test(text)) process = "清梳联";
+    else if (/条并卷/.test(text)) process = "条并卷";
+    else if (/并条精梳|条卷精梳/.test(text)) process = "条卷精梳";
+    else if (/精梳/.test(text)) process = "精梳";
+    else if (/粗纱/.test(text)) process = "粗纱";
+    else if (/细络联/.test(text)) process = "细络联";
+    else if (/细纱/.test(text)) process = "细纱";
+    else if (/络筒/.test(text)) process = "络筒";
+    else if (/并条/.test(text)) process = "并条";
+    else if (/主机|气流纺|涡流纺/.test(text)) process = "主机";
+    else if (/辅助/.test(text)) process = "辅助";
+    else if (/打包/.test(text)) process = "打包机";
+    else if (/备用/.test(text)) process = "备用";
+    return prefix && !process.startsWith(prefix) ? `${prefix}${process}` : process;
+  }
+
+  function standardRoom(panel) {
+    const source = String(panel || "").trim().replaceAll("#", "号").replace(/[（）]/g, (value) => value === "（" ? "(" : ")");
+    if (!source || !/配|^[一二三四五六七八九十\d]+号(?:\(\d+\))?$/.test(source)) return "未标注配电室";
+    const matched = /^([一二三四五六七八九十\d]+)(?:号)?配?(?:电室)?(\(\d+\))?$/.exec(source);
+    if (!matched) return source.includes("配电室") ? source : source.replace(/配$/, "配电室");
+    const numberMap = { 一: 1, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9, 十: 10 };
+    const number = numberMap[matched[1]] || matched[1];
+    return `${number}号配电室${matched[2] || ""}`;
+  }
+
+  function officialProcessNames() {
+    return [...new Set(Object.values(OFFICIAL_PROCESS_CELLS).flat().map(([process]) => process))];
+  }
 
   function requestResult(request) {
     return new Promise((resolve, reject) => {
@@ -97,6 +176,13 @@
       row.status_code || "normal",
     ]);
     const totalUsage = rows.reduce((sum, row) => sum + (finiteNumber(row.usage ?? row._usage) || 0), 0);
+    const processTotals = new Map();
+    rows.forEach((row) => {
+      const usage = finiteNumber(row.usage ?? row._usage);
+      if (usage === null) return;
+      const process = standardProcess(row);
+      processTotals.set(process, (processTotals.get(process) || 0) + usage);
+    });
     return {
       key: `${date}|${factoryId}`,
       date,
@@ -105,6 +191,8 @@
       completed: rows.some((row) => finiteNumber(row.end) !== null),
       readings,
       totalUsage,
+      officialTotal: totalUsage,
+      officialRows: [...processTotals.entries()],
       updatedAt: new Date().toISOString(),
     };
   }
@@ -112,9 +200,25 @@
   async function saveRows(date, factoryId, rows, source = "manual") {
     const database = await openDatabase();
     try {
-      const transaction = database.transaction(DAILY_STORE, "readwrite");
-      transaction.objectStore(DAILY_STORE).put(compactRows(date, factoryId, rows, source));
+      const transaction = database.transaction([DAILY_STORE, META_STORE], "readwrite");
+      const daily = transaction.objectStore(DAILY_STORE);
+      const metaStore = transaction.objectStore(META_STORE);
+      const [recordsOnDate, meta] = await Promise.all([
+        requestResult(daily.index("date").count(date)),
+        requestResult(metaStore.get("import")),
+      ]);
+      const record = compactRows(date, factoryId, rows, source);
+      daily.put(record);
+      if (meta) {
+        meta.firstDate = !meta.firstDate || date < meta.firstDate ? date : meta.firstDate;
+        meta.lastDate = !meta.lastDate || date > meta.lastDate ? date : meta.lastDate;
+        if (record.completed && (!meta.completedThrough || date > meta.completedThrough)) meta.completedThrough = date;
+        if (!recordsOnDate) meta.dayCount = Number(meta.dayCount || 0) + 1;
+        meta.updatedAt = new Date().toISOString();
+        metaStore.put(meta);
+      }
       await transactionDone(transaction);
+      return meta || null;
     } finally {
       database.close();
     }
@@ -280,6 +384,8 @@
       })),
     }));
     const addresses = new Set(mapping.flatMap((factory) => factory.meters.flatMap((item) => [item.startAddress, item.endAddress])));
+    Object.values(OFFICIAL_PROCESS_CELLS).flat().forEach(([, address]) => addresses.add(address));
+    Object.values(OFFICIAL_TOTAL_CELLS).flat().forEach((address) => addresses.add(address));
     const byDate = new Map();
 
     for (let index = 0; index < sheets.length; index += 1) {
@@ -299,6 +405,11 @@
           const status = meter.required && (start === null || end === null || end < start) ? "other" : "normal";
           return [start, end, status];
         });
+        const officialRows = (OFFICIAL_PROCESS_CELLS[factory.id] || [])
+          .map(([process, address]) => [process, cells.get(address) ?? null])
+          .filter(([, usage]) => usage !== null);
+        const officialTotal = (OFFICIAL_TOTAL_CELLS[factory.id] || [])
+          .reduce((sum, address) => sum + (cells.get(address) || 0), 0);
         records.push({
           key: `${sheet.date}|${factory.id}`,
           date: sheet.date,
@@ -307,6 +418,8 @@
           completed: true,
           readings,
           totalUsage,
+          officialTotal: officialTotal || officialRows.reduce((sum, [, usage]) => sum + usage, 0) || totalUsage,
+          officialRows,
         });
       });
       const previous = byDate.get(sheet.date);
@@ -336,16 +449,32 @@
         dayCount: ordered.length,
         sheetCount: sheets.length,
         meterCount: (companyData.factories || []).reduce((sum, factory) => sum + factory.meters.length, 0),
+        schemaVersion: 2,
+        reportBasis: "原表正式汇总区",
       },
     };
   }
 
-  async function storeImport(parsed) {
+  async function storeImport(parsed, companyData) {
     const database = await openDatabase();
     try {
       const existingTransaction = database.transaction(DAILY_STORE, "readonly");
       const existing = await requestResult(existingTransaction.objectStore(DAILY_STORE).getAll());
-      const manual = existing.filter((record) => record.source === "manual");
+      const factoryById = new Map((companyData.factories || []).map((factory) => [factory.id, factory]));
+      const manual = existing.filter((record) => record.source === "manual").map((record) => {
+        const factory = factoryById.get(record.factoryId);
+        if (!factory || Array.isArray(record.officialRows)) return record;
+        return compactRows(record.date, record.factoryId, expandRecord(record, factory), "manual");
+      });
+      const importedDates = new Set(parsed.records.map((record) => record.date));
+      const extraManualDates = new Set();
+      manual.forEach((record) => {
+        if (!importedDates.has(record.date)) extraManualDates.add(record.date);
+        if (!parsed.meta.firstDate || record.date < parsed.meta.firstDate) parsed.meta.firstDate = record.date;
+        if (!parsed.meta.lastDate || record.date > parsed.meta.lastDate) parsed.meta.lastDate = record.date;
+        if (record.completed && (!parsed.meta.completedThrough || record.date > parsed.meta.completedThrough)) parsed.meta.completedThrough = record.date;
+      });
+      parsed.meta.dayCount += extraManualDates.size;
       const manualKeys = new Set(manual.map((record) => record.key));
       const transaction = database.transaction([DAILY_STORE, META_STORE], "readwrite");
       const daily = transaction.objectStore(DAILY_STORE);
@@ -361,7 +490,7 @@
   }
 
   async function importWorkbook(file, companyData, onProgress) {
-    return storeImport(await parseWorkbook(file, companyData, onProgress));
+    return storeImport(await parseWorkbook(file, companyData, onProgress), companyData);
   }
 
   function expandRecord(record, factory) {
@@ -375,7 +504,9 @@
         order_no: meter.order_no,
         name: meter.name,
         category: meter.category,
+        process: standardProcess(meter),
         panel: meter.panel,
+        room: standardRoom(meter.panel),
         ratio_text: meter.ratio_text,
         multiplier: meter.multiplier,
         required: meter.required,
@@ -401,5 +532,8 @@
     importWorkbook,
     parseWorkbook,
     saveRows,
+    officialProcessNames,
+    standardProcess,
+    standardRoom,
   };
 })(typeof window === "undefined" ? globalThis : window);

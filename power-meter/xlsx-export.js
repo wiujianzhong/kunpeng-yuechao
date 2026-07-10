@@ -105,6 +105,47 @@
     return concatBytes([...localParts, centralDirectory, end]);
   }
 
+  async function deflateBytes(data) {
+    if (typeof CompressionStream === "undefined") return { bytes: data, method: 0 };
+    try {
+      const stream = new Blob([data]).stream().pipeThrough(new CompressionStream("deflate-raw"));
+      return { bytes: new Uint8Array(await new Response(stream).arrayBuffer()), method: 8 };
+    } catch (_) {
+      return { bytes: data, method: 0 };
+    }
+  }
+
+  async function createZipCompressed(files) {
+    const localParts = [];
+    const centralParts = [];
+    let offset = 0;
+    const stamp = dosTimestamp();
+    for (const { name, content } of files) {
+      const nameBytes = encoder.encode(name);
+      const data = typeof content === "string" ? encoder.encode(content) : content;
+      const packed = await deflateBytes(data);
+      const crc = crc32(data);
+      const localHeader = concatBytes([
+        uint32(0x04034b50), uint16(20), uint16(0), uint16(packed.method), uint16(stamp.time), uint16(stamp.day),
+        uint32(crc), uint32(packed.bytes.length), uint32(data.length), uint16(nameBytes.length), uint16(0),
+      ]);
+      localParts.push(localHeader, nameBytes, packed.bytes);
+      const centralHeader = concatBytes([
+        uint32(0x02014b50), uint16(20), uint16(20), uint16(0), uint16(packed.method), uint16(stamp.time), uint16(stamp.day),
+        uint32(crc), uint32(packed.bytes.length), uint32(data.length), uint16(nameBytes.length), uint16(0), uint16(0),
+        uint16(0), uint16(0), uint32(0), uint32(offset),
+      ]);
+      centralParts.push(centralHeader, nameBytes);
+      offset += localHeader.length + nameBytes.length + packed.bytes.length;
+    }
+    const centralDirectory = concatBytes(centralParts);
+    const end = concatBytes([
+      uint32(0x06054b50), uint16(0), uint16(0), uint16(files.length), uint16(files.length),
+      uint32(centralDirectory.length), uint32(offset), uint16(0),
+    ]);
+    return concatBytes([...localParts, centralDirectory, end]);
+  }
+
   class SheetBuilder {
     constructor() {
       this.rows = new Map();
@@ -385,8 +426,8 @@
   function buildPeriodSummarySheet(report) {
     const sheet = new SheetBuilder();
     sheet.merge(1, 1, 8, `${report.company}用电${report.label}`, 1, 34);
-    sheet.merge(2, 1, 8, `${report.startDate} 至 ${report.endDate}｜自动汇总已保存历史数据`, 2, 24);
-    sheet.merge(4, 1, 2, "周期总用电", 7, 28);
+    sheet.merge(2, 1, 8, `${report.startDate} 至 ${report.endDate}｜${report.selection || "全部数据"}`, 2, 24);
+    sheet.merge(4, 1, 2, "筛选周期总用电", 7, 28);
     sheet.merge(4, 3, 4, report.totalUsage, 8, 28);
     sheet.merge(4, 5, 6, "有数据天数", 7, 28);
     sheet.merge(4, 7, 8, report.daysWithData, 8, 28);
@@ -395,7 +436,7 @@
     sheet.merge(5, 5, 6, "现场异常记录", 7, 28);
     sheet.merge(5, 7, 8, report.warningCount, 8, 28);
 
-    const headers = ["日期", "星期", "全公司合计(kWh)", ...report.factories.map((factory) => factory.name)];
+    const headers = ["日期", "星期", "筛选合计(kWh)", ...report.factories.map((factory) => factory.name)];
     headers.forEach((header, index) => sheet.add(7, index + 1, header, 3));
     report.dailyRows.forEach((item, index) => {
       const row = 8 + index;
@@ -415,7 +456,7 @@
       const summary = report.factorySummaries.find((item) => item.factoryId === factory.id);
       sheet.add(totalRow, 4 + index, summary?.usage || 0, 15, { type: "number" });
     });
-    sheet.merge(totalRow + 2, 1, 8, "口径：周报为上周五至本周四；月报为自然月内已有数据。空白日期不参与日均计算。", 13, 28);
+    sheet.merge(totalRow + 2, 1, 8, `数据口径：${report.basis || "计量点明细口径"}。周报固定为上周五至本周四，周五提交。`, 13, 28);
     return sheet.xml({
       columns: [
         { width: 14 }, { width: 10 }, { width: 20 }, { width: 16 },
@@ -429,12 +470,12 @@
   function buildPeriodAnalysisSheet(report) {
     const sheet = new SheetBuilder();
     sheet.merge(1, 1, 9, `${report.company}用电${report.label}分析表`, 1, 34);
-    sheet.merge(2, 1, 9, `${report.startDate} 至 ${report.endDate}｜五分厂统一分析`, 2, 24);
+    sheet.merge(2, 1, 9, `${report.startDate} 至 ${report.endDate}｜${report.selection || "全部数据"}`, 2, 24);
 
     sheet.merge(4, 1, 6, "分厂汇总", 9, 24);
-    sheet.merge(4, 7, 9, "分类用电", 9, 24);
+    sheet.merge(4, 7, 9, "工序用电", 9, 24);
     ["分厂", "用电量(kWh)", "占比", "日均", "峰值日期", "峰值用电"].forEach((header, index) => sheet.add(5, index + 1, header, 3));
-    ["分类", "用电量(kWh)", "占比"].forEach((header, index) => sheet.add(5, index + 7, header, 3));
+    ["工序", "用电量(kWh)", "占比"].forEach((header, index) => sheet.add(5, index + 7, header, 3));
     const upperRows = Math.max(report.factorySummaries.length, report.categories.length, 1);
     for (let index = 0; index < upperRows; index += 1) {
       const row = 6 + index;
@@ -456,10 +497,10 @@
     }
 
     const topTitleRow = 7 + upperRows;
-    sheet.merge(topTitleRow, 1, 9, "周期用电最高计量点", 9, 24);
+    sheet.merge(topTitleRow, 1, 9, "周期用电重点项目", 9, 24);
     sheet.add(topTitleRow + 1, 1, "排名", 3);
     sheet.add(topTitleRow + 1, 2, "分厂", 3);
-    sheet.merge(topTitleRow + 1, 3, 4, "计量点", 3);
+    sheet.merge(topTitleRow + 1, 3, 4, "计量点/工序", 3);
     sheet.merge(topTitleRow + 1, 5, 7, "分类", 3);
     sheet.merge(topTitleRow + 1, 8, 9, "周期用电量(kWh)", 3);
     report.topMeters.forEach((item, index) => {
@@ -471,7 +512,7 @@
       sheet.merge(row, 8, 9, item.usage, 5, 22);
     });
     const noteRow = topTitleRow + 3 + report.topMeters.length;
-    sheet.merge(noteRow, 1, 9, "分析说明：排行按周期累计实际电量计算；异常记录只提示复核，不凭空估算缺失电量。", 13, 28);
+    sheet.merge(noteRow, 1, 9, `分析说明：排行按周期累计电量计算；${report.basis || "异常记录只提示复核，不凭空估算缺失电量。"}`, 13, 28);
     return sheet.xml({
       columns: [
         { width: 10 }, { width: 16 }, { width: 13 }, { width: 13 }, { width: 15 },
@@ -481,22 +522,141 @@
     });
   }
 
+  const STATUS_LABELS = {
+    normal: "正常",
+    broken: "表坏/无显示",
+    recovered: "表计恢复/更换",
+    temporary_high: "临时加电",
+    stopped: "停用/停电",
+    other: "其他情况",
+  };
+
+  function flatCellXml(row, column, value, style, numeric = false) {
+    const ref = `${columnName(column)}${row}`;
+    if (numeric) {
+      const number = numberValue(value);
+      return number === null ? `<c r="${ref}" s="${style}"/>` : `<c r="${ref}" s="${style}"><v>${number}</v></c>`;
+    }
+    if (value === null || value === undefined || value === "") return `<c r="${ref}" s="${style}"/>`;
+    return `<c r="${ref}" s="${style}" t="inlineStr"><is><t xml:space="preserve">${xmlEscape(value)}</t></is></c>`;
+  }
+
+  function buildFlatTableSheet({ title, subtitle, headers, rows, values, numericColumns = [], widths }) {
+    const lastColumn = headers.length;
+    const numberSet = new Set(numericColumns);
+    const rowXml = [
+      `<row r="1" ht="34" customHeight="1">${flatCellXml(1, 1, title, 1)}</row>`,
+      `<row r="2" ht="24" customHeight="1">${flatCellXml(2, 1, subtitle, 2)}</row>`,
+      `<row r="4" ht="26" customHeight="1">${headers.map((header, index) => flatCellXml(4, index + 1, header, 3)).join("")}</row>`,
+    ];
+    rows.forEach((item, index) => {
+      const rowNumber = index + 5;
+      const cells = values(item).map((value, columnIndex) => flatCellXml(rowNumber, columnIndex + 1, value, numberSet.has(columnIndex) ? 5 : 4, numberSet.has(columnIndex)));
+      rowXml.push(`<row r="${rowNumber}">${cells.join("")}</row>`);
+    });
+    const lastRow = Math.max(4, rows.length + 4);
+    const columnXml = widths.map((width, index) => `<col min="${index + 1}" max="${index + 1}" width="${width}" customWidth="1"/>`).join("");
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>
+  <dimension ref="A1:${columnName(lastColumn)}${lastRow}"/>
+  <sheetViews><sheetView showGridLines="0" workbookViewId="0"><pane ySplit="4" topLeftCell="A5" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>
+  <sheetFormatPr defaultRowHeight="20"/>
+  <cols>${columnXml}</cols>
+  <sheetData>${rowXml.join("")}</sheetData>
+  <autoFilter ref="A4:${columnName(lastColumn)}${lastRow}"/>
+  <mergeCells count="2"><mergeCell ref="A1:${columnName(lastColumn)}1"/><mergeCell ref="A2:${columnName(lastColumn)}2"/></mergeCells>
+  <pageMargins left="0.3" right="0.3" top="0.5" bottom="0.5" header="0.2" footer="0.2"/>
+  <pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0" paperSize="9"/>
+</worksheet>`;
+  }
+
+  function buildPeriodDetailSheet(report) {
+    return buildFlatTableSheet({
+      title: `${report.company}用电${report.label}明细`,
+      subtitle: `${report.startDate} 至 ${report.endDate}｜${report.basis}｜${report.selection}`,
+      headers: ["日期", "星期", "分厂", "配电室", "工序", "计量点/汇总项", "原始分类", "昨日读数", "今日读数", "差数", "变比", "用电量(kWh)", "现场情况", "数据来源"],
+      rows: report.detailRows || [],
+      values: (item) => [
+        item.date, weekdayName(item.date), item.factoryName, item.room, item.process, item.meterName, item.category,
+        item.start, item.end, item.difference, item.multiplier, item.usage, STATUS_LABELS[item.statusCode] || item.statusCode || "正常", item.source,
+      ],
+      numericColumns: [7, 8, 9, 10, 11],
+      widths: [13, 9, 12, 18, 20, 26, 24, 14, 14, 12, 10, 17, 16, 20],
+    });
+  }
+
+  function buildMasterDetailSheet(report) {
+    return buildFlatTableSheet({
+      title: `${report.company}用电全量数据底表`,
+      subtitle: `${report.firstDate} 至 ${report.endDate}｜每个计量点每天一条记录，可直接筛选`,
+      headers: ["日期", "分厂", "配电室", "标准工序", "计量点", "原始分类", "变比", "倍率", "起点读数", "终点读数", "差数", "用电量(kWh)", "现场情况", "数据来源"],
+      rows: report.detailRows,
+      values: (item) => [
+        item.date, item.factoryName, item.room, item.process, item.meterName, item.category, item.ratioText,
+        item.multiplier, item.start, item.end, item.difference, item.usage, STATUS_LABELS[item.statusCode] || item.statusCode || "正常", item.source,
+      ],
+      numericColumns: [7, 8, 9, 10, 11],
+      widths: [13, 12, 18, 20, 27, 24, 12, 10, 14, 14, 12, 17, 16, 14],
+    });
+  }
+
+  function buildMasterOfficialSheet(report) {
+    return buildFlatTableSheet({
+      title: `${report.company}正式工序汇总底表`,
+      subtitle: `${report.firstDate} 至 ${report.endDate}｜与原表表头、分厂和工序汇总区保持一致`,
+      headers: ["日期", "分厂", "标准工序", "用电量(kWh)", "数据口径"],
+      rows: report.officialRows,
+      values: (item) => [item.date, item.factoryName, item.process, item.usage, item.source],
+      numericColumns: [3],
+      widths: [14, 14, 24, 18, 22],
+    });
+  }
+
+  function buildDictionarySheet(report) {
+    return buildFlatTableSheet({
+      title: `${report.company}计量点字典`,
+      subtitle: "固定基础信息｜用于核对分厂、配电室、工序和原表位置",
+      headers: ["分厂", "配电室", "标准工序", "计量点", "原始分类", "变比", "倍率", "原表位置"],
+      rows: report.dictionaryRows,
+      values: (item) => [item.factoryName, item.room, item.process, item.meterName, item.category, item.ratioText, item.multiplier, item.sourceCell],
+      numericColumns: [6],
+      widths: [14, 18, 22, 30, 26, 13, 10, 12],
+    });
+  }
+
   function workbookFiles(report, options = {}) {
-    const period = Boolean(options.period);
-    const dailySheet = period ? buildPeriodSummarySheet(report) : buildDailySheet(report);
-    const analysisSheet = period ? buildPeriodAnalysisSheet(report) : buildAnalysisSheet(report);
-    const firstSheetName = period ? "周期汇总" : "用电日报";
-    const secondSheetName = "分析表";
-    const documentTitle = period ? `${report.company}用电${report.label}` : `${report.company}用电日报`;
+    const sheets = options.master
+      ? [
+          { name: "数据明细", xml: buildMasterDetailSheet(report) },
+          { name: "正式工序汇总", xml: buildMasterOfficialSheet(report) },
+          { name: "计量点字典", xml: buildDictionarySheet(report) },
+        ]
+      : options.period
+        ? [
+            { name: "周期汇总", xml: buildPeriodSummarySheet(report) },
+            { name: "分析表", xml: buildPeriodAnalysisSheet(report) },
+            { name: "筛选数据明细", xml: buildPeriodDetailSheet(report) },
+          ]
+        : [
+            { name: "用电日报", xml: buildDailySheet(report) },
+            { name: "分析表", xml: buildAnalysisSheet(report) },
+          ];
+    const documentTitle = options.master
+      ? `${report.company}用电全量数据底表`
+      : options.period ? `${report.company}用电${report.label}` : `${report.company}用电日报`;
     const now = new Date().toISOString();
+    const sheetOverrides = sheets.map((_, index) => `  <Override PartName="/xl/worksheets/sheet${index + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("\n");
+    const workbookSheets = sheets.map((sheet, index) => `<sheet name="${xmlEscape(sheet.name)}" sheetId="${index + 1}" r:id="rId${index + 1}"/>`).join("");
+    const sheetRelations = sheets.map((_, index) => `  <Relationship Id="rId${index + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${index + 1}.xml"/>`).join("\n");
+    const styleRelationId = sheets.length + 1;
     return [
       { name: "[Content_Types].xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml" ContentType="application/xml"/>
   <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
-  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
-  <Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+${sheetOverrides}
   <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
   <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
   <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
@@ -515,24 +675,22 @@
       { name: "docProps/app.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
   <Application>雅新纺织用电抄表分析工具</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop>
-  <HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>工作表</vt:lpstr></vt:variant><vt:variant><vt:i4>2</vt:i4></vt:variant></vt:vector></HeadingPairs>
-  <TitlesOfParts><vt:vector size="2" baseType="lpstr"><vt:lpstr>${xmlEscape(firstSheetName)}</vt:lpstr><vt:lpstr>${xmlEscape(secondSheetName)}</vt:lpstr></vt:vector></TitlesOfParts>
+  <HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>工作表</vt:lpstr></vt:variant><vt:variant><vt:i4>${sheets.length}</vt:i4></vt:variant></vt:vector></HeadingPairs>
+  <TitlesOfParts><vt:vector size="${sheets.length}" baseType="lpstr">${sheets.map((sheet) => `<vt:lpstr>${xmlEscape(sheet.name)}</vt:lpstr>`).join("")}</vt:vector></TitlesOfParts>
 </Properties>` },
       { name: "xl/workbook.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
   <bookViews><workbookView xWindow="0" yWindow="0" windowWidth="24000" windowHeight="14000"/></bookViews>
-  <sheets><sheet name="${xmlEscape(firstSheetName)}" sheetId="1" r:id="rId1"/><sheet name="${xmlEscape(secondSheetName)}" sheetId="2" r:id="rId2"/></sheets>
+  <sheets>${workbookSheets}</sheets>
   <calcPr calcId="191029" calcMode="auto" fullCalcOnLoad="1" forceFullCalc="1"/>
 </workbook>` },
       { name: "xl/_rels/workbook.xml.rels", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
-  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
-  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+${sheetRelations}
+  <Relationship Id="rId${styleRelationId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
 </Relationships>` },
       { name: "xl/styles.xml", content: STYLES_XML },
-      { name: "xl/worksheets/sheet1.xml", content: dailySheet },
-      { name: "xl/worksheets/sheet2.xml", content: analysisSheet },
+      ...sheets.map((sheet, index) => ({ name: `xl/worksheets/sheet${index + 1}.xml`, content: sheet.xml })),
     ];
   }
 
@@ -541,8 +699,13 @@
     return new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
   }
 
-  function createPeriodWorkbookBlob(report) {
-    const bytes = createZip(workbookFiles(report, { period: true }));
+  async function createPeriodWorkbookBlob(report) {
+    const bytes = await createZipCompressed(workbookFiles(report, { period: true }));
+    return new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  }
+
+  async function createMasterWorkbookBlob(report) {
+    const bytes = await createZipCompressed(workbookFiles(report, { master: true }));
     return new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
   }
 
@@ -561,9 +724,20 @@
     downloadBlob(createWorkbookBlob(report), report.fileName);
   }
 
-  function downloadPeriod(report) {
-    downloadBlob(createPeriodWorkbookBlob(report), report.fileName);
+  async function downloadPeriod(report) {
+    downloadBlob(await createPeriodWorkbookBlob(report), report.fileName);
   }
 
-  global.PowerMeterXlsx = { createPeriodWorkbookBlob, createWorkbookBlob, download, downloadPeriod };
+  async function downloadMaster(report) {
+    downloadBlob(await createMasterWorkbookBlob(report), report.fileName);
+  }
+
+  global.PowerMeterXlsx = {
+    createMasterWorkbookBlob,
+    createPeriodWorkbookBlob,
+    createWorkbookBlob,
+    download,
+    downloadMaster,
+    downloadPeriod,
+  };
 })(window);

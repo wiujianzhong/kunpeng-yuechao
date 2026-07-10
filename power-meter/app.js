@@ -26,6 +26,7 @@ const state = {
   referenceDifferences: new Map(),
   serverWarnings: new Map(),
   rowElements: new Map(),
+  reportOptionsReady: false,
 };
 
 const el = {
@@ -39,8 +40,22 @@ const el = {
   historyProgressBar: document.querySelector("#historyProgressBar"),
   historyFileInput: document.querySelector("#historyFileInput"),
   historyImportButton: document.querySelector("#historyImportButton"),
-  weeklyReportButton: document.querySelector("#weeklyReportButton"),
-  monthlyReportButton: document.querySelector("#monthlyReportButton"),
+  masterDownloadButton: document.querySelector("#masterDownloadButton"),
+  reportCenter: document.querySelector("#reportCenter"),
+  reportType: document.querySelector("#reportType"),
+  reportReferenceField: document.querySelector("#reportReferenceField"),
+  reportReferenceDate: document.querySelector("#reportReferenceDate"),
+  reportStartField: document.querySelector("#reportStartField"),
+  reportStartDate: document.querySelector("#reportStartDate"),
+  reportEndField: document.querySelector("#reportEndField"),
+  reportEndDate: document.querySelector("#reportEndDate"),
+  reportPeriodPreview: document.querySelector("#reportPeriodPreview"),
+  reportFactories: document.querySelector("#reportFactories"),
+  reportProcesses: document.querySelector("#reportProcesses"),
+  reportRooms: document.querySelector("#reportRooms"),
+  reportSelectionSummary: document.querySelector("#reportSelectionSummary"),
+  reportBasisHint: document.querySelector("#reportBasisHint"),
+  generateReportButton: document.querySelector("#generateReportButton"),
   factoryTabs: document.querySelector("#factoryTabs"),
   factoryLedgerLabel: document.querySelector("#factoryLedgerLabel"),
   ledgerTitle: document.querySelector("#ledgerTitle"),
@@ -240,13 +255,20 @@ function shortDate(date) {
 
 function renderHistoryStatus() {
   const meta = state.importMeta;
-  const ready = Boolean(meta);
-  el.weeklyReportButton.disabled = !ready;
-  el.monthlyReportButton.disabled = !ready;
+  const ready = Boolean(meta?.schemaVersion >= 2);
+  el.masterDownloadButton.disabled = !ready;
+  el.generateReportButton.disabled = !ready;
   if (!meta) {
     el.historyStatus.textContent = "尚未导入原始 Excel";
     el.historyDetail.textContent = "首次使用导入一次，系统自动整理全部日期；文件不会上传。";
     el.historyProgressBar.style.width = "0";
+    return;
+  }
+  if (!ready) {
+    el.historyStatus.textContent = "历史数据需要升级一次";
+    el.historyDetail.textContent = "请重新导入原始 Excel，系统会补齐正式工序汇总口径。";
+    el.historyProgressBar.style.width = "0";
+    el.historyImportButton.textContent = "重新导入升级";
     return;
   }
   el.historyStatus.textContent = `已整理 ${meta.dayCount} 天 · 有效数据到 ${shortDate(meta.completedThrough)}`;
@@ -264,14 +286,15 @@ async function syncSavedRecordsToHistory() {
       if (Array.isArray(record?.rows)) await window.PowerMeterData.saveRows(date, factoryId, record.rows, "manual");
     }
   }
+  state.importMeta = await window.PowerMeterData.getMeta().catch(() => state.importMeta) || state.importMeta;
 }
 
 
 async function importHistoryFile(file) {
   if (!file || !window.PowerMeterData?.importWorkbook) return;
   el.historyImportButton.disabled = true;
-  el.weeklyReportButton.disabled = true;
-  el.monthlyReportButton.disabled = true;
+  el.masterDownloadButton.disabled = true;
+  el.generateReportButton.disabled = true;
   el.historyImportButton.textContent = "正在整理…";
   el.historyStatus.textContent = "正在读取原始工作表";
   el.historyDetail.textContent = "请保持当前页面打开，数据只在本机处理。";
@@ -313,19 +336,28 @@ function addDays(value, days) {
 }
 
 
-function periodBounds(type) {
-  const selected = dateAtUtc(state.date || todayLocal());
-  const completedThrough = state.importMeta?.completedThrough ? dateAtUtc(state.importMeta.completedThrough) : selected;
+function reportBounds(type = el.reportType.value) {
+  const referenceText = el.reportReferenceDate.value || state.date || todayLocal();
+  const reference = dateAtUtc(referenceText);
+  const completedThrough = state.importMeta?.completedThrough ? dateAtUtc(state.importMeta.completedThrough) : reference;
+  if (type === "day") return { start: referenceText, end: referenceText, label: "日报" };
   if (type === "week") {
-    const selectedThursday = addDays(selected, -((selected.getUTCDay() - 4 + 7) % 7));
+    const candidateThursday = addDays(reference, (4 - reference.getUTCDay() + 7) % 7);
     const completedThursday = addDays(completedThrough, -((completedThrough.getUTCDay() - 4 + 7) % 7));
-    const end = selectedThursday < completedThursday ? selectedThursday : completedThursday;
+    const end = candidateThursday < completedThursday ? candidateThursday : completedThursday;
     return { start: dateText(addDays(end, -6)), end: dateText(end), label: "周报" };
   }
-  const start = new Date(Date.UTC(selected.getUTCFullYear(), selected.getUTCMonth(), 1));
-  let end = selected < completedThrough ? selected : completedThrough;
-  if (end < start) end = addDays(new Date(Date.UTC(selected.getUTCFullYear(), selected.getUTCMonth() + 1, 1)), -1);
-  return { start: dateText(start), end: dateText(end), label: "月报" };
+  if (type === "month") {
+    const start = new Date(Date.UTC(reference.getUTCFullYear(), reference.getUTCMonth(), 1));
+    const monthEnd = addDays(new Date(Date.UTC(reference.getUTCFullYear(), reference.getUTCMonth() + 1, 1)), -1);
+    const end = completedThrough >= start && completedThrough < monthEnd ? completedThrough : monthEnd;
+    return { start: dateText(start), end: dateText(end), label: "月报" };
+  }
+  return {
+    start: el.reportStartDate.value || referenceText,
+    end: el.reportEndDate.value || referenceText,
+    label: "自定义报表",
+  };
 }
 
 
@@ -338,65 +370,207 @@ function datesBetween(startDate, endDate) {
 }
 
 
-async function createPeriodReport(type) {
-  if (!state.importMeta || !window.PowerMeterData || !window.PowerMeterXlsx?.downloadPeriod) {
+function checkedFilter(container) {
+  const inputs = [...container.querySelectorAll('input[type="checkbox"]')];
+  const selected = inputs.filter((input) => input.checked).map((input) => input.value);
+  return selected.length === inputs.length ? null : new Set(selected);
+}
+
+function selectedFilterText(container, allText) {
+  const inputs = [...container.querySelectorAll('input[type="checkbox"]')];
+  const selected = inputs.filter((input) => input.checked).map((input) => input.value);
+  if (selected.length === inputs.length) return allText;
+  if (!selected.length) return "未选择";
+  return selected.length <= 3 ? selected.join("、") : `${selected.slice(0, 2).join("、")}等${selected.length}项`;
+}
+
+function renderFilterChips(container, values) {
+  container.replaceChildren();
+  const tools = document.createElement("div");
+  tools.className = "filter-tools";
+  [
+    ["全选", true],
+    ["清空", false],
+  ].forEach(([labelText, checked]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = labelText;
+    button.addEventListener("click", () => {
+      container.querySelectorAll('input[type="checkbox"]').forEach((input) => { input.checked = checked; });
+      refreshReportUi();
+    });
+    tools.appendChild(button);
+  });
+  container.appendChild(tools);
+  values.forEach((value) => {
+    const label = document.createElement("label");
+    label.className = "filter-chip";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.value = value;
+    input.checked = true;
+    const text = document.createElement("span");
+    text.textContent = value;
+    label.append(input, text);
+    input.addEventListener("change", refreshReportUi);
+    container.appendChild(label);
+  });
+}
+
+function initializeReportOptions() {
+  const factories = state.companyData.factories || [];
+  const processSet = new Set(window.PowerMeterData.officialProcessNames());
+  const roomSet = new Set();
+  factories.forEach((factory) => factory.meters.forEach((meter) => {
+    processSet.add(window.PowerMeterData.standardProcess(meter));
+    roomSet.add(window.PowerMeterData.standardRoom(meter.panel));
+  }));
+  processSet.add("汇总口径调整");
+  const processOrder = ["清梳联", "清梳联除尘", "精梳", "条卷精梳", "精梳除尘", "条并卷", "并条", "粗纱", "细纱", "络筒", "空调", "空压", "照明", "细络联", "开松间", "气流纺", "涡流纺", "辅助", "打包机", "备用", "其他", "汇总口径调整"];
+  const processes = [...processSet].sort((a, b) => {
+    const aIndex = processOrder.findIndex((item) => a.includes(item));
+    const bIndex = processOrder.findIndex((item) => b.includes(item));
+    return (aIndex < 0 ? 999 : aIndex) - (bIndex < 0 ? 999 : bIndex) || a.localeCompare(b, "zh-CN");
+  });
+  const rooms = [...roomSet].sort((a, b) => a.localeCompare(b, "zh-CN", { numeric: true }));
+  renderFilterChips(el.reportFactories, factories.map((factory) => factory.name));
+  renderFilterChips(el.reportProcesses, processes);
+  renderFilterChips(el.reportRooms, rooms);
+  state.reportOptionsReady = true;
+}
+
+function refreshReportUi() {
+  const custom = el.reportType.value === "custom";
+  el.reportReferenceField.hidden = custom;
+  el.reportStartField.hidden = !custom;
+  el.reportEndField.hidden = !custom;
+  const bounds = reportBounds();
+  el.reportPeriodPreview.textContent = bounds.start === bounds.end ? bounds.start : `${bounds.start} → ${bounds.end}`;
+  const factories = selectedFilterText(el.reportFactories, "全部分厂");
+  const processes = selectedFilterText(el.reportProcesses, "全部工序");
+  const rooms = selectedFilterText(el.reportRooms, "全部配电室");
+  el.reportSelectionSummary.textContent = `${factories} · ${processes} · ${rooms}`;
+  const roomFilter = checkedFilter(el.reportRooms);
+  el.reportBasisHint.textContent = roomFilter === null
+    ? "当前采用原表正式汇总口径，含空压和汇总口径调整。"
+    : "已筛选配电室：自动采用计量点明细口径，并与所选工序交叉筛选。";
+}
+
+function factsForRecord(record, factory, processFilter, roomFilter) {
+  if (roomFilter === null && Array.isArray(record.officialRows) && record.officialRows.length) {
+    const rows = record.officialRows.map(([process, usage]) => [process, toNumber(usage) || 0]);
+    const processTotal = rows.reduce((sum, [, usage]) => sum + usage, 0);
+    const residual = (toNumber(record.officialTotal) ?? processTotal) - processTotal;
+    if (Math.abs(residual) >= 0.01) rows.push(["汇总口径调整", residual]);
+    return rows
+      .filter(([process]) => processFilter === null || processFilter.has(process))
+      .map(([process, usage]) => ({
+        date: record.date,
+        factoryId: factory.id,
+        factoryName: factory.name,
+        room: "全部配电室",
+        process,
+        meterId: "official-summary",
+        meterName: "原表正式汇总",
+        category: process,
+        start: null,
+        end: null,
+        difference: null,
+        multiplier: null,
+        usage,
+        statusCode: "normal",
+        source: record.source === "import" ? "原表正式汇总" : "当日录入自动汇总",
+      }));
+  }
+  return window.PowerMeterData.expandRecord(record, factory)
+    .filter((row) => (processFilter === null || processFilter.has(row.process)) && (roomFilter === null || roomFilter.has(row.room)))
+    .map((row) => ({
+      date: record.date,
+      factoryId: factory.id,
+      factoryName: factory.name,
+      room: row.room,
+      process: row.process,
+      meterId: row.meter_id,
+      meterName: row.name,
+      category: row.category,
+      start: row.start,
+      end: row.end,
+      difference: row.difference,
+      multiplier: row.multiplier,
+      usage: toNumber(row.usage) || 0,
+      statusCode: row.status_code || "normal",
+      source: record.source === "import" ? "计量点历史明细" : "当日录入明细",
+    }));
+}
+
+async function createPeriodReport() {
+  if (!state.importMeta?.schemaVersion || !window.PowerMeterData || !window.PowerMeterXlsx?.downloadPeriod) {
     showToast("请先导入原始历史 Excel");
     return;
   }
-  const bounds = periodBounds(type);
+  const bounds = reportBounds();
   if (bounds.end < bounds.start) {
-    showToast("所选月份还没有可汇总的数据");
+    showToast("结束日期不能早于开始日期");
     return;
   }
-  const records = (await window.PowerMeterData.getRange(bounds.start, bounds.end)).filter((record) => record.completed);
-  if (!records.length) {
-    showToast("这个时间段还没有已完成的数据");
+  const factoryFilter = checkedFilter(el.reportFactories);
+  const processFilter = checkedFilter(el.reportProcesses);
+  const roomFilter = checkedFilter(el.reportRooms);
+  if (factoryFilter?.size === 0 || processFilter?.size === 0 || roomFilter?.size === 0) {
+    showToast("请至少选择一个分厂、工序和配电室");
+    return;
+  }
+  const factoryByName = new Map(state.companyData.factories.map((factory) => [factory.name, factory]));
+  const selectedFactories = factoryFilter === null
+    ? state.companyData.factories
+    : [...factoryFilter].map((name) => factoryByName.get(name)).filter(Boolean);
+  const selectedIds = new Set(selectedFactories.map((factory) => factory.id));
+  const records = (await window.PowerMeterData.getRange(bounds.start, bounds.end))
+    .filter((record) => record.completed && selectedIds.has(record.factoryId));
+  const factoryById = new Map(selectedFactories.map((factory) => [factory.id, factory]));
+  const facts = records.flatMap((record) => factsForRecord(record, factoryById.get(record.factoryId), processFilter, roomFilter));
+  if (!facts.length) {
+    showToast("所选组合没有可汇总的数据");
     return;
   }
 
-  const factories = new Map(state.companyData.factories.map((factory) => [factory.id, factory]));
   const daily = new Map(datesBetween(bounds.start, bounds.end).map((date) => [date, {
     date,
     totalUsage: 0,
-    factories: Object.fromEntries(state.companyData.factories.map((factory) => [factory.id, 0])),
+    factories: Object.fromEntries(selectedFactories.map((factory) => [factory.id, 0])),
     completedFactories: 0,
   }]));
-  const factoryTotals = new Map(state.companyData.factories.map((factory) => [factory.id, 0]));
-  const factoryPeaks = new Map();
-  const categories = new Map();
-  const meterTotals = new Map();
+  const factoryTotals = new Map(selectedFactories.map((factory) => [factory.id, 0]));
+  const processTotals = new Map();
+  const topTotals = new Map();
+  const activeFactoryDays = new Set();
   let warningCount = 0;
-
-  records.forEach((record) => {
-    const factory = factories.get(record.factoryId);
-    if (!factory) return;
-    const rows = window.PowerMeterData.expandRecord(record, factory);
-    const day = daily.get(record.date);
-    const usage = rows.reduce((sum, row) => sum + (toNumber(row.usage) || 0), 0);
+  facts.forEach((fact) => {
+    const usage = toNumber(fact.usage) || 0;
+    const day = daily.get(fact.date);
     day.totalUsage += usage;
-    day.factories[factory.id] = usage;
-    day.completedFactories += 1;
-    factoryTotals.set(factory.id, (factoryTotals.get(factory.id) || 0) + usage);
-    const peak = factoryPeaks.get(factory.id);
-    if (!peak || usage > peak.usage) factoryPeaks.set(factory.id, { date: record.date, usage });
-    rows.forEach((row) => {
-      const rowUsage = toNumber(row.usage);
-      if (row.status_code && row.status_code !== "normal") warningCount += 1;
-      if (rowUsage === null || rowUsage <= 0) return;
-      categories.set(row.category, (categories.get(row.category) || 0) + rowUsage);
-      const key = `${factory.id}|${row.meter_id}`;
-      const current = meterTotals.get(key) || { name: row.name, factoryName: factory.name, category: row.category, usage: 0 };
-      current.usage += rowUsage;
-      meterTotals.set(key, current);
-    });
+    day.factories[fact.factoryId] = (day.factories[fact.factoryId] || 0) + usage;
+    activeFactoryDays.add(`${fact.date}|${fact.factoryId}`);
+    factoryTotals.set(fact.factoryId, (factoryTotals.get(fact.factoryId) || 0) + usage);
+    processTotals.set(fact.process, (processTotals.get(fact.process) || 0) + usage);
+    if (fact.statusCode !== "normal") warningCount += 1;
+    const topKey = roomFilter === null ? `${fact.factoryId}|${fact.process}` : `${fact.factoryId}|${fact.meterId}`;
+    const current = topTotals.get(topKey) || {
+      name: roomFilter === null ? fact.process : fact.meterName,
+      factoryName: fact.factoryName,
+      category: fact.process,
+      usage: 0,
+    };
+    current.usage += usage;
+    topTotals.set(topKey, current);
   });
-
+  activeFactoryDays.forEach((key) => daily.get(key.split("|")[0]).completedFactories += 1);
   const dailyRows = [...daily.values()];
   const daysWithData = dailyRows.filter((item) => item.completedFactories > 0).length;
   const totalUsage = dailyRows.reduce((sum, item) => sum + item.totalUsage, 0);
-  const factorySummaries = state.companyData.factories.map((factory) => {
+  const factorySummaries = selectedFactories.map((factory) => {
     const usage = factoryTotals.get(factory.id) || 0;
-    const peak = factoryPeaks.get(factory.id) || { date: "—", usage: 0 };
+    const peak = dailyRows.reduce((best, day) => day.factories[factory.id] > best.usage ? { date: day.date, usage: day.factories[factory.id] } : best, { date: "—", usage: 0 });
     return {
       factoryId: factory.id,
       factoryName: factory.name,
@@ -407,28 +581,104 @@ async function createPeriodReport(type) {
       peakUsage: peak.usage,
     };
   });
-  const categoryRows = [...categories.entries()]
+  const processes = [...processTotals.entries()]
     .sort((a, b) => b[1] - a[1])
-    .map(([category, usage]) => ({ category, usage, share: totalUsage ? usage / totalUsage : 0 }));
-  const topMeters = [...meterTotals.values()].sort((a, b) => b.usage - a.usage).slice(0, 20);
-
-  window.PowerMeterXlsx.downloadPeriod({
+    .map(([process, usage]) => ({ category: process, process, usage, share: totalUsage ? usage / totalUsage : 0 }));
+  const topMeters = [...topTotals.values()].sort((a, b) => b.usage - a.usage).slice(0, 30);
+  const basis = roomFilter === null ? "原表正式汇总口径" : "计量点明细口径（配电室与工序交叉筛选）";
+  const selection = el.reportSelectionSummary.textContent;
+  await window.PowerMeterXlsx.downloadPeriod({
     company: "雅新纺织有限公司",
-    type,
+    type: el.reportType.value,
     label: bounds.label,
     startDate: bounds.start,
     endDate: bounds.end,
     dailyRows,
-    factories: state.companyData.factories.map((factory) => ({ id: factory.id, name: factory.name })),
+    factories: selectedFactories.map((factory) => ({ id: factory.id, name: factory.name })),
     factorySummaries,
-    categories: categoryRows,
+    categories: processes,
     topMeters,
+    detailRows: facts,
     totalUsage,
     daysWithData,
     warningCount,
+    basis,
+    selection,
     fileName: `雅新纺织-用电${bounds.label}-${bounds.start}至${bounds.end}.xlsx`,
   });
   showToast(`${bounds.label}已生成：${shortDate(bounds.start)}至${shortDate(bounds.end)}`);
+}
+
+async function downloadMasterWorkbook() {
+  if (!state.importMeta?.schemaVersion || !window.PowerMeterXlsx?.downloadMaster) {
+    showToast("请先导入原始历史 Excel");
+    return;
+  }
+  el.masterDownloadButton.disabled = true;
+  el.masterDownloadButton.textContent = "正在整理底表…";
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+  try {
+    const records = (await window.PowerMeterData.getRange(state.importMeta.firstDate, state.importMeta.completedThrough))
+      .filter((record) => record.completed);
+    const factoryById = new Map(state.companyData.factories.map((factory) => [factory.id, factory]));
+    const detailRows = [];
+    const officialRows = [];
+    records.forEach((record) => {
+      const factory = factoryById.get(record.factoryId);
+      window.PowerMeterData.expandRecord(record, factory).forEach((row) => detailRows.push({
+        date: record.date,
+        factoryName: factory.name,
+        room: row.room,
+        process: row.process,
+        meterName: row.name,
+        category: row.category,
+        ratioText: row.ratio_text,
+        multiplier: row.multiplier,
+        start: row.start,
+        end: row.end,
+        difference: row.difference,
+        usage: row.usage,
+        statusCode: row.status_code,
+        source: record.source === "import" ? "历史导入" : "当日录入",
+      }));
+      const pairs = Array.isArray(record.officialRows) ? record.officialRows.map(([process, usage]) => [process, toNumber(usage) || 0]) : [];
+      const processTotal = pairs.reduce((sum, [, usage]) => sum + usage, 0);
+      const residual = (toNumber(record.officialTotal) ?? processTotal) - processTotal;
+      if (Math.abs(residual) >= 0.01) pairs.push(["汇总口径调整", residual]);
+      pairs.forEach(([process, usage]) => officialRows.push({
+        date: record.date,
+        factoryName: factory.name,
+        process,
+        usage,
+        source: record.source === "import" ? "原表正式汇总" : "当日录入自动汇总",
+      }));
+    });
+    const dictionaryRows = state.companyData.factories.flatMap((factory) => factory.meters.map((meter) => ({
+      factoryName: factory.name,
+      room: window.PowerMeterData.standardRoom(meter.panel),
+      process: window.PowerMeterData.standardProcess(meter),
+      meterName: meter.name,
+      category: meter.category,
+      ratioText: meter.ratio_text,
+      multiplier: meter.multiplier,
+      sourceCell: meter.source_cell,
+    })));
+    await window.PowerMeterXlsx.downloadMaster({
+      company: "雅新纺织有限公司",
+      firstDate: state.importMeta.firstDate,
+      endDate: state.importMeta.completedThrough,
+      detailRows,
+      officialRows,
+      dictionaryRows,
+      fileName: `雅新纺织-用电全量数据底表-${state.importMeta.completedThrough}.xlsx`,
+    });
+    showToast(`全量数据底表已生成，共 ${detailRows.length} 条计量点日记录`);
+  } catch (error) {
+    showToast(`底表生成失败：${error.message}`);
+  } finally {
+    el.masterDownloadButton.disabled = false;
+    el.masterDownloadButton.textContent = "下载全量数据底表";
+  }
 }
 
 
@@ -606,8 +856,11 @@ async function staticRequest(url, options = {}) {
     records[payload.date][state.factoryId] = { rows, report: { local, ai: null, ai_status: "GitHub试用版" } };
     localStorage.setItem(STATIC_STORAGE_KEY, JSON.stringify(records));
     if (window.PowerMeterData?.saveRows) {
-      await window.PowerMeterData.saveRows(payload.date, state.factoryId, rows, "manual");
+      const updatedMeta = await window.PowerMeterData.saveRows(payload.date, state.factoryId, rows, "manual");
+      state.importMeta = updatedMeta || state.importMeta;
       state.importedTotals.set(state.factoryId, Number(calculation.summary.total_usage || 0));
+      renderHistoryStatus();
+      refreshReportUi();
     }
     return { ...calculation, local_analysis: local };
   }
@@ -673,7 +926,7 @@ async function loadDate(readingDate) {
   state.serverWarnings.clear();
   if (STATIC_MODE && window.PowerMeterData) {
     const importedForDate = await window.PowerMeterData.getDate(readingDate);
-    state.importedTotals = new Map(importedForDate.filter((item) => item.completed).map((item) => [item.factoryId, item.totalUsage]));
+    state.importedTotals = new Map(importedForDate.filter((item) => item.completed).map((item) => [item.factoryId, item.officialTotal ?? item.totalUsage]));
     const previous = await window.PowerMeterData.getLatestBefore(readingDate, state.factoryId);
     const factory = selectedFactory();
     const previousRows = previous && factory ? window.PowerMeterData.expandRecord(previous, factory) : [];
@@ -1319,8 +1572,11 @@ el.testModeButton.addEventListener("click", () => setTestMode(!state.testMode));
 el.exitTestModeButton.addEventListener("click", () => setTestMode(false));
 el.historyImportButton.addEventListener("click", () => el.historyFileInput.click());
 el.historyFileInput.addEventListener("change", () => importHistoryFile(el.historyFileInput.files?.[0]));
-el.weeklyReportButton.addEventListener("click", () => createPeriodReport("week"));
-el.monthlyReportButton.addEventListener("click", () => createPeriodReport("month"));
+el.masterDownloadButton.addEventListener("click", downloadMasterWorkbook);
+el.generateReportButton.addEventListener("click", () => createPeriodReport().catch((error) => showToast(`报表生成失败：${error.message}`)));
+[el.reportType, el.reportReferenceDate, el.reportStartDate, el.reportEndDate].forEach((control) => {
+  control.addEventListener("change", refreshReportUi);
+});
 el.saveButton.addEventListener("click", saveAndAnalyze);
 el.exportButton.addEventListener("click", () => {
   if (STATIC_MODE) {
@@ -1364,13 +1620,17 @@ el.apiForm.addEventListener("submit", async (event) => {
 
 
 async function initialize() {
-  el.readingDate.value = todayLocal();
+  const today = todayLocal();
+  el.readingDate.value = today;
+  el.reportReferenceDate.value = today;
+  el.reportStartDate.value = today;
+  el.reportEndDate.value = today;
   if (STATIC_MODE) {
     const [meterResponse, historyResponse] = await Promise.all([
       fetch("meters.json", { cache: "no-store" }),
       fetch("history.json", { cache: "no-store" }),
     ]);
-    if (!meterResponse.ok) throw new Error("五分厂基础数据加载失败");
+    if (!meterResponse.ok) throw new Error("分厂基础数据加载失败");
     if (!historyResponse.ok) throw new Error("历史起点数据加载失败");
     state.companyData = await meterResponse.json();
     state.historyData = await historyResponse.json();
@@ -1378,11 +1638,14 @@ async function initialize() {
     await syncSavedRecordsToHistory();
     state.factoryId = state.companyData.factories?.[0]?.id || "";
     renderFactoryTabs();
+    initializeReportOptions();
+    refreshReportUi();
     updateModeUi();
     renderHistoryStatus();
   } else {
     el.factoryTabs.hidden = true;
     el.historyPanel.hidden = true;
+    el.reportCenter.hidden = true;
     el.testModeButton.hidden = true;
     el.testBanner.hidden = true;
   }

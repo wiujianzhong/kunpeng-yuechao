@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#123f46">
   <title>雅新纺织有限公司用电抄表分析工具</title>
-  <link rel="stylesheet" href="styles.css?v=20260710g">
+  <link rel="stylesheet" href="styles.css?v=20260710v2b">
 </head>
 <body>
   <header class="masthead">
@@ -38,10 +38,10 @@
     <button id="exitTestModeButton" type="button">退出测试模式</button>
   </section>
 
-  <section id="historyPanel" class="history-panel" aria-label="历史数据与周期报表">
+  <section id="historyPanel" class="history-panel" aria-label="历史数据底表">
     <div class="history-ledger-mark" aria-hidden="true">
-      <span>HISTORY</span>
-      <strong>历史台账</strong>
+      <span>MASTER DATA</span>
+      <strong>数据底表</strong>
     </div>
     <div class="history-copy">
       <span class="history-label">本机历史数据</span>
@@ -52,8 +52,68 @@
     <div class="history-actions">
       <input id="historyFileInput" type="file" accept=".xlsx" hidden>
       <button id="historyImportButton" class="history-primary" type="button">导入历史 Excel</button>
-      <button id="weeklyReportButton" type="button" disabled>下载周报</button>
-      <button id="monthlyReportButton" type="button" disabled>下载月报</button>
+      <button id="masterDownloadButton" type="button" disabled>下载全量数据底表</button>
+    </div>
+  </section>
+
+  <section id="reportCenter" class="report-center" aria-labelledby="reportCenterTitle">
+    <div class="report-heading">
+      <div>
+        <p class="section-kicker">任意组合 · 自动出表</p>
+        <h2 id="reportCenterTitle">报表中心</h2>
+      </div>
+      <span class="report-rule">周报固定：上周五 → 本周四，周五提交</span>
+    </div>
+
+    <div class="report-period-grid">
+      <label>
+        <span>报表类型</span>
+        <select id="reportType">
+          <option value="day">日报</option>
+          <option value="week" selected>周报</option>
+          <option value="month">月报</option>
+          <option value="custom">自定义日期</option>
+        </select>
+      </label>
+      <label id="reportReferenceField">
+        <span>选择日期</span>
+        <input id="reportReferenceDate" type="date">
+      </label>
+      <label id="reportStartField" hidden>
+        <span>开始日期</span>
+        <input id="reportStartDate" type="date">
+      </label>
+      <label id="reportEndField" hidden>
+        <span>结束日期</span>
+        <input id="reportEndDate" type="date">
+      </label>
+      <div class="period-preview">
+        <span>本次范围</span>
+        <strong id="reportPeriodPreview">—</strong>
+      </div>
+    </div>
+
+    <div class="report-filter-grid">
+      <fieldset>
+        <legend>分厂 <small>可多选</small></legend>
+        <div id="reportFactories" class="filter-chips"></div>
+      </fieldset>
+      <fieldset>
+        <legend>工序 <small>可多选</small></legend>
+        <div id="reportProcesses" class="filter-chips filter-chips-scroll"></div>
+      </fieldset>
+      <fieldset>
+        <legend>配电室 <small>可多选</small></legend>
+        <div id="reportRooms" class="filter-chips filter-chips-scroll"></div>
+      </fieldset>
+    </div>
+
+    <div class="report-runner">
+      <div>
+        <strong id="reportSelectionSummary">全部分厂 · 全部工序 · 全部配电室</strong>
+        <small id="reportBasisHint">未选择配电室时，优先采用原表正式汇总口径。</small>
+      </div>
+      <button id="generateReportButton" class="primary-button" type="button" disabled>生成并下载美化报表</button>
     </div>
   </section>
 
@@ -218,8 +278,8 @@
     </article>
   </template>
 
-  <script src="data-import.js?v=20260710g" defer></script>
-  <script src="xlsx-export.js?v=20260710g" defer></script>
-  <script src="app.js?v=20260710g" defer></script>
+  <script src="data-import.js?v=20260710v2b" defer></script>
+  <script src="xlsx-export.js?v=20260710v2b" defer></script>
+  <script src="app.js?v=20260710v2b" defer></script>
 </body>
 </html>
