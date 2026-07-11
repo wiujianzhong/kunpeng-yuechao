@@ -4375,8 +4375,47 @@
           "source_cell": "Z127"
         },
         {
-          "meter_id": "factory-3-Z139",
+          "meter_id": "factory-3-Z130",
           "order_no": 21,
+          "name": "7#开松间3",
+          "category": "三厂开松间用电",
+          "panel": "开松间",
+          "ratio_text": "600/5",
+          "multiplier": 120,
+          "seed": 36925,
+          "source_end": 36925,
+          "required": true,
+          "source_cell": "Z130"
+        },
+        {
+          "meter_id": "factory-3-Z131",
+          "order_no": 22,
+          "name": "7#开松间4",
+          "category": "三厂开松间用电",
+          "panel": "开松间",
+          "ratio_text": "600/5",
+          "multiplier": 120,
+          "seed": 28464,
+          "source_end": 28464,
+          "required": true,
+          "source_cell": "Z131"
+        },
+        {
+          "meter_id": "factory-3-Z132",
+          "order_no": 23,
+          "name": "7#开松间5",
+          "category": "三厂开松间用电",
+          "panel": "开松间",
+          "ratio_text": "750/5",
+          "multiplier": 150,
+          "seed": 18009,
+          "source_end": 18009,
+          "required": true,
+          "source_cell": "Z132"
+        },
+        {
+          "meter_id": "factory-3-Z139",
+          "order_no": 24,
           "name": "1#精梳",
           "category": "三厂精梳用电",
           "panel": "一号配",
@@ -4389,7 +4428,7 @@
         },
         {
           "meter_id": "factory-3-Z140",
-          "order_no": 22,
+          "order_no": 25,
           "name": "2#精梳",
           "category": "三厂精梳用电",
           "panel": "一号配",
@@ -4402,7 +4441,7 @@
         },
         {
           "meter_id": "factory-3-Z141",
-          "order_no": 23,
+          "order_no": 26,
           "name": "3#精梳",
           "category": "三厂精梳用电",
           "panel": "一号配",
@@ -4415,7 +4454,7 @@
         },
         {
           "meter_id": "factory-3-Z142",
-          "order_no": 24,
+          "order_no": 27,
           "name": "4#精梳",
           "category": "三厂精梳用电",
           "panel": "一号配",
@@ -4428,7 +4467,7 @@
         },
         {
           "meter_id": "factory-3-Z143",
-          "order_no": 25,
+          "order_no": 28,
           "name": "5#精梳",
           "category": "三厂精梳用电",
           "panel": "一号配",
@@ -4441,7 +4480,7 @@
         },
         {
           "meter_id": "factory-3-Z144",
-          "order_no": 26,
+          "order_no": 29,
           "name": "6#精梳",
           "category": "三厂精梳用电",
           "panel": "一号配",
@@ -4454,7 +4493,7 @@
         },
         {
           "meter_id": "factory-3-Z145",
-          "order_no": 27,
+          "order_no": 30,
           "name": "7#精梳",
           "category": "三厂精梳用电",
           "panel": "二号配",
@@ -4467,7 +4506,7 @@
         },
         {
           "meter_id": "factory-3-Z146",
-          "order_no": 28,
+          "order_no": 31,
           "name": "8#精梳",
           "category": "三厂精梳用电",
           "panel": "二号配",
@@ -4480,7 +4519,7 @@
         },
         {
           "meter_id": "factory-3-Z147",
-          "order_no": 29,
+          "order_no": 32,
           "name": "9#精梳",
           "category": "三厂精梳用电",
           "panel": "二号配",
@@ -4493,7 +4532,7 @@
         },
         {
           "meter_id": "factory-3-Z148",
-          "order_no": 30,
+          "order_no": 33,
           "name": "10#精梳",
           "category": "三厂精梳用电",
           "panel": "二号配",
@@ -4506,7 +4545,7 @@
         },
         {
           "meter_id": "factory-3-Z149",
-          "order_no": 31,
+          "order_no": 34,
           "name": "11#精梳",
           "category": "三厂精梳用电",
           "panel": "二号配",
@@ -4519,7 +4558,7 @@
         },
         {
           "meter_id": "factory-3-Z150",
-          "order_no": 32,
+          "order_no": 35,
           "name": "12#精梳",
           "category": "三厂精梳用电",
           "panel": "二号配",
@@ -4532,7 +4571,7 @@
         },
         {
           "meter_id": "factory-3-Z156",
-          "order_no": 33,
+          "order_no": 36,
           "name": "1#开松间空调",
           "category": "三分厂空调用电",
           "panel": "一号配",
@@ -4545,7 +4584,7 @@
         },
         {
           "meter_id": "factory-3-Z157",
-          "order_no": 34,
+          "order_no": 37,
           "name": "3#梳棉空调",
           "category": "三分厂空调用电",
           "panel": "一号配",
@@ -4558,7 +4597,7 @@
         },
         {
           "meter_id": "factory-3-Z158",
-          "order_no": 35,
+          "order_no": 38,
           "name": "5#精梳空调",
           "category": "三分厂空调用电",
           "panel": "一号配",
@@ -4571,7 +4610,7 @@
         },
         {
           "meter_id": "factory-3-Z159",
-          "order_no": 36,
+          "order_no": 39,
           "name": "2#清花空调二层",
           "category": "三分厂空调用电",
           "panel": "二号配",
@@ -4584,7 +4623,7 @@
         },
         {
           "meter_id": "factory-3-Z160",
-          "order_no": 37,
+          "order_no": 40,
           "name": "4#梳棉空调二层",
           "category": "三分厂空调用电",
           "panel": "二号配",
@@ -4597,7 +4636,7 @@
         },
         {
           "meter_id": "factory-3-Z161",
-          "order_no": 38,
+          "order_no": 41,
           "name": "6#精梳空调二层",
           "category": "三分厂空调用电",
           "panel": "二号配",
@@ -4610,7 +4649,7 @@
         },
         {
           "meter_id": "factory-3-Z162",
-          "order_no": 39,
+          "order_no": 42,
           "name": "9#细纱空调一层",
           "category": "三分厂空调用电",
           "panel": "三号配",
@@ -4623,7 +4662,7 @@
         },
         {
           "meter_id": "factory-3-Z163",
-          "order_no": 40,
+          "order_no": 43,
           "name": "9#细纱空调二层",
           "category": "三分厂空调用电",
           "panel": "三号配",
@@ -4636,7 +4675,7 @@
         },
         {
           "meter_id": "factory-3-Z164",
-          "order_no": 41,
+          "order_no": 44,
           "name": "新加9#空调",
           "category": "三分厂空调用电",
           "panel": "三号配",
@@ -4649,7 +4688,7 @@
         },
         {
           "meter_id": "factory-3-Z165",
-          "order_no": 42,
+          "order_no": 45,
           "name": "7#粗纱空调一层",
           "category": "三分厂空调用电",
           "panel": "三号配",
@@ -4662,7 +4701,7 @@
         },
         {
           "meter_id": "factory-3-Z166",
-          "order_no": 43,
+          "order_no": 46,
           "name": "7#粗纱空调二层",
           "category": "三分厂空调用电",
           "panel": "三号配",
@@ -4675,7 +4714,7 @@
         },
         {
           "meter_id": "factory-3-Z167",
-          "order_no": 44,
+          "order_no": 47,
           "name": "10#细纱空调一层",
           "category": "三分厂空调用电",
           "panel": "四号配",
@@ -4688,7 +4727,7 @@
         },
         {
           "meter_id": "factory-3-Z168",
-          "order_no": 45,
+          "order_no": 48,
           "name": "10#细纱空调二层",
           "category": "三分厂空调用电",
           "panel": "四号配",
@@ -4701,7 +4740,7 @@
         },
         {
           "meter_id": "factory-3-Z169",
-          "order_no": 46,
+          "order_no": 49,
           "name": "新加10#空调",
           "category": "三分厂空调用电",
           "panel": "四号配",
@@ -4714,7 +4753,7 @@
         },
         {
           "meter_id": "factory-3-Z170",
-          "order_no": 47,
+          "order_no": 50,
           "name": "8#粗纱空调一层",
           "category": "三分厂空调用电",
           "panel": "四号配",
@@ -4727,7 +4766,7 @@
         },
         {
           "meter_id": "factory-3-Z171",
-          "order_no": 48,
+          "order_no": 51,
           "name": "8#粗纱空调二层",
           "category": "三分厂空调用电",
           "panel": "四号配",
@@ -4740,7 +4779,7 @@
         },
         {
           "meter_id": "factory-3-Z172",
-          "order_no": 49,
+          "order_no": 52,
           "name": "11#细纱空调一层",
           "category": "三分厂空调用电",
           "panel": "五号配",
@@ -4753,7 +4792,7 @@
         },
         {
           "meter_id": "factory-3-Z173",
-          "order_no": 50,
+          "order_no": 53,
           "name": "11#细纱空调二层",
           "category": "三分厂空调用电",
           "panel": "五号配",
@@ -4766,7 +4805,7 @@
         },
         {
           "meter_id": "factory-3-Z174",
-          "order_no": 51,
+          "order_no": 54,
           "name": "新加11#空调",
           "category": "三分厂空调用电",
           "panel": "五号配",
@@ -4779,7 +4818,7 @@
         },
         {
           "meter_id": "factory-3-Z175",
-          "order_no": 52,
+          "order_no": 55,
           "name": "13#络筒一层空调",
           "category": "三分厂空调用电",
           "panel": "五号配",
@@ -4792,7 +4831,7 @@
         },
         {
           "meter_id": "factory-3-Z176",
-          "order_no": 53,
+          "order_no": 56,
           "name": "13#络筒二层空调",
           "category": "三分厂空调用电",
           "panel": "五号配",
@@ -4805,7 +4844,7 @@
         },
         {
           "meter_id": "factory-3-Z177",
-          "order_no": 54,
+          "order_no": 57,
           "name": "12#细纱空调二层",
           "category": "三分厂空调用电",
           "panel": "六号配",
@@ -4818,7 +4857,7 @@
         },
         {
           "meter_id": "factory-3-Z178",
-          "order_no": 55,
+          "order_no": 58,
           "name": "12#细纱空调一层",
           "category": "三分厂空调用电",
           "panel": "六号配",
@@ -4831,7 +4870,7 @@
         },
         {
           "meter_id": "factory-3-Z179",
-          "order_no": 56,
+          "order_no": 59,
           "name": "新加12#空调",
           "category": "三分厂空调用电",
           "panel": "六号配",
@@ -4844,7 +4883,7 @@
         },
         {
           "meter_id": "factory-3-Z180",
-          "order_no": 57,
+          "order_no": 60,
           "name": "14#络筒空调一层",
           "category": "三分厂空调用电",
           "panel": "六号配",
@@ -4857,7 +4896,7 @@
         },
         {
           "meter_id": "factory-3-Z181",
-          "order_no": 58,
+          "order_no": 61,
           "name": "14#络筒空调二层",
           "category": "三分厂空调用电",
           "panel": "六号配",
@@ -4870,7 +4909,7 @@
         },
         {
           "meter_id": "factory-3-Z183",
-          "order_no": 59,
+          "order_no": 62,
           "name": "立达细纱新增空调",
           "category": "三分厂空调用电",
           "panel": "九号配",
@@ -4883,7 +4922,7 @@
         },
         {
           "meter_id": "factory-3-Z184",
-          "order_no": 60,
+          "order_no": 63,
           "name": "1#小车间空调",
           "category": "三分厂空调用电",
           "panel": "1#配",
@@ -4896,7 +4935,7 @@
         },
         {
           "meter_id": "factory-3-Z195",
-          "order_no": 61,
+          "order_no": 64,
           "name": "络筒1",
           "category": "三厂络筒用电",
           "panel": "五号配",
@@ -4909,7 +4948,7 @@
         },
         {
           "meter_id": "factory-3-Z196",
-          "order_no": 62,
+          "order_no": 65,
           "name": "络筒2",
           "category": "三厂络筒用电",
           "panel": "五号配",
@@ -4922,7 +4961,7 @@
         },
         {
           "meter_id": "factory-3-Z197",
-          "order_no": 63,
+          "order_no": 66,
           "name": "络筒3",
           "category": "三厂络筒用电",
           "panel": "五号配",
@@ -4935,7 +4974,7 @@
         },
         {
           "meter_id": "factory-3-Z198",
-          "order_no": 64,
+          "order_no": 67,
           "name": "络筒4",
           "category": "三厂络筒用电",
           "panel": "五号配",
@@ -4948,7 +4987,7 @@
         },
         {
           "meter_id": "factory-3-Z199",
-          "order_no": 65,
+          "order_no": 68,
           "name": "络筒5",
           "category": "三厂络筒用电",
           "panel": "六号配",
@@ -4961,7 +5000,7 @@
         },
         {
           "meter_id": "factory-3-Z200",
-          "order_no": 66,
+          "order_no": 69,
           "name": "络筒6",
           "category": "三厂络筒用电",
           "panel": "六号配",
@@ -4974,7 +5013,7 @@
         },
         {
           "meter_id": "factory-3-Z201",
-          "order_no": 67,
+          "order_no": 70,
           "name": "络筒7",
           "category": "三厂络筒用电",
           "panel": "六号配",
@@ -4987,7 +5026,7 @@
         },
         {
           "meter_id": "factory-3-Z202",
-          "order_no": 68,
+          "order_no": 71,
           "name": "络筒8",
           "category": "三厂络筒用电",
           "panel": "六号配",
@@ -5000,7 +5039,7 @@
         },
         {
           "meter_id": "factory-3-Z203",
-          "order_no": 69,
+          "order_no": 72,
           "name": "蒸纱纺",
           "category": "三厂络筒用电",
           "panel": "七号配",
@@ -5013,7 +5052,7 @@
         },
         {
           "meter_id": "factory-3-Z204",
-          "order_no": 70,
+          "order_no": 73,
           "name": "络筒1",
           "category": "三厂络筒用电",
           "panel": "新加配电室",
@@ -5026,7 +5065,7 @@
         },
         {
           "meter_id": "factory-3-Z205",
-          "order_no": 71,
+          "order_no": 74,
           "name": "络筒2",
           "category": "三厂络筒用电",
           "panel": "新加配电室",
@@ -5039,7 +5078,7 @@
         },
         {
           "meter_id": "factory-3-Z213",
-          "order_no": 72,
+          "order_no": 75,
           "name": "清花一号",
           "category": "三厂清花梳棉",
           "panel": "一号配",
@@ -5052,7 +5091,7 @@
         },
         {
           "meter_id": "factory-3-Z214",
-          "order_no": 73,
+          "order_no": 76,
           "name": "清花二号",
           "category": "三厂清花梳棉",
           "panel": "一号配",
@@ -5065,7 +5104,7 @@
         },
         {
           "meter_id": "factory-3-Z215",
-          "order_no": 74,
+          "order_no": 77,
           "name": "1#梳棉",
           "category": "三厂清花梳棉",
           "panel": "一号配",
@@ -5078,7 +5117,7 @@
         },
         {
           "meter_id": "factory-3-Z216",
-          "order_no": 75,
+          "order_no": 78,
           "name": "2#梳棉",
           "category": "三厂清花梳棉",
           "panel": "一号配",
@@ -5091,7 +5130,7 @@
         },
         {
           "meter_id": "factory-3-Z217",
-          "order_no": 76,
+          "order_no": 79,
           "name": "3#梳棉",
           "category": "三厂清花梳棉",
           "panel": "一号配",
@@ -5104,7 +5143,7 @@
         },
         {
           "meter_id": "factory-3-Z218",
-          "order_no": 77,
+          "order_no": 80,
           "name": "4#梳棉",
           "category": "三厂清花梳棉",
           "panel": "一号配",
@@ -5117,7 +5156,7 @@
         },
         {
           "meter_id": "factory-3-Z219",
-          "order_no": 78,
+          "order_no": 81,
           "name": "5#梳棉",
           "category": "三厂清花梳棉",
           "panel": "",
@@ -5130,7 +5169,7 @@
         },
         {
           "meter_id": "factory-3-Z220",
-          "order_no": 79,
+          "order_no": 82,
           "name": "6#梳棉",
           "category": "三厂清花梳棉",
           "panel": "",
@@ -5143,7 +5182,7 @@
         },
         {
           "meter_id": "factory-3-Z221",
-          "order_no": 80,
+          "order_no": 83,
           "name": "新加梳棉",
           "category": "三厂清花梳棉",
           "panel": "",
@@ -5156,7 +5195,7 @@
         },
         {
           "meter_id": "factory-3-Z222",
-          "order_no": 81,
+          "order_no": 84,
           "name": "清花三号",
           "category": "三厂清花梳棉",
           "panel": "二号配",
@@ -5169,7 +5208,7 @@
         },
         {
           "meter_id": "factory-3-Z223",
-          "order_no": 82,
+          "order_no": 85,
           "name": "清花7线",
           "category": "三厂清花梳棉",
           "panel": "二号配",
@@ -5182,7 +5221,7 @@
         },
         {
           "meter_id": "factory-3-Z224",
-          "order_no": 83,
+          "order_no": 86,
           "name": "7#梳棉",
           "category": "三厂清花梳棉",
           "panel": "二号配",
@@ -5195,7 +5234,7 @@
         },
         {
           "meter_id": "factory-3-Z225",
-          "order_no": 84,
+          "order_no": 87,
           "name": "8#梳棉",
           "category": "三厂清花梳棉",
           "panel": "二号配",
@@ -5208,7 +5247,7 @@
         },
         {
           "meter_id": "factory-3-Z226",
-          "order_no": 85,
+          "order_no": 88,
           "name": "9#梳棉",
           "category": "三厂清花梳棉",
           "panel": "二号配",
@@ -5221,7 +5260,7 @@
         },
         {
           "meter_id": "factory-3-Z227",
-          "order_no": 86,
+          "order_no": 89,
           "name": "10#梳棉",
           "category": "三厂清花梳棉",
           "panel": "二号配",
@@ -5234,7 +5273,7 @@
         },
         {
           "meter_id": "factory-3-Z228",
-          "order_no": 87,
+          "order_no": 90,
           "name": "11#梳棉",
           "category": "三厂清花梳棉",
           "panel": "",
@@ -5247,7 +5286,7 @@
         },
         {
           "meter_id": "factory-3-Z229",
-          "order_no": 88,
+          "order_no": 91,
           "name": "12#梳棉",
           "category": "三厂清花梳棉",
           "panel": "",
@@ -5260,7 +5299,7 @@
         },
         {
           "meter_id": "factory-3-Z230",
-          "order_no": 89,
+          "order_no": 92,
           "name": "中间大道梳棉",
           "category": "三厂清花梳棉",
           "panel": "",
@@ -5273,7 +5312,7 @@
         },
         {
           "meter_id": "factory-3-Z231",
-          "order_no": 90,
+          "order_no": 93,
           "name": "新加梳棉",
           "category": "三厂清花梳棉",
           "panel": "",
@@ -5286,7 +5325,7 @@
         },
         {
           "meter_id": "factory-3-Z236",
-          "order_no": 91,
+          "order_no": 94,
           "name": "并条机（预）",
           "category": "三分厂条并卷用电",
           "panel": "一号配",
@@ -5299,7 +5338,7 @@
         },
         {
           "meter_id": "factory-3-Z237",
-          "order_no": 92,
+          "order_no": 95,
           "name": "条并卷",
           "category": "三分厂条并卷用电",
           "panel": "一号配",
@@ -5312,7 +5351,7 @@
         },
         {
           "meter_id": "factory-3-Z238",
-          "order_no": 93,
+          "order_no": 96,
           "name": "并条机（头）",
           "category": "三分厂条并卷用电",
           "panel": "一号配",
@@ -5325,7 +5364,7 @@
         },
         {
           "meter_id": "factory-3-Z239",
-          "order_no": 94,
+          "order_no": 97,
           "name": "后并条",
           "category": "三分厂条并卷用电",
           "panel": "一号配",
@@ -5338,7 +5377,7 @@
         },
         {
           "meter_id": "factory-3-Z240",
-          "order_no": 95,
+          "order_no": 98,
           "name": "并条机（预2）",
           "category": "三分厂条并卷用电",
           "panel": "二号配",
@@ -5351,7 +5390,7 @@
         },
         {
           "meter_id": "factory-3-Z241",
-          "order_no": 96,
+          "order_no": 99,
           "name": "并条卷2",
           "category": "三分厂条并卷用电",
           "panel": "二号配",
@@ -5364,7 +5403,7 @@
         },
         {
           "meter_id": "factory-3-Z242",
-          "order_no": 97,
+          "order_no": 100,
           "name": "并条机2",
           "category": "三分厂条并卷用电",
           "panel": "二号配",
@@ -5377,7 +5416,7 @@
         },
         {
           "meter_id": "factory-3-Z252",
-          "order_no": 98,
+          "order_no": 101,
           "name": "3#配1#_35#",
           "category": "三厂细纱用电",
           "panel": "三厂细纱用电",
@@ -5390,7 +5429,7 @@
         },
         {
           "meter_id": "factory-3-Z253",
-          "order_no": 99,
+          "order_no": 102,
           "name": "4#配106#_140#",
           "category": "三厂细纱用电",
           "panel": "三厂细纱用电",
@@ -5403,7 +5442,7 @@
         },
         {
           "meter_id": "factory-3-Z254",
-          "order_no": 100,
+          "order_no": 103,
           "name": "5#配36#_68#",
           "category": "三厂细纱用电",
           "panel": "三厂细纱用电",
@@ -5416,7 +5455,7 @@
         },
         {
           "meter_id": "factory-3-Z255",
-          "order_no": 101,
+          "order_no": 104,
           "name": "6#配69#_105#",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5429,7 +5468,7 @@
         },
         {
           "meter_id": "factory-3-Z256",
-          "order_no": 102,
+          "order_no": 105,
           "name": "8#配103-105",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5442,7 +5481,7 @@
         },
         {
           "meter_id": "factory-3-Z257",
-          "order_no": 103,
+          "order_no": 106,
           "name": "106-108",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5455,7 +5494,7 @@
         },
         {
           "meter_id": "factory-3-Z258",
-          "order_no": 104,
+          "order_no": 107,
           "name": "细纱91-93",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5468,7 +5507,7 @@
         },
         {
           "meter_id": "factory-3-Z259",
-          "order_no": 105,
+          "order_no": 108,
           "name": "细纱94-96",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5481,7 +5520,7 @@
         },
         {
           "meter_id": "factory-3-Z260",
-          "order_no": 106,
+          "order_no": 109,
           "name": "细纱97-99",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5494,7 +5533,7 @@
         },
         {
           "meter_id": "factory-3-Z261",
-          "order_no": 107,
+          "order_no": 110,
           "name": "细纱100-102",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5507,7 +5546,7 @@
         },
         {
           "meter_id": "factory-3-Z262",
-          "order_no": 108,
+          "order_no": 111,
           "name": "细纱118-120",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5520,7 +5559,7 @@
         },
         {
           "meter_id": "factory-3-Z263",
-          "order_no": 109,
+          "order_no": 112,
           "name": "细纱109-111",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5533,7 +5572,7 @@
         },
         {
           "meter_id": "factory-3-Z264",
-          "order_no": 110,
+          "order_no": 113,
           "name": "细纱112-114",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5546,7 +5585,7 @@
         },
         {
           "meter_id": "factory-3-Z265",
-          "order_no": 111,
+          "order_no": 114,
           "name": "细纱115-117",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5559,7 +5598,7 @@
         },
         {
           "meter_id": "factory-3-Z266",
-          "order_no": 112,
+          "order_no": 115,
           "name": "9配细纱21-23",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5572,7 +5611,7 @@
         },
         {
           "meter_id": "factory-3-Z267",
-          "order_no": 113,
+          "order_no": 116,
           "name": "细纱24-26",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5585,7 +5624,7 @@
         },
         {
           "meter_id": "factory-3-Z268",
-          "order_no": 114,
+          "order_no": 117,
           "name": "细纱27-29",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5598,7 +5637,7 @@
         },
         {
           "meter_id": "factory-3-Z269",
-          "order_no": 115,
+          "order_no": 118,
           "name": "细纱30-32",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5611,7 +5650,7 @@
         },
         {
           "meter_id": "factory-3-Z270",
-          "order_no": 116,
+          "order_no": 119,
           "name": "细纱33-35",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5624,7 +5663,7 @@
         },
         {
           "meter_id": "factory-3-Z271",
-          "order_no": 117,
+          "order_no": 120,
           "name": "细纱36-37",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5637,7 +5676,7 @@
         },
         {
           "meter_id": "factory-3-Z272",
-          "order_no": 118,
+          "order_no": 121,
           "name": "细纱38-40",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5650,7 +5689,7 @@
         },
         {
           "meter_id": "factory-3-Z273",
-          "order_no": 119,
+          "order_no": 122,
           "name": "细纱41-43",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5663,7 +5702,7 @@
         },
         {
           "meter_id": "factory-3-Z274",
-          "order_no": 120,
+          "order_no": 123,
           "name": "细纱44-46",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5676,7 +5715,7 @@
         },
         {
           "meter_id": "factory-3-Z275",
-          "order_no": 121,
+          "order_no": 124,
           "name": "细纱47-49",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5689,7 +5728,7 @@
         },
         {
           "meter_id": "factory-3-Z276",
-          "order_no": 122,
+          "order_no": 125,
           "name": "细纱1#",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5702,7 +5741,7 @@
         },
         {
           "meter_id": "factory-3-Z277",
-          "order_no": 123,
+          "order_no": 126,
           "name": "细纱2#",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5715,7 +5754,7 @@
         },
         {
           "meter_id": "factory-3-Z278",
-          "order_no": 124,
+          "order_no": 127,
           "name": "细纱3#",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5728,7 +5767,7 @@
         },
         {
           "meter_id": "factory-3-Z279",
-          "order_no": 125,
+          "order_no": 128,
           "name": "细纱4#",
           "category": "三厂细纱用电",
           "panel": "",
@@ -5741,7 +5780,7 @@
         },
         {
           "meter_id": "factory-3-Z285",
-          "order_no": 126,
+          "order_no": 129,
           "name": "清尾照明",
           "category": "三厂照明用电",
           "panel": "一号配",
@@ -5754,7 +5793,7 @@
         },
         {
           "meter_id": "factory-3-Z287",
-          "order_no": 127,
+          "order_no": 130,
           "name": "应急照明1",
           "category": "三厂照明用电",
           "panel": "一号配",
@@ -5767,7 +5806,7 @@
         },
         {
           "meter_id": "factory-3-Z288",
-          "order_no": 128,
+          "order_no": 131,
           "name": "2#应急照明",
           "category": "三厂照明用电",
           "panel": "二号配",
@@ -5780,7 +5819,7 @@
         },
         {
           "meter_id": "factory-3-Z289",
-          "order_no": 129,
+          "order_no": 132,
           "name": "4#应急照明",
           "category": "三厂照明用电",
           "panel": "二号配",
@@ -5793,7 +5832,7 @@
         },
         {
           "meter_id": "factory-3-Z290",
-          "order_no": 130,
+          "order_no": 133,
           "name": "三厂临照明",
           "category": "三厂照明用电",
           "panel": "二号配",
@@ -5806,7 +5845,7 @@
         },
         {
           "meter_id": "factory-3-Z291",
-          "order_no": 131,
+          "order_no": 134,
           "name": "粗纱梳棉照明",
           "category": "三厂照明用电",
           "panel": "二号配",
@@ -5819,7 +5858,7 @@
         },
         {
           "meter_id": "factory-3-Z292",
-          "order_no": 132,
+          "order_no": 135,
           "name": "细纱北区照明",
           "category": "三厂照明用电",
           "panel": "三号配",
@@ -5832,7 +5871,7 @@
         },
         {
           "meter_id": "factory-3-Z293",
-          "order_no": 133,
+          "order_no": 136,
           "name": "1#应急照明（备用）",
           "category": "三厂照明用电",
           "panel": "三号配",
@@ -5845,7 +5884,7 @@
         },
         {
           "meter_id": "factory-3-Z294",
-          "order_no": 134,
+          "order_no": 137,
           "name": "3#应急照明",
           "category": "三厂照明用电",
           "panel": "三号配",
@@ -5858,7 +5897,7 @@
         },
         {
           "meter_id": "factory-3-Z295",
-          "order_no": 135,
+          "order_no": 138,
           "name": "粗细北区照明",
           "category": "三厂照明用电",
           "panel": "四号配",
@@ -5871,7 +5910,7 @@
         },
         {
           "meter_id": "factory-3-Z296",
-          "order_no": 136,
+          "order_no": 139,
           "name": "2#应急照明（备用）",
           "category": "三厂照明用电",
           "panel": "四号配",
@@ -5884,7 +5923,7 @@
         },
         {
           "meter_id": "factory-3-Z297",
-          "order_no": 137,
+          "order_no": 140,
           "name": "4#应急照明",
           "category": "三厂照明用电",
           "panel": "四号配",
@@ -5897,7 +5936,7 @@
         },
         {
           "meter_id": "factory-3-Z298",
-          "order_no": 138,
+          "order_no": 141,
           "name": "6#应急照明（备用）",
           "category": "三厂照明用电",
           "panel": "四号配",
@@ -5910,7 +5949,7 @@
         },
         {
           "meter_id": "factory-3-Z299",
-          "order_no": 139,
+          "order_no": 142,
           "name": "细络北区照明",
           "category": "三厂照明用电",
           "panel": "五号",
@@ -5923,7 +5962,7 @@
         },
         {
           "meter_id": "factory-3-Z300",
-          "order_no": 140,
+          "order_no": 143,
           "name": "5#应急照明",
           "category": "三厂照明用电",
           "panel": "五号",
@@ -5936,7 +5975,7 @@
         },
         {
           "meter_id": "factory-3-Z301",
-          "order_no": 141,
+          "order_no": 144,
           "name": "细络照明",
           "category": "三厂照明用电",
           "panel": "六号",
@@ -5949,7 +5988,7 @@
         },
         {
           "meter_id": "factory-3-Z302",
-          "order_no": 142,
+          "order_no": 145,
           "name": "6#应急照明",
           "category": "三厂照明用电",
           "panel": "六号",
@@ -5962,7 +6001,7 @@
         },
         {
           "meter_id": "factory-3-Z303",
-          "order_no": 143,
+          "order_no": 146,
           "name": "8#照明",
           "category": "三厂照明用电",
           "panel": "八号",
@@ -5975,7 +6014,7 @@
         },
         {
           "meter_id": "factory-3-Z304",
-          "order_no": 144,
+          "order_no": 147,
           "name": "9#照明",
           "category": "三厂照明用电",
           "panel": "九号",

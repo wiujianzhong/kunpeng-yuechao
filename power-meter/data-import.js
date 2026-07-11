@@ -46,7 +46,10 @@
   const OFFICIAL_UNIT_CELLS = {
     "factory-4": [["气流纺", "L22"], ["涡流纺", "L23"]],
   };
-  const REPORT_AUXILIARY_CELLS = ["F16", "J15", "M22"];
+  const REPORT_AUXILIARY_CELLS = ["F16", "J15", "J16", "M22", "M23", "M24", "O20"];
+  const WEEKLY_PERIOD_OVERRIDES = {
+    "26.5.8": { startDate: "2026-05-08", endDate: "2026-05-14" },
+  };
   const FACTORY_NAMES = {
     "factory-1": "一分厂",
     "factory-2": "二分厂",
@@ -61,6 +64,12 @@
     { id: "factory-4-air", name: "四分厂气流纺", factoryId: "factory-4", unitName: "气流纺" },
     { id: "factory-4-vortex", name: "四分厂涡流纺", factoryId: "factory-4", unitName: "涡流纺" },
     { id: "factory-7", name: "七分厂", factoryId: "factory-7" },
+  ];
+  const OPENING_ENDPOINT_METERS = [
+    ["AA130", "AB130", 120],
+    ["AA131", "AB131", 120],
+    ["AA132", "AB132", 150],
+    ["AA156", "AB156", 80],
   ];
 
   function cellRange(column, start, end) {
@@ -246,11 +255,19 @@
       const sourceCommon = finiteNumber(referenceData?.sources?.publicDaily?.[record.date]?.commonShare);
       const embeddedCommon = finiteNumber(record.commonShare ?? record.reportAdjustments?.includedCommonShare) || 0;
       const commonCorrection = sourceCommon === null ? 0 : sourceCommon - embeddedCommon;
-      if (unit.factoryId !== "factory-4") return (finiteNumber(record.reportTotal ?? record.officialTotal) || 0) + commonCorrection;
+      const sourceAir = finiteNumber(referenceData?.sources?.publicDaily?.[record.date]?.airAllocations?.[unit.factoryId]);
+      const embeddedAir = finiteNumber(record.reportAdjustments?.includedPublicAir) || 0;
+      const airCorrection = sourceAir === null ? 0 : sourceAir - embeddedAir;
+      if (unit.factoryId !== "factory-4") return (finiteNumber(record.reportTotal ?? record.officialTotal) || 0) + commonCorrection + airCorrection;
       const units = new Map((record.reportUnits || record.officialUnits || []).map(([name, usage]) => [name, finiteNumber(usage) || 0]));
-      return (units.get(unit.unitName) || 0) + commonCorrection;
+      return (units.get(unit.unitName) || 0) + commonCorrection + airCorrection * (unit.unitName === "气流纺" ? 0.7 : 0.3);
     };
     const weeks = [];
+    const historicalByPeriod = new Map();
+    (referenceData?.weekly || []).forEach((item) => {
+      const key = `${item.startDate}|${item.endDate}`;
+      if (!historicalByPeriod.has(key)) historicalByPeriod.set(key, item);
+    });
     let monthKey = "";
     let monthRunning = Object.fromEntries(WEEKLY_REPORT_UNITS.map((unit) => [unit.id, 0]));
     const weekEnds = [...new Set(completeRecords.map((record) => weekEnd(record.date)))].sort();
@@ -288,6 +305,34 @@
       }
       WEEKLY_REPORT_UNITS.forEach((unit) => { monthRunning[unit.id] += unitTotals[unit.id]; });
       const totalUsage = Object.values(unitTotals).reduce((sum, usage) => sum + usage, 0);
+      const historical = historicalByPeriod.get(`${startDate}|${endDate}`);
+      let referenceAudit = null;
+      if (historical?.units) {
+        const unitDifferences = Object.fromEntries(WEEKLY_REPORT_UNITS.map((unit) => [
+          unit.id,
+          (finiteNumber(historical.units[unit.id]) || 0) - unitTotals[unit.id],
+        ]));
+        const differences = Object.values(unitDifferences).sort((a, b) => a - b);
+        const middle = Math.floor(differences.length / 2);
+        const uniformDifference = differences.length % 2
+          ? differences[middle]
+          : (differences[middle - 1] + differences[middle]) / 2;
+        const spread = differences.length ? differences.at(-1) - differences[0] : 0;
+        const historicalTotal = WEEKLY_REPORT_UNITS.reduce((sum, unit) => sum + (finiteNumber(historical.units[unit.id]) || 0), 0);
+        referenceAudit = {
+          sourceSheet: historical.sourceSheet,
+          historicalTotal,
+          totalDifference: historicalTotal - totalUsage,
+          uniformDifference,
+          spread,
+          unitDifferences,
+          status: differences.every((value) => Math.abs(value) <= 1)
+            ? "一致"
+            : spread <= 1
+              ? "六单元统一差额"
+              : "单厂源表或历史录入差异",
+        };
+      }
       const previous = weeks.at(-1);
       weeks.push({
         startDate,
@@ -297,6 +342,7 @@
         monthTotals: { ...monthRunning },
         totalUsage,
         previousChange: previous?.totalUsage ? (totalUsage - previous.totalUsage) / previous.totalUsage : null,
+        referenceAudit,
         dailyRows,
         processes: [...processTotals.entries()]
           .sort((a, b) => b[1] - a[1])
@@ -323,10 +369,14 @@
     let officialUnits = [[FACTORY_NAMES[factoryId] || factoryId, totalUsage]];
     let reportTotal = totalUsage;
     let reportUnits = officialUnits;
+    let gasUsage = 0;
+    let vortexUsage = 0;
     const reportAdjustments = {
       excludedNetFiber: 0,
       excludedOpeningRoom: 0,
+      excludedThirdFactoryVortex: 0,
       excludedFourFactoryCommon: 0,
+      includedPublicAir: 0,
       includedCommonShare: 0,
     };
     if (factoryId === "factory-2") {
@@ -342,14 +392,18 @@
         const text = `${row.category || ""}${row.name || ""}`;
         return sum + (/开松/.test(text) ? finiteNumber(row.usage ?? row._usage) || 0 : 0);
       }, 0);
-      reportTotal -= reportAdjustments.excludedOpeningRoom;
+      reportAdjustments.excludedThirdFactoryVortex = rows.reduce((sum, row) => {
+        const text = `${row.category || ""}${row.name || ""}`;
+        return sum + (/三厂.*涡流纺|涡流纺.*三厂/.test(text) ? finiteNumber(row.usage ?? row._usage) || 0 : 0);
+      }, 0);
+      reportTotal -= reportAdjustments.excludedOpeningRoom + reportAdjustments.excludedThirdFactoryVortex;
       reportUnits = [[FACTORY_NAMES[factoryId], reportTotal]];
     }
     if (factoryId === "factory-4") {
-      const gasUsage = [...processTotals.entries()]
+      gasUsage = [...processTotals.entries()]
         .filter(([process]) => process.startsWith("气流纺"))
         .reduce((sum, [, usage]) => sum + usage, 0);
-      const vortexUsage = [...processTotals.entries()]
+      vortexUsage = [...processTotals.entries()]
         .filter(([process]) => process.startsWith("涡流纺"))
         .reduce((sum, [, usage]) => sum + usage, 0);
       const sharedUsage = totalUsage - gasUsage - vortexUsage;
@@ -362,9 +416,16 @@
       reportTotal = gasUsage + vortexUsage;
       reportUnits = [["气流纺", gasUsage], ["涡流纺", vortexUsage]];
     }
+    const monthlyPacking = factoryId === "factory-4"
+      ? rows.reduce((sum, row) => sum + (/打包/.test(`${row.category || ""}${row.name || ""}`) ? finiteNumber(row.usage ?? row._usage) || 0 : 0), 0)
+      : 0;
     const monthlyUnits = factoryId === "factory-4"
-      ? officialUnits
-      : [[FACTORY_NAMES[factoryId] || factoryId, factoryId === "factory-3" ? totalUsage - reportAdjustments.excludedOpeningRoom : totalUsage]];
+      ? [["气流纺", gasUsage + monthlyPacking], ["涡流纺", vortexUsage]]
+      : [[FACTORY_NAMES[factoryId] || factoryId, factoryId === "factory-2"
+        ? totalUsage - reportAdjustments.excludedNetFiber
+        : factoryId === "factory-3"
+          ? totalUsage - reportAdjustments.excludedOpeningRoom - reportAdjustments.excludedThirdFactoryVortex
+          : totalUsage]];
     const monthlyTotal = monthlyUnits.reduce((sum, [, usage]) => sum + usage, 0);
     return {
       key: `${date}|${factoryId}`,
@@ -583,7 +644,8 @@
 
   function numericCells(sheetXml, addresses) {
     const values = new Map();
-    for (const matched of sheetXml.matchAll(/<c\b[^>]*\br="([A-Z]+\d+)"[^>]*>([\s\S]*?)<\/c>/g)) {
+    const populatedCellsXml = sheetXml.replace(/<c\b[^>]*\/>/g, "");
+    for (const matched of populatedCellsXml.matchAll(/<c\b[^>]*\br="([A-Z]+\d+)"[^>]*>([\s\S]*?)<\/c>/g)) {
       if (!addresses.has(matched[1])) continue;
       const value = /<v>([^<]*)<\/v>/.exec(matched[2]);
       values.set(matched[1], finiteNumber(value?.[1]));
@@ -646,9 +708,10 @@
       const title = String(cells.get("A1") || "").replace(/\s+/g, "");
       const values = ["C6", "D6", "E6", "F6", "G6", "H6"].map((address) => finiteNumber(cells.get(address)));
       if (!/电气周报/.test(title) || values.some((value) => value === null)) continue;
-      const endDate = completedThursday(sheet.date);
+      const periodOverride = WEEKLY_PERIOD_OVERRIDES[sheet.name];
+      const endDate = periodOverride?.endDate || completedThursday(sheet.date);
       weekly.push({
-        startDate: addDaysText(endDate, -6),
+        startDate: periodOverride?.startDate || addDaysText(endDate, -6),
         endDate,
         sourceSheet: sheet.name,
         sourceFile: file.name,
@@ -680,6 +743,17 @@
     return month >= 1 && month <= 12 ? `${defaultYear}-${String(month).padStart(2, "0")}` : null;
   }
 
+  function closingDateFromSourceSheet(name, defaultYear = null) {
+    const text = String(name || "").replace(/\s+/g, "");
+    let matched = /^(20\d{2})年(\d{1,2})[.月](\d{1,2})?/.exec(text);
+    if (matched?.[3]) return `${matched[1]}-${String(Number(matched[2])).padStart(2, "0")}-${String(Number(matched[3])).padStart(2, "0")}`;
+    matched = /^(\d{2})[.年](\d{1,2})\.(\d{1,2})月/.exec(text);
+    if (matched) return `${2000 + Number(matched[1])}-${String(Number(matched[2])).padStart(2, "0")}-${String(Number(matched[3])).padStart(2, "0")}`;
+    matched = /^(\d{1,2})\.(\d{1,2})月/.exec(text);
+    if (!matched || !defaultYear) return null;
+    return `${defaultYear}-${String(Number(matched[1])).padStart(2, "0")}-${String(Number(matched[2])).padStart(2, "0")}`;
+  }
+
   function sourceNumber(cells, address) {
     return finiteNumber(cells.get(address)) || 0;
   }
@@ -696,6 +770,12 @@
         daily[sheet.date] = {
           commonShare,
           publicAirShare: sourceNumber(cells, "H23") / 4,
+          airAllocations: {
+            "factory-1": sourceNumber(cells, "C33"),
+            "factory-2": sourceNumber(cells, "D33"),
+            "factory-3": sourceNumber(cells, "E33"),
+            "factory-4": sourceNumber(cells, "C36"),
+          },
           fullCommonShare: sourceNumber(cells, "I4"),
           laboratory: sourceNumber(cells, "G17"),
           sourceFile: file.name,
@@ -721,6 +801,7 @@
         reservoir: sourceNumber(cells, "G145"),
         airEnergy: sourceNumber(cells, "G146"),
         waterWells: sourceNumber(cells, "F29") - sourceNumber(cells, "G24") + sourceNumber(cells, "G131"),
+        closingDate: closingDateFromSourceSheet(sheet.name, 2026),
         sourceFile: file.name,
         sourceSheet: sheet.name,
       };
@@ -740,7 +821,7 @@
       const cells = await sheetCellMap(context, sheet);
       const usage = finiteNumber(cells.get("G18"));
       if (usage === null) continue;
-      monthly[month] = { usage, sourceFile: file.name, sourceSheet: sheet.name };
+      monthly[month] = { usage, closingDate: closingDateFromSourceSheet(sheet.name), sourceFile: file.name, sourceSheet: sheet.name };
     }
     if (!Object.keys(monthly).length) throw new Error(`${file.name}没有识别到月度路灯数据`);
     return monthly;
@@ -758,6 +839,7 @@
       monthly[month] = {
         office: office || 0,
         dining: dining || 0,
+        closingDate: closingDateFromSourceSheet(sheet.name),
         sourceFile: file.name,
         sourceSheet: sheet.name,
       };
@@ -786,6 +868,24 @@
           "factory-7": finiteNumber(cells.get("P64")) || 0,
         },
         managementTotal: finiteNumber(cells.get("D54")) || 0,
+        managementComponents: {
+          "路灯": finiteNumber(cells.get("D39")) || 0,
+          "办公楼": finiteNumber(cells.get("D40")) || 0,
+          "宿舍": finiteNumber(cells.get("D41")) || 0,
+          "清餐": finiteNumber(cells.get("D42")) || 0,
+          "低压10号": finiteNumber(cells.get("D43")) || 0,
+          "汉餐": finiteNumber(cells.get("D44")) || 0,
+          "抓包及叉车库": finiteNumber(cells.get("D45")) || 0,
+          "车棚": finiteNumber(cells.get("D46")) || 0,
+          "机修间": finiteNumber(cells.get("D47")) || 0,
+          "皮辊制作间": finiteNumber(cells.get("D48")) || 0,
+          "生活泵站": finiteNumber(cells.get("D49")) || 0,
+          "交换站": finiteNumber(cells.get("D50")) || 0,
+          "蓄回水池": finiteNumber(cells.get("D51")) || 0,
+          "空气能": finiteNumber(cells.get("D52")) || 0,
+          "公共水井": finiteNumber(cells.get("D53")) || 0,
+          "中心实验室": finiteNumber(cells.get("D64")) || 0,
+        },
         openingRoom: finiteNumber(cells.get("R16")) || 0,
         companyTotal: finiteNumber(cells.get("R65")) || 0,
       };
@@ -850,6 +950,7 @@
     Object.values(OFFICIAL_TOTAL_CELLS).flat().forEach((address) => addresses.add(address));
     Object.values(OFFICIAL_UNIT_CELLS).flat().forEach(([, address]) => addresses.add(address));
     REPORT_AUXILIARY_CELLS.forEach((address) => addresses.add(address));
+    OPENING_ENDPOINT_METERS.flatMap(([start, end]) => [start, end]).forEach((address) => addresses.add(address));
     const byDate = new Map();
 
     for (let index = 0; index < sheets.length; index += 1) {
@@ -881,7 +982,7 @@
         const productionBase = factory.id === "factory-2"
           ? officialTotal - (cells.get("F16") || 0)
           : factory.id === "factory-3"
-            ? officialTotal - (cells.get("J15") || 0)
+            ? officialTotal - (cells.get("J15") || 0) - (cells.get("J16") || 0)
             : factory.id === "factory-4"
               ? officialTotal - commonFourFactory
               : officialTotal;
@@ -890,8 +991,9 @@
           : [[factory.name, (productionBase || officialRows.reduce((sum, [, usage]) => sum + usage, 0) || totalUsage) + commonFourFactory]];
         const reportTotal = reportUnits.reduce((sum, [, usage]) => sum + usage, 0);
         const monthlyUnits = factory.id === "factory-4"
-          ? officialUnits
-          : [[factory.name, factory.id === "factory-3" ? officialTotal - (cells.get("J15") || 0) : officialTotal]];
+          ? [["气流纺", (cells.get("L22") || 0) - commonFourFactory / 2 + (cells.get("O20") || 0) / 2],
+            ["涡流纺", (cells.get("L23") || 0) - commonFourFactory / 2 - (cells.get("O20") || 0) / 2]]
+          : [[factory.name, productionBase || officialRows.reduce((sum, [, usage]) => sum + usage, 0) || totalUsage]];
         const monthlyTotal = monthlyUnits.reduce((sum, [, usage]) => sum + usage, 0);
         records.push({
           key: `${sheet.date}|${factory.id}`,
@@ -908,11 +1010,20 @@
           reportUnits,
           monthlyTotal,
           monthlyUnits,
+          openingEndpointReadings: factory.id === "factory-3"
+            ? OPENING_ENDPOINT_METERS.map(([start, end, multiplier]) => [cells.get(start) ?? null, cells.get(end) ?? null, multiplier])
+            : [],
           commonShare: commonFourFactory,
           reportAdjustments: {
             excludedNetFiber: factory.id === "factory-2" ? cells.get("F16") || 0 : 0,
             excludedOpeningRoom: factory.id === "factory-3" ? cells.get("J15") || 0 : 0,
+            excludedThirdFactoryVortex: factory.id === "factory-3" ? cells.get("J16") || 0 : 0,
             excludedFourFactoryCommon: factory.id === "factory-4" ? commonFourFactory : 0,
+            includedPublicAir: factory.id === "factory-1" ? cells.get("D18") || 0
+              : factory.id === "factory-2" ? cells.get("G18") || 0
+                : factory.id === "factory-3" ? cells.get("J18") || 0
+                  : factory.id === "factory-4" ? (cells.get("M23") || 0) + (cells.get("M24") || 0)
+                    : 0,
             includedCommonShare: commonFourFactory,
           },
         });
@@ -945,8 +1056,8 @@
         dayCount: ordered.length,
         sheetCount: sheets.length,
         meterCount: (companyData.factories || []).reduce((sum, factory) => sum + factory.meters.length, 0),
-        schemaVersion: 6,
-        reportBasis: "周报生产区加公摊；月报生产区加管理生活区",
+        schemaVersion: 7,
+        reportBasis: "周报生产区加公摊；月报按源表月结节点加管理生活区",
       },
     };
   }
@@ -960,7 +1071,8 @@
       const manual = existing.filter((record) => record.source === "manual").map((record) => {
         const factory = factoryById.get(record.factoryId);
         if (!factory || (Array.isArray(record.officialRows) && Array.isArray(record.officialUnits) && Array.isArray(record.reportUnits)
-          && Array.isArray(record.monthlyUnits) && Number.isFinite(Number(record.monthlyTotal)) && record.commonShare !== undefined)) return record;
+          && Array.isArray(record.monthlyUnits) && Number.isFinite(Number(record.monthlyTotal))
+          && record.reportAdjustments?.excludedThirdFactoryVortex !== undefined && record.commonShare !== undefined)) return record;
         return compactRows(record.date, record.factoryId, expandRecord(record, factory), "manual");
       });
       const importedDates = new Set(parsed.records.map((record) => record.date));

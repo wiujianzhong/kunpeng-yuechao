@@ -590,10 +590,10 @@
       sheet.add(summaryRow, 2, audit.sourceCommonTotal || 0, 8, { type: "number" });
       sheet.add(summaryRow, 3, "历史统一差额/单元", 7);
       sheet.add(summaryRow, 4, audit.commonAdjustment || 0, 8, { type: "number" });
-      sheet.merge(summaryRow, 5, 7, "公摊已由源表计算，不再用历史差额倒推", 4);
+      sheet.merge(summaryRow, 5, 7, "历史周报为手工值，统一差额来源未留公式", 4);
       sheet.add(summaryRow + 1, 1, "各单元差额离散", 7);
       sheet.add(summaryRow + 1, 2, audit.spread || 0, 8, { type: "number" });
-      sheet.merge(summaryRow + 1, 3, 7, audit.spread <= 1 ? "统一版本差" : "存在个别原表修订或人工差异", audit.spread <= 1 ? 4 : 14);
+      sheet.merge(summaryRow + 1, 3, 7, audit.spread <= 1 ? "六单元统一差额" : "存在单厂源表或历史录入差异", audit.spread <= 1 ? 4 : 14);
       summaryRow += 3;
     } else {
       const monthlyRows = [
@@ -609,6 +609,39 @@
         sheet.merge(row, 3, 7, note, 4);
       });
       summaryRow += monthlyRows.length + 1;
+      if (audit.reconciliation) {
+        sheet.merge(summaryRow, 1, 7, "月报差额分解（历史－当前）", 9, 24);
+        summaryRow += 1;
+        [["生产区", audit.reconciliation.productionCalculated, audit.reconciliation.productionHistorical],
+          ["管理生活区分摊", audit.reconciliation.managementCalculated, audit.reconciliation.managementHistorical],
+          ["开松间", audit.reconciliation.openingCalculated, audit.reconciliation.openingHistorical]].forEach(([label, calculated, historical]) => {
+          sheet.add(summaryRow, 1, label, 4);
+          sheet.add(summaryRow, 2, calculated || 0, 5, { type: "number" });
+          sheet.add(summaryRow, 3, historical || 0, 5, { type: "number" });
+          sheet.add(summaryRow, 4, (historical || 0) - (calculated || 0), 16, { type: "number" });
+          sheet.merge(summaryRow, 5, 7, "历史报表－当前底表", 4);
+          summaryRow += 1;
+        });
+        summaryRow += 1;
+      }
+      if (audit.componentItems?.length) {
+        sheet.merge(summaryRow, 1, 7, "管理生活区逐项对账", 9, 24);
+        summaryRow += 1;
+        ["项目", "当前源表", "历史月报", "差额", "结论"].forEach((header, index) => {
+          if (index < 4) sheet.add(summaryRow, index + 1, header, 3);
+          else sheet.merge(summaryRow, 5, 7, header, 3);
+        });
+        summaryRow += 1;
+        audit.componentItems.forEach((item) => {
+          sheet.add(summaryRow, 1, item.name, 4);
+          sheet.add(summaryRow, 2, item.calculated, 5, { type: "number" });
+          sheet.add(summaryRow, 3, item.historical, 5, { type: "number" });
+          sheet.add(summaryRow, 4, item.difference, Math.abs(item.difference) <= 1 ? 5 : 16, { type: "number" });
+          sheet.merge(summaryRow, 5, 7, Math.abs(item.difference) <= 1 ? "一致" : "历史手填或源表差异", Math.abs(item.difference) <= 1 ? 4 : 14);
+          summaryRow += 1;
+        });
+        summaryRow += 1;
+      }
     }
     sheet.merge(summaryRow, 1, 7, audit.note, 13, 38);
     return sheet.xml({
@@ -726,9 +759,9 @@
 
   function buildWeeklyOverviewSheet(report) {
     const sheet = new SheetBuilder();
-    sheet.merge(1, 1, 11, `${report.company}用电周报历史总簿`, 1, 34);
-    sheet.merge(2, 1, 11, `完整周报 ${report.totalWeeks} 周｜固定周期：周五至次周四｜数据截至 ${report.throughDate}`, 2, 24);
-    const headers = ["周序", "开始日期", "截止日期", ...report.units.map((unit) => unit.name), "全公司合计", "较上周变化"];
+    sheet.merge(1, 1, 16, `${report.company}用电周报历史总簿`, 1, 34);
+    sheet.merge(2, 1, 16, `完整周报 ${report.totalWeeks} 周｜固定周期：周五至次周四｜数据截至 ${report.throughDate}`, 2, 24);
+    const headers = ["周序", "开始日期", "截止日期", ...report.units.map((unit) => unit.name), "自动合计", "历史合计", "历史－自动", "统一差额/单元", "差额离散", "对账结论", "较上周变化"];
     headers.forEach((header, index) => sheet.add(4, index + 1, header, 3));
     report.weeks.forEach((week, index) => {
       const row = index + 5;
@@ -737,18 +770,24 @@
       sheet.add(row, 3, week.endDate, 12);
       report.units.forEach((unit, unitIndex) => sheet.add(row, 4 + unitIndex, week.unitTotals[unit.id] || 0, 5, { type: "number" }));
       sheet.add(row, 10, week.totalUsage, 15, { type: "number" });
-      sheet.add(row, 11, week.previousChange, 10, { type: week.previousChange === null ? "text" : "number" });
+      sheet.add(row, 11, week.referenceAudit?.historicalTotal ?? "—", 5, { type: week.referenceAudit ? "number" : "text" });
+      sheet.add(row, 12, week.referenceAudit?.totalDifference ?? "—", week.referenceAudit ? 16 : 4, { type: week.referenceAudit ? "number" : "text" });
+      sheet.add(row, 13, week.referenceAudit?.uniformDifference ?? "—", 5, { type: week.referenceAudit ? "number" : "text" });
+      sheet.add(row, 14, week.referenceAudit?.spread ?? "—", 5, { type: week.referenceAudit ? "number" : "text" });
+      sheet.add(row, 15, week.referenceAudit?.status || "无历史周报", week.referenceAudit?.status === "一致" ? 4 : 14);
+      sheet.add(row, 16, week.previousChange, 10, { type: week.previousChange === null ? "text" : "number" });
       sheet.setHeight(row, 22);
     });
     const noteRow = report.weeks.length + 6;
-    sheet.merge(noteRow, 1, 11, "说明：周报只收录完整的周五至周四周期；生产区叠加五厂公摊水井均分，四分厂仍拆气流纺、涡流纺。", 13, 28);
+    sheet.merge(noteRow, 1, 16, "说明：周报只收录完整的周五至周四周期；历史周报用电量为手工值，统一差额仅说明六单元存在共同调整，原单元格没有公式，无法继续追溯来源。", 13, 32);
     return sheet.xml({
       columns: [
         { width: 8 }, { width: 13 }, { width: 13 }, { width: 16 }, { width: 16 }, { width: 16 },
-        { width: 18 }, { width: 18 }, { width: 16 }, { width: 18 }, { width: 14 },
+        { width: 18 }, { width: 18 }, { width: 16 }, { width: 18 }, { width: 16 }, { width: 16 },
+        { width: 16 }, { width: 14 }, { width: 28 }, { width: 14 },
       ],
       freezeRow: 4,
-      autoFilter: report.weeks.length ? `A4:K${report.weeks.length + 4}` : "",
+      autoFilter: report.weeks.length ? `A4:P${report.weeks.length + 4}` : "",
     });
   }
 

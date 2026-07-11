@@ -262,7 +262,7 @@ function shortDate(date) {
 
 function renderHistoryStatus() {
   const meta = state.importMeta;
-  const ready = Boolean(meta?.schemaVersion >= 6);
+  const ready = Boolean(meta?.schemaVersion >= 7);
   el.masterDownloadButton.disabled = !ready;
   el.weeklyHistoryButton.disabled = !ready;
   el.generateReportButton.disabled = !ready;
@@ -354,6 +354,20 @@ function addDays(value, days) {
   return date;
 }
 
+function previousMonthKey(monthKey) {
+  const [year, month] = monthKey.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 2, 1));
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+function sourceClosingDate(monthKey) {
+  const sources = state.referenceData?.sources;
+  return sources?.publicMonthly?.[monthKey]?.closingDate
+    || sources?.roadMonthly?.[monthKey]?.closingDate
+    || sources?.facilitiesMonthly?.[monthKey]?.closingDate
+    || null;
+}
+
 
 function reportBounds(type = el.reportType.value) {
   const referenceText = el.reportReferenceDate.value || state.date || todayLocal();
@@ -367,10 +381,15 @@ function reportBounds(type = el.reportType.value) {
     return { start: dateText(addDays(end, -6)), end: dateText(end), label: "周报" };
   }
   if (type === "month") {
-    const start = new Date(Date.UTC(reference.getUTCFullYear(), reference.getUTCMonth(), 1));
-    const monthEnd = addDays(new Date(Date.UTC(reference.getUTCFullYear(), reference.getUTCMonth() + 1, 1)), -1);
-    const end = completedThrough >= start && completedThrough < monthEnd ? completedThrough : monthEnd;
-    return { start: dateText(start), end: dateText(end), label: "月报" };
+    const monthKey = referenceText.slice(0, 7);
+    const closingDate = sourceClosingDate(monthKey);
+    const previousClosingDate = sourceClosingDate(previousMonthKey(monthKey));
+    const naturalStart = new Date(Date.UTC(reference.getUTCFullYear(), reference.getUTCMonth(), 1));
+    const naturalEnd = addDays(new Date(Date.UTC(reference.getUTCFullYear(), reference.getUTCMonth() + 1, 1)), -1);
+    const start = previousClosingDate ? addDays(previousClosingDate, 1) : naturalStart;
+    const plannedEnd = closingDate ? dateAtUtc(closingDate) : naturalEnd;
+    const end = completedThrough >= start && completedThrough < plannedEnd ? completedThrough : plannedEnd;
+    return { start: dateText(start), end: dateText(end), label: "月报", monthKey, closingDate: dateText(plannedEnd) };
   }
   return {
     start: el.reportStartDate.value || referenceText,
@@ -403,7 +422,7 @@ async function buildWeeklyHistoryReport() {
 }
 
 async function downloadWeeklyHistoryWorkbook() {
-  if (state.importMeta?.schemaVersion < 6 || !window.PowerMeterXlsx?.downloadWeeklyHistory) {
+  if (state.importMeta?.schemaVersion < 7 || !window.PowerMeterXlsx?.downloadWeeklyHistory) {
     showToast("请重新导入基础数据和公摊表，升级周报总簿口径");
     return;
   }
@@ -540,7 +559,9 @@ function refreshReportUi() {
     el.reportBasisHint.textContent = "按计量点明细汇总所选配电室，不再叠加工序限制。";
   } else {
     el.reportSelectionSummary.textContent = `${factories} · 整厂汇总`;
-    el.reportBasisHint.textContent = "周报采用基础数据生产区加五厂公摊；四分厂拆成气流纺、涡流纺，路灯和生活区不进周报。";
+    el.reportBasisHint.textContent = el.reportType.value === "month"
+      ? "月报按源表月结节点统计，不按自然月；管理生活区五厂均摊，开松间单列。"
+      : "周报采用基础数据生产区加五厂公摊；四分厂拆成气流纺、涡流纺，路灯和生活区不进周报。";
   }
 }
 
@@ -560,6 +581,9 @@ function reportingUnits(factories, mode) {
 
 function factsForRecord(record, factory, mode, processFilter, roomFilter, reportType = "day") {
   if (mode === "factory") {
+    const sourceAir = toNumber(state.referenceData?.sources?.publicDaily?.[record.date]?.airAllocations?.[factory.id]);
+    const embeddedAir = toNumber(record.reportAdjustments?.includedPublicAir) || 0;
+    const airCorrection = sourceAir === null ? 0 : sourceAir - embeddedAir;
     if (reportType === "month") {
       const units = factory.id === "factory-4"
         ? record.monthlyUnits || record.officialUnits || record.reportUnits || []
@@ -582,7 +606,9 @@ function factsForRecord(record, factory, mode, processFilter, roomFilter, report
           end: null,
           difference: null,
           multiplier: null,
-          usage: toNumber(usage) || 0,
+          usage: (toNumber(usage) || 0) + (factory.id === "factory-4"
+            ? unitName === "气流纺" ? airCorrection * 0.7 : airCorrection * 0.3
+            : airCorrection),
           statusCode: "normal",
           source: "基础表月报生产区口径",
         };
@@ -612,7 +638,9 @@ function factsForRecord(record, factory, mode, processFilter, roomFilter, report
         end: null,
         difference: null,
         multiplier: null,
-        usage: (toNumber(usage) || 0) + commonCorrection,
+        usage: (toNumber(usage) || 0) + commonCorrection + (factory.id === "factory-4"
+          ? unitName === "气流纺" ? airCorrection * 0.7 : airCorrection * 0.3
+          : airCorrection),
         statusCode: "normal",
         source: sourceCommon === null
           ? (record.source === "import" ? "基础表生产区 + 内嵌公摊" : "当日录入自动汇总")
@@ -701,6 +729,27 @@ function monthlySourceSummary(monthKey) {
   return { components, total, share: total / 5 };
 }
 
+function monthlyEndpointUsage(records, factoryId, meterFilter) {
+  const factory = state.companyData.factories.find((item) => item.id === factoryId);
+  const ordered = records.filter((record) => record.factoryId === factoryId).sort((a, b) => a.date.localeCompare(b.date));
+  if (!factory || !ordered.length) return 0;
+  if (factoryId === "factory-3" && ordered[0].openingEndpointReadings?.length && ordered.at(-1).openingEndpointReadings?.length) {
+    return ordered[0].openingEndpointReadings.reduce((sum, [start, , multiplier], index) => {
+      const end = ordered.at(-1).openingEndpointReadings[index]?.[1];
+      return Number.isFinite(Number(start)) && Number.isFinite(Number(end)) && Number(end) >= Number(start)
+        ? sum + (Number(end) - Number(start)) * Number(multiplier || 0)
+        : sum;
+    }, 0);
+  }
+  return factory.meters.reduce((sum, meter, index) => {
+    if (!meterFilter(meter)) return sum;
+    const start = toNumber(ordered[0].readings?.[index]?.[0]);
+    const end = toNumber(ordered.at(-1).readings?.[index]?.[1]);
+    if (start === null || end === null || end < start) return sum;
+    return sum + (end - start) * Number(meter.multiplier || 0);
+  }, 0);
+}
+
 function referenceAudit(bounds, mode, selectedUnits, factoryTotals, records) {
   if (mode !== "factory" || !state.referenceData) return null;
   if (el.reportType.value === "week") {
@@ -720,8 +769,8 @@ function referenceAudit(bounds, mode, selectedUnits, factoryTotals, records) {
       item.conclusion = Math.abs(item.difference) <= 1
         ? "一致"
         : Math.abs(item.difference - commonAdjustment) <= 1
-          ? "公摊源表版本差"
-          : "原底表修订或人工差异";
+          ? "六单元统一差额"
+          : "单厂源表或历史录入差异";
     });
     const commonByDate = new Map();
     records.forEach((record) => {
@@ -738,12 +787,12 @@ function referenceAudit(bounds, mode, selectedUnits, factoryTotals, records) {
       commonAdjustment,
       sourceCommonTotal: [...commonByDate.values()].reduce((sum, usage) => sum + usage, 0),
       spread,
-      status: exact ? "与历史周报一致" : spread <= 1 ? "历史周报与当前公摊源表存在统一版本差" : "存在源表修订或人工差异",
-      note: "自动计算列采用基础数据生产区加公摊表公共水井均分；路灯、办公楼和清餐不进入周报。历史提交差额只提示复核，不覆盖底层数据。",
+      status: exact ? "与历史周报一致" : spread <= 1 ? "历史周报存在六单元统一差额，来源未留公式" : "存在单厂源表或历史录入差异",
+      note: "自动计算列采用基础数据生产区、公摊表公共水井均分及空压分配；汉餐、路灯、办公楼和清餐不进入周报。历史周报用电量是手工值，统一差额只作提示；原单元格没有公式，无法继续追溯来源。",
     };
   }
-  if (el.reportType.value !== "month" || bounds.start.slice(0, 7) !== bounds.end.slice(0, 7)) return null;
-  const month = state.referenceData.monthly?.[bounds.start.slice(0, 7)];
+  if (el.reportType.value !== "month" || !bounds.monthKey) return null;
+  const month = state.referenceData.monthly?.[bounds.monthKey];
   const ring = month?.ring;
   if (!ring?.productionUnits) return null;
   const items = selectedUnits
@@ -762,13 +811,12 @@ function referenceAudit(bounds, mode, selectedUnits, factoryTotals, records) {
       };
     });
   const summary = month.summary;
-  const sourceManagement = monthlySourceSummary(bounds.start.slice(0, 7));
+  const sourceManagement = monthlySourceSummary(bounds.monthKey);
   const selectedFactoryIds = new Set(selectedUnits.map((unit) => unit.sourceFactoryId));
   const selectedFactoryCount = selectedFactoryIds.size;
   const includesThirdFactory = selectedFactoryIds.has("factory-3");
   const sourceOpeningRoom = includesThirdFactory
-    ? records.filter((record) => record.factoryId === "factory-3")
-      .reduce((sum, record) => sum + (toNumber(record.reportAdjustments?.excludedOpeningRoom) || 0), 0)
+    ? monthlyEndpointUsage(records, "factory-3", (meter) => /开松/.test(`${meter.category || ""}${meter.name || ""}`))
     : 0;
   const sourceProductionTotal = items.reduce((sum, item) => sum + item.calculated, 0);
   const historicalProductionTotal = items.reduce((sum, item) => sum + item.historical, 0);
@@ -776,6 +824,14 @@ function referenceAudit(bounds, mode, selectedUnits, factoryTotals, records) {
   const historicalManagementShare = Number(summary?.managementShare || 0);
   const historicalManagementSelected = historicalManagementShare * selectedFactoryCount;
   const historicalOpeningRoom = includesThirdFactory ? Number(summary?.openingRoom ?? ring.openingRoom ?? 0) : 0;
+  const currentComponentMap = new Map(sourceManagement?.components || []);
+  const historicalComponentMap = new Map(Object.entries(ring.managementComponents || {}));
+  const componentNames = [...new Set([...currentComponentMap.keys(), ...historicalComponentMap.keys()])];
+  const componentItems = componentNames.map((name) => {
+    const calculated = toNumber(currentComponentMap.get(name)) || 0;
+    const historical = toNumber(historicalComponentMap.get(name)) || 0;
+    return { name, calculated, historical, difference: historical - calculated };
+  });
   return {
     type: "month",
     title: "历史月报对账",
@@ -790,6 +846,15 @@ function referenceAudit(bounds, mode, selectedUnits, factoryTotals, records) {
     sourceOpeningRoom,
     sourceCompanyTotal: sourceProductionTotal + sourceManagementSelected + sourceOpeningRoom,
     historicalCompanyTotal: historicalProductionTotal + historicalManagementSelected + historicalOpeningRoom,
+    componentItems,
+    reconciliation: {
+      productionCalculated: sourceProductionTotal,
+      productionHistorical: historicalProductionTotal,
+      managementCalculated: sourceManagementSelected,
+      managementHistorical: historicalManagementSelected,
+      openingCalculated: sourceOpeningRoom,
+      openingHistorical: historicalOpeningRoom,
+    },
     status: items.every((item) => Math.abs(item.difference) <= 1) ? "生产区数据一致" : "存在历史底表修订/缺失日",
     note: "月报生产区按六单元核算；路灯、办公楼、清餐及生活外围只进入月度管理生活区，再按五个分厂平均分摊；四分厂合并后只分一份，开松间单列。",
   };
@@ -896,11 +961,10 @@ async function createPeriodReport() {
   const topMeters = [...topTotals.values()].sort((a, b) => b.usage - a.usage).slice(0, 30);
   const audit = referenceAudit(bounds, mode, selectedUnits, factoryTotals, records);
   const monthSources = el.reportType.value === "month" && mode === "factory"
-    ? monthlySourceSummary(bounds.start.slice(0, 7))
+    ? monthlySourceSummary(bounds.monthKey)
     : null;
   const openingRoom = el.reportType.value === "month" && selectedIds.has("factory-3")
-    ? records.filter((record) => record.factoryId === "factory-3")
-      .reduce((sum, record) => sum + (toNumber(record.reportAdjustments?.excludedOpeningRoom) || 0), 0)
+    ? monthlyEndpointUsage(records, "factory-3", (meter) => /开松/.test(`${meter.category || ""}${meter.name || ""}`))
     : 0;
   const monthlySummary = monthSources ? {
     managementTotal: monthSources.total,
