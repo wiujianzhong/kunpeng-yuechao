@@ -158,6 +158,7 @@
         key: REFERENCE_KEY,
         weekly: [],
         monthly: {},
+        sources: { publicDaily: {}, publicMonthly: {}, roadMonthly: {}, facilitiesMonthly: {} },
       };
     } finally {
       database.close();
@@ -172,6 +173,7 @@
         key: REFERENCE_KEY,
         weekly: referenceData.weekly || [],
         monthly: referenceData.monthly || {},
+        sources: referenceData.sources || { publicDaily: {}, publicMonthly: {}, roadMonthly: {}, facilitiesMonthly: {} },
         updatedAt: new Date().toISOString(),
       });
       await transactionDone(transaction);
@@ -222,7 +224,7 @@
     }
   }
 
-  function buildWeeklyHistory(records, meta) {
+  function buildWeeklyHistory(records, meta, referenceData = null) {
     const completeRecords = records.filter((record) => record.completed);
     const factoryIds = [...new Set(WEEKLY_REPORT_UNITS.map((unit) => unit.factoryId))];
     const recordsByKey = new Map(completeRecords.map((record) => [`${record.date}|${record.factoryId}`, record]));
@@ -241,9 +243,12 @@
       return dates;
     };
     const unitValue = (record, unit) => {
-      if (unit.factoryId !== "factory-4") return finiteNumber(record.reportTotal ?? record.officialTotal) || 0;
+      const sourceCommon = finiteNumber(referenceData?.sources?.publicDaily?.[record.date]?.commonShare);
+      const embeddedCommon = finiteNumber(record.commonShare ?? record.reportAdjustments?.includedCommonShare) || 0;
+      const commonCorrection = sourceCommon === null ? 0 : sourceCommon - embeddedCommon;
+      if (unit.factoryId !== "factory-4") return (finiteNumber(record.reportTotal ?? record.officialTotal) || 0) + commonCorrection;
       const units = new Map((record.reportUnits || record.officialUnits || []).map(([name, usage]) => [name, finiteNumber(usage) || 0]));
-      return units.get(unit.unitName) || 0;
+      return (units.get(unit.unitName) || 0) + commonCorrection;
     };
     const weeks = [];
     let monthKey = "";
@@ -322,6 +327,7 @@
       excludedNetFiber: 0,
       excludedOpeningRoom: 0,
       excludedFourFactoryCommon: 0,
+      includedCommonShare: 0,
     };
     if (factoryId === "factory-2") {
       reportAdjustments.excludedNetFiber = rows.reduce((sum, row) => {
@@ -356,6 +362,10 @@
       reportTotal = gasUsage + vortexUsage;
       reportUnits = [["气流纺", gasUsage], ["涡流纺", vortexUsage]];
     }
+    const monthlyUnits = factoryId === "factory-4"
+      ? officialUnits
+      : [[FACTORY_NAMES[factoryId] || factoryId, factoryId === "factory-3" ? totalUsage - reportAdjustments.excludedOpeningRoom : totalUsage]];
+    const monthlyTotal = monthlyUnits.reduce((sum, [, usage]) => sum + usage, 0);
     return {
       key: `${date}|${factoryId}`,
       date,
@@ -369,6 +379,9 @@
       officialUnits,
       reportTotal,
       reportUnits,
+      monthlyTotal,
+      monthlyUnits,
+      commonShare: 0,
       reportAdjustments,
       updatedAt: new Date().toISOString(),
     };
@@ -615,6 +628,10 @@
     if (!sampleSheet) throw new Error(`${file.name}没有可读取的工作表`);
     const cells = await sheetCellMap(context, sampleSheet);
     const title = String(cells.get("A1") || "").replace(/\s+/g, "");
+    const secondRow = String(cells.get("A2") || "").replace(/\s+/g, "");
+    if (/分厂公摊用电/.test(title)) return { kind: "public-source", context };
+    if (/路灯用电总汇/.test(title)) return { kind: "road-source", context };
+    if (/计量单位/.test(title) && /生活变办公楼总/.test(secondRow)) return { kind: "facilities-source", context };
     if (/电气周报/.test(title)) return { kind: "weekly", context };
     if (/月.*用电|用电.*月|月.*汇总/.test(title)) return { kind: "monthly", context };
     if (context.sheets.filter((sheet) => sheet.date).length >= 2) return { kind: "daily", context };
@@ -646,6 +663,107 @@
   function monthFromTitle(title) {
     const matched = /(20\d{2})年-?(\d{1,2})月/.exec(String(title || "").replace(/\s+/g, ""));
     return matched ? `${matched[1]}-${String(Number(matched[2])).padStart(2, "0")}` : null;
+  }
+
+  function monthFromSourceSheet(name, defaultYear = null) {
+    const text = String(name || "").replace(/\s+/g, "");
+    let matched = /^(20\d{2})年(\d{1,2})月/.exec(text);
+    if (matched) return `${matched[1]}-${String(Number(matched[2])).padStart(2, "0")}`;
+    matched = /^(\d{2})[.年](\d{1,2})(?:\.\d{1,2})?月/.exec(text);
+    if (matched) {
+      const month = Number(matched[2]);
+      return month >= 1 && month <= 12 ? `${2000 + Number(matched[1])}-${String(month).padStart(2, "0")}` : null;
+    }
+    matched = /^(\d{1,2})\.(\d{1,2})月/.exec(text);
+    if (!matched || !defaultYear) return null;
+    const month = Number(matched[1]);
+    return month >= 1 && month <= 12 ? `${defaultYear}-${String(month).padStart(2, "0")}` : null;
+  }
+
+  function sourceNumber(cells, address) {
+    return finiteNumber(cells.get(address)) || 0;
+  }
+
+  async function parsePublicSource(file, context) {
+    const daily = {};
+    const monthly = {};
+    const laboratoryByMonth = {};
+    for (const sheet of context.sheets) {
+      if (sheet.date) {
+        const cells = await sheetCellMap(context, sheet);
+        const commonShare = finiteNumber(cells.get("H21"));
+        if (commonShare === null) continue;
+        daily[sheet.date] = {
+          commonShare,
+          publicAirShare: sourceNumber(cells, "H23") / 4,
+          fullCommonShare: sourceNumber(cells, "I4"),
+          laboratory: sourceNumber(cells, "G17"),
+          sourceFile: file.name,
+          sourceSheet: sheet.name,
+        };
+        const month = sheet.date.slice(0, 7);
+        laboratoryByMonth[month] = (laboratoryByMonth[month] || 0) + sourceNumber(cells, "G17");
+        continue;
+      }
+      const month = monthFromSourceSheet(sheet.name, 2026);
+      if (!month) continue;
+      const cells = await sheetCellMap(context, sheet);
+      monthly[month] = {
+        dormitory: sourceNumber(cells, "I130"),
+        lowVoltage10: sourceNumber(cells, "G134"),
+        hanDining: sourceNumber(cells, "G135"),
+        garage: sourceNumber(cells, "L136"),
+        shed: sourceNumber(cells, "G140"),
+        repairRoom: sourceNumber(cells, "G141"),
+        rollerRoom: sourceNumber(cells, "G142"),
+        lifePump: sourceNumber(cells, "G143"),
+        exchangeStation: sourceNumber(cells, "G144"),
+        reservoir: sourceNumber(cells, "G145"),
+        airEnergy: sourceNumber(cells, "G146"),
+        waterWells: sourceNumber(cells, "F29") - sourceNumber(cells, "G24") + sourceNumber(cells, "G131"),
+        sourceFile: file.name,
+        sourceSheet: sheet.name,
+      };
+    }
+    Object.entries(laboratoryByMonth).forEach(([month, laboratory]) => {
+      monthly[month] = { ...(monthly[month] || {}), laboratory };
+    });
+    if (!Object.keys(daily).length) throw new Error(`${file.name}没有识别到公摊日数据`);
+    return { daily, monthly };
+  }
+
+  async function parseRoadSource(file, context) {
+    const monthly = {};
+    for (const sheet of context.sheets) {
+      const month = monthFromSourceSheet(sheet.name);
+      if (!month) continue;
+      const cells = await sheetCellMap(context, sheet);
+      const usage = finiteNumber(cells.get("G18"));
+      if (usage === null) continue;
+      monthly[month] = { usage, sourceFile: file.name, sourceSheet: sheet.name };
+    }
+    if (!Object.keys(monthly).length) throw new Error(`${file.name}没有识别到月度路灯数据`);
+    return monthly;
+  }
+
+  async function parseFacilitiesSource(file, context) {
+    const monthly = {};
+    for (const sheet of context.sheets) {
+      const month = monthFromSourceSheet(sheet.name);
+      if (!month) continue;
+      const cells = await sheetCellMap(context, sheet);
+      const office = finiteNumber(cells.get("I2"));
+      const dining = finiteNumber(cells.get("I12"));
+      if (office === null && dining === null) continue;
+      monthly[month] = {
+        office: office || 0,
+        dining: dining || 0,
+        sourceFile: file.name,
+        sourceSheet: sheet.name,
+      };
+    }
+    if (!Object.keys(monthly).length) throw new Error(`${file.name}没有识别到办公楼、清餐月度数据`);
+    return monthly;
   }
 
   async function parseMonthlyReference(file, context) {
@@ -702,6 +820,9 @@
     const detected = await detectWorkbookKind(file);
     if (detected.kind === "weekly") return { kind: "weekly", data: await parseWeeklyReference(file, detected.context) };
     if (detected.kind === "monthly") return { kind: "monthly", data: await parseMonthlyReference(file, detected.context) };
+    if (detected.kind === "public-source") return { kind: "public-source", data: await parsePublicSource(file, detected.context) };
+    if (detected.kind === "road-source") return { kind: "road-source", data: await parseRoadSource(file, detected.context) };
+    if (detected.kind === "facilities-source") return { kind: "facilities-source", data: await parseFacilitiesSource(file, detected.context) };
     return { kind: "daily", data: null };
   }
 
@@ -757,7 +878,7 @@
           ? OFFICIAL_UNIT_CELLS[factory.id].map(([name, address]) => [name, cells.get(address) || 0])
           : [[factory.name, officialTotal || officialRows.reduce((sum, [, usage]) => sum + usage, 0) || totalUsage]];
         const commonFourFactory = cells.get("M22") || 0;
-        const reportTotal = factory.id === "factory-2"
+        const productionBase = factory.id === "factory-2"
           ? officialTotal - (cells.get("F16") || 0)
           : factory.id === "factory-3"
             ? officialTotal - (cells.get("J15") || 0)
@@ -765,8 +886,13 @@
               ? officialTotal - commonFourFactory
               : officialTotal;
         const reportUnits = factory.id === "factory-4"
-          ? OFFICIAL_UNIT_CELLS[factory.id].map(([name, address]) => [name, (cells.get(address) || 0) - commonFourFactory / 2])
-          : [[factory.name, reportTotal || officialRows.reduce((sum, [, usage]) => sum + usage, 0) || totalUsage]];
+          ? OFFICIAL_UNIT_CELLS[factory.id].map(([name, address]) => [name, (cells.get(address) || 0) - commonFourFactory / 2 + commonFourFactory])
+          : [[factory.name, (productionBase || officialRows.reduce((sum, [, usage]) => sum + usage, 0) || totalUsage) + commonFourFactory]];
+        const reportTotal = reportUnits.reduce((sum, [, usage]) => sum + usage, 0);
+        const monthlyUnits = factory.id === "factory-4"
+          ? officialUnits
+          : [[factory.name, factory.id === "factory-3" ? officialTotal - (cells.get("J15") || 0) : officialTotal]];
+        const monthlyTotal = monthlyUnits.reduce((sum, [, usage]) => sum + usage, 0);
         records.push({
           key: `${sheet.date}|${factory.id}`,
           date: sheet.date,
@@ -778,12 +904,16 @@
           officialTotal: officialTotal || officialRows.reduce((sum, [, usage]) => sum + usage, 0) || totalUsage,
           officialRows,
           officialUnits,
-          reportTotal: reportTotal || officialRows.reduce((sum, [, usage]) => sum + usage, 0) || totalUsage,
+          reportTotal,
           reportUnits,
+          monthlyTotal,
+          monthlyUnits,
+          commonShare: commonFourFactory,
           reportAdjustments: {
             excludedNetFiber: factory.id === "factory-2" ? cells.get("F16") || 0 : 0,
             excludedOpeningRoom: factory.id === "factory-3" ? cells.get("J15") || 0 : 0,
             excludedFourFactoryCommon: factory.id === "factory-4" ? commonFourFactory : 0,
+            includedCommonShare: commonFourFactory,
           },
         });
       });
@@ -815,8 +945,8 @@
         dayCount: ordered.length,
         sheetCount: sheets.length,
         meterCount: (companyData.factories || []).reduce((sum, factory) => sum + factory.meters.length, 0),
-        schemaVersion: 4,
-        reportBasis: "原表生产区汇总口径",
+        schemaVersion: 6,
+        reportBasis: "周报生产区加公摊；月报生产区加管理生活区",
       },
     };
   }
@@ -829,7 +959,8 @@
       const factoryById = new Map((companyData.factories || []).map((factory) => [factory.id, factory]));
       const manual = existing.filter((record) => record.source === "manual").map((record) => {
         const factory = factoryById.get(record.factoryId);
-        if (!factory || (Array.isArray(record.officialRows) && Array.isArray(record.officialUnits) && Array.isArray(record.reportUnits))) return record;
+        if (!factory || (Array.isArray(record.officialRows) && Array.isArray(record.officialUnits) && Array.isArray(record.reportUnits)
+          && Array.isArray(record.monthlyUnits) && Number.isFinite(Number(record.monthlyTotal)) && record.commonShare !== undefined)) return record;
         return compactRows(record.date, record.factoryId, expandRecord(record, factory), "manual");
       });
       const importedDates = new Set(parsed.records.map((record) => record.date));
@@ -863,6 +994,7 @@
     const selectedFiles = [...files];
     if (!selectedFiles.length) throw new Error("请选择要导入的Excel资料");
     let referenceData = await getReferenceData();
+    referenceData.sources = referenceData.sources || { publicDaily: {}, publicMonthly: {}, roadMonthly: {}, facilitiesMonthly: {} };
     let meta = await getMeta();
     const imported = [];
     let referenceChanged = false;
@@ -888,6 +1020,28 @@
         referenceData.weekly = [...merged.values()].sort((a, b) => a.startDate.localeCompare(b.startDate));
         referenceChanged = true;
         imported.push(`历史周报：${weekly.length}周`);
+        continue;
+      }
+      if (detected.kind === "public-source") {
+        const source = await parsePublicSource(file, detected.context);
+        referenceData.sources.publicDaily = { ...referenceData.sources.publicDaily, ...source.daily };
+        referenceData.sources.publicMonthly = { ...referenceData.sources.publicMonthly, ...source.monthly };
+        referenceChanged = true;
+        imported.push(`五厂公摊：${Object.keys(source.daily).length}天`);
+        continue;
+      }
+      if (detected.kind === "road-source") {
+        const monthly = await parseRoadSource(file, detected.context);
+        referenceData.sources.roadMonthly = { ...referenceData.sources.roadMonthly, ...monthly };
+        referenceChanged = true;
+        imported.push(`路灯月度：${Object.keys(monthly).length}个月`);
+        continue;
+      }
+      if (detected.kind === "facilities-source") {
+        const monthly = await parseFacilitiesSource(file, detected.context);
+        referenceData.sources.facilitiesMonthly = { ...referenceData.sources.facilitiesMonthly, ...monthly };
+        referenceChanged = true;
+        imported.push(`办公楼/清餐：${Object.keys(monthly).length}个月`);
         continue;
       }
       const monthly = await parseMonthlyReference(file, detected.context);

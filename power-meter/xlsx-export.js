@@ -476,7 +476,24 @@
       });
       noteRow = totalRow + 4;
     }
-    sheet.merge(noteRow, 1, lastColumn, `数据口径：${report.basis || "计量点明细口径"}。周报固定为上周五至本周四，周五提交。`, 13, 28);
+    if (report.monthlySummary) {
+      const monthlyRows = [
+        ["管理生活区合计", report.monthlySummary.managementTotal, "路灯、办公楼、清餐及生活外围，仅进入月报"],
+        ["五厂均摊/厂", report.monthlySummary.managementShare, "四分厂合并后只分一份"],
+        ["所选分厂管理分摊", report.monthlySummary.selectedManagementTotal, `所选 ${report.monthlySummary.selectedFactoryCount} 个分厂`],
+        ["开松间单列", report.monthlySummary.openingRoom, "仅选择三分厂时计入"],
+        ["月报口径合计", report.monthlySummary.companyTotal, "生产区及公摊 + 管理生活区分摊 + 开松间"],
+      ];
+      monthlyRows.forEach(([label, value, note], index) => {
+        const row = noteRow + index;
+        sheet.merge(row, 1, 2, label, index === monthlyRows.length - 1 ? 7 : 4);
+        sheet.merge(row, 3, 4, value, index === monthlyRows.length - 1 ? 8 : 5, 22);
+        sheet.merge(row, 5, lastColumn, note, 4);
+      });
+      noteRow += monthlyRows.length + 1;
+    }
+    const periodRule = report.type === "week" ? "周报固定为上周五至本周四，周五提交。" : "";
+    sheet.merge(noteRow, 1, lastColumn, `数据口径：${report.basis || "计量点明细口径"}。${periodRule}`, 13, 28);
     return sheet.xml({
       columns: [{ width: 14 }, { width: 10 }, { width: 24 }, ...report.factories.map(() => ({ width: 18 }))],
       freezeRow: 7,
@@ -545,7 +562,7 @@
     sheet.merge(1, 1, 7, `${report.company}${audit.title}`, 1, 34);
     sheet.merge(2, 1, 7, `${report.startDate} 至 ${report.endDate}｜来源：${audit.sourceFile || "历史报表"}${audit.sourceSheet ? ` / ${audit.sourceSheet}` : ""}`, 2, 24);
     sheet.merge(3, 1, 7, audit.status, 9, 24);
-    ["核算单元", "自动计算（生产区）", "历史报表", "差额", "差异率", "识别结论", "处理原则"].forEach((header, index) => sheet.add(5, index + 1, header, 3));
+    ["核算单元", "自动计算（当前源表）", "历史报表", "差额", "差异率", "识别结论", "处理原则"].forEach((header, index) => sheet.add(5, index + 1, header, 3));
     audit.items.forEach((item, index) => {
       const row = 6 + index;
       sheet.add(row, 1, item.unitName, 4);
@@ -554,7 +571,7 @@
       sheet.add(row, 4, item.difference, Math.abs(item.difference) <= 1 ? 5 : 16, { type: "number" });
       sheet.add(row, 5, item.calculated ? item.difference / item.calculated : 0, 10, { type: "number" });
       sheet.add(row, 6, item.conclusion, Math.abs(item.difference) <= 1 ? 4 : 14);
-      sheet.add(row, 7, item.conclusion === "历史周报统一公摊" ? "保留历史提交值并单列公摊" : item.conclusion === "一致" ? "无需处理" : "提示复核，不覆盖原始日数据", 4);
+      sheet.add(row, 7, item.conclusion === "一致" ? "无需处理" : "提示复核，不覆盖底层数据", 4);
       sheet.setHeight(row, 24);
     });
     const totalRow = 6 + audit.items.length;
@@ -569,18 +586,21 @@
 
     let summaryRow = totalRow + 2;
     if (audit.type === "week") {
-      sheet.add(summaryRow, 1, "统一公摊/单元", 7);
-      sheet.add(summaryRow, 2, audit.commonAdjustment || 0, 8, { type: "number" });
-      sheet.add(summaryRow, 3, "各单元差额离散", 7);
-      sheet.add(summaryRow, 4, audit.spread || 0, 8, { type: "number" });
-      sheet.merge(summaryRow, 5, 7, audit.spread <= 1 ? "规则完全一致" : "存在个别原表修订或人工差异", audit.spread <= 1 ? 4 : 14);
-      summaryRow += 2;
+      sheet.add(summaryRow, 1, "当前公摊源表/单元", 7);
+      sheet.add(summaryRow, 2, audit.sourceCommonTotal || 0, 8, { type: "number" });
+      sheet.add(summaryRow, 3, "历史统一差额/单元", 7);
+      sheet.add(summaryRow, 4, audit.commonAdjustment || 0, 8, { type: "number" });
+      sheet.merge(summaryRow, 5, 7, "公摊已由源表计算，不再用历史差额倒推", 4);
+      sheet.add(summaryRow + 1, 1, "各单元差额离散", 7);
+      sheet.add(summaryRow + 1, 2, audit.spread || 0, 8, { type: "number" });
+      sheet.merge(summaryRow + 1, 3, 7, audit.spread <= 1 ? "统一版本差" : "存在个别原表修订或人工差异", audit.spread <= 1 ? 4 : 14);
+      summaryRow += 3;
     } else {
       const monthlyRows = [
-        ["管理区用电", audit.managementTotal || 0, "按五个分厂平均分摊"],
-        ["每分厂管理分摊", audit.managementShare || 0, "四分厂合并后只分一份"],
-        ["开松间单列", audit.openingRoom || 0, "不并入三分厂生产区"],
-        ["历史全公司月用电", audit.historicalCompanyTotal || 0, "生产区 + 管理区 + 开松间"],
+        ["当前所选管理分摊", audit.sourceManagementTotal || 0, `历史报表：${audit.managementTotal || 0}`],
+        ["当前五厂均摊/厂", audit.sourceManagementShare || 0, `历史报表：${audit.managementShare || 0}`],
+        ["当前开松间", audit.sourceOpeningRoom || 0, `历史报表：${audit.openingRoom || 0}`],
+        ["当前所选月报合计", audit.sourceCompanyTotal || 0, `历史报表：${audit.historicalCompanyTotal || 0}`],
       ];
       monthlyRows.forEach(([label, value, note], index) => {
         const row = summaryRow + index;
@@ -721,7 +741,7 @@
       sheet.setHeight(row, 22);
     });
     const noteRow = report.weeks.length + 6;
-    sheet.merge(noteRow, 1, 11, "说明：周报只收录数据齐全的周五至周四周期；四分厂按原表 L22 气流纺、L23 涡流纺分别统计。", 13, 28);
+    sheet.merge(noteRow, 1, 11, "说明：周报只收录完整的周五至周四周期；生产区叠加五厂公摊水井均分，四分厂仍拆气流纺、涡流纺。", 13, 28);
     return sheet.xml({
       columns: [
         { width: 8 }, { width: 13 }, { width: 13 }, { width: 16 }, { width: 16 }, { width: 16 },
@@ -735,8 +755,8 @@
   function buildWeeklyLedgerSheet(week, report) {
     const sheet = new SheetBuilder();
     sheet.merge(1, 1, 9, `${report.company}用电周报`, 1, 34);
-    sheet.merge(2, 1, 9, `${week.startDate} 至 ${week.endDate}｜周五至周四｜原始基础表正式汇总口径`, 2, 24);
-    sheet.merge(3, 1, 9, "四分厂已拆分为气流纺、涡流纺；异常只提示复核，不人工估算缺失电量。", 9, 24);
+    sheet.merge(2, 1, 9, `${week.startDate} 至 ${week.endDate}｜周五至周四｜基础数据 + 五厂公摊口径`, 2, 24);
+    sheet.merge(3, 1, 9, "四分厂拆分气流纺、涡流纺；路灯、办公楼、清餐和生活区不进入周报。", 9, 24);
 
     sheet.merge(5, 1, 2, "统计项目", 3, 26);
     report.units.forEach((unit, index) => sheet.add(5, index + 3, unit.name, 3));

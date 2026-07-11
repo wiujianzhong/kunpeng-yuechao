@@ -262,29 +262,30 @@ function shortDate(date) {
 
 function renderHistoryStatus() {
   const meta = state.importMeta;
-  const ready = Boolean(meta?.schemaVersion >= 4);
+  const ready = Boolean(meta?.schemaVersion >= 6);
   el.masterDownloadButton.disabled = !ready;
   el.weeklyHistoryButton.disabled = !ready;
   el.generateReportButton.disabled = !ready;
   if (!meta) {
     el.historyStatus.textContent = "尚未导入原始 Excel";
-    el.historyDetail.textContent = "首次导入日报；周报、月报可继续导入用于自动对账，文件不会上传。";
+    el.historyDetail.textContent = "请导入基础数据、公摊、路灯、办公楼清餐；周报月报仅用于对账。";
     el.historyProgressBar.style.width = "0";
     return;
   }
   if (!ready) {
     el.historyStatus.textContent = "历史数据需要升级一次";
-    el.historyDetail.textContent = "请重新导入原始日报，系统会补齐生产区、四分厂拆分和历史对账口径。";
+    el.historyDetail.textContent = "请重新导入基础数据和公摊表，系统会升级完整周报月报口径。";
     el.historyProgressBar.style.width = "0";
     el.historyImportButton.textContent = "重新导入升级";
     return;
   }
   const weekCount = state.referenceData?.weekly?.length || 0;
   const monthCount = Object.keys(state.referenceData?.monthly || {}).length;
+  const publicDays = Object.keys(state.referenceData?.sources?.publicDaily || {}).length;
   el.historyStatus.textContent = `已整理 ${meta.dayCount} 天 · 有效数据到 ${shortDate(meta.completedThrough)}`;
-  el.historyDetail.textContent = `${meta.fileName}｜${weekCount}周历史对账｜${monthCount}个月报对账｜仅保存在当前浏览器`;
+  el.historyDetail.textContent = `${meta.fileName}｜${publicDays}天公摊｜${weekCount}周对账｜${monthCount}个月报对账｜仅保存在当前浏览器`;
   el.historyProgressBar.style.width = "100%";
-  el.historyImportButton.textContent = "更新历史资料";
+  el.historyImportButton.textContent = "更新底层数据";
 }
 
 
@@ -325,13 +326,13 @@ async function importHistoryFiles(files) {
     state.referenceData = result.referenceData || state.referenceData;
     renderHistoryStatus();
     await loadDate(state.date || el.readingDate.value);
-    showToast(`历史资料导入完成：${result.imported.join("；")}`);
+    showToast(`底层数据导入完成：${result.imported.join("；")}`);
   } catch (error) {
     renderHistoryStatus();
     showToast(`导入失败：${error.message}`);
   } finally {
     el.historyImportButton.disabled = false;
-    el.historyImportButton.textContent = state.importMeta ? "更新历史资料" : "导入历史资料";
+    el.historyImportButton.textContent = state.importMeta ? "更新底层数据" : "导入底层数据";
     el.historyFileInput.value = "";
   }
 }
@@ -390,7 +391,7 @@ function datesBetween(startDate, endDate) {
 async function buildWeeklyHistoryReport() {
   const records = (await window.PowerMeterData.getRange(state.importMeta.firstDate, state.importMeta.completedThrough))
     .filter((record) => record.completed);
-  const { units, weeks } = window.PowerMeterData.buildWeeklyHistory(records, state.importMeta);
+  const { units, weeks } = window.PowerMeterData.buildWeeklyHistory(records, state.importMeta, state.referenceData);
   return {
     company: "雅新纺织有限公司",
     throughDate: state.importMeta.completedThrough,
@@ -402,8 +403,8 @@ async function buildWeeklyHistoryReport() {
 }
 
 async function downloadWeeklyHistoryWorkbook() {
-  if (state.importMeta?.schemaVersion < 4 || !window.PowerMeterXlsx?.downloadWeeklyHistory) {
-    showToast("请重新导入原始历史 Excel，升级周报总簿口径");
+  if (state.importMeta?.schemaVersion < 6 || !window.PowerMeterXlsx?.downloadWeeklyHistory) {
+    showToast("请重新导入基础数据和公摊表，升级周报总簿口径");
     return;
   }
   el.weeklyHistoryButton.disabled = true;
@@ -539,7 +540,7 @@ function refreshReportUi() {
     el.reportBasisHint.textContent = "按计量点明细汇总所选配电室，不再叠加工序限制。";
   } else {
     el.reportSelectionSummary.textContent = `${factories} · 整厂汇总`;
-    el.reportBasisHint.textContent = "采用可追溯的生产区口径；四分厂拆成气流纺、涡流纺，历史周报公摊在对账表单列。";
+    el.reportBasisHint.textContent = "周报采用基础数据生产区加五厂公摊；四分厂拆成气流纺、涡流纺，路灯和生活区不进周报。";
   }
 }
 
@@ -557,8 +558,39 @@ function reportingUnits(factories, mode) {
     : [{ id: factory.id, name: factory.name, sourceFactoryId: factory.id }]);
 }
 
-function factsForRecord(record, factory, mode, processFilter, roomFilter) {
+function factsForRecord(record, factory, mode, processFilter, roomFilter, reportType = "day") {
   if (mode === "factory") {
+    if (reportType === "month") {
+      const units = factory.id === "factory-4"
+        ? record.monthlyUnits || record.officialUnits || record.reportUnits || []
+        : [[factory.name, toNumber(record.monthlyTotal ?? record.officialTotal) ?? toNumber(record.totalUsage) ?? 0]];
+      return units.map(([unitName, usage]) => {
+        const unitId = factory.id === "factory-4"
+          ? unitName === "气流纺" ? "factory-4-air" : "factory-4-vortex"
+          : factory.id;
+        const displayName = factory.id === "factory-4" ? `四分厂${unitName}` : factory.name;
+        return {
+          date: record.date,
+          factoryId: unitId,
+          factoryName: displayName,
+          room: "全部配电室",
+          process: displayName,
+          meterId: `monthly-unit-${unitId}`,
+          meterName: "月报生产区汇总",
+          category: displayName,
+          start: null,
+          end: null,
+          difference: null,
+          multiplier: null,
+          usage: toNumber(usage) || 0,
+          statusCode: "normal",
+          source: "基础表月报生产区口径",
+        };
+      });
+    }
+    const sourceCommon = toNumber(state.referenceData?.sources?.publicDaily?.[record.date]?.commonShare);
+    const embeddedCommon = toNumber(record.commonShare ?? record.reportAdjustments?.includedCommonShare) || 0;
+    const commonCorrection = sourceCommon === null ? 0 : sourceCommon - embeddedCommon;
     const units = factory.id === "factory-4" && Array.isArray(record.reportUnits || record.officialUnits)
       ? record.reportUnits || record.officialUnits
       : [[factory.name, toNumber(record.reportTotal ?? record.officialTotal) ?? toNumber(record.totalUsage) ?? 0]];
@@ -580,9 +612,11 @@ function factsForRecord(record, factory, mode, processFilter, roomFilter) {
         end: null,
         difference: null,
         multiplier: null,
-        usage: toNumber(usage) || 0,
+        usage: (toNumber(usage) || 0) + commonCorrection,
         statusCode: "normal",
-        source: record.source === "import" ? "原表生产区汇总" : "当日录入自动汇总",
+        source: sourceCommon === null
+          ? (record.source === "import" ? "基础表生产区 + 内嵌公摊" : "当日录入自动汇总")
+          : "基础表生产区 + 五厂公摊源表",
       };
     });
   }
@@ -639,7 +673,35 @@ function medianNumber(values) {
   return ordered.length % 2 ? ordered[middle] : (ordered[middle - 1] + ordered[middle]) / 2;
 }
 
-function referenceAudit(bounds, mode, selectedUnits, factoryTotals) {
+function monthlySourceSummary(monthKey) {
+  const sources = state.referenceData?.sources;
+  const publicMonth = sources?.publicMonthly?.[monthKey];
+  const road = sources?.roadMonthly?.[monthKey];
+  const facilities = sources?.facilitiesMonthly?.[monthKey];
+  if (!publicMonth && !road && !facilities) return null;
+  const components = [
+    ["路灯", toNumber(road?.usage) || 0],
+    ["办公楼", toNumber(facilities?.office) || 0],
+    ["宿舍", toNumber(publicMonth?.dormitory) || 0],
+    ["清餐", toNumber(facilities?.dining) || 0],
+    ["低压10号", toNumber(publicMonth?.lowVoltage10) || 0],
+    ["汉餐", toNumber(publicMonth?.hanDining) || 0],
+    ["抓包及叉车库", toNumber(publicMonth?.garage) || 0],
+    ["车棚", toNumber(publicMonth?.shed) || 0],
+    ["机修间", toNumber(publicMonth?.repairRoom) || 0],
+    ["皮辊制作间", toNumber(publicMonth?.rollerRoom) || 0],
+    ["生活泵站", toNumber(publicMonth?.lifePump) || 0],
+    ["交换站", toNumber(publicMonth?.exchangeStation) || 0],
+    ["蓄回水池", toNumber(publicMonth?.reservoir) || 0],
+    ["空气能", toNumber(publicMonth?.airEnergy) || 0],
+    ["公共水井", toNumber(publicMonth?.waterWells) || 0],
+    ["中心实验室", toNumber(publicMonth?.laboratory) || 0],
+  ];
+  const total = components.reduce((sum, [, usage]) => sum + usage, 0);
+  return { components, total, share: total / 5 };
+}
+
+function referenceAudit(bounds, mode, selectedUnits, factoryTotals, records) {
   if (mode !== "factory" || !state.referenceData) return null;
   if (el.reportType.value === "week") {
     const reference = (state.referenceData.weekly || []).find((item) => item.startDate === bounds.start && item.endDate === bounds.end);
@@ -653,10 +715,19 @@ function referenceAudit(bounds, mode, selectedUnits, factoryTotals) {
       });
     const commonAdjustment = medianNumber(items.map((item) => item.difference));
     const spread = items.length ? Math.max(...items.map((item) => item.difference)) - Math.min(...items.map((item) => item.difference)) : 0;
+    const exact = items.every((item) => Math.abs(item.difference) <= 1);
     items.forEach((item) => {
-      item.conclusion = Math.abs(item.difference - commonAdjustment) <= 1
-        ? "历史周报统一公摊"
-        : "原底表修订或人工差异";
+      item.conclusion = Math.abs(item.difference) <= 1
+        ? "一致"
+        : Math.abs(item.difference - commonAdjustment) <= 1
+          ? "公摊源表版本差"
+          : "原底表修订或人工差异";
+    });
+    const commonByDate = new Map();
+    records.forEach((record) => {
+      const source = toNumber(state.referenceData?.sources?.publicDaily?.[record.date]?.commonShare);
+      const embedded = toNumber(record.commonShare ?? record.reportAdjustments?.includedCommonShare) || 0;
+      commonByDate.set(record.date, source === null ? embedded : source);
     });
     return {
       type: "week",
@@ -665,9 +736,10 @@ function referenceAudit(bounds, mode, selectedUnits, factoryTotals) {
       sourceSheet: reference.sourceSheet,
       items,
       commonAdjustment,
+      sourceCommonTotal: [...commonByDate.values()].reduce((sum, usage) => sum + usage, 0),
       spread,
-      status: spread <= 1 ? "统一公摊规则一致" : "存在源表修订或人工差异",
-      note: "自动计算列采用可追溯的生产区口径；历史提交列保留同事原周报，差额单独列示，不把无法追溯的公摊偷偷写进每日数据。",
+      status: exact ? "与历史周报一致" : spread <= 1 ? "历史周报与当前公摊源表存在统一版本差" : "存在源表修订或人工差异",
+      note: "自动计算列采用基础数据生产区加公摊表公共水井均分；路灯、办公楼和清餐不进入周报。历史提交差额只提示复核，不覆盖底层数据。",
     };
   }
   if (el.reportType.value !== "month" || bounds.start.slice(0, 7) !== bounds.end.slice(0, 7)) return null;
@@ -690,24 +762,42 @@ function referenceAudit(bounds, mode, selectedUnits, factoryTotals) {
       };
     });
   const summary = month.summary;
+  const sourceManagement = monthlySourceSummary(bounds.start.slice(0, 7));
+  const selectedFactoryIds = new Set(selectedUnits.map((unit) => unit.sourceFactoryId));
+  const selectedFactoryCount = selectedFactoryIds.size;
+  const includesThirdFactory = selectedFactoryIds.has("factory-3");
+  const sourceOpeningRoom = includesThirdFactory
+    ? records.filter((record) => record.factoryId === "factory-3")
+      .reduce((sum, record) => sum + (toNumber(record.reportAdjustments?.excludedOpeningRoom) || 0), 0)
+    : 0;
+  const sourceProductionTotal = items.reduce((sum, item) => sum + item.calculated, 0);
+  const historicalProductionTotal = items.reduce((sum, item) => sum + item.historical, 0);
+  const sourceManagementSelected = (sourceManagement?.share || 0) * selectedFactoryCount;
+  const historicalManagementShare = Number(summary?.managementShare || 0);
+  const historicalManagementSelected = historicalManagementShare * selectedFactoryCount;
+  const historicalOpeningRoom = includesThirdFactory ? Number(summary?.openingRoom ?? ring.openingRoom ?? 0) : 0;
   return {
     type: "month",
     title: "历史月报对账",
     sourceFile: ring.sourceFile,
     sourceSheet: "Sheet1",
     items,
-    managementTotal: Number(summary?.managementTotal ?? ring.managementTotal ?? 0),
-    managementShare: Number(summary?.managementShare || 0),
-    openingRoom: Number(summary?.openingRoom ?? ring.openingRoom ?? 0),
-    historicalCompanyTotal: Number(summary?.companyTotal ?? ring.companyTotal ?? 0),
+    managementTotal: historicalManagementSelected,
+    managementShare: historicalManagementShare,
+    sourceManagementTotal: sourceManagementSelected,
+    sourceManagementShare: sourceManagement?.share || 0,
+    openingRoom: historicalOpeningRoom,
+    sourceOpeningRoom,
+    sourceCompanyTotal: sourceProductionTotal + sourceManagementSelected + sourceOpeningRoom,
+    historicalCompanyTotal: historicalProductionTotal + historicalManagementSelected + historicalOpeningRoom,
     status: items.every((item) => Math.abs(item.difference) <= 1) ? "生产区数据一致" : "存在历史底表修订/缺失日",
-    note: "月报生产区按六单元核算；管理区按五个分厂平均分摊，四分厂合并后只分摊一份；开松间单列。",
+    note: "月报生产区按六单元核算；路灯、办公楼、清餐及生活外围只进入月度管理生活区，再按五个分厂平均分摊；四分厂合并后只分一份，开松间单列。",
   };
 }
 
 async function createPeriodReport() {
   if (!state.importMeta?.schemaVersion || !window.PowerMeterData || !window.PowerMeterXlsx?.downloadPeriod) {
-    showToast("请先导入原始历史 Excel");
+    showToast("请先导入基础数据和公摊表");
     return;
   }
   const bounds = reportBounds();
@@ -740,7 +830,14 @@ async function createPeriodReport() {
   const records = (await window.PowerMeterData.getRange(bounds.start, bounds.end))
     .filter((record) => record.completed && selectedIds.has(record.factoryId));
   const factoryById = new Map(selectedFactories.map((factory) => [factory.id, factory]));
-  const facts = records.flatMap((record) => factsForRecord(record, factoryById.get(record.factoryId), mode, processFilter, roomFilter));
+  const facts = records.flatMap((record) => factsForRecord(
+    record,
+    factoryById.get(record.factoryId),
+    mode,
+    processFilter,
+    roomFilter,
+    el.reportType.value,
+  ));
   if (!facts.length) {
     showToast("所选组合没有可汇总的数据");
     return;
@@ -797,12 +894,30 @@ async function createPeriodReport() {
     .sort((a, b) => b[1] - a[1])
     .map(([process, usage]) => ({ category: process, process, usage, share: totalUsage ? usage / totalUsage : 0 }));
   const topMeters = [...topTotals.values()].sort((a, b) => b.usage - a.usage).slice(0, 30);
-  const audit = referenceAudit(bounds, mode, selectedUnits, factoryTotals);
+  const audit = referenceAudit(bounds, mode, selectedUnits, factoryTotals, records);
+  const monthSources = el.reportType.value === "month" && mode === "factory"
+    ? monthlySourceSummary(bounds.start.slice(0, 7))
+    : null;
+  const openingRoom = el.reportType.value === "month" && selectedIds.has("factory-3")
+    ? records.filter((record) => record.factoryId === "factory-3")
+      .reduce((sum, record) => sum + (toNumber(record.reportAdjustments?.excludedOpeningRoom) || 0), 0)
+    : 0;
+  const monthlySummary = monthSources ? {
+    managementTotal: monthSources.total,
+    managementShare: monthSources.share,
+    selectedFactoryCount: selectedFactories.length,
+    selectedManagementTotal: monthSources.share * selectedFactories.length,
+    openingRoom,
+    companyTotal: totalUsage + monthSources.share * selectedFactories.length + openingRoom,
+    components: monthSources.components,
+  } : null;
   const basis = mode === "room"
     ? "计量点明细口径（仅按配电室筛选）"
     : mode === "process"
       ? "原表正式工序汇总口径"
-      : "原表生产区汇总口径";
+      : el.reportType.value === "month"
+        ? "基础数据月报生产区 + 管理生活区五厂均摊 + 开松间单列"
+        : "基础数据周报生产区 + 五厂公摊源表口径";
   const selection = el.reportSelectionSummary.textContent;
   await window.PowerMeterXlsx.downloadPeriod({
     company: "雅新纺织有限公司",
@@ -820,6 +935,7 @@ async function createPeriodReport() {
     daysWithData,
     warningCount,
     referenceAudit: audit,
+    monthlySummary,
     basis,
     selection,
     fileName: `雅新纺织-用电${bounds.label}-${bounds.start}至${bounds.end}.xlsx`,
@@ -831,7 +947,7 @@ async function createPeriodReport() {
 
 async function downloadMasterWorkbook() {
   if (!state.importMeta?.schemaVersion || !window.PowerMeterXlsx?.downloadMaster) {
-    showToast("请先导入原始历史 Excel");
+    showToast("请先导入基础数据和公摊表");
     return;
   }
   el.masterDownloadButton.disabled = true;
