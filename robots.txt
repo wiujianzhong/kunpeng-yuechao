@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /ppt-admin.html
+
+Sitemap: https://jx.xiaowustudio.cn/sitemap.xml

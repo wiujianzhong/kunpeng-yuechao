@@ -18,6 +18,8 @@ LEGACY_SECRET = "xiaowu1994"
 LEGACY_MIGRATION_DEADLINE = 1814716800000
 ADMIN_PASSWORD_HASH = "157421c681bfde5495f18aea96b37ae84921aab31c4098439e0cf409fe459008"
 ALLOWED_ORIGINS = {
+    "https://jx.xiaowustudio.cn",
+    "https://th.xiaowustudio.cn",
     "https://jiaxin-ppt.xiaowustudio.cn",
     "https://texhong-ppt.xiaowustudio.cn",
     "https://wiujianzhong.github.io",
@@ -133,11 +135,12 @@ def register_or_check(code, installation_id, current_machine):
             machine_code, expiry, code_type = verified
             if code_type == "legacy" and now_ms() > LEGACY_MIGRATION_DEADLINE:
                 return None, "旧激活码已超过迁移期限"
-        if machine_code != current_machine:
-            return None, "激活码不匹配此设备"
         installations = []
         if row:
             installations = json.loads(row[2] or "[]")
+        if machine_code != current_machine:
+            if not row or not installation_id or installation_id not in installations:
+                return None, "浏览器记录已变化，请联系管理员恢复授权"
         if installation_id and installation_id not in installations:
             installations.append(installation_id)
         connection.execute(

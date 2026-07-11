@@ -1,0 +1,4 @@
+Contact: https://xiaowustudio.cn/
+Canonical: https://jx.xiaowustudio.cn/.well-known/security.txt
+Preferred-Languages: zh-CN
+Expires: 2027-07-11T00:00:00Z

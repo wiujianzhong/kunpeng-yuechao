@@ -1,38 +1,74 @@
 (function () {
     'use strict';
 
-    const VERSION = '20260707-authfix';
+    const VERSION = '20260711-stable-auth';
     const ACTIVATION_KEY = 'jx_ppt_activation';
     const OFFLINE_GRACE_KEY = 'jx_ppt_offline_grace';
     const INSTALLATION_KEY = 'jx_ppt_installation_id';
     const TRIAL_KEY = 'jx_ppt_trial';
     const TRIAL_FINGERPRINT_PREFIX = 'trialFingerprint-';
     const LICENSE_API = 'https://pptsq.xiaowustudio.cn/api/license';
-    const GRACE_MS = 7 * 24 * 60 * 60 * 1000;
+    const GRACE_MS = 30 * 24 * 60 * 60 * 1000;
+    const LEGACY_MIGRATION_PREFIX = 'jx-ppt-migrate:';
+    const hostname = window.location.hostname.toLowerCase();
+    const PRODUCT_SCOPE = hostname === 'th.xiaowustudio.cn'
+        || hostname === 'texhong-ppt.xiaowustudio.cn'
+        || (hostname === 'wiujianzhong.github.io' && window.location.pathname.includes('texhong'))
+        ? 'th'
+        : 'jx';
 
-    function storageGet(key) {
-        try {
-            return localStorage.getItem(key);
-        } catch (_) {
-            const prefix = `${encodeURIComponent(key)}=`;
-            const cookies = document.cookie ? document.cookie.split('; ') : [];
-            for (const cookie of cookies) {
-                if (cookie.indexOf(prefix) === 0) {
-                    return decodeURIComponent(cookie.slice(prefix.length));
-                }
+    function scopedCookieName(key) {
+        return `${key}_${PRODUCT_SCOPE}`;
+    }
+
+    function cookieGet(name) {
+        const prefix = `${encodeURIComponent(name)}=`;
+        const cookies = document.cookie ? document.cookie.split('; ') : [];
+        for (const cookie of cookies) {
+            if (cookie.indexOf(prefix) !== 0) continue;
+            try {
+                return decodeURIComponent(cookie.slice(prefix.length));
+            } catch (_) {
+                return null;
             }
-            return null;
+        }
+        return null;
+    }
+
+    function cookieSet(name, value, maxAgeSeconds) {
+        try {
+            const attributes = [
+                `max-age=${maxAgeSeconds || 400 * 24 * 60 * 60}`,
+                'path=/',
+                'SameSite=Lax'
+            ];
+            if (window.location.protocol === 'https:') attributes.push('Secure');
+            if (hostname === 'xiaowustudio.cn' || hostname.endsWith('.xiaowustudio.cn')) {
+                attributes.push('Domain=.xiaowustudio.cn');
+            }
+            document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; ${attributes.join('; ')}`;
+            return true;
+        } catch (_) {
+            return false;
         }
     }
 
+    function storageGet(key) {
+        try {
+            const value = localStorage.getItem(key);
+            if (value !== null) return value;
+        } catch (_) {}
+        return cookieGet(scopedCookieName(key)) || cookieGet(key);
+    }
+
     function storageSet(key, value, maxAgeSeconds) {
+        let localSaved = false;
         try {
             localStorage.setItem(key, value);
-            return true;
+            localSaved = true;
         } catch (_) {}
-        const maxAge = maxAgeSeconds || 400 * 24 * 60 * 60;
-        document.cookie = `${encodeURIComponent(key)}=${encodeURIComponent(value)}; max-age=${maxAge}; path=/; SameSite=Lax`;
-        return false;
+        const cookieSaved = cookieSet(scopedCookieName(key), value, maxAgeSeconds);
+        return localSaved || cookieSaved;
     }
 
     function simpleHash(str) {
@@ -132,16 +168,70 @@
         });
     }
 
+    function withTimeout(promise, timeoutMs) {
+        return Promise.race([
+            promise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('本地记录读取超时')), timeoutMs))
+        ]);
+    }
+
+    function persistentMaxAge(key) {
+        return key === OFFLINE_GRACE_KEY
+            ? Math.ceil(GRACE_MS / 1000)
+            : 400 * 24 * 60 * 60;
+    }
+
+    function persistentDBKey(key) {
+        return `paid-${PRODUCT_SCOPE}-${key}`;
+    }
+
+    async function readPersistentValue(key) {
+        const stored = storageGet(key);
+        if (stored !== null) {
+            storageSet(key, stored, persistentMaxAge(key));
+            putActivationDBValue(persistentDBKey(key), stored).catch(() => {});
+            return stored;
+        }
+        try {
+            const backup = await withTimeout(getActivationDBValue(persistentDBKey(key)), 1200);
+            if (typeof backup === 'string' && backup) {
+                storageSet(key, backup, persistentMaxAge(key));
+                return backup;
+            }
+        } catch (_) {}
+        return null;
+    }
+
+    async function writePersistentValue(key, value) {
+        storageSet(key, value, persistentMaxAge(key));
+        try {
+            await withTimeout(putActivationDBValue(persistentDBKey(key), value), 1200);
+        } catch (_) {}
+    }
+
+    function importLegacyWindowName() {
+        if (!window.name || !window.name.startsWith(LEGACY_MIGRATION_PREFIX)) return;
+        try {
+            const payload = JSON.parse(decodeURIComponent(window.name.slice(LEGACY_MIGRATION_PREFIX.length)));
+            [ACTIVATION_KEY, OFFLINE_GRACE_KEY, INSTALLATION_KEY, TRIAL_KEY].forEach(key => {
+                if (typeof payload[key] === 'string' && payload[key]) {
+                    storageSet(key, payload[key], persistentMaxAge(key));
+                }
+            });
+        } catch (_) {}
+        window.name = '';
+    }
+
     function updateMachineCode() {
         const codeBox = document.getElementById('machine-code-display');
         if (codeBox) codeBox.textContent = getMachineCode();
     }
 
-    function installationId() {
-        let value = storageGet(INSTALLATION_KEY);
+    async function installationId() {
+        let value = await readPersistentValue(INSTALLATION_KEY);
         if (!value) {
             value = (crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`).replace(/-/g, '');
-            storageSet(INSTALLATION_KEY, value);
+            await writePersistentValue(INSTALLATION_KEY, value);
         }
         return value;
     }
@@ -165,7 +255,9 @@
         const section = document.getElementById('trial-section');
         const footer = document.getElementById('activation-footer-text');
         if (section) section.style.display = '';
-        if (footer) footer.textContent = message || '👆 新用户点上方免费体验 · 已有激活码则输入激活';
+        if (footer) footer.textContent = message || (section
+            ? '👆 新用户点上方免费体验 · 已有激活码则输入激活'
+            : '已有管理员授权码，请在上方输入并验证');
     }
 
     function showError(message) {
@@ -175,15 +267,15 @@
         error.classList.add('visible');
     }
 
-    function saveGrace(expiry) {
-        storageSet(OFFLINE_GRACE_KEY, JSON.stringify({
+    async function saveGrace(expiry) {
+        await writePersistentValue(OFFLINE_GRACE_KEY, JSON.stringify({
             expiry: Math.min(Number(expiry), Date.now() + GRACE_MS)
-        }), 7 * 24 * 60 * 60);
+        }));
     }
 
-    function hasGrace() {
+    async function hasGrace() {
         try {
-            return Date.now() < JSON.parse(storageGet(OFFLINE_GRACE_KEY) || '{}').expiry;
+            return Date.now() < JSON.parse(await readPersistentValue(OFFLINE_GRACE_KEY) || '{}').expiry;
         } catch (_) {
             return false;
         }
@@ -191,48 +283,58 @@
 
     async function checkServer(code) {
         const machineCode = getMachineCode();
-        const response = await fetch(`${LICENSE_API}/check`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                code,
-                machineCode,
-                installationId: installationId(),
-                clientVersion: VERSION
-            })
-        });
-        if (!response.ok) throw new Error('授权服务器暂时不可用');
-        return response.json();
+        const controller = typeof AbortController === 'function' ? new AbortController() : null;
+        const timeout = controller ? setTimeout(() => controller.abort(), 8000) : null;
+        try {
+            const response = await fetch(`${LICENSE_API}/check`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code,
+                    machineCode,
+                    installationId: await installationId(),
+                    clientVersion: VERSION
+                }),
+                signal: controller?.signal
+            });
+            if (!response.ok) throw new Error('授权服务器暂时不可用');
+            return response.json();
+        } finally {
+            if (timeout) clearTimeout(timeout);
+        }
     }
 
-    async function restorePaidLicense() {
-        const code = storageGet(ACTIVATION_KEY);
-        if (!code) return false;
+    async function restorePaidLicense(code) {
+        if (!code) return { valid: false, message: '' };
         try {
             const result = await checkServer(code);
             if (result.valid) {
-                saveGrace(result.expiry);
+                await writePersistentValue(ACTIVATION_KEY, code);
+                await saveGrace(result.expiry);
                 hideOverlay();
-                return true;
+                return { valid: true, message: '' };
             }
-            return false;
+            return { valid: false, message: result.message || '授权已失效，请联系管理员' };
         } catch (_) {
-            if (hasGrace()) {
+            if (await hasGrace()) {
                 hideOverlay();
-                return true;
+                return { valid: true, message: '' };
             }
-            return false;
+            return { valid: false, message: '网络暂时无法连接授权服务，请检查网络后刷新' };
         }
     }
 
     async function init() {
+        importLegacyWindowName();
         updateMachineCode();
-        const code = storageGet(ACTIVATION_KEY);
-        if (code && hasGrace()) hideOverlay();
-        if (code && await restorePaidLicense()) return;
+        const code = await readPersistentValue(ACTIVATION_KEY);
+        if (code && await hasGrace()) hideOverlay();
+        const paidResult = code ? await restorePaidLicense(code) : { valid: false, message: '' };
+        if (paidResult.valid) return;
         if (await restoreTrial()) return;
         showTrialSection();
         showOverlay();
+        if (paidResult.message) showError(paidResult.message);
     }
 
     async function restoreTrial() {
@@ -271,6 +373,7 @@
             return;
         }
         const button = document.getElementById('activation-btn');
+        const oldButtonText = button?.textContent;
         if (button) {
             button.disabled = true;
             button.textContent = '正在验证...';
@@ -281,8 +384,8 @@
                 showError(result.message || '激活码无效、过期或不匹配此设备');
                 return;
             }
-            storageSet(ACTIVATION_KEY, code);
-            saveGrace(result.expiry);
+            await writePersistentValue(ACTIVATION_KEY, code);
+            await saveGrace(result.expiry);
             document.getElementById('activation-error')?.classList.remove('visible');
             hideOverlay();
         } catch (_) {
@@ -290,7 +393,7 @@
         } finally {
             if (button) {
                 button.disabled = false;
-                button.textContent = '激 活';
+                button.textContent = oldButtonText || '激 活';
             }
         }
     };
