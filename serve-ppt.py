@@ -17,6 +17,13 @@ SECRET_PATH = DATA_DIR / "server-secret"
 LEGACY_SECRET = "xiaowu1994"
 LEGACY_MIGRATION_DEADLINE = 1814716800000
 ADMIN_PASSWORD_HASH = "157421c681bfde5495f18aea96b37ae84921aab31c4098439e0cf409fe459008"
+ADMIN_LINK_TOKEN_HASH = "39980af83b36f0c0aaeeec7984928d15e3162f1ee8a76f29dcadcd481815170e"
+PERMANENT_EXPIRY = 4102444799000
+ADMIN_PLANS = {
+    "month": (30, "1个月"),
+    "year": (365, "1年"),
+    "permanent": (None, "永久"),
+}
 ALLOWED_ORIGINS = {
     "https://jx.xiaowustudio.cn",
     "https://th.xiaowustudio.cn",
@@ -219,14 +226,33 @@ class Handler(SimpleHTTPRequestHandler):
                 password_hash = hashlib.sha256(
                     str(payload.get("password", "")).encode()
                 ).hexdigest()
-                if not hmac.compare_digest(password_hash, ADMIN_PASSWORD_HASH):
-                    self.send_json(403, {"ok": False, "message": "管理员密码错误"})
+                link_token_hash = hashlib.sha256(
+                    str(payload.get("adminToken", "")).encode()
+                ).hexdigest()
+                password_valid = hmac.compare_digest(
+                    password_hash, ADMIN_PASSWORD_HASH
+                )
+                link_token_valid = hmac.compare_digest(
+                    link_token_hash, ADMIN_LINK_TOKEN_HASH
+                )
+                if not password_valid and not link_token_valid:
+                    self.send_json(403, {"ok": False, "message": "管理员链接无效"})
                     return
                 machine_code = str(payload.get("machineCode", "")).strip()
-                days = max(1, min(int(payload.get("days", 365)), 3650))
                 if not machine_code:
                     raise ValueError("机器码为空")
-                expiry = now_ms() + days * 24 * 60 * 60 * 1000
+                plan = str(payload.get("plan", "")).strip()
+                if plan in ADMIN_PLANS:
+                    days, plan_label = ADMIN_PLANS[plan]
+                    expiry = (
+                        PERMANENT_EXPIRY
+                        if days is None
+                        else now_ms() + days * 24 * 60 * 60 * 1000
+                    )
+                else:
+                    days = max(1, min(int(payload.get("days", 365)), 3650))
+                    plan_label = f"{days}天"
+                    expiry = now_ms() + days * 24 * 60 * 60 * 1000
                 data = {
                     "m": machine_code,
                     "e": expiry,
@@ -235,7 +261,15 @@ class Handler(SimpleHTTPRequestHandler):
                 code = base64.b64encode(
                     json.dumps(data, separators=(",", ":")).encode()
                 ).decode()
-                self.send_json(200, {"ok": True, "code": code, "expiry": expiry})
+                self.send_json(
+                    200,
+                    {
+                        "ok": True,
+                        "code": code,
+                        "expiry": expiry,
+                        "plan": plan_label,
+                    },
+                )
             except (ValueError, json.JSONDecodeError):
                 self.send_json(400, {"ok": False, "message": "请求内容无效"})
             return
