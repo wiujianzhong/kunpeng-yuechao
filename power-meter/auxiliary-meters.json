@@ -1,0 +1,2037 @@
+{
+  "schema_version": 1,
+  "production_meter_count": 858,
+  "auxiliary_meter_count": 110,
+  "total_meter_count": 968,
+  "groups": [
+    {
+      "id": "public-metering",
+      "name": "公摊及厂级总表",
+      "reporting": false,
+      "source_kind": "public-source",
+      "cadence": "daily",
+      "description": "每日录入；用于公共水井、空压分配及厂级总表交叉校验。",
+      "meters": [
+        {
+          "meter_id": "public-metering-CD44",
+          "name": "一厂1#变 低压总表（4000/5）",
+          "category": "一厂厂级低压总表（校验）",
+          "panel": "1#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 137995,
+          "source_end": 137995,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C44",
+          "source_end_cell": "D44",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 1
+        },
+        {
+          "meter_id": "public-metering-CD45",
+          "name": "一厂2#变 低压总表（4000/5）",
+          "category": "一厂厂级低压总表（校验）",
+          "panel": "2#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 109163,
+          "source_end": 109163,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C45",
+          "source_end_cell": "D45",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 2
+        },
+        {
+          "meter_id": "public-metering-CD46",
+          "name": "一厂3#变 低压总表（4000/5）",
+          "category": "一厂厂级低压总表（校验）",
+          "panel": "3#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 162179,
+          "source_end": 162179,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C46",
+          "source_end_cell": "D46",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 3
+        },
+        {
+          "meter_id": "public-metering-CD47",
+          "name": "一厂4#变 低压总表（4000/5）",
+          "category": "一厂厂级低压总表（校验）",
+          "panel": "4#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 140827,
+          "source_end": 140827,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C47",
+          "source_end_cell": "D47",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 4
+        },
+        {
+          "meter_id": "public-metering-CD48",
+          "name": "一厂5#变 低压总表（5000/5）",
+          "category": "一厂厂级低压总表（校验）",
+          "panel": "5#变",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 153301,
+          "source_end": 153301,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C48",
+          "source_end_cell": "D48",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 5
+        },
+        {
+          "meter_id": "public-metering-CD49",
+          "name": "一厂6#变 低压总表（6000/5）",
+          "category": "一厂厂级低压总表（校验）",
+          "panel": "6#变",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 132341,
+          "source_end": 132341,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C49",
+          "source_end_cell": "D49",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 6
+        },
+        {
+          "meter_id": "public-metering-CD50",
+          "name": "一厂8#变 低压总表（6000/5）",
+          "category": "一厂厂级低压总表（校验）",
+          "panel": "8#变",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 106173,
+          "source_end": 106173,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C50",
+          "source_end_cell": "D50",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 7
+        },
+        {
+          "meter_id": "public-metering-CD51",
+          "name": "一厂9#变 低压总表（6000/5）",
+          "category": "一厂厂级低压总表（校验）",
+          "panel": "9#变",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 92915.1,
+          "source_end": 92915.1,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C51",
+          "source_end_cell": "D51",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 8
+        },
+        {
+          "meter_id": "public-metering-CD52",
+          "name": "一厂10#变 低压总表（6000/5）",
+          "category": "一厂厂级低压总表（校验）",
+          "panel": "10#变",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 22672.8,
+          "source_end": 22672.8,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C52",
+          "source_end_cell": "D52",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 9
+        },
+        {
+          "meter_id": "public-metering-CD60",
+          "name": "二厂1#变 低压总表（4000/5）",
+          "category": "二厂厂级低压总表（校验）",
+          "panel": "1#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 167476,
+          "source_end": 167476,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C60",
+          "source_end_cell": "D60",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 10
+        },
+        {
+          "meter_id": "public-metering-CD61",
+          "name": "二厂2#变 低压总表（4000/5）",
+          "category": "二厂厂级低压总表（校验）",
+          "panel": "2#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 150251,
+          "source_end": 150251,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C61",
+          "source_end_cell": "D61",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 11
+        },
+        {
+          "meter_id": "public-metering-CD62",
+          "name": "二厂3#变 低压总表（4000/5）",
+          "category": "二厂厂级低压总表（校验）",
+          "panel": "3#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 161540,
+          "source_end": 161540,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C62",
+          "source_end_cell": "D62",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 12
+        },
+        {
+          "meter_id": "public-metering-CD63",
+          "name": "二厂4#变 低压总表（4000/5）",
+          "category": "二厂厂级低压总表（校验）",
+          "panel": "4#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 138405,
+          "source_end": 138405,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C63",
+          "source_end_cell": "D63",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 13
+        },
+        {
+          "meter_id": "public-metering-CD64",
+          "name": "二厂5#变 低压总表（6000/5）",
+          "category": "二厂厂级低压总表（校验）",
+          "panel": "5#变",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 143504,
+          "source_end": 143504,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C64",
+          "source_end_cell": "D64",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 14
+        },
+        {
+          "meter_id": "public-metering-CD65",
+          "name": "二厂6#变 低压总表（5000/5）",
+          "category": "二厂厂级低压总表（校验）",
+          "panel": "6#变",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 164287,
+          "source_end": 164287,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C65",
+          "source_end_cell": "D65",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 15
+        },
+        {
+          "meter_id": "public-metering-CD66",
+          "name": "二厂7#变南区 低压总表（6000/5）",
+          "category": "二厂厂级低压总表（校验）",
+          "panel": "7#变南区",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 66674,
+          "source_end": 66674,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C66",
+          "source_end_cell": "D66",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 16
+        },
+        {
+          "meter_id": "public-metering-CD67",
+          "name": "二厂8#变北区 低压总表（6000/5）",
+          "category": "二厂厂级低压总表（校验）",
+          "panel": "8#变北区",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 108301,
+          "source_end": 108301,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C67",
+          "source_end_cell": "D67",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 17
+        },
+        {
+          "meter_id": "public-metering-CD68",
+          "name": "二厂9#变1 低压总表（6000/5）",
+          "category": "二厂厂级低压总表（校验）",
+          "panel": "9#变1",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 13513,
+          "source_end": 13513,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C68",
+          "source_end_cell": "D68",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 18
+        },
+        {
+          "meter_id": "public-metering-CD69",
+          "name": "二厂9#变2 低压总表（6000/5）",
+          "category": "二厂厂级低压总表（校验）",
+          "panel": "9#变2",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 14982,
+          "source_end": 14982,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C69",
+          "source_end_cell": "D69",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 19
+        },
+        {
+          "meter_id": "public-metering-CD77",
+          "name": "三厂1#变 低压总表（4000/5）",
+          "category": "三厂厂级低压总表（校验）",
+          "panel": "1#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 131739,
+          "source_end": 131739,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C77",
+          "source_end_cell": "D77",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 20
+        },
+        {
+          "meter_id": "public-metering-CD78",
+          "name": "三厂2#变 低压总表（4000/5）",
+          "category": "三厂厂级低压总表（校验）",
+          "panel": "2#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 125414,
+          "source_end": 125414,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C78",
+          "source_end_cell": "D78",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 21
+        },
+        {
+          "meter_id": "public-metering-CD79",
+          "name": "三厂3#变 低压总表（4000/5）",
+          "category": "三厂厂级低压总表（校验）",
+          "panel": "3#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 145157,
+          "source_end": 145157,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C79",
+          "source_end_cell": "D79",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 22
+        },
+        {
+          "meter_id": "public-metering-CD80",
+          "name": "三厂4#变 低压总表（4000/5）",
+          "category": "三厂厂级低压总表（校验）",
+          "panel": "4#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 156277,
+          "source_end": 156277,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C80",
+          "source_end_cell": "D80",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 23
+        },
+        {
+          "meter_id": "public-metering-CD81",
+          "name": "三厂5#变 低压总表（5000/5）",
+          "category": "三厂厂级低压总表（校验）",
+          "panel": "5#变",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 153074,
+          "source_end": 153074,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C81",
+          "source_end_cell": "D81",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 24
+        },
+        {
+          "meter_id": "public-metering-CD82",
+          "name": "三厂6#变 低压总表（6000/5）",
+          "category": "三厂厂级低压总表（校验）",
+          "panel": "6#变",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 138095,
+          "source_end": 138095,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C82",
+          "source_end_cell": "D82",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 25
+        },
+        {
+          "meter_id": "public-metering-CD83",
+          "name": "三厂7#变 低压总表（4000/5）",
+          "category": "三厂厂级低压总表（校验）",
+          "panel": "7#变",
+          "ratio_text": "4000/5",
+          "multiplier": 800.0,
+          "seed": 40303,
+          "source_end": 40303,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C83",
+          "source_end_cell": "D83",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 26
+        },
+        {
+          "meter_id": "public-metering-CD84",
+          "name": "三厂8#变 低压总表（6000/5）",
+          "category": "三厂厂级低压总表（校验）",
+          "panel": "8#变",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 86912,
+          "source_end": 86912,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C84",
+          "source_end_cell": "D84",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 27
+        },
+        {
+          "meter_id": "public-metering-CD85",
+          "name": "三厂9#变 低压总表（6000/5）",
+          "category": "三厂厂级低压总表（校验）",
+          "panel": "9#变",
+          "ratio_text": "6000/5",
+          "multiplier": 1200.0,
+          "seed": 93904,
+          "source_end": 93904,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C85",
+          "source_end_cell": "D85",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 28
+        },
+        {
+          "meter_id": "public-metering-CD86",
+          "name": "三厂新加配电室 低压总表（6000/6）",
+          "category": "三厂厂级低压总表（校验）",
+          "panel": "新加配电室",
+          "ratio_text": "6000/6",
+          "multiplier": 1200.0,
+          "seed": 14742,
+          "source_end": 14742,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C86",
+          "source_end_cell": "D86",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 29
+        },
+        {
+          "meter_id": "public-metering-CD93",
+          "name": "四厂1#变 气流纺低压总表（5000/5）",
+          "category": "四厂厂级低压总表（校验）",
+          "panel": "1#变",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 17154.71,
+          "source_end": 17154.71,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C93",
+          "source_end_cell": "D93",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 30
+        },
+        {
+          "meter_id": "public-metering-CD94",
+          "name": "四厂2#变 气流纺低压总表（5000/5）",
+          "category": "四厂厂级低压总表（校验）",
+          "panel": "2#变",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 21059.89,
+          "source_end": 21059.89,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C94",
+          "source_end_cell": "D94",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 31
+        },
+        {
+          "meter_id": "public-metering-CD95",
+          "name": "四厂3#变 气流纺低压总表（5000/5）",
+          "category": "四厂厂级低压总表（校验）",
+          "panel": "3#变",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 18669.9,
+          "source_end": 18669.9,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C95",
+          "source_end_cell": "D95",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 32
+        },
+        {
+          "meter_id": "public-metering-CD96",
+          "name": "四厂4-G4#变 涡流纺低压总表（5000/5）",
+          "category": "四厂厂级低压总表（校验）",
+          "panel": "4-G4#变",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 9219.76,
+          "source_end": 9219.76,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C96",
+          "source_end_cell": "D96",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 33
+        },
+        {
+          "meter_id": "public-metering-CD97",
+          "name": "四厂4-G5#变 涡流纺低压总表（5000/5）",
+          "category": "四厂厂级低压总表（校验）",
+          "panel": "4-G5#变",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 19335.82,
+          "source_end": 19335.82,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C97",
+          "source_end_cell": "D97",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 34
+        },
+        {
+          "meter_id": "public-metering-CD98",
+          "name": "四厂5#变 涡流纺低压总表（2500/5）",
+          "category": "四厂厂级低压总表（校验）",
+          "panel": "5#变",
+          "ratio_text": "2500/5",
+          "multiplier": 500.0,
+          "seed": 22237.33,
+          "source_end": 22237.33,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C98",
+          "source_end_cell": "D98",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 35
+        },
+        {
+          "meter_id": "public-metering-CD106",
+          "name": "七厂1#变 低压总表（5000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "1#变",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 8531,
+          "source_end": 8531,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C106",
+          "source_end_cell": "D106",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 36
+        },
+        {
+          "meter_id": "public-metering-CD107",
+          "name": "七厂2#变 低压总表（3000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "2#变",
+          "ratio_text": "3000/5",
+          "multiplier": 600.0,
+          "seed": 6859,
+          "source_end": 6859,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C107",
+          "source_end_cell": "D107",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 37
+        },
+        {
+          "meter_id": "public-metering-CD108",
+          "name": "七厂3#变 低压总表（5000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "3#变",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 7189,
+          "source_end": 7189,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C108",
+          "source_end_cell": "D108",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 38
+        },
+        {
+          "meter_id": "public-metering-CD109",
+          "name": "七厂4#变 低压总表（5000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "4#变",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 661,
+          "source_end": 661,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C109",
+          "source_end_cell": "D109",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 39
+        },
+        {
+          "meter_id": "public-metering-CD110",
+          "name": "七厂5#变（1） 低压总表（5000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "5#变（1）",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 10206,
+          "source_end": 10206,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C110",
+          "source_end_cell": "D110",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 40
+        },
+        {
+          "meter_id": "public-metering-CD111",
+          "name": "七厂5#变（2） 低压总表（5000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "5#变（2）",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 12011,
+          "source_end": 12011,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C111",
+          "source_end_cell": "D111",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 41
+        },
+        {
+          "meter_id": "public-metering-CD112",
+          "name": "七厂6#变（1） 低压总表（5000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "6#变（1）",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 13607,
+          "source_end": 13607,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C112",
+          "source_end_cell": "D112",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 42
+        },
+        {
+          "meter_id": "public-metering-CD113",
+          "name": "七厂6#变（2） 低压总表（5000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "6#变（2）",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 15201,
+          "source_end": 15201,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C113",
+          "source_end_cell": "D113",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 43
+        },
+        {
+          "meter_id": "public-metering-CD114",
+          "name": "七厂7#变（1） 低压总表（5000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "7#变（1）",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 7368,
+          "source_end": 7368,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C114",
+          "source_end_cell": "D114",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 44
+        },
+        {
+          "meter_id": "public-metering-CD115",
+          "name": "七厂7#变（2） 低压总表（5000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "7#变（2）",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 5714,
+          "source_end": 5714,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C115",
+          "source_end_cell": "D115",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 45
+        },
+        {
+          "meter_id": "public-metering-CD116",
+          "name": "七厂8#变（1） 低压总表（5000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "8#变（1）",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 12868,
+          "source_end": 12868,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C116",
+          "source_end_cell": "D116",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 46
+        },
+        {
+          "meter_id": "public-metering-CD117",
+          "name": "七厂8#变（2） 低压总表（5000/5）",
+          "category": "七厂厂级低压总表（校验）",
+          "panel": "8#变（2）",
+          "ratio_text": "5000/5",
+          "multiplier": 1000.0,
+          "seed": 12875,
+          "source_end": 12875,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C117",
+          "source_end_cell": "D117",
+          "roles": [
+            "audit_low_voltage"
+          ],
+          "order_no": 47
+        },
+        {
+          "meter_id": "public-metering-KL44",
+          "name": "一厂1#水井",
+          "category": "公共水井",
+          "panel": "一厂",
+          "ratio_text": "60/1",
+          "multiplier": 60.0,
+          "seed": 19472,
+          "source_end": 19472,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K44",
+          "source_end_cell": "L44",
+          "roles": [
+            "weekly_common",
+            "monthly_water"
+          ],
+          "order_no": 48
+        },
+        {
+          "meter_id": "public-metering-KL45",
+          "name": "一厂5#西水井",
+          "category": "公共水井",
+          "panel": "一厂",
+          "ratio_text": "60/1",
+          "multiplier": 60.0,
+          "seed": 68119,
+          "source_end": 68119,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K45",
+          "source_end_cell": "L45",
+          "roles": [
+            "weekly_common",
+            "monthly_water"
+          ],
+          "order_no": 49
+        },
+        {
+          "meter_id": "public-metering-KL50",
+          "name": "一厂6#空压机1",
+          "category": "公共空压",
+          "panel": "一厂",
+          "ratio_text": "150/1",
+          "multiplier": 150.0,
+          "seed": 21621,
+          "source_end": 21621,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K50",
+          "source_end_cell": "L50",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 50
+        },
+        {
+          "meter_id": "public-metering-KL51",
+          "name": "一厂6#空压机2",
+          "category": "公共空压",
+          "panel": "一厂",
+          "ratio_text": "150/1",
+          "multiplier": 150.0,
+          "seed": 17462,
+          "source_end": 17462,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K51",
+          "source_end_cell": "L51",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 51
+        },
+        {
+          "meter_id": "public-metering-KL62",
+          "name": "二厂中心实验室",
+          "category": "中心实验室",
+          "panel": "二厂",
+          "ratio_text": "90/1",
+          "multiplier": 90.0,
+          "seed": 6508,
+          "source_end": 6508,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K62",
+          "source_end_cell": "L62",
+          "roles": [
+            "management:中心实验室"
+          ],
+          "order_no": 52
+        },
+        {
+          "meter_id": "public-metering-KL65",
+          "name": "二厂5#空压机1",
+          "category": "公共空压",
+          "panel": "二厂",
+          "ratio_text": "150/1",
+          "multiplier": 150.0,
+          "seed": 16458,
+          "source_end": 16458,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K65",
+          "source_end_cell": "L65",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 53
+        },
+        {
+          "meter_id": "public-metering-KL66",
+          "name": "二厂5#空压机2",
+          "category": "公共空压",
+          "panel": "二厂",
+          "ratio_text": "150/1",
+          "multiplier": 150.0,
+          "seed": 33501,
+          "source_end": 33501,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K66",
+          "source_end_cell": "L66",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 54
+        },
+        {
+          "meter_id": "public-metering-CD8",
+          "name": "二厂7#配新加空压机",
+          "category": "公共空压",
+          "panel": "二厂",
+          "ratio_text": "50/1",
+          "multiplier": 50.0,
+          "seed": 1946,
+          "source_end": 1946,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C8",
+          "source_end_cell": "D8",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 55
+        },
+        {
+          "meter_id": "public-metering-KL67",
+          "name": "二厂8#水井2",
+          "category": "公共水井",
+          "panel": "二厂",
+          "ratio_text": "50/1",
+          "multiplier": 50.0,
+          "seed": 57264,
+          "source_end": 57264,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K67",
+          "source_end_cell": "L67",
+          "roles": [
+            "weekly_common",
+            "monthly_water"
+          ],
+          "order_no": 56
+        },
+        {
+          "meter_id": "public-metering-KL68",
+          "name": "二厂8#水井3",
+          "category": "公共水井",
+          "panel": "二厂",
+          "ratio_text": "80/1",
+          "multiplier": 80.0,
+          "seed": 14900,
+          "source_end": 14900,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K68",
+          "source_end_cell": "L68",
+          "roles": [
+            "weekly_common",
+            "monthly_water"
+          ],
+          "order_no": 57
+        },
+        {
+          "meter_id": "public-metering-KL79",
+          "name": "三厂倍捻机",
+          "category": "公共设备校验",
+          "panel": "三厂",
+          "ratio_text": "80/1",
+          "multiplier": 80.0,
+          "seed": 1771.4,
+          "source_end": 1771.4,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K79",
+          "source_end_cell": "L79",
+          "roles": [
+            "audit_auxiliary"
+          ],
+          "order_no": 58
+        },
+        {
+          "meter_id": "public-metering-KL80",
+          "name": "三厂6#水井8",
+          "category": "公共水井",
+          "panel": "三厂",
+          "ratio_text": "50/1",
+          "multiplier": 50.0,
+          "seed": 12903,
+          "source_end": 12903,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K80",
+          "source_end_cell": "L80",
+          "roles": [
+            "weekly_common",
+            "monthly_water"
+          ],
+          "order_no": 59
+        },
+        {
+          "meter_id": "public-metering-KL81",
+          "name": "三厂7#水井7",
+          "category": "公共水井",
+          "panel": "三厂",
+          "ratio_text": "80/1",
+          "multiplier": 80.0,
+          "seed": 32072,
+          "source_end": 32072,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K81",
+          "source_end_cell": "L81",
+          "roles": [
+            "weekly_common",
+            "monthly_water"
+          ],
+          "order_no": 60
+        },
+        {
+          "meter_id": "public-metering-KL82",
+          "name": "三厂6#空压机1",
+          "category": "公共空压",
+          "panel": "三厂",
+          "ratio_text": "80/1",
+          "multiplier": 80.0,
+          "seed": 87200,
+          "source_end": 87200,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K82",
+          "source_end_cell": "L82",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 61
+        },
+        {
+          "meter_id": "public-metering-KL83",
+          "name": "三厂6#空压机2",
+          "category": "公共空压",
+          "panel": "三厂",
+          "ratio_text": "150/1",
+          "multiplier": 150.0,
+          "seed": 51793,
+          "source_end": 51793,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K83",
+          "source_end_cell": "L83",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 62
+        },
+        {
+          "meter_id": "public-metering-KL84",
+          "name": "三厂6#空压机3",
+          "category": "公共空压",
+          "panel": "三厂",
+          "ratio_text": "160/1",
+          "multiplier": 160.0,
+          "seed": 83293,
+          "source_end": 83293,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K84",
+          "source_end_cell": "L84",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 63
+        },
+        {
+          "meter_id": "public-metering-KL85",
+          "name": "三厂7#空压站低压电源",
+          "category": "公共空压",
+          "panel": "三厂",
+          "ratio_text": "150/1",
+          "multiplier": 150.0,
+          "seed": 98407,
+          "source_end": 98407,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K85",
+          "source_end_cell": "L85",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 64
+        },
+        {
+          "meter_id": "public-metering-IJ93",
+          "name": "四厂泵房照明",
+          "category": "公共水井及泵房",
+          "panel": "四厂",
+          "ratio_text": "10/1",
+          "multiplier": 10.0,
+          "seed": 570.7,
+          "source_end": 570.7,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "I93",
+          "source_end_cell": "J93",
+          "roles": [
+            "weekly_common",
+            "monthly_water"
+          ],
+          "order_no": 65
+        },
+        {
+          "meter_id": "public-metering-IJ94",
+          "name": "四厂泵房",
+          "category": "公共水井及泵房",
+          "panel": "四厂",
+          "ratio_text": "40/1",
+          "multiplier": 40.0,
+          "seed": 2316,
+          "source_end": 2316,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "I94",
+          "source_end_cell": "J94",
+          "roles": [
+            "weekly_common",
+            "monthly_water"
+          ],
+          "order_no": 66
+        },
+        {
+          "meter_id": "public-metering-IJ95",
+          "name": "四厂8#水井",
+          "category": "公共水井及泵房",
+          "panel": "四厂",
+          "ratio_text": "70/1",
+          "multiplier": 70.0,
+          "seed": 1140.1,
+          "source_end": 1140.1,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "I95",
+          "source_end_cell": "J95",
+          "roles": [
+            "weekly_common",
+            "monthly_water"
+          ],
+          "order_no": 67
+        },
+        {
+          "meter_id": "public-metering-KL106",
+          "name": "七厂1#空压站1",
+          "category": "公共空压",
+          "panel": "七厂",
+          "ratio_text": "100/1",
+          "multiplier": 100.0,
+          "seed": 20798,
+          "source_end": 20798,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K106",
+          "source_end_cell": "L106",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 68
+        },
+        {
+          "meter_id": "public-metering-KL107",
+          "name": "七厂1#空压站2",
+          "category": "公共空压",
+          "panel": "七厂",
+          "ratio_text": "100/1",
+          "multiplier": 100.0,
+          "seed": 17226,
+          "source_end": 17226,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K107",
+          "source_end_cell": "L107",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 69
+        },
+        {
+          "meter_id": "public-metering-KL108",
+          "name": "七厂1#空压站3",
+          "category": "公共空压",
+          "panel": "七厂",
+          "ratio_text": "100/1",
+          "multiplier": 100.0,
+          "seed": 11671,
+          "source_end": 11671,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K108",
+          "source_end_cell": "L108",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 70
+        },
+        {
+          "meter_id": "public-metering-KL21",
+          "name": "高压空压机一（10000/5）",
+          "category": "高压空压",
+          "panel": "三厂10#配",
+          "ratio_text": "10000/5",
+          "multiplier": 2000.0,
+          "seed": 15405.8,
+          "source_end": 15405.8,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K21",
+          "source_end_cell": "L21",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 71
+        },
+        {
+          "meter_id": "public-metering-KL22",
+          "name": "高压空压机二（15000/5）",
+          "category": "高压空压",
+          "panel": "三厂10#配",
+          "ratio_text": "15000/5",
+          "multiplier": 3000.0,
+          "seed": 26139.08,
+          "source_end": 26139.08,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K22",
+          "source_end_cell": "L22",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 72
+        },
+        {
+          "meter_id": "public-metering-KL23",
+          "name": "高压空压机三（15000/5）",
+          "category": "高压空压",
+          "panel": "三厂10#配",
+          "ratio_text": "15000/5",
+          "multiplier": 3000.0,
+          "seed": 24524.36,
+          "source_end": 24524.36,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K23",
+          "source_end_cell": "L23",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 73
+        },
+        {
+          "meter_id": "public-metering-KL24",
+          "name": "高压空压机四（15000/5）",
+          "category": "高压空压",
+          "panel": "三厂10#配",
+          "ratio_text": "15000/5",
+          "multiplier": 3000.0,
+          "seed": 3365.36,
+          "source_end": 3365.36,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "K24",
+          "source_end_cell": "L24",
+          "roles": [
+            "air_total"
+          ],
+          "order_no": 74
+        },
+        {
+          "meter_id": "public-metering-CD24",
+          "name": "西门卫动力柜",
+          "category": "公共水井及外围",
+          "panel": "西门卫",
+          "ratio_text": "0.2/1",
+          "multiplier": 0.2,
+          "seed": 561585.6,
+          "source_end": 561585.6,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C24",
+          "source_end_cell": "D24",
+          "roles": [
+            "weekly_common"
+          ],
+          "order_no": 75
+        }
+      ]
+    },
+    {
+      "id": "living-area",
+      "name": "生活区与外围",
+      "reporting": false,
+      "source_kind": "public-source",
+      "cadence": "weekly",
+      "description": "每周四及月结日录入；进入月报管理生活区，路灯/办公楼/清餐总表用于校验。",
+      "meters": [
+        {
+          "meter_id": "living-area-CD125",
+          "name": "路灯（1/1）",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 37040.728,
+          "source_end": 37040.728,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C125",
+          "source_end_cell": "D125",
+          "roles": [
+            "management:路灯"
+          ],
+          "order_no": 1
+        },
+        {
+          "meter_id": "living-area-CD126",
+          "name": "办公楼（200/5）",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "200/5",
+          "multiplier": 1.0,
+          "seed": 86504.4,
+          "source_end": 86504.4,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C126",
+          "source_end_cell": "D126",
+          "roles": [
+            "management:办公楼"
+          ],
+          "order_no": 2
+        },
+        {
+          "meter_id": "living-area-CD127",
+          "name": "五/六号宿舍楼",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 197621.04,
+          "source_end": 197621.04,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C127",
+          "source_end_cell": "D127",
+          "roles": [
+            "management:宿舍"
+          ],
+          "order_no": 3
+        },
+        {
+          "meter_id": "living-area-CD128",
+          "name": "三/四号宿舍楼",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 28891.44,
+          "source_end": 28891.44,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C128",
+          "source_end_cell": "D128",
+          "roles": [
+            "management:宿舍"
+          ],
+          "order_no": 4
+        },
+        {
+          "meter_id": "living-area-CD129",
+          "name": "二号宿舍楼",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 24413.88,
+          "source_end": 24413.88,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C129",
+          "source_end_cell": "D129",
+          "roles": [
+            "management:宿舍"
+          ],
+          "order_no": 5
+        },
+        {
+          "meter_id": "living-area-CD130",
+          "name": "一号宿舍楼",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 26054.34,
+          "source_end": 26054.34,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C130",
+          "source_end_cell": "D130",
+          "roles": [
+            "management:宿舍"
+          ],
+          "order_no": 6
+        },
+        {
+          "meter_id": "living-area-CD131",
+          "name": "绿化",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 10874.82,
+          "source_end": 10874.82,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C131",
+          "source_end_cell": "D131",
+          "roles": [
+            "monthly_water"
+          ],
+          "order_no": 7
+        },
+        {
+          "meter_id": "living-area-CD132",
+          "name": "清餐食堂总",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 462891,
+          "source_end": 462891,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C132",
+          "source_end_cell": "D132",
+          "roles": [
+            "audit_dining_total"
+          ],
+          "order_no": 8
+        },
+        {
+          "meter_id": "living-area-CD133",
+          "name": "生活配低压总表",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 1631848.5,
+          "source_end": 1631848.5,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C133",
+          "source_end_cell": "D133",
+          "roles": [
+            "audit_living_total"
+          ],
+          "order_no": 9
+        },
+        {
+          "meter_id": "living-area-CD134",
+          "name": "低压10#（150/5）",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "150/5",
+          "multiplier": 30.0,
+          "seed": 984.2,
+          "source_end": 984.2,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C134",
+          "source_end_cell": "D134",
+          "roles": [
+            "management:低压10号"
+          ],
+          "order_no": 10
+        },
+        {
+          "meter_id": "living-area-CD135",
+          "name": "七号配汉餐（750/5）",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "750/5",
+          "multiplier": 150.0,
+          "seed": 16278,
+          "source_end": 16278,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C135",
+          "source_end_cell": "D135",
+          "roles": [
+            "management:汉餐"
+          ],
+          "order_no": 11
+        },
+        {
+          "meter_id": "living-area-CD136",
+          "name": "七分厂1#叉车库（250/5）",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "250/5",
+          "multiplier": 50.0,
+          "seed": 2101,
+          "source_end": 2101,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C136",
+          "source_end_cell": "D136",
+          "roles": [
+            "management:抓包及叉车库"
+          ],
+          "order_no": 12
+        },
+        {
+          "meter_id": "living-area-CD137",
+          "name": "七分厂8#1叉车房（300/5）",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "300/5",
+          "multiplier": 60.0,
+          "seed": 325,
+          "source_end": 325,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C137",
+          "source_end_cell": "D137",
+          "roles": [
+            "management:抓包及叉车库"
+          ],
+          "order_no": 13
+        },
+        {
+          "meter_id": "living-area-CD138",
+          "name": "七分厂8#2叉车房",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "60/1",
+          "multiplier": 60.0,
+          "seed": 344,
+          "source_end": 344,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C138",
+          "source_end_cell": "D138",
+          "roles": [
+            "management:抓包及叉车库"
+          ],
+          "order_no": 14
+        },
+        {
+          "meter_id": "living-area-CD139",
+          "name": "抓包车库(400/5)",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "400/5",
+          "multiplier": 80.0,
+          "seed": 7749,
+          "source_end": 7749,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C139",
+          "source_end_cell": "D139",
+          "roles": [
+            "management:抓包及叉车库"
+          ],
+          "order_no": 15
+        },
+        {
+          "meter_id": "living-area-CD140",
+          "name": "车棚",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 93369.72,
+          "source_end": 93369.72,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C140",
+          "source_end_cell": "D140",
+          "roles": [
+            "management:车棚"
+          ],
+          "order_no": 16
+        },
+        {
+          "meter_id": "living-area-CD141",
+          "name": "机修间（150/5）",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "150/5",
+          "multiplier": 30.0,
+          "seed": 2662,
+          "source_end": 2662,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C141",
+          "source_end_cell": "D141",
+          "roles": [
+            "management:机修间"
+          ],
+          "order_no": 17
+        },
+        {
+          "meter_id": "living-area-CD142",
+          "name": "2#皮辊制作间（100/5）",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "100/5",
+          "multiplier": 120.0,
+          "seed": 4897,
+          "source_end": 4897,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C142",
+          "source_end_cell": "D142",
+          "roles": [
+            "management:皮辊制作间"
+          ],
+          "order_no": 18
+        },
+        {
+          "meter_id": "living-area-CD143",
+          "name": "生活泵站（250/5）",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "250/5",
+          "multiplier": 50.0,
+          "seed": 287.8,
+          "source_end": 287.8,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C143",
+          "source_end_cell": "D143",
+          "roles": [
+            "management:生活泵站"
+          ],
+          "order_no": 19
+        },
+        {
+          "meter_id": "living-area-CD144",
+          "name": "1厂7#配交换站",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "80/1",
+          "multiplier": 80.0,
+          "seed": 25895,
+          "source_end": 25895,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C144",
+          "source_end_cell": "D144",
+          "roles": [
+            "management:交换站"
+          ],
+          "order_no": 20
+        },
+        {
+          "meter_id": "living-area-CD145",
+          "name": "蓄、回水池（1/1）",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "1/1",
+          "multiplier": 40.0,
+          "seed": 8737,
+          "source_end": 8737,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C145",
+          "source_end_cell": "D145",
+          "roles": [
+            "management:蓄回水池"
+          ],
+          "order_no": 21
+        },
+        {
+          "meter_id": "living-area-CD146",
+          "name": "空气能（750/5）",
+          "category": "生活区与外围",
+          "panel": "生活区",
+          "ratio_text": "750/5",
+          "multiplier": 150.0,
+          "seed": 38603,
+          "source_end": 38603,
+          "required": true,
+          "source_kind": "public-source",
+          "source_start": "C146",
+          "source_end_cell": "D146",
+          "roles": [
+            "management:空气能"
+          ],
+          "order_no": 22
+        }
+      ]
+    },
+    {
+      "id": "road-lighting",
+      "name": "厂区路灯",
+      "reporting": false,
+      "source_kind": "road-source",
+      "cadence": "weekly",
+      "description": "每周四及月结日录入；与生活区路灯合并进入月报。",
+      "meters": [
+        {
+          "meter_id": "road-lighting-CD4",
+          "name": "一厂 一#南路灯（300/5）",
+          "category": "厂区路灯",
+          "panel": "一厂",
+          "ratio_text": "300/5",
+          "multiplier": 60.0,
+          "seed": 1756.4,
+          "source_end": 1756.4,
+          "required": true,
+          "source_kind": "road-source",
+          "source_start": "C4",
+          "source_end_cell": "D4",
+          "roles": [
+            "management:路灯"
+          ],
+          "order_no": 1
+        },
+        {
+          "meter_id": "road-lighting-CD5",
+          "name": "一厂 六#西路灯（250/5）",
+          "category": "厂区路灯",
+          "panel": "一厂",
+          "ratio_text": "250/5",
+          "multiplier": 40.0,
+          "seed": 1746,
+          "source_end": 1746,
+          "required": true,
+          "source_kind": "road-source",
+          "source_start": "C5",
+          "source_end_cell": "D5",
+          "roles": [
+            "management:路灯"
+          ],
+          "order_no": 2
+        },
+        {
+          "meter_id": "road-lighting-CD7",
+          "name": "二厂 一#南路灯（50/5）",
+          "category": "厂区路灯",
+          "panel": "二厂",
+          "ratio_text": "50/5",
+          "multiplier": 10.0,
+          "seed": 9919,
+          "source_end": 9919,
+          "required": true,
+          "source_kind": "road-source",
+          "source_start": "C7",
+          "source_end_cell": "D7",
+          "roles": [
+            "management:路灯"
+          ],
+          "order_no": 3
+        },
+        {
+          "meter_id": "road-lighting-CD8",
+          "name": "二厂 二#北路灯（250/5）",
+          "category": "厂区路灯",
+          "panel": "二厂",
+          "ratio_text": "250/5",
+          "multiplier": 50.0,
+          "seed": 1048,
+          "source_end": 1048,
+          "required": true,
+          "source_kind": "road-source",
+          "source_start": "C8",
+          "source_end_cell": "D8",
+          "roles": [
+            "management:路灯"
+          ],
+          "order_no": 4
+        },
+        {
+          "meter_id": "road-lighting-CD10",
+          "name": "三厂 二#西南路灯（250/5）",
+          "category": "厂区路灯",
+          "panel": "三厂",
+          "ratio_text": "250/5",
+          "multiplier": 50.0,
+          "seed": 4245,
+          "source_end": 4245,
+          "required": true,
+          "source_kind": "road-source",
+          "source_start": "C10",
+          "source_end_cell": "D10",
+          "roles": [
+            "management:路灯"
+          ],
+          "order_no": 5
+        },
+        {
+          "meter_id": "road-lighting-CD11",
+          "name": "三厂 五#东北路灯（40/5）",
+          "category": "厂区路灯",
+          "panel": "三厂",
+          "ratio_text": "40/5",
+          "multiplier": 8.0,
+          "seed": 18064,
+          "source_end": 18064,
+          "required": true,
+          "source_kind": "road-source",
+          "source_start": "C11",
+          "source_end_cell": "D11",
+          "roles": [
+            "management:路灯"
+          ],
+          "order_no": 6
+        },
+        {
+          "meter_id": "road-lighting-CD13",
+          "name": "四厂 四#配（2）路灯（75/5）",
+          "category": "厂区路灯",
+          "panel": "四厂",
+          "ratio_text": "75/5",
+          "multiplier": 15.0,
+          "seed": 210.8,
+          "source_end": 210.8,
+          "required": true,
+          "source_kind": "road-source",
+          "source_start": "C13",
+          "source_end_cell": "D13",
+          "roles": [
+            "management:路灯"
+          ],
+          "order_no": 7
+        },
+        {
+          "meter_id": "road-lighting-CD14",
+          "name": "七厂 三#路灯（250/5）",
+          "category": "厂区路灯",
+          "panel": "七厂",
+          "ratio_text": "250/5",
+          "multiplier": 50.0,
+          "seed": 288,
+          "source_end": 288,
+          "required": true,
+          "source_kind": "road-source",
+          "source_start": "C14",
+          "source_end_cell": "D14",
+          "roles": [
+            "management:路灯"
+          ],
+          "order_no": 8
+        }
+      ]
+    },
+    {
+      "id": "dining-submeters",
+      "name": "清餐分表",
+      "reporting": false,
+      "source_kind": "facilities-source",
+      "cadence": "weekly",
+      "description": "每周四及月结日录入；后厨和二楼4只表进入月报，大厅表仅作校验。",
+      "meters": [
+        {
+          "meter_id": "dining-submeters-DE7",
+          "name": "清餐一楼大厅（250/5）",
+          "category": "清餐分表",
+          "panel": "清餐",
+          "ratio_text": "250/5",
+          "multiplier": 50.0,
+          "seed": 24082.2,
+          "source_end": 24082.2,
+          "required": true,
+          "source_kind": "facilities-source",
+          "source_start": "D7",
+          "source_end_cell": "E7",
+          "roles": [
+            "audit_dining_submeter"
+          ],
+          "order_no": 1
+        },
+        {
+          "meter_id": "dining-submeters-DE8",
+          "name": "清餐一楼后厨（800/5）",
+          "category": "清餐分表",
+          "panel": "清餐",
+          "ratio_text": "800/5",
+          "multiplier": 160.0,
+          "seed": 15997.7,
+          "source_end": 15997.7,
+          "required": true,
+          "source_kind": "facilities-source",
+          "source_start": "D8",
+          "source_end_cell": "E8",
+          "roles": [
+            "management:清餐"
+          ],
+          "order_no": 2
+        },
+        {
+          "meter_id": "dining-submeters-DE9",
+          "name": "清餐二楼外面（1/1）",
+          "category": "清餐分表",
+          "panel": "清餐",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 361163,
+          "source_end": 361163,
+          "required": true,
+          "source_kind": "facilities-source",
+          "source_start": "D9",
+          "source_end_cell": "E9",
+          "roles": [
+            "management:清餐"
+          ],
+          "order_no": 3
+        },
+        {
+          "meter_id": "dining-submeters-DE10",
+          "name": "清餐二楼里面左（1/1）",
+          "category": "清餐分表",
+          "panel": "清餐",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 103441,
+          "source_end": 103441,
+          "required": true,
+          "source_kind": "facilities-source",
+          "source_start": "D10",
+          "source_end_cell": "E10",
+          "roles": [
+            "management:清餐"
+          ],
+          "order_no": 4
+        },
+        {
+          "meter_id": "dining-submeters-DE11",
+          "name": "清餐二楼里面右（1/1）",
+          "category": "清餐分表",
+          "panel": "清餐",
+          "ratio_text": "1/1",
+          "multiplier": 1.0,
+          "seed": 45752,
+          "source_end": 45752,
+          "required": true,
+          "source_kind": "facilities-source",
+          "source_start": "D11",
+          "source_end_cell": "E11",
+          "roles": [
+            "management:清餐"
+          ],
+          "order_no": 5
+        }
+      ]
+    }
+  ]
+}

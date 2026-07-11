@@ -848,6 +848,99 @@
     return monthly;
   }
 
+  function explicitSourceDate(sheet, sourceKind) {
+    if (sourceKind === "public-source" && sheet.date) return sheet.date;
+    const text = String(sheet.name || "").replace(/\s+/g, "");
+    let matched = /^(\d{2}|20\d{2})[.年](\d{1,2})[.月](\d{1,2})/.exec(text);
+    let year;
+    let month;
+    let day;
+    if (matched) {
+      year = matched[1].length === 2 ? 2000 + Number(matched[1]) : Number(matched[1]);
+      month = Number(matched[2]);
+      day = Number(matched[3]);
+    } else {
+      matched = sourceKind === "public-source" ? /^(\d{1,2})\.(\d{1,2})(?:周|月)/.exec(text) : null;
+      if (!matched) return null;
+      year = 2026;
+      month = Number(matched[1]);
+      day = Number(matched[2]);
+    }
+    const date = new Date(Date.UTC(year, month - 1, day));
+    if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+    return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  }
+
+  function compactAuxiliaryRecord(date, group, cells, sourceKind) {
+    let validCount = 0;
+    let totalUsage = 0;
+    const categoryTotals = new Map();
+    const readings = group.meters.map((meter) => {
+      const start = finiteNumber(cells.get(meter.source_start));
+      const end = finiteNumber(cells.get(meter.source_end_cell));
+      const valid = start !== null && end !== null && end >= start;
+      if (valid) {
+        validCount += 1;
+        const usage = (end - start) * Number(meter.multiplier || 0);
+        totalUsage += usage;
+        categoryTotals.set(meter.category, (categoryTotals.get(meter.category) || 0) + usage);
+      }
+      return [start, end, meter.required && !valid ? "other" : "normal"];
+    });
+    const units = [[group.name, totalUsage]];
+    return {
+      key: `${date}|${group.id}`,
+      date,
+      factoryId: group.id,
+      source: `import-${sourceKind}`,
+      sourceKind,
+      completed: validCount > 0,
+      readings,
+      totalUsage,
+      officialTotal: totalUsage,
+      officialRows: [...categoryTotals.entries()],
+      officialUnits: units,
+      reportTotal: totalUsage,
+      reportUnits: units,
+      monthlyTotal: totalUsage,
+      monthlyUnits: units,
+      commonShare: 0,
+      reportAdjustments: {
+        excludedNetFiber: 0,
+        excludedOpeningRoom: 0,
+        excludedThirdFactoryVortex: 0,
+        excludedFourFactoryCommon: 0,
+        includedPublicAir: 0,
+        includedCommonShare: 0,
+      },
+      validCount,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  async function parseAuxiliaryRecords(context, companyData, sourceKind) {
+    const groups = (companyData.factories || []).filter((group) => group.source_kind === sourceKind);
+    if (!groups.length) return [];
+    const byKey = new Map();
+    for (const sheet of context.sheets) {
+      const date = explicitSourceDate(sheet, sourceKind);
+      if (!date) continue;
+      const cells = await sheetCellMap(context, sheet);
+      groups.forEach((group) => {
+        if (sourceKind === "public-source" && group.cadence === "daily" && !sheet.date) return;
+        if (sourceKind === "public-source" && group.cadence === "weekly" && !/[周月]/.test(sheet.name)) return;
+        const record = compactAuxiliaryRecord(date, group, cells, sourceKind);
+        const previous = byKey.get(record.key);
+        const priority = /月/.test(sheet.name) ? 2 : /周/.test(sheet.name) ? 1 : 0;
+        record.sourceSheet = sheet.name;
+        record.sourcePriority = priority;
+        if (!previous || record.validCount > previous.validCount
+          || (record.validCount === previous.validCount && priority > previous.sourcePriority)) byKey.set(record.key, record);
+      });
+    }
+    return [...byKey.values()].sort((a, b) => a.date.localeCompare(b.date) || a.factoryId.localeCompare(b.factoryId));
+  }
+
   async function parseMonthlyReference(file, context) {
     const sheet = context.sheets[0];
     const cells = await sheetCellMap(context, sheet);
@@ -926,6 +1019,12 @@
     return { kind: "daily", data: null };
   }
 
+  async function parseAuxiliaryWorkbook(file, companyData) {
+    const detected = await detectWorkbookKind(file);
+    if (!/^(public|road|facilities)-source$/.test(detected.kind)) return { kind: detected.kind, records: [] };
+    return { kind: detected.kind, records: await parseAuxiliaryRecords(detected.context, companyData, detected.kind) };
+  }
+
   async function parseWorkbook(file, companyData, onProgress = () => {}) {
     if (!file || !/\.xlsx$/i.test(file.name || "")) throw new Error("请选择.xlsx格式的原始基础数据表");
     if (file.size > 80 * 1024 * 1024) throw new Error("文件超过80MB，请先确认是否选错文件");
@@ -937,7 +1036,7 @@
     const sheets = workbookSheets(workbookXml, relationsXml);
     if (sheets.length < 2) throw new Error("没有识别到按日期命名的历史工作表");
 
-    const mapping = (companyData.factories || []).map((factory) => ({
+    const mapping = (companyData.factories || []).filter((factory) => !factory.source_kind).map((factory) => ({
       factory,
       meters: factory.meters.map((meter) => ({
         meter,
@@ -1056,8 +1155,8 @@
         dayCount: ordered.length,
         sheetCount: sheets.length,
         meterCount: (companyData.factories || []).reduce((sum, factory) => sum + factory.meters.length, 0),
-        schemaVersion: 7,
-        reportBasis: "周报生产区加公摊；月报按源表月结节点加管理生活区",
+        schemaVersion: 8,
+        reportBasis: "968只统一计量点；周报生产区加公摊；月报按月结节点加管理生活区",
       },
     };
   }
@@ -1075,6 +1174,7 @@
           && record.reportAdjustments?.excludedThirdFactoryVortex !== undefined && record.commonShare !== undefined)) return record;
         return compactRows(record.date, record.factoryId, expandRecord(record, factory), "manual");
       });
+      const auxiliary = existing.filter((record) => String(record.source || "").startsWith("import-"));
       const importedDates = new Set(parsed.records.map((record) => record.date));
       const extraManualDates = new Set();
       manual.forEach((record) => {
@@ -1089,6 +1189,7 @@
       const daily = transaction.objectStore(DAILY_STORE);
       daily.clear();
       manual.forEach((record) => daily.put(record));
+      auxiliary.filter((record) => !manualKeys.has(record.key)).forEach((record) => daily.put(record));
       parsed.records.filter((record) => !manualKeys.has(record.key)).forEach((record) => daily.put(record));
       transaction.objectStore(META_STORE).put(parsed.meta);
       await transactionDone(transaction);
@@ -1100,6 +1201,23 @@
 
   async function importWorkbook(file, companyData, onProgress) {
     return storeImport(await parseWorkbook(file, companyData, onProgress), companyData);
+  }
+
+  async function storeAuxiliaryRecords(records, sourceKind) {
+    if (!records.length) return;
+    const database = await openDatabase();
+    try {
+      const readTransaction = database.transaction(DAILY_STORE, "readonly");
+      const existing = await requestResult(readTransaction.objectStore(DAILY_STORE).getAll());
+      const manualKeys = new Set(existing.filter((record) => record.source === "manual").map((record) => record.key));
+      const transaction = database.transaction(DAILY_STORE, "readwrite");
+      const store = transaction.objectStore(DAILY_STORE);
+      existing.filter((record) => record.source === `import-${sourceKind}`).forEach((record) => store.delete(record.key));
+      records.filter((record) => !manualKeys.has(record.key)).forEach((record) => store.put(record));
+      await transactionDone(transaction);
+    } finally {
+      database.close();
+    }
   }
 
   async function importFiles(files, companyData, onProgress = () => {}) {
@@ -1136,24 +1254,30 @@
       }
       if (detected.kind === "public-source") {
         const source = await parsePublicSource(file, detected.context);
+        const auxiliary = await parseAuxiliaryRecords(detected.context, companyData, detected.kind);
+        await storeAuxiliaryRecords(auxiliary, detected.kind);
         referenceData.sources.publicDaily = { ...referenceData.sources.publicDaily, ...source.daily };
         referenceData.sources.publicMonthly = { ...referenceData.sources.publicMonthly, ...source.monthly };
         referenceChanged = true;
-        imported.push(`五厂公摊：${Object.keys(source.daily).length}天`);
+        imported.push(`五厂公摊：${Object.keys(source.daily).length}天、${auxiliary.length}条原始录入记录`);
         continue;
       }
       if (detected.kind === "road-source") {
         const monthly = await parseRoadSource(file, detected.context);
+        const auxiliary = await parseAuxiliaryRecords(detected.context, companyData, detected.kind);
+        await storeAuxiliaryRecords(auxiliary, detected.kind);
         referenceData.sources.roadMonthly = { ...referenceData.sources.roadMonthly, ...monthly };
         referenceChanged = true;
-        imported.push(`路灯月度：${Object.keys(monthly).length}个月`);
+        imported.push(`路灯：${Object.keys(monthly).length}个月、${auxiliary.length}条原始录入记录`);
         continue;
       }
       if (detected.kind === "facilities-source") {
         const monthly = await parseFacilitiesSource(file, detected.context);
+        const auxiliary = await parseAuxiliaryRecords(detected.context, companyData, detected.kind);
+        await storeAuxiliaryRecords(auxiliary, detected.kind);
         referenceData.sources.facilitiesMonthly = { ...referenceData.sources.facilitiesMonthly, ...monthly };
         referenceChanged = true;
-        imported.push(`办公楼/清餐：${Object.keys(monthly).length}个月`);
+        imported.push(`办公楼/清餐：${Object.keys(monthly).length}个月、${auxiliary.length}条原始录入记录`);
         continue;
       }
       const monthly = await parseMonthlyReference(file, detected.context);
@@ -1183,6 +1307,7 @@
         room: standardRoom(meter.panel),
         ratio_text: meter.ratio_text,
         multiplier: meter.multiplier,
+        roles: meter.roles || [],
         required: meter.required,
         expected_start: start,
         start,
@@ -1195,7 +1320,107 @@
     });
   }
 
+  function auxiliaryMeterUsage(record, meter, index) {
+    const start = finiteNumber(record.readings?.[index]?.[0]);
+    const end = finiteNumber(record.readings?.[index]?.[1]);
+    if (start === null || end === null || end < start) return null;
+    return (end - start) * Number(meter.multiplier || 0);
+  }
+
+  function buildAuxiliaryDailySources(records, companyData) {
+    const groups = new Map((companyData.factories || []).filter((group) => group.reporting === false).map((group) => [group.id, group]));
+    const expectedCommon = [...groups.values()].flatMap((group) => group.meters).filter((meter) => meter.roles?.includes("weekly_common")).length;
+    const expectedAir = [...groups.values()].flatMap((group) => group.meters).filter((meter) => meter.roles?.includes("air_total")).length;
+    const byDate = new Map();
+    records.forEach((record) => {
+      const group = groups.get(record.factoryId);
+      if (!group) return;
+      const day = byDate.get(record.date) || { commonTotal: 0, commonCount: 0, airTotal: 0, airCount: 0 };
+      group.meters.forEach((meter, index) => {
+        const usage = auxiliaryMeterUsage(record, meter, index);
+        if (usage === null) return;
+        if (meter.roles?.includes("weekly_common")) {
+          day.commonTotal += usage;
+          day.commonCount += 1;
+        }
+        if (meter.roles?.includes("air_total")) {
+          day.airTotal += usage;
+          day.airCount += 1;
+        }
+      });
+      byDate.set(record.date, day);
+    });
+    const daily = {};
+    byDate.forEach((day, date) => {
+      if (day.commonCount !== expectedCommon || day.airCount !== expectedAir) return;
+      daily[date] = {
+        commonShare: day.commonTotal / 5,
+        airAllocations: {
+          "factory-1": day.airTotal * 0.264,
+          "factory-2": day.airTotal * 0.257,
+          "factory-3": day.airTotal * 0.259,
+          "factory-4": day.airTotal * 0.22,
+        },
+        sourceFile: "统一计量点录入",
+        sourceSheet: date,
+      };
+    });
+    return { daily, expectedCommon, expectedAir };
+  }
+
+  function buildAuxiliaryMonthlySource(records, companyData) {
+    const groups = new Map((companyData.factories || []).filter((group) => group.reporting === false).map((group) => [group.id, group]));
+    const recordsByGroup = new Map();
+    records.forEach((record) => {
+      if (!groups.has(record.factoryId)) return;
+      const list = recordsByGroup.get(record.factoryId) || [];
+      list.push(record);
+      recordsByGroup.set(record.factoryId, list);
+    });
+    const components = new Map();
+    let expectedCount = 0;
+    const validMeters = new Set();
+    let continuityIssues = 0;
+    groups.forEach((group) => {
+      const groupRecords = recordsByGroup.get(group.id) || [];
+      const monthlyRecords = groupRecords.filter((record) => record.sourcePriority === 2).sort((a, b) => a.date.localeCompare(b.date));
+      const calculationRecords = monthlyRecords.length ? [monthlyRecords.at(-1)] : groupRecords;
+      group.meters.forEach((meter, index) => {
+        const componentRole = (meter.roles || []).find((role) => role.startsWith("management:"));
+        const component = componentRole?.slice("management:".length) || (meter.roles?.includes("monthly_water") ? "公共水井" : null);
+        if (!component) return;
+        expectedCount += 1;
+        let previousEnd = null;
+        calculationRecords.forEach((record) => {
+          const start = finiteNumber(record.readings?.[index]?.[0]);
+          const end = finiteNumber(record.readings?.[index]?.[1]);
+          const usage = auxiliaryMeterUsage(record, meter, index);
+          if (usage === null) return;
+          if (previousEnd !== null && Math.abs(start - previousEnd) > 0.000001) continuityIssues += 1;
+          previousEnd = end;
+          validMeters.add(`${group.id}|${meter.meter_id}`);
+          components.set(component, (components.get(component) || 0) + usage);
+        });
+      });
+    });
+    const orderedNames = ["路灯", "办公楼", "宿舍", "清餐", "低压10号", "汉餐", "抓包及叉车库", "车棚", "机修间", "皮辊制作间", "生活泵站", "交换站", "蓄回水池", "空气能", "公共水井", "中心实验室"];
+    const ordered = orderedNames.map((name) => [name, components.get(name) || 0]);
+    const total = ordered.reduce((sum, [, usage]) => sum + usage, 0);
+    const validCount = validMeters.size;
+    return {
+      complete: expectedCount > 0 && validCount === expectedCount && continuityIssues === 0,
+      expectedCount,
+      validCount,
+      continuityIssues,
+      components: ordered,
+      total,
+      share: total / 5,
+    };
+  }
+
   global.PowerMeterData = {
+    buildAuxiliaryDailySources,
+    buildAuxiliaryMonthlySource,
     buildWeeklyHistory,
     compactRows,
     expandRecord,
@@ -1208,6 +1433,8 @@
     importFiles,
     importWorkbook,
     parseWorkbook,
+    parseAuxiliaryRecords,
+    parseAuxiliaryWorkbook,
     parseReferenceFile,
     saveRows,
     officialProcessNames,

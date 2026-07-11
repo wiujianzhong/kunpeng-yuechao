@@ -732,6 +732,11 @@ input:focus-visible {
   border-color: var(--teal-2);
 }
 
+.factory-tab.complete:not(.active) {
+  border-color: #78a997;
+  background: #f1f8f5;
+}
+
 .factory-tab.active {
   color: #fff;
   background: var(--teal);

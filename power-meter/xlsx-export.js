@@ -478,7 +478,7 @@
     }
     if (report.monthlySummary) {
       const monthlyRows = [
-        ["管理生活区合计", report.monthlySummary.managementTotal, "路灯、办公楼、清餐及生活外围，仅进入月报"],
+        ["管理生活区合计", report.monthlySummary.managementTotal, `来源：${report.monthlySummary.source || "月结源表"}；仅进入月报`],
         ["五厂均摊/厂", report.monthlySummary.managementShare, "四分厂合并后只分一份"],
         ["所选分厂管理分摊", report.monthlySummary.selectedManagementTotal, `所选 ${report.monthlySummary.selectedFactoryCount} 个分厂`],
         ["开松间单列", report.monthlySummary.openingRoom, "仅选择三分厂时计入"],
@@ -748,12 +748,12 @@
   function buildDictionarySheet(report) {
     return buildFlatTableSheet({
       title: `${report.company}计量点字典`,
-      subtitle: "固定基础信息｜用于核对分厂、配电室、工序和原表位置",
-      headers: ["分厂", "配电室", "标准工序", "计量点", "原始分类", "变比", "倍率", "原表位置"],
+      subtitle: "968只统一计量点｜用于核对录入区、频率、报表用途和原表位置",
+      headers: ["录入区", "配电室/位置", "标准工序", "计量点", "原始分类", "变比", "倍率", "录入频率", "报表用途", "原表位置"],
       rows: report.dictionaryRows,
-      values: (item) => [item.factoryName, item.room, item.process, item.meterName, item.category, item.ratioText, item.multiplier, item.sourceCell],
+      values: (item) => [item.factoryName, item.room, item.process, item.meterName, item.category, item.ratioText, item.multiplier, item.cadence, item.roles, item.sourceCell],
       numericColumns: [6],
-      widths: [14, 18, 22, 30, 26, 13, 10, 12],
+      widths: [18, 18, 22, 30, 26, 13, 10, 16, 28, 16],
     });
   }
 
