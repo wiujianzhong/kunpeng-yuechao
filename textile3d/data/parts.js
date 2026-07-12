@@ -9,7 +9,7 @@ export const manuals = [
   {id:'jwf1012',name:'JWF1012 机件略图',pages:34,contentStart:4}
 ];
 
-const p=(code,name,page,type,dims,extra={})=>({manual:'jwf1206',assembly:'JWF1206-0100',code,name,page,type,dims,status:'资料与3D待核',...extra});
+const p=(code,name,page,type,dims,extra={})=>({manual:'jwf1206',assembly:'JWF1206-0100',code,name,page,type,dims,status:'资料与3D待核',dataStatus:'待核',modelStatus:'待核',...extra});
 
 export const parts = [
   p('JWF1206-0100-1','右前底板结合件',4,'plate',[785,337,14.7]),
@@ -36,7 +36,9 @@ export const parts = [
     nameEn:'FRONT TOP HOOD SUB-ASS',
     quantity:1,
     sheetPage:'共5页第2页',
-    status:'已核图·轮廓级',
+    status:'资料已核·轮廓3D已核',
+    dataStatus:'厂家资料已核',
+    modelStatus:'轮廓级3D已核',
     dimensionNote:'厂家原格仅明确标注总宽 1930 mm',
     sourceCrop:'assets/manuals/jwf1206/crops/JWF1204-0100-10.png',
     sourceVector:'assets/manuals/jwf1206/crops/JWF1204-0100-10.pdf'

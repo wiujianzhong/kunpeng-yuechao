@@ -1,17 +1,21 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {manuals,parts as coreParts} from './data/parts.js?v=20260713-8';
-import {jwf1206Parts09to30} from './data/jwf1206-pages-09-30.js?v=20260713-8';
-import {jwf1206Parts31to50} from './data/jwf1206-pages-31-50.js?v=20260713-8';
-import {jwf1206Parts51to73} from './data/jwf1206-pages-51-73.js?v=20260713-8';
-import {zfa051aParts} from './data/zfa051a-parts.js?v=20260713-8';
-import {jwf1026Parts} from './data/jwf1026-parts.js?v=20260713-8';
-import {jwf1124cParts} from './data/jwf1124c-parts.js?v=20260713-8';
-import {jwf1012Parts} from './data/jwf1012-parts.js?v=20260713-8';
-import {tf2513Parts} from './data/tf2513-parts.js?v=20260713-8';
-import {fa103bParts} from './data/fa103b-parts.js?v=20260713-8';
-import {jwf1102Parts} from './data/jwf1102-parts.js?v=20260713-8';
-import {createPartModel} from './models/part-models.js?v=20260713-8';
+import {manuals,parts as coreParts} from './data/parts.js?v=20260713-9';
+import {jwf1206Parts09to30} from './data/jwf1206-pages-09-30.js?v=20260713-9';
+import {jwf1206_pages_09_16_verified} from './data/jwf1206-pages-09-16-verified.js?v=20260713-9';
+import {jwf1206Parts31to50} from './data/jwf1206-pages-31-50.js?v=20260713-9';
+import {jwf1206Parts51to73} from './data/jwf1206-pages-51-73.js?v=20260713-9';
+import {zfa051aParts} from './data/zfa051a-parts.js?v=20260713-9';
+import {jwf1026Parts} from './data/jwf1026-parts.js?v=20260713-9';
+import {jwf1124cParts} from './data/jwf1124c-parts.js?v=20260713-9';
+import {jwf1012Parts} from './data/jwf1012-parts.js?v=20260713-9';
+import {tf2513Parts} from './data/tf2513-parts.js?v=20260713-9';
+import {fa103bParts} from './data/fa103b-parts.js?v=20260713-9';
+import {jwf1102Parts} from './data/jwf1102-parts.js?v=20260713-9';
+import {assemblies} from './data/assemblies.js?v=20260713-9';
+import {jwf1206_0100_verified} from './data/jwf1206-0100-verified.js?v=20260713-9';
+import {createPartModel} from './models/part-models.js?v=20260713-9';
+import {createAssemblyModel} from './models/assembly-models.js?v=20260713-9';
 
 function inferType(part){
   if(part.type!=='unknown')return part.type;
@@ -35,15 +39,26 @@ function inferType(part){
   return 'unknown';
 }
 
+const verified09to16Count=jwf1206_pages_09_16_verified.length;
+if(verified09to16Count!==93||jwf1206_pages_09_16_verified.some((part,index)=>part.page!==jwf1206Parts09to30[index]?.page)){
+  throw new Error('JWF1206第9—16页审计数据与原索引顺序不一致');
+}
+const verifiedJwf1206Parts09to30=[
+  ...jwf1206Parts09to30.slice(0,verified09to16Count).map((part,index)=>({...part,...jwf1206_pages_09_16_verified[index],type:part.type})),
+  ...jwf1206Parts09to30.slice(verified09to16Count)
+];
 const indexedParts=[
-  ...jwf1206Parts09to30,...jwf1206Parts31to50,...jwf1206Parts51to73,
+  ...verifiedJwf1206Parts09to30,...jwf1206Parts31to50,...jwf1206Parts51to73,
   ...zfa051aParts,...jwf1026Parts,...jwf1124cParts,...jwf1012Parts,
   ...tf2513Parts,...fa103bParts,...jwf1102Parts
 ].map(part=>{
   const inferred=inferType(part);
-  return {...part,type:inferred==='unknown'?'casing':inferred,status:'资料与3D待核'};
+  const verified=part.dataStatus==='厂家资料已核';
+  return {...part,type:inferred==='unknown'?'casing':inferred,status:verified?part.status:'资料与3D待核',dataStatus:verified?'厂家资料已核':'待核',modelStatus:verified?(part.modelStatus||'待核'):'待核'};
 });
-const parts=[...coreParts,...indexedParts];
+if(jwf1206_0100_verified.length!==coreParts.length)throw new Error('JWF1206-0100审计数据与模型基线数量不一致');
+const verifiedCoreParts=coreParts.map((part,index)=>({...part,...jwf1206_0100_verified[index]}));
+const parts=[...verifiedCoreParts,...indexedParts];
 
 const manualSelect=document.querySelector('#manual-select');
 const search=document.querySelector('#part-search');
@@ -53,14 +68,17 @@ const dialog=document.querySelector('#detail-dialog');
 const pageSize=6;
 const urlParams=new URLSearchParams(location.search);
 let currentManual=urlParams.get('manual')||'jwf1206';
-let currentView='3d';
+let currentView=urlParams.get('view')||'3d';
 let currentPage=1;
 let query=urlParams.get('q')||'';
 let previewEngine=null;
 let detailEngine=null;
+let currentCopyCode='';
+let copyResetTimer=null;
 const previewCache=new Map();
 
 if(!manuals.some(item=>item.id===currentManual))currentManual=manuals[0].id;
+if(!['3d','assemblies','pages'].includes(currentView))currentView='3d';
 manuals.forEach(manual=>{
   const count=parts.filter(part=>part.manual===manual.id).length;
   manualSelect.insertAdjacentHTML('beforeend',`<option value="${manual.id}">${manual.name}（${count}条零件）</option>`);
@@ -69,18 +87,58 @@ manualSelect.value=currentManual;
 search.value=query;
 
 function pagePath(manual,page){return `assets/manuals/${manual}/pages/page-${String(page).padStart(2,'0')}.jpg`}
+function hdPagePath(manual,page){return `assets/manuals/${manual}/pages-hd/page-${String(page).padStart(2,'0')}.jpg`}
+function pdfPagePath(manual,page){return `assets/manuals/${manual}/original.pdf#page=${page}`}
 function formatDims(part){
   if(!Array.isArray(part.dims)||!part.dims.length)return '图纸未标明确尺寸';
   return part.dims.join(' × ')+(part.dims.every(Number.isFinite)?' mm':'');
 }
 function formatCode(part){return part.code?.trim()||'厂家未提供件号'}
-function isVerified(part){return part.status?.startsWith('已核图')}
+function formatUsage(part){return part.quantity==null?'待逐格核对':`${part.quantity} ${part.quantityUnit||'件'}/台`}
+function isVerified(part){return part.dataStatus==='厂家资料已核'||part.status?.startsWith('已核图')||part.status?.startsWith('资料已核')}
+function isModelVerified(part){return part.modelStatus?.includes('已核')||part.status?.includes('3D已核')}
+
+function setCopyCode(code){
+  currentCopyCode=code?.trim?.()||'';
+  const button=document.querySelector('#copy-code');
+  clearTimeout(copyResetTimer);
+  button.disabled=!currentCopyCode;
+  button.textContent=currentCopyCode?'复制':'无件号';
+}
+
+async function copyCurrentCode(){
+  if(!currentCopyCode)return;
+  const button=document.querySelector('#copy-code');
+  let copied=false;
+  try{
+    if(!navigator.clipboard?.writeText)throw new Error('当前环境不支持剪贴板接口');
+    await navigator.clipboard.writeText(currentCopyCode);
+    copied=true;
+  }catch(error){}
+  if(!copied){
+    const textarea=document.createElement('textarea');
+    textarea.value=currentCopyCode;
+    textarea.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
+    textarea.setAttribute('readonly','');
+    document.body.append(textarea);
+    textarea.select();
+    textarea.setSelectionRange(0,textarea.value.length);
+    try{copied=document.execCommand('copy')}catch(error){copied=false}
+    textarea.remove();
+  }
+  button.textContent=copied?'已复制':'复制失败';
+  clearTimeout(copyResetTimer);
+  copyResetTimer=setTimeout(()=>{button.textContent='复制'},1200);
+}
 
 function createLitScene(){
   const scene=new THREE.Scene();
-  scene.add(new THREE.HemisphereLight(0xe5fff9,0x0a181b,2.3));
+  scene.add(new THREE.HemisphereLight(0xeafff8,0x526b68,2.7));
+  scene.add(new THREE.AmbientLight(0xffffff,.58));
   const key=new THREE.DirectionalLight(0xffffff,4);key.position.set(4,7,5);scene.add(key);
   const rim=new THREE.DirectionalLight(0x6fffd5,2);rim.position.set(-5,2,-4);scene.add(rim);
+  const lowerFill=new THREE.DirectionalLight(0xd9fff5,1.8);lowerFill.position.set(1,-6,4);scene.add(lowerFill);
+  const frontFill=new THREE.DirectionalLight(0xffffff,1.1);frontFill.position.set(0,1,7);scene.add(frontFill);
   return scene;
 }
 
@@ -108,25 +166,27 @@ function getPreviewEngine(){
   return previewEngine;
 }
 
-function previewImage(part){
-  const key=`${part.manual}:${formatCode(part)}`;
+function modelPreview(key,createModel,fallback){
   if(previewCache.has(key))return previewCache.get(key);
   const engine=getPreviewEngine();
-  if(engine.failed)return part.sourceCrop||pagePath(part.manual,part.page);
+  if(engine.failed)return fallback;
   let model;
   try{
-    model=createPartModel(part);model.rotation.set(-.08,.52,0);engine.scene.add(model);
+    model=createModel();model.rotation.set(-.08,.52,0);engine.scene.add(model);
     engine.renderer.render(engine.scene,engine.camera);
     const image=engine.canvas.toDataURL('image/webp',.84);
     previewCache.set(key,image);
     if(previewCache.size>24)previewCache.delete(previewCache.keys().next().value);
     return image;
   }catch(error){
-    return part.sourceCrop||pagePath(part.manual,part.page);
+    return fallback;
   }finally{
     if(model){engine.scene.remove(model);disposeModel(model)}
   }
 }
+
+function previewImage(part){return modelPreview(`part:${part.manual}:${formatCode(part)}`,()=>createPartModel(part),part.sourceCrop||hdPagePath(part.manual,part.page))}
+function assemblyPreview(assembly){return modelPreview(`assembly:${assembly.manual}:${assembly.code}`,()=>createAssemblyModel(assembly),assembly.sourceImage)}
 
 function getDetailEngine(){
   if(detailEngine)return detailEngine;
@@ -141,19 +201,22 @@ function getDetailEngine(){
     let model=null;
     const resize=()=>{const w=Math.max(stage.clientWidth,1),h=Math.max(stage.clientHeight,1);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()};
     const observer=new ResizeObserver(resize);observer.observe(stage);
+    const showModel=(nextModel,cameraPosition)=>{
+      stage.classList.remove('viewer-failed');
+      if(model){scene.remove(model);disposeModel(model);model=null}
+      try{
+        model=nextModel;scene.add(model);
+        camera.position.fromArray(cameraPosition);controls.target.set(0,0,0);controls.update();resize();
+        renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});
+        return true;
+      }catch(error){
+        renderer.setAnimationLoop(null);model=null;return false;
+      }
+    };
     detailEngine={
-      show(part){
-        stage.classList.remove('viewer-failed');
-        if(model){scene.remove(model);disposeModel(model);model=null}
-        try{
-          model=createPartModel(part);scene.add(model);
-          camera.position.set(4.8,3.3,5.4);controls.target.set(0,0,0);controls.update();resize();
-          renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});
-          return true;
-        }catch(error){
-          renderer.setAnimationLoop(null);model=null;return false;
-        }
-      },
+      show(part){try{return showModel(createPartModel(part),[4.8,3.3,5.4])}catch(error){return false}},
+      showAssembly(assembly){try{return showModel(createAssemblyModel(assembly),[7.4,5.4,8.2])}catch(error){return false}},
+      setExplode(value){model?.userData.setExplode?.(value)},
       pause(){renderer.setAnimationLoop(null)},
       dispose(){
         renderer.setAnimationLoop(null);observer.disconnect();controls.dispose();
@@ -176,14 +239,45 @@ function filteredParts(){
   return pool.filter(part=>`${part.name||''}${part.nameEn||''}${part.code||''}${part.assembly||''}`.toLowerCase().includes(q));
 }
 
+function filteredAssemblies(){
+  const pool=assemblies.filter(assembly=>assembly.manual===currentManual);
+  const q=query.toLowerCase();
+  if(!q)return pool;
+  return pool.filter(assembly=>`${assembly.code}${assembly.name}${assembly.nameEn}`.toLowerCase().includes(q));
+}
+
 function updateHeading(count,unit){
   const manual=manuals.find(item=>item.id===currentManual);
   const manualParts=parts.filter(part=>part.manual===currentManual);
   const verified=manualParts.filter(isVerified).length;
-  document.querySelector('#manual-kicker').textContent=`${manual.name} · 已收录 ${manualParts.length} 条 · 已核图 ${verified} 条`;
-  document.querySelector('#result-title').textContent=currentView==='3d'?'零件3D预览':'厂家原图页';
+  document.querySelector('#manual-kicker').textContent=`${manual.name} · 已收录 ${manualParts.length} 条 · 已核资料 ${verified} 条`;
+  document.querySelector('#result-title').textContent={
+    '3d':'零件3D预览',
+    assemblies:'爆炸总成3D视觉',
+    pages:'厂家高清原图页'
+  }[currentView]||'零件3D预览';
   document.querySelector('#result-count').textContent=count;
   document.querySelector('#result-unit').textContent=unit;
+}
+
+function renderAssemblies(){
+  const found=filteredAssemblies();
+  const pages=Math.max(1,Math.ceil(found.length/pageSize));
+  currentPage=Math.min(currentPage,pages);
+  const shown=found.slice((currentPage-1)*pageSize,currentPage*pageSize);
+  content.className='assembly-grid';content.innerHTML='';updateHeading(found.length,'个爆炸总成视觉');
+  if(!shown.length){
+    content.innerHTML='<div class="empty"><strong>这本资料的总成3D正在按爆炸图逐页制作</strong><span>厂家高清原图已经保留；只有核对过爆炸图层级的总成才会出现在这里。</span></div>';
+    pagination.innerHTML='';return;
+  }
+  shown.forEach(assembly=>{
+    const card=document.createElement('article');
+    card.className='part-card assembly-card';
+    card.innerHTML=`<div class="thumb-stage assembly-stage"><img class="model-preview" alt="${assembly.name} 爆炸总成3D预览"><span class="thumb-code">${assembly.code}</span><span class="model-pill verified">视觉级总成</span><span class="explode-mark">可合拢 / 可爆炸</span></div><div class="card-info"><div class="card-name-row"><h2>${assembly.name}</h2><span class="page">爆炸图第${assembly.drawingPage}页</span></div><div class="card-meta"><div><span>厂家英文</span><strong>${assembly.nameEn}</strong></div><div><span>图中标号</span><strong>1–${assembly.itemCount} 项</strong></div></div></div>`;
+    card.addEventListener('click',()=>openAssemblyDetail(assembly));
+    content.append(card);card.querySelector('.model-preview').src=assemblyPreview(assembly);
+  });
+  renderPagination(pages);
 }
 
 function renderParts(){
@@ -199,8 +293,10 @@ function renderParts(){
   shown.forEach(part=>{
     const card=document.createElement('article');
     const verified=isVerified(part);
+    const modelVerified=isModelVerified(part);
+    const hasVerifiedDims=verified&&Array.isArray(part.dims)&&part.dims.length>0;
     card.className='part-card';
-    card.innerHTML=`<div class="thumb-stage"><img class="model-preview" alt="${part.name} 3D静态预览"><span class="thumb-code">${formatCode(part)}</span><span class="model-pill ${verified?'verified':''}">${verified?'已核图':'资料待核'}</span></div><div class="card-info"><div class="card-name-row"><h2>${part.name}</h2><span class="page">原第${part.page}页</span></div><div class="card-meta"><div><span>所属总成</span><strong>${part.assembly}</strong></div><div><span>${verified?'厂家明确尺寸':'录入尺寸（待核）'}</span><strong>${formatDims(part)}</strong></div></div></div>`;
+    card.innerHTML=`<div class="thumb-stage"><img class="model-preview" alt="${part.name} 3D静态预览"><span class="thumb-code">${formatCode(part)}</span><span class="model-pill ${verified?'verified':''}">${verified?'资料已核':'资料待核'}</span><span class="model-state ${modelVerified?'verified':''}">${modelVerified?'轮廓3D':'3D待核'}</span></div><div class="card-info"><div class="card-name-row"><h2>${part.name}</h2><span class="page">原第${part.page}页</span></div><div class="card-meta"><div><span>所属总成</span><strong>${part.assembly}</strong></div><div><span>${hasVerifiedDims?'厂家明确尺寸':verified?'厂家未标尺寸':'录入尺寸（待核）'}</span><strong>${formatDims(part)}</strong></div><div class="usage"><span>单台用量</span><strong>${formatUsage(part)}</strong></div></div></div>`;
     card.addEventListener('click',()=>openDetail(part));
     content.append(card);
     card.querySelector('.model-preview').src=previewImage(part);
@@ -216,7 +312,7 @@ function renderPages(){
   currentPage=Math.min(currentPage,pageCount);
   const shown=pages.slice((currentPage-1)*pageSize,currentPage*pageSize);
   content.className='page-grid';content.innerHTML='';updateHeading(pages.length,'页厂家原图');
-  shown.forEach(page=>content.insertAdjacentHTML('beforeend',`<a class="page-card" href="${pagePath(currentManual,page)}" target="_blank"><img src="${pagePath(currentManual,page)}" loading="lazy" alt="第${page}页"><span>第 ${page} 页 · 点击查看高清原图</span></a>`));
+  shown.forEach(page=>content.insertAdjacentHTML('beforeend',`<a class="page-card" href="${pdfPagePath(currentManual,page)}" target="_blank"><img src="${hdPagePath(currentManual,page)}" loading="lazy" alt="第${page}页"><span>第 ${page} 页 · 300dpi高清页 · 点击打开原始PDF</span></a>`));
   renderPagination(pageCount);
 }
 
@@ -242,41 +338,95 @@ function renderPagination(total){
   pagination.append(jump);
 }
 
-function render(){currentView==='3d'?renderParts():renderPages()}
+function render(){
+  if(currentView==='assemblies')renderAssemblies();
+  else if(currentView==='pages')renderPages();
+  else renderParts();
+}
 
 function openDetail(part){
   const manualName=manuals.find(item=>item.id===part.manual)?.name||part.manual;
   const verified=isVerified(part);
+  const modelVerified=isModelVerified(part);
+  document.querySelector('.detail-info').scrollTop=0;
+  document.querySelector('#detail-code-label').textContent='零件件号';
+  document.querySelector('#detail-page-label').textContent='原手册位置';
+  document.querySelector('#detail-status-label').textContent='核对状态';
+  document.querySelector('#detail-sheet-label').textContent='原图页眉/总成';
+  document.querySelector('#detail-quantity-label').textContent='单台用量';
+  document.querySelector('#stage-help').textContent='拖动旋转 · 滚轮/双指缩放';
+  document.querySelector('#explode-control').hidden=true;
   document.querySelector('#stage-code').textContent=formatCode(part);
   document.querySelector('#detail-assembly').textContent=`${part.assembly}${part.sheetPage?` · ${part.sheetPage}`:''} · ${manualName}`;
   document.querySelector('#detail-name').textContent=part.name;
   document.querySelector('#detail-name-en').textContent=part.nameEn||'厂家原格未提供英文描述';
   document.querySelector('#detail-code').textContent=formatCode(part);
+  setCopyCode(part.code);
   document.querySelector('#detail-page').textContent=`第 ${part.page} 页`;
-  document.querySelector('#detail-status').textContent=part.status;
+  document.querySelector('#detail-status').textContent=`${part.dataStatus||'待核'} · ${part.modelStatus||'待核'}`;
   document.querySelector('#detail-dims').textContent=formatDims(part);
-  document.querySelector('#detail-dims-label').textContent=verified?'厂家明确尺寸':'录入尺寸（待核）';
+  document.querySelector('#detail-dims-label').textContent=verified&&part.dims?.length?'厂家明确尺寸':verified?'厂家未标尺寸':'录入尺寸（待核）';
   document.querySelector('#detail-sheet').textContent=part.assembly||'厂家未提供';
-  document.querySelector('#detail-quantity').textContent=part.quantity??'厂家未识别';
+  document.querySelector('#detail-quantity').textContent=formatUsage(part);
   document.querySelector('#accuracy').textContent=verified
-    ?`已按厂家原格核对件号、名称、英文描述和主要轮廓。${part.dimensionNote||'图纸未标注尺寸仍不得推测'}；未标注的高度、深度、板厚和背面结构不作为准确数据。`
+    ?modelVerified
+      ?`厂家资料和主要3D轮廓均已逐项核对。${part.dimensionNote||'图纸未标注尺寸仍不得推测'}；未标注的高度、深度、板厚和背面结构不作为准确数据。`
+      :`件号、名称、英文描述、页码和厂家明确尺寸已按原格核对；当前3D仍是待核预览，不可作为加工、采购或装配依据。`
     :'当前录入的件号、名称、尺寸和3D均尚未逐件与厂家原图核对，不可作为申报、采购、加工或装配依据；下方厂家原页已默认展开，请以原图为准。';
-  const source=part.sourceCrop||pagePath(part.manual,part.page);
+  const source=part.sourceCrop||hdPagePath(part.manual,part.page);
   const originPreview=document.querySelector('#origin-preview');
   const showOrigin=document.querySelector('#show-origin');
   document.querySelector('#origin-image').src=source;
   document.querySelector('#origin-caption').textContent=part.sourceCrop
-    ?`厂家原手册第${part.page}页 · 该零件高清原格（非AI重画）`
-    :`厂家原手册第${part.page}页整页原图`;
-  document.querySelector('#open-page').href=pagePath(part.manual,part.page);
+    ?`厂家原手册第${part.page}页 · 600dpi零件原格（非AI重画）`
+    :`厂家原手册第${part.page}页 · 300dpi高清整页（非AI重画）`;
+  const pageLink=document.querySelector('#open-page');
+  pageLink.href=pdfPagePath(part.manual,part.page);pageLink.textContent='打开原始PDF页';
   const vectorLink=document.querySelector('#open-vector');
-  vectorLink.hidden=!part.sourceVector;vectorLink.href=part.sourceVector||'#';
+  vectorLink.hidden=!part.sourceVector;vectorLink.href=part.sourceVector||'#';vectorLink.textContent='打开矢量原格';
   originPreview.classList.add('show');
   showOrigin.textContent=part.sourceCrop?'隐藏厂家原格':'隐藏厂家原页';
   if(!dialog.open)dialog.showModal();
   const active=getDetailEngine().show(part);
   const fallback=document.querySelector('#detail-fallback');
   fallback.classList.toggle('show',!active);fallback.src=previewImage(part);
+  document.querySelector('.detail-stage').classList.toggle('viewer-failed',!active);
+}
+
+function openAssemblyDetail(assembly){
+  const manualName=manuals.find(item=>item.id===assembly.manual)?.name||assembly.manual;
+  document.querySelector('.detail-info').scrollTop=0;
+  document.querySelector('#detail-code-label').textContent='总成号';
+  document.querySelector('#detail-page-label').textContent='厂家爆炸图';
+  document.querySelector('#detail-status-label').textContent='模型级别';
+  document.querySelector('#detail-dims-label').textContent='爆炸图标号';
+  document.querySelector('#detail-sheet-label').textContent='配套明细表';
+  document.querySelector('#detail-quantity-label').textContent='总成构件';
+  document.querySelector('#stage-help').textContent='拖动旋转 · 双指缩放 · 下方调节爆炸程度';
+  document.querySelector('#stage-code').textContent=assembly.code;
+  document.querySelector('#detail-assembly').textContent=`${assembly.code} · ${manualName}`;
+  document.querySelector('#detail-name').textContent=assembly.name;
+  document.querySelector('#detail-name-en').textContent=assembly.nameEn;
+  document.querySelector('#detail-code').textContent=assembly.code;
+  setCopyCode(assembly.code);
+  document.querySelector('#detail-page').textContent=`第 ${assembly.drawingPage} 页`;
+  document.querySelector('#detail-status').textContent=assembly.status;
+  document.querySelector('#detail-dims').textContent=`1–${assembly.itemCount}`;
+  document.querySelector('#detail-sheet').textContent=assembly.bomPages.map(page=>`第${page}页`).join('、');
+  document.querySelector('#detail-quantity').textContent=`${assembly.itemCount} 项`;
+  document.querySelector('#accuracy').textContent=`${assembly.accuracy} 该模型用于理解结构和装配顺序，不可作为加工、配合或维修尺寸依据。`;
+  const control=document.querySelector('#explode-control');control.hidden=false;
+  const range=document.querySelector('#explode-range');range.value=76;
+  document.querySelector('#assembly-legend').innerHTML=assembly.keyParts.map(item=>`<span>${item}</span>`).join('');
+  document.querySelector('#origin-image').src=assembly.sourceImage;
+  document.querySelector('#origin-caption').textContent=`厂家原手册第${assembly.drawingPage}页 · 300dpi高清爆炸图（非AI重画）`;
+  document.querySelector('#origin-preview').classList.add('show');
+  document.querySelector('#show-origin').textContent='隐藏厂家爆炸图';
+  const vectorLink=document.querySelector('#open-vector');vectorLink.hidden=false;vectorLink.href=assembly.sourceVector;vectorLink.textContent='打开原始PDF页';
+  const pageLink=document.querySelector('#open-page');pageLink.href=assembly.sourceImage;pageLink.textContent='打开高清整页';
+  if(!dialog.open)dialog.showModal();
+  const active=getDetailEngine().showAssembly(assembly);getDetailEngine().setExplode(.76);
+  const fallback=document.querySelector('#detail-fallback');fallback.classList.toggle('show',!active);fallback.src=assemblyPreview(assembly);
   document.querySelector('.detail-stage').classList.toggle('viewer-failed',!active);
 }
 
@@ -288,6 +438,7 @@ document.querySelectorAll('.view-switch button').forEach(button=>button.addEvent
   button.classList.add('active');currentView=button.dataset.view;currentPage=1;render();
 }));
 document.querySelector('.close-detail').addEventListener('click',()=>dialog.close());
+document.querySelector('#copy-code').addEventListener('click',copyCurrentCode);
 dialog.addEventListener('close',()=>{
   detailEngine?.pause();
   if(detailEngine?.failed)detailEngine=null;
@@ -297,11 +448,15 @@ document.querySelector('#show-origin').addEventListener('click',event=>{
   const shown=document.querySelector('#origin-preview').classList.toggle('show');
   event.currentTarget.textContent=shown?'隐藏厂家原图':'查看厂家原图';
 });
+document.querySelector('#explode-range').addEventListener('input',event=>detailEngine?.setExplode(Number(event.currentTarget.value)/100));
 window.addEventListener('beforeunload',()=>{
   detailEngine?.dispose();
   if(previewEngine?.renderer){previewEngine.renderer.dispose();previewEngine.renderer.forceContextLoss()}
 });
 
+document.querySelectorAll('.view-switch button').forEach(button=>button.classList.toggle('active',button.dataset.view===currentView));
 render();
 const directPart=urlParams.get('part');
 if(directPart){const target=parts.find(part=>part.code===directPart);if(target)openDetail(target)}
+const directAssembly=urlParams.get('assembly');
+if(directAssembly){const target=assemblies.find(assembly=>assembly.code===directAssembly);if(target)openAssemblyDetail(target)}

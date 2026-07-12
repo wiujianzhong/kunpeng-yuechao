@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>嘉新集团纺织机械3D零件库</title>
-  <link rel="stylesheet" href="catalog.css?v=20260713-8">
+  <link rel="stylesheet" href="catalog.css?v=20260713-9">
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"}}</script>
 </head>
 <body>
@@ -25,7 +25,7 @@
       </div>
       <div class="view-block">
         <label>查看方式</label>
-        <div class="view-switch"><button class="active" data-view="3d">3D预览</button><button data-view="pages">厂家原图</button></div>
+        <div class="view-switch"><button class="active" data-view="3d">零件3D</button><button data-view="assemblies">总成3D</button><button data-view="pages">厂家原图</button></div>
       </div>
     </section>
 
@@ -44,26 +44,31 @@
       <canvas id="detail-canvas"></canvas>
       <img id="detail-fallback" class="detail-fallback" alt="3D静态预览">
       <div class="stage-code" id="stage-code"></div>
-      <div class="stage-help">拖动旋转 · 滚轮/双指缩放</div>
+      <div class="stage-help" id="stage-help">拖动旋转 · 滚轮/双指缩放</div>
     </div>
     <aside class="detail-info">
       <p class="detail-assembly" id="detail-assembly"></p>
       <h2 id="detail-name"></h2>
       <p class="detail-name-en" id="detail-name-en"></p>
       <div class="identity">
-        <div><span>零件件号</span><strong id="detail-code"></strong></div>
-        <div><span>原手册位置</span><strong id="detail-page"></strong></div>
-        <div><span>模型状态</span><strong id="detail-status"></strong></div>
+        <div><span id="detail-code-label">零件件号</span><div class="copy-value"><strong id="detail-code"></strong><button id="copy-code" type="button">复制</button></div></div>
+        <div><span id="detail-page-label">原手册位置</span><strong id="detail-page"></strong></div>
+        <div><span id="detail-status-label">模型状态</span><strong id="detail-status"></strong></div>
         <div><span id="detail-dims-label">图纸尺寸</span><strong id="detail-dims"></strong></div>
-        <div><span>原图页眉/总成</span><strong id="detail-sheet"></strong></div>
-        <div><span>厂家数量</span><strong id="detail-quantity"></strong></div>
+        <div><span id="detail-sheet-label">原图页眉/总成</span><strong id="detail-sheet"></strong></div>
+        <div><span id="detail-quantity-label">单台用量</span><strong id="detail-quantity"></strong></div>
       </div>
       <p class="accuracy" id="accuracy"></p>
-      <div class="detail-actions"><button id="show-origin">查看厂家原图</button><a id="open-vector" target="_blank" hidden>打开高清矢量原格</a><a id="open-page" target="_blank">打开原整页</a></div>
+      <div class="explode-control" id="explode-control" hidden>
+        <div class="explode-label"><strong>爆炸程度</strong><span>拖动查看装配层级</span></div>
+        <div class="explode-range"><span>合拢</span><input id="explode-range" type="range" min="0" max="100" value="76" aria-label="爆炸程度"><span>爆炸</span></div>
+        <div class="assembly-legend" id="assembly-legend"></div>
+      </div>
+      <div class="detail-actions"><button id="show-origin">查看厂家原图</button><a id="open-vector" target="_blank" hidden>打开高清矢量原格</a><a id="open-page" target="_blank">打开原始PDF页</a></div>
       <div class="origin-preview" id="origin-preview"><img id="origin-image" alt="厂家原图"><span id="origin-caption"></span></div>
     </aside>
   </dialog>
 
-  <script type="module" src="catalog.js?v=20260713-8"></script>
+  <script type="module" src="catalog.js?v=20260713-9"></script>
 </body>
 </html>
