@@ -14,7 +14,8 @@ import {fa103bParts} from './data/fa103b-parts.js?v=20260713-9';
 import {jwf1102Parts} from './data/jwf1102-parts.js?v=20260713-9';
 import {assemblies} from './data/assemblies.js?v=20260713-9';
 import {jwf1206_0100_verified} from './data/jwf1206-0100-verified.js?v=20260713-9';
-import {createPartModel} from './models/part-models.js?v=20260713-9';
+import {getPartModelSpec} from './data/model-specs/index.js?v=20260713-10';
+import {createPartModel} from './models/part-models.js?v=20260713-10';
 import {createAssemblyModel} from './models/assembly-models.js?v=20260713-9';
 
 function inferType(part){
@@ -58,7 +59,12 @@ const indexedParts=[
 });
 if(jwf1206_0100_verified.length!==coreParts.length)throw new Error('JWF1206-0100审计数据与模型基线数量不一致');
 const verifiedCoreParts=coreParts.map((part,index)=>({...part,...jwf1206_0100_verified[index]}));
-const parts=[...verifiedCoreParts,...indexedParts];
+const parts=[...verifiedCoreParts,...indexedParts].map(part=>{
+  const modelSpec=getPartModelSpec(part.manual,part.code||part.recordKey);
+  if(!modelSpec)return part;
+  const modelStatus=`${modelSpec.level}3D已核`;
+  return {...part,modelSpec,modelStatus,status:`${part.dataStatus==='厂家资料已核'?'资料已核':'资料待核'}·${modelStatus}`};
+});
 
 const manualSelect=document.querySelector('#manual-select');
 const search=document.querySelector('#part-search');
@@ -97,6 +103,7 @@ function formatCode(part){return part.code?.trim()||'厂家未提供件号'}
 function formatUsage(part){return part.quantity==null?'待逐格核对':`${part.quantity} ${part.quantityUnit||'件'}/台`}
 function isVerified(part){return part.dataStatus==='厂家资料已核'||part.status?.startsWith('已核图')||part.status?.startsWith('资料已核')}
 function isModelVerified(part){return part.modelStatus?.includes('已核')||part.status?.includes('3D已核')}
+function modelBadge(part){return isModelVerified(part)?part.modelSpec?.level==='尺寸级'?'尺寸3D':'轮廓3D':'3D待核'}
 
 function setCopyCode(code){
   currentCopyCode=code?.trim?.()||'';
@@ -185,7 +192,7 @@ function modelPreview(key,createModel,fallback){
   }
 }
 
-function previewImage(part){return modelPreview(`part:${part.manual}:${formatCode(part)}`,()=>createPartModel(part),part.sourceCrop||hdPagePath(part.manual,part.page))}
+function previewImage(part){return modelPreview(`part:${part.manual}:${part.code||part.recordKey||formatCode(part)}`,()=>createPartModel(part),part.sourceCrop||hdPagePath(part.manual,part.page))}
 function assemblyPreview(assembly){return modelPreview(`assembly:${assembly.manual}:${assembly.code}`,()=>createAssemblyModel(assembly),assembly.sourceImage)}
 
 function getDetailEngine(){
@@ -250,7 +257,8 @@ function updateHeading(count,unit){
   const manual=manuals.find(item=>item.id===currentManual);
   const manualParts=parts.filter(part=>part.manual===currentManual);
   const verified=manualParts.filter(isVerified).length;
-  document.querySelector('#manual-kicker').textContent=`${manual.name} · 已收录 ${manualParts.length} 条 · 已核资料 ${verified} 条`;
+  const modeled=manualParts.filter(isModelVerified).length;
+  document.querySelector('#manual-kicker').textContent=`${manual.name} · 已收录 ${manualParts.length} 条 · 已核资料 ${verified} 条 · 已建3D ${modeled} 件`;
   document.querySelector('#result-title').textContent={
     '3d':'零件3D预览',
     assemblies:'爆炸总成3D视觉',
@@ -296,7 +304,7 @@ function renderParts(){
     const modelVerified=isModelVerified(part);
     const hasVerifiedDims=verified&&Array.isArray(part.dims)&&part.dims.length>0;
     card.className='part-card';
-    card.innerHTML=`<div class="thumb-stage"><img class="model-preview" alt="${part.name} 3D静态预览"><span class="thumb-code">${formatCode(part)}</span><span class="model-pill ${verified?'verified':''}">${verified?'资料已核':'资料待核'}</span><span class="model-state ${modelVerified?'verified':''}">${modelVerified?'轮廓3D':'3D待核'}</span></div><div class="card-info"><div class="card-name-row"><h2>${part.name}</h2><span class="page">原第${part.page}页</span></div><div class="card-meta"><div><span>所属总成</span><strong>${part.assembly}</strong></div><div><span>${hasVerifiedDims?'厂家明确尺寸':verified?'厂家未标尺寸':'录入尺寸（待核）'}</span><strong>${formatDims(part)}</strong></div><div class="usage"><span>单台用量</span><strong>${formatUsage(part)}</strong></div></div></div>`;
+    card.innerHTML=`<div class="thumb-stage"><img class="model-preview" alt="${part.name} 3D静态预览"><span class="thumb-code">${formatCode(part)}</span><span class="model-pill ${verified?'verified':''}">${verified?'资料已核':'资料待核'}</span><span class="model-state ${modelVerified?'verified':''}">${modelBadge(part)}</span></div><div class="card-info"><div class="card-name-row"><h2>${part.name}</h2><span class="page">原第${part.page}页</span></div><div class="card-meta"><div><span>所属总成</span><strong>${part.assembly}</strong></div><div><span>${hasVerifiedDims?'厂家明确尺寸':verified?'厂家未标尺寸':'录入尺寸（待核）'}</span><strong>${formatDims(part)}</strong></div><div class="usage"><span>单台用量</span><strong>${formatUsage(part)}</strong></div></div></div>`;
     card.addEventListener('click',()=>openDetail(part));
     content.append(card);
     card.querySelector('.model-preview').src=previewImage(part);
@@ -368,9 +376,10 @@ function openDetail(part){
   document.querySelector('#detail-dims-label').textContent=verified&&part.dims?.length?'厂家明确尺寸':verified?'厂家未标尺寸':'录入尺寸（待核）';
   document.querySelector('#detail-sheet').textContent=part.assembly||'厂家未提供';
   document.querySelector('#detail-quantity').textContent=formatUsage(part);
+  const assumptions=part.modelSpec?.source?.assumptions?.join('；');
   document.querySelector('#accuracy').textContent=verified
     ?modelVerified
-      ?`厂家资料和主要3D轮廓均已逐项核对。${part.dimensionNote||'图纸未标注尺寸仍不得推测'}；未标注的高度、深度、板厚和背面结构不作为准确数据。`
+      ?`厂家资料和主要3D轮廓均已逐项核对。${part.dimensionNote||'图纸未标注尺寸仍不得推测'}${assumptions?`；未标部分：${assumptions}`:'；未标注的高度、深度、板厚和背面结构不作为准确数据'}。`
       :`件号、名称、英文描述、页码和厂家明确尺寸已按原格核对；当前3D仍是待核预览，不可作为加工、采购或装配依据。`
     :'当前录入的件号、名称、尺寸和3D均尚未逐件与厂家原图核对，不可作为申报、采购、加工或装配依据；下方厂家原页已默认展开，请以原图为准。';
   const source=part.sourceCrop||hdPagePath(part.manual,part.page);

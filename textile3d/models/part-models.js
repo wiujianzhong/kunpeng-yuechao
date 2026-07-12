@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {createSpecModel} from './spec-models.js?v=20260713-10';
 
 const metal=(color=0x819294,rough=.34)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:.78});
 const dark=()=>new THREE.MeshStandardMaterial({color:0x1c2929,roughness:.48,metalness:.35});
@@ -101,6 +102,7 @@ function belt(group,dims=[600,30,8]){const [length,width,thickness]=dims;const l
 function motor(group,dims=[300,180,160]){const [length,diameter]=dims;const body=add(group,new THREE.CylinderGeometry(diameter*.5,diameter*.5,length*.72,48),metal(0x4e6264));body.rotation.z=Math.PI/2;for(let i=-4;i<=4;i++){const fin=add(group,new THREE.TorusGeometry(diameter*.52,Math.max(diameter*.018,2),8,48),metal(0x657779),i*length*.07,0,0);fin.rotation.y=Math.PI/2}add(group,new THREE.BoxGeometry(length*.28,diameter*.45,diameter*.5),metal(0x718284),-length*.46,0,0);const axle=add(group,new THREE.CylinderGeometry(diameter*.11,diameter*.11,length*.18,28),metal(0xb7c1be,.16),length*.46,0,0);axle.rotation.z=Math.PI/2}
 
 export function createPartModel(part){
+  if(part.modelSpec)return createSpecModel(part.modelSpec);
   const group=new THREE.Group();const dims=numericDims(part);
   ({plate,door,beam,column,hoodDoor,topCover,frontTopHood,panel,hood,bracket,window:windowPart,pressPlate,lock:lockPart,casing,hinge,magnet,handle,seal,embedStrip,embedCore,plug,shaft,cylinder:cylinderPart,pulley,gear,roller,fan,spring,ring,tube,belt,motor}[part.type]||panel)(group,dims,part);
   normalize(group);if(part.mirror)group.scale.x*=-1;return group;
