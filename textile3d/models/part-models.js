@@ -53,6 +53,26 @@ function hoodDoor(group,[w,h,d],part){
 }
 
 function topCover(group,[w,h,d]){add(group,new THREE.BoxGeometry(w,d,h),metal());add(group,new THREE.BoxGeometry(w*.92,d*2.2,h*.06),metal(0x566a6c),0,d*.8,-h*.44);add(group,new THREE.BoxGeometry(w*.92,d*2.2,h*.06),metal(0x566a6c),0,d*.8,h*.44)}
+function frontTopHood(group,[w,h,d]){
+  // 厂家略图只明确标注总宽；高度、深度和板厚按图面比例做轮廓级还原。
+  const faceH=h*.68,t=Math.max(d*.065,5),frontZ=d*.45;
+  const face=new THREE.Shape();face.moveTo(-w*.5,-faceH*.5);face.lineTo(w*.5,-faceH*.5);face.lineTo(w*.5,faceH*.5);face.lineTo(-w*.5,faceH*.5);face.closePath();
+  const holeW=w*.34,holeH=faceH*.22,r=holeH*.28,hole=new THREE.Path(),x=-holeW*.5,y=-faceH*.12-holeH*.5;
+  hole.moveTo(x+r,y);hole.quadraticCurveTo(x,y,x,y+r);hole.lineTo(x,y+holeH-r);hole.quadraticCurveTo(x,y+holeH,x+r,y+holeH);hole.lineTo(x+holeW-r,y+holeH);hole.quadraticCurveTo(x+holeW,y+holeH,x+holeW,y+holeH-r);hole.lineTo(x+holeW,y+r);hole.quadraticCurveTo(x+holeW,y,x+holeW-r,y);hole.closePath();face.holes.push(hole);
+  const faceGeo=new THREE.ExtrudeGeometry(face,{depth:t,bevelEnabled:false});faceGeo.center();add(group,faceGeo,metal(0x829395),0,0,frontZ);
+  add(group,new THREE.BoxGeometry(holeW*.96,holeH*.9,t*.9),dark(),0,-faceH*.12,frontZ-t*.65);
+  const rise=h*.5-faceH*.5,run=d*.9,slope=Math.hypot(rise,run),angle=Math.atan2(rise,run);
+  const roof=add(group,new THREE.BoxGeometry(w,t,slope),metal(0x8b9b9c),0,(faceH*.5+h*.5)*.5,0);roof.rotation.x=angle;
+  add(group,new THREE.BoxGeometry(w,t,d*.22),metal(0x697d7f),0,h*.5,-d*.39);
+  add(group,new THREE.BoxGeometry(w,h*.1,t),metal(0x617577),0,h*.45,-d*.5);
+  add(group,new THREE.BoxGeometry(w,t,d*.2),metal(0x617577),0,-faceH*.5,frontZ-d*.1);
+  for(const side of [-1,1]){
+    add(group,new THREE.BoxGeometry(t*1.7,faceH,d*.18),metal(0x566b6d),side*(w*.5-t*.85),0,frontZ-d*.09);
+    add(group,new THREE.BoxGeometry(t*2.1,faceH*.2,d*.28),metal(0x526668),side*(w*.5+t*.2),-faceH*.06,frontZ-d*.05);
+  }
+  add(group,new THREE.BoxGeometry(w*.98,t*1.7,d*.12),metal(0x5f7375),0,faceH*.47,frontZ);
+  add(group,new THREE.BoxGeometry(w*.98,t*1.7,d*.12),metal(0x5f7375),0,-faceH*.47,frontZ);
+}
 function panel(group,[w,h,d],part){add(group,new THREE.BoxGeometry(w,h,d),metal());if(part.perforated){for(let x=-2;x<=2;x++)for(let y=-2;y<=2;y++)add(group,new THREE.CylinderGeometry(d*.18,d*.18,d*1.1,16),dark(),x*w*.14,y*h*.14,d*.52).rotation.x=Math.PI/2}}
 function hood(group,[w,h,d]){const shape=new THREE.Shape();shape.moveTo(-w*.5,-h*.5);shape.lineTo(w*.5,-h*.5);shape.lineTo(w*.32,h*.5);shape.lineTo(-w*.18,h*.35);shape.closePath();const geo=new THREE.ExtrudeGeometry(shape,{depth:d,bevelEnabled:true,bevelSize:d*.08,bevelThickness:d*.08,bevelSegments:2});geo.center();add(group,geo,metal())}
 function bracket(group,[w,h,d]){const shape=new THREE.Shape();shape.moveTo(-w*.5,-h*.5);shape.lineTo(w*.5,-h*.5);shape.lineTo(w*.5,-h*.28);shape.lineTo(w*.12,-h*.28);shape.lineTo(w*.12,h*.5);shape.lineTo(-w*.12,h*.5);shape.lineTo(-w*.12,-h*.28);shape.lineTo(-w*.5,-h*.28);shape.closePath();const geo=new THREE.ExtrudeGeometry(shape,{depth:d,bevelEnabled:true,bevelSize:2,bevelThickness:2,bevelSegments:2});geo.center();add(group,geo,metal(0x77898b))}
@@ -82,6 +102,6 @@ function motor(group,dims=[300,180,160]){const [length,diameter]=dims;const body
 
 export function createPartModel(part){
   const group=new THREE.Group();const dims=numericDims(part);
-  ({plate,door,beam,column,hoodDoor,topCover,panel,hood,bracket,window:windowPart,pressPlate,lock:lockPart,casing,hinge,magnet,handle,seal,embedStrip,embedCore,plug,shaft,cylinder:cylinderPart,pulley,gear,roller,fan,spring,ring,tube,belt,motor}[part.type]||panel)(group,dims,part);
+  ({plate,door,beam,column,hoodDoor,topCover,frontTopHood,panel,hood,bracket,window:windowPart,pressPlate,lock:lockPart,casing,hinge,magnet,handle,seal,embedStrip,embedCore,plug,shaft,cylinder:cylinderPart,pulley,gear,roller,fan,spring,ring,tube,belt,motor}[part.type]||panel)(group,dims,part);
   normalize(group);if(part.mirror)group.scale.x*=-1;return group;
 }

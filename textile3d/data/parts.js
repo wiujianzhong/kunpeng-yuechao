@@ -9,7 +9,7 @@ export const manuals = [
   {id:'jwf1012',name:'JWF1012 机件略图',pages:34,contentStart:4}
 ];
 
-const p=(code,name,page,type,dims,extra={})=>({manual:'jwf1206',assembly:'JWF1206-0100',code,name,page,type,dims,status:'真3D已建模',...extra});
+const p=(code,name,page,type,dims,extra={})=>({manual:'jwf1206',assembly:'JWF1206-0100',code,name,page,type,dims,status:'资料与3D待核',...extra});
 
 export const parts = [
   p('JWF1206-0100-1','右前底板结合件',4,'plate',[785,337,14.7]),
@@ -32,7 +32,15 @@ export const parts = [
   p('JWF1204-0100-5','右中立柱结合件',5,'column',[2010,225,120]),
   p('JWF1204-0100-8','左中立柱结合件',5,'column',[2010,225,120],{mirror:true}),
   p('JWF1204-0100-9','左前立柱结合件',5,'column',[2055,225,120],{mirror:true}),
-  p('JWF1204-0100-10','右前罩结合件（一）',5,'topCover',[1930,520,120]),
+  p('JWF1204-0100-10','前顶罩结合件（一）',5,'frontTopHood',[1930],{
+    nameEn:'FRONT TOP HOOD SUB-ASS',
+    quantity:1,
+    sheetPage:'共5页第2页',
+    status:'已核图·轮廓级',
+    dimensionNote:'厂家原格仅明确标注总宽 1930 mm',
+    sourceCrop:'assets/manuals/jwf1206/crops/JWF1204-0100-10.png',
+    sourceVector:'assets/manuals/jwf1206/crops/JWF1204-0100-10.pdf'
+  }),
   p('JWF1204-0100-11','前上罩结合件',5,'panel',[1930,430,35]),
   p('JWF1204-0100-12','左前罩结合件',5,'hoodDoor',[503,1184,30],{mirror:true}),
   p('JWF1204-0100-13B','左前门结合件',5,'hoodDoor',[672,1184,30],{mirror:true}),
