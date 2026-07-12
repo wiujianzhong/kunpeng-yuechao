@@ -8,15 +8,19 @@ import {jwf1206Parts51to73} from './data/jwf1206-pages-51-73.js?v=20260713-9';
 import {zfa051aParts} from './data/zfa051a-parts.js?v=20260713-9';
 import {jwf1026Parts} from './data/jwf1026-parts.js?v=20260713-9';
 import {jwf1124cParts} from './data/jwf1124c-parts.js?v=20260713-9';
+import {jwf1124cP04Verified} from './data/jwf1124c-p04-verified.js?v=20260713-13';
+import {jwf1124cP06Verified} from './data/jwf1124c-p06-verified.js?v=20260713-13';
+import {jwf1124cP08Verified} from './data/jwf1124c-p08-verified.js?v=20260713-13';
+import {jwf1124cP09Verified} from './data/jwf1124c-p09-verified.js?v=20260713-13';
 import {jwf1012Parts} from './data/jwf1012-parts.js?v=20260713-9';
 import {tf2513Parts} from './data/tf2513-parts.js?v=20260713-9';
 import {fa103bParts} from './data/fa103b-parts.js?v=20260713-9';
 import {jwf1102Parts} from './data/jwf1102-parts.js?v=20260713-9';
-import {assemblies} from './data/assemblies.js?v=20260713-9';
+import {assemblies} from './data/assemblies.js?v=20260713-13';
 import {jwf1206_0100_verified} from './data/jwf1206-0100-verified.js?v=20260713-9';
-import {getPartModelSpec} from './data/model-specs/index.js?v=20260713-10';
+import {getPartModelSpec} from './data/model-specs/index.js?v=20260713-13';
 import {createPartModel} from './models/part-models.js?v=20260713-10';
-import {createAssemblyModel} from './models/assembly-models.js?v=20260713-9';
+import {createAssemblyModel} from './models/assembly-models.js?v=20260713-13';
 
 function inferType(part){
   if(part.type!=='unknown')return part.type;
@@ -48,9 +52,21 @@ const verifiedJwf1206Parts09to30=[
   ...jwf1206Parts09to30.slice(0,verified09to16Count).map((part,index)=>({...part,...jwf1206_pages_09_16_verified[index],type:part.type})),
   ...jwf1206Parts09to30.slice(verified09to16Count)
 ];
+function mergeVerifiedPage(source,page,verified,label){
+  const pageParts=source.filter(part=>part.page===page);
+  if(pageParts.length!==verified.length)throw new Error(`${label}核对数据与原索引数量不一致`);
+  let index=0;
+  return source.map(part=>part.page===page?{...part,...verified[index++],type:part.type}:part);
+}
+const verifiedJwf1124cParts=[
+  [4,jwf1124cP04Verified,'JWF1124C第4页'],
+  [6,jwf1124cP06Verified,'JWF1124C第6页'],
+  [8,jwf1124cP08Verified,'JWF1124C第8页'],
+  [9,jwf1124cP09Verified,'JWF1124C第9页']
+].reduce((result,[page,verified,label])=>mergeVerifiedPage(result,page,verified,label),jwf1124cParts);
 const indexedParts=[
   ...verifiedJwf1206Parts09to30,...jwf1206Parts31to50,...jwf1206Parts51to73,
-  ...zfa051aParts,...jwf1026Parts,...jwf1124cParts,...jwf1012Parts,
+  ...zfa051aParts,...jwf1026Parts,...verifiedJwf1124cParts,...jwf1012Parts,
   ...tf2513Parts,...fa103bParts,...jwf1102Parts
 ].map(part=>{
   const inferred=inferType(part);
@@ -60,7 +76,7 @@ const indexedParts=[
 if(jwf1206_0100_verified.length!==coreParts.length)throw new Error('JWF1206-0100审计数据与模型基线数量不一致');
 const verifiedCoreParts=coreParts.map((part,index)=>({...part,...jwf1206_0100_verified[index]}));
 const parts=[...verifiedCoreParts,...indexedParts].map(part=>{
-  const modelSpec=getPartModelSpec(part.manual,part.code||part.recordKey);
+  const modelSpec=getPartModelSpec(part.manual,part.code,part.recordKey,part.page);
   if(!modelSpec)return part;
   const modelStatus=`${modelSpec.level}3D已核`;
   return {...part,modelSpec,modelStatus,status:`${part.dataStatus==='厂家资料已核'?'资料已核':'资料待核'}·${modelStatus}`};
@@ -192,7 +208,7 @@ function modelPreview(key,createModel,fallback){
   }
 }
 
-function previewImage(part){return modelPreview(`part:${part.manual}:${part.code||part.recordKey||formatCode(part)}`,()=>createPartModel(part),part.sourceCrop||hdPagePath(part.manual,part.page))}
+function previewImage(part){return modelPreview(`part:${part.manual}:${part.recordKey||part.code||formatCode(part)}`,()=>createPartModel(part),part.sourceCrop||hdPagePath(part.manual,part.page))}
 function assemblyPreview(assembly){return modelPreview(`assembly:${assembly.manual}:${assembly.code}`,()=>createAssemblyModel(assembly),assembly.sourceImage)}
 
 function getDetailEngine(){

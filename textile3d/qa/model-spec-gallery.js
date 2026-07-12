@@ -2,11 +2,19 @@ import * as THREE from 'three';
 import {allPartModelSpecs} from '../data/model-specs/index.js';
 import {jwf1206_0100_verified} from '../data/jwf1206-0100-verified.js';
 import {jwf1206_pages_09_16_verified} from '../data/jwf1206-pages-09-16-verified.js';
+import {jwf1124cP04Verified} from '../data/jwf1124c-p04-verified.js';
+import {jwf1124cP06Verified} from '../data/jwf1124c-p06-verified.js';
+import {jwf1124cP08Verified} from '../data/jwf1124c-p08-verified.js';
+import {jwf1124cP09Verified} from '../data/jwf1124c-p09-verified.js';
 import {createSpecModel} from '../models/spec-models.js';
 
-const page=Number(new URLSearchParams(location.search).get('page'))||0;
-const partData=[...jwf1206_0100_verified,...jwf1206_pages_09_16_verified];
-const specs=Object.entries(allPartModelSpecs.jwf1206).filter(([code,spec])=>!page||spec.source.page===page);
+const params=new URLSearchParams(location.search);
+const manual=params.get('manual')||'jwf1206';
+const page=Number(params.get('page'))||0;
+const partData=manual==='jwf1124c'
+  ?[...jwf1124cP04Verified,...jwf1124cP06Verified,...jwf1124cP08Verified,...jwf1124cP09Verified]
+  :[...jwf1206_0100_verified,...jwf1206_pages_09_16_verified];
+const specs=Object.entries(allPartModelSpecs[manual]||{}).filter(([code,spec])=>!page||spec.source.page===page);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
 renderer.setPixelRatio(1);renderer.setSize(560,360,false);renderer.outputColorSpace=THREE.SRGBColorSpace;
 const scene=new THREE.Scene();
@@ -25,10 +33,10 @@ function renderSpec(spec){
 
 const gallery=document.querySelector('#gallery');
 for(const [code,spec] of specs){
-  const part=partData.find(item=>(item.code||item.recordKey)===code);
+  const part=partData.find(item=>item.code===code||item.recordKey===code);
   const card=document.createElement('article');card.className='card';
-  card.innerHTML=`<div class="title"><strong>${code} · ${part?.name||''}</strong><span>${spec.level}</span></div><div class="compare"><img class="model" alt="${code} 3D"><img class="source" src="../${part?.sourceCrop||''}" alt="${code} 厂家原格"></div><p class="note">${spec.source.assumptions.join('；')}</p>`;
+  card.innerHTML=`<div class="title"><strong>${part?.code||code} · ${part?.name||''}</strong><span>${spec.level}</span></div><div class="compare"><img class="model" alt="${part?.code||code} 3D"><img class="source" src="../${part?.sourceCrop||''}" alt="${part?.code||code} 厂家原格"></div><p class="note">${spec.source.assumptions.join('；')}</p>`;
   card.querySelector('.model').src=renderSpec(spec);gallery.append(card);
 }
-document.querySelector('#summary').textContent=`${page?`第${page}页 · `:''}${specs.length}件对照`;
+document.querySelector('#summary').textContent=`${manual} · ${page?`第${page}页 · `:''}${specs.length}件对照`;
 renderer.dispose();renderer.forceContextLoss();
