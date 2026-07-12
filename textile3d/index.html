@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>嘉新集团纺织机械3D零件库</title>
+  <link rel="stylesheet" href="catalog.css">
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"}}</script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><img src="assets/caresun-logo.png" alt="嘉新国际集团"><strong>纺织机械3D零件库</strong></div>
+    <div class="build-state"><span></span>逐件建模中</div>
+  </header>
+
+  <main>
+    <section class="workbench">
+      <div class="selector-block">
+        <label for="manual-select">选择厂家资料</label>
+        <select id="manual-select"></select>
+      </div>
+      <div class="search-block">
+        <label for="part-search">搜索当前资料</label>
+        <div class="search-input"><span>⌕</span><input id="part-search" type="search" placeholder="输入零件名称或件号"></div>
+      </div>
+      <div class="view-block">
+        <label>查看方式</label>
+        <div class="view-switch"><button class="active" data-view="3d">3D零件</button><button data-view="pages">厂家原图</button></div>
+      </div>
+    </section>
+
+    <section class="result-head">
+      <div><p id="manual-kicker"></p><h1 id="result-title">零件3D模型</h1></div>
+      <div class="result-stats"><strong id="result-count">0</strong><span id="result-unit">个真3D模型</span></div>
+    </section>
+
+    <section id="content" class="part-grid" aria-live="polite"></section>
+    <nav id="pagination" class="pagination" aria-label="分页"></nav>
+  </main>
+
+  <dialog id="detail-dialog" class="detail-dialog">
+    <button class="close-detail" aria-label="关闭">×</button>
+    <div class="detail-stage">
+      <canvas id="detail-canvas"></canvas>
+      <div class="stage-code" id="stage-code"></div>
+      <div class="stage-help">拖动旋转 · 滚轮/双指缩放</div>
+    </div>
+    <aside class="detail-info">
+      <p class="detail-assembly" id="detail-assembly"></p>
+      <h2 id="detail-name"></h2>
+      <div class="identity">
+        <div><span>零件件号</span><strong id="detail-code"></strong></div>
+        <div><span>原手册位置</span><strong id="detail-page"></strong></div>
+        <div><span>模型状态</span><strong id="detail-status"></strong></div>
+        <div><span>图纸尺寸</span><strong id="detail-dims"></strong></div>
+      </div>
+      <p class="accuracy">模型按厂家二维尺寸和轮廓建立；图纸未标注的厚度及背面结构属于估算。</p>
+      <div class="detail-actions"><button id="show-origin">查看厂家原零件图</button><a id="open-page" target="_blank">打开原整页</a></div>
+      <div class="origin-preview" id="origin-preview"><img id="origin-image" alt="厂家原图"><span id="origin-caption"></span></div>
+    </aside>
+  </dialog>
+
+  <script type="module" src="catalog.js?v=20260713-7"></script>
+</body>
+</html>
