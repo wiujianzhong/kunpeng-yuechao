@@ -1,0 +1,1557 @@
+{
+  "auditVersion": 1,
+  "manualId": "fa103b",
+  "manualTitle": "FA103B 外供立体图",
+  "sourcePdf": "assets/manuals/fa103b/original.pdf",
+  "sourcePdfSha256": "5913e4e543d0abc6dcbb512d1199fa3992c3cdc85ed5170be6fb44764c5c7412",
+  "comparedDataFile": "data/fa103b-parts.js",
+  "scope": {
+    "pdfPages": [
+      10,
+      11
+    ],
+    "assembly": "FA103B-0300",
+    "assemblyDrawingPage": 10,
+    "partsTablePage": 11,
+    "auditedItemRange": [
+      1,
+      39
+    ],
+    "emptyItemRange": [
+      40,
+      50
+    ],
+    "recordCount": 39,
+    "quantityTotalsByUnit": {
+      "件": 513,
+      "dm": 66
+    },
+    "numericQuantityTotalMixedUnits": 579
+  },
+  "sourceHeader": {
+    "companyZh": "恒天重工股份有限公司",
+    "companyEnSource": "HI-TECH HEAVY INDUSTRY CO.,LTD.",
+    "machineTitleZh": "FA103B型双轴流开棉机",
+    "machineTitleEnSource": "TYPE FA103B DOUBLE-ROLL OPENER",
+    "assemblyCode": "FA103B-0300",
+    "assemblyTitleZh": "尘格部件",
+    "assemblyTitleEnSource": "PRODUCT ASSEMBLY CHART",
+    "sheetPageZh": "共1页第1页",
+    "sheetPageEn": "PAGE 1 OF 1",
+    "quantityColumnEnSource": "QUALITY"
+  },
+  "method": {
+    "pageRenderDpi": 600,
+    "assemblyCropDpi": 600,
+    "cellCropDpi": 600,
+    "review": "第10、11页按600dpi整页目测；第11页39个非空项逐格核对件号、中文名称、单台设备用量、单位和明确规格。",
+    "assemblyRule": "第10页沿PDF矢量外图框中心线裁切，完整保留尘格部件爆炸图、标号和标题栏。",
+    "cellRule": "第11页项目1—26取左表、27—39取右表；40—50为空，不生成零件记录。每格四边沿整行矢量格框中心线。",
+    "quantityRule": "数量栏按单台设备用量保存；第15、16项原文33dm保留dm长度单位，其他37项单位为件，禁止把不同单位相加冒充件数。",
+    "recordKeyRule": "同名侧板、玻璃窗、调节板及同标准号GB70、GB93、GB97.1均按厂家序号建立独立recordKey。",
+    "englishRule": "厂家第11页明细行没有逐项英文名称，nameEn保持null；标题栏英文及QUALITY拼写按原文保存。",
+    "specificationRule": "只保存厂家名称栏或件号明确规格；嵌条、嵌芯截面规格取件号3X3、6X8，普通图号数字不当尺寸。",
+    "remarkRule": "第11页39项备注栏均为空，统一保存null。"
+  },
+  "coordinateSystem": {
+    "unit": "pt",
+    "origin": "PDF左下角",
+    "pageSizePt": [
+      842,
+      595
+    ],
+    "cropPolicy": "[left,bottom,right,top]沿矢量格框中心线",
+    "assemblyFrameCropBoxPt": [
+      60.24,
+      33.12,
+      814.08,
+      566.64
+    ],
+    "leftTableXBoundsPt": [
+      103.44,
+      458.88
+    ],
+    "rightTableXBoundsPt": [
+      458.88,
+      814.32
+    ],
+    "rowBoundsPtTopToBottom": [
+      495.36,
+      477.6,
+      459.84,
+      442.08,
+      424.32,
+      406.56,
+      388.56,
+      370.8,
+      353.04,
+      335.28,
+      317.52,
+      299.76,
+      282,
+      264,
+      246.24,
+      228.48,
+      210.72,
+      192.96,
+      175.2,
+      157.2,
+      139.44,
+      121.68,
+      103.92,
+      86.16,
+      68.4,
+      50.64,
+      32.88
+    ]
+  },
+  "assemblyOverview": {
+    "pdfPage": 10,
+    "pageType": "尘格部件爆炸总图",
+    "overviewCropBoxPt": [
+      60.24,
+      33.12,
+      814.08,
+      566.64
+    ],
+    "sourceSlug": "FA103B-0300-assembly-p10",
+    "titleBlock": {
+      "code": "FA103B-0300",
+      "nameZh": "尘格部件",
+      "nameEnSource": "PRODUCT ASSEMBLY CHART",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": "PAGE 1 OF 1"
+    },
+    "visibleMarkerRange": [
+      1,
+      39
+    ],
+    "rangeMeaning": "第10页可见项目标号1—39；空间关系只按图面记录，不推断隐藏配合。",
+    "confirmedSpatialLayers": [
+      "左右两块侧板结合件作为装配基准，中部布置多根尘棒结合件及两组弧形三角针板结合件。",
+      "侧板窗口周围分别展开玻璃窗、嵌条、嵌芯和调节板；玻璃窗与柔性嵌条、嵌芯保持独立。",
+      "左下为操作杆、调节指示座、调节偏心轴、指针、调节座圈和手柄球/把手组成的调节机构；标准件按各标号独立。"
+    ]
+  },
+  "partsTableTitleBlock": {
+    "pdfPage": 11,
+    "code": "FA103B-0300",
+    "nameZh": "尘格部件",
+    "nameEnSource": "PRODUCT ASSEMBLY CHART",
+    "sheetPageZh": "共1页第1页",
+    "sheetPageEn": "PAGE 1 OF 1",
+    "quantityColumnEnSource": "QUALITY"
+  },
+  "sourceAmbiguities": [
+    "第10、11页标题栏英文均为通用原文“PRODUCT ASSEMBLY CHART”，按厂家原文保存。",
+    "第11页数量列英文原文拼作“QUALITY”；业务含义按用户确认为单台设备用量。",
+    "第15、16项数量原文为33dm，是长度用量而不是33件；审计按dm保存。",
+    "厂家第11页明细行没有逐项英文零件名称，nameEn保持null。",
+    "项目40—50整行为空，不生成记录、不猜补。"
+  ],
+  "existingIndexDifferences": [
+    {
+      "item": 10,
+      "field": "nameZh",
+      "existing": "操件杆",
+      "source": "操作杆"
+    },
+    {
+      "item": 36,
+      "field": "nameZh",
+      "existing": "手柄 M12X40",
+      "source": "手柄球 M12X40"
+    }
+  ],
+  "coverageIssues": [
+    "既有索引39项均缺少单台设备用量、单位、recordKey、逐格cropBox和600dpi原格资产。",
+    "既有索引未保存第15、16项数量单位dm，不能按默认件数处理。"
+  ],
+  "issueSummary": {
+    "recordCount": 39,
+    "nameZhMismatch": 2,
+    "missingQuantityInExistingIndex": 39,
+    "missingSourceCropInExistingIndex": 39,
+    "sourceEnglishUnavailable": 39,
+    "mixedQuantityUnitRows": 2
+  },
+  "parts": [
+    {
+      "item": 1,
+      "recordKey": "fa103b-p11-item-001",
+      "code": "FA103A-0300-3",
+      "nameZh": "三角针板结合件",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          477.6,
+          458.88,
+          495.36
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-001",
+      "auditIssues": []
+    },
+    {
+      "item": 2,
+      "recordKey": "fa103b-p11-item-002",
+      "code": "FA103B-0300-1",
+      "nameZh": "侧板结合件",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          459.84,
+          458.88,
+          477.6
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-002",
+      "auditIssues": [
+        "第2、3项均为侧板结合件，但件号和爆炸图方向不同，分别独立建档。"
+      ]
+    },
+    {
+      "item": 3,
+      "recordKey": "fa103b-p11-item-003",
+      "code": "FA103B-0300-2",
+      "nameZh": "侧板结合件",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          442.08,
+          458.88,
+          459.84
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-003",
+      "auditIssues": [
+        "第2、3项均为侧板结合件，但件号和爆炸图方向不同，分别独立建档。"
+      ]
+    },
+    {
+      "item": 4,
+      "recordKey": "fa103b-p11-item-004",
+      "code": "FA103B-0300-3",
+      "nameZh": "窗口结合件",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          424.32,
+          458.88,
+          442.08
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-004",
+      "auditIssues": []
+    },
+    {
+      "item": 5,
+      "recordKey": "fa103b-p11-item-005",
+      "code": "FA103-0302",
+      "nameZh": "螺钉",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 46,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 5,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          406.56,
+          458.88,
+          424.32
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-005",
+      "auditIssues": []
+    },
+    {
+      "item": 6,
+      "recordKey": "fa103b-p11-item-006",
+      "code": "FA103-0303",
+      "nameZh": "调节指示座",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 6,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          388.56,
+          458.88,
+          406.56
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-006",
+      "auditIssues": []
+    },
+    {
+      "item": 7,
+      "recordKey": "fa103b-p11-item-007",
+      "code": "FA103-0304",
+      "nameZh": "调节偏心轴",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 7,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          370.8,
+          458.88,
+          388.56
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-007",
+      "auditIssues": []
+    },
+    {
+      "item": 8,
+      "recordKey": "fa103b-p11-item-008",
+      "code": "FA103-0305",
+      "nameZh": "指针",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 8,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          353.04,
+          458.88,
+          370.8
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-008",
+      "auditIssues": []
+    },
+    {
+      "item": 9,
+      "recordKey": "fa103b-p11-item-009",
+      "code": "FA103-0306",
+      "nameZh": "调节座圈",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 9,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          335.28,
+          458.88,
+          353.04
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-009",
+      "auditIssues": []
+    },
+    {
+      "item": 10,
+      "recordKey": "fa103b-p11-item-010",
+      "code": "FA103-0307",
+      "nameZh": "操作杆",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 10,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          317.52,
+          458.88,
+          335.28
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-010",
+      "auditIssues": [
+        "厂家原文为“操作杆”；既有索引误写“操件杆”，本次按原格纠正。"
+      ]
+    },
+    {
+      "item": 11,
+      "recordKey": "fa103b-p11-item-011",
+      "code": "FA103B-0301",
+      "nameZh": "玻璃窗",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 11,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          299.76,
+          458.88,
+          317.52
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-011",
+      "auditIssues": [
+        "第11、14项均为玻璃窗，但件号、数量和爆炸图位置不同，分别独立建档。"
+      ]
+    },
+    {
+      "item": 12,
+      "recordKey": "fa103b-p11-item-012",
+      "code": "FA103B-0302",
+      "nameZh": "调节板",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 12,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          282,
+          458.88,
+          299.76
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-012",
+      "auditIssues": [
+        "第12、13、39项均为调节板，但件号、数量和结构位置不同，分别独立建档。"
+      ]
+    },
+    {
+      "item": 13,
+      "recordKey": "fa103b-p11-item-013",
+      "code": "FA103B-0303",
+      "nameZh": "调节板",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 13,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          264,
+          458.88,
+          282
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-013",
+      "auditIssues": [
+        "第12、13、39项均为调节板，但件号、数量和结构位置不同，分别独立建档。"
+      ]
+    },
+    {
+      "item": 14,
+      "recordKey": "fa103b-p11-item-014",
+      "code": "FA103B-0304",
+      "nameZh": "玻璃窗",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 14,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          246.24,
+          458.88,
+          264
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-014",
+      "auditIssues": [
+        "第11、14项均为玻璃窗，但件号、数量和爆炸图位置不同，分别独立建档。"
+      ]
+    },
+    {
+      "item": 15,
+      "recordKey": "fa103b-p11-item-015",
+      "code": "TZH1077-3X3",
+      "nameZh": "嵌条",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 33,
+        "unit": "dm",
+        "meaning": "单台设备用量（厂家数量栏原文33dm）"
+      },
+      "specification": "3X3",
+      "dimensions": [
+        "3X3"
+      ],
+      "dimensionSource": "厂家件号中的截面规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 15,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          228.48,
+          458.88,
+          246.24
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-015",
+      "auditIssues": [
+        "厂家数量栏原文为33dm，单位按长度分米保存，不改写为33件。"
+      ]
+    },
+    {
+      "item": 16,
+      "recordKey": "fa103b-p11-item-016",
+      "code": "TZH1077-6X8",
+      "nameZh": "嵌芯",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 33,
+        "unit": "dm",
+        "meaning": "单台设备用量（厂家数量栏原文33dm）"
+      },
+      "specification": "6X8",
+      "dimensions": [
+        "6X8"
+      ],
+      "dimensionSource": "厂家件号中的截面规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 16,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          210.72,
+          458.88,
+          228.48
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-016",
+      "auditIssues": [
+        "厂家数量栏原文为33dm，单位按长度分米保存，不改写为33件。"
+      ]
+    },
+    {
+      "item": 17,
+      "recordKey": "fa103b-p11-item-017",
+      "code": "GB5783",
+      "nameZh": "螺栓 M6X16",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 12,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6X16",
+      "dimensions": [
+        "M6X16"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 17,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          192.96,
+          458.88,
+          210.72
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-017",
+      "auditIssues": []
+    },
+    {
+      "item": 18,
+      "recordKey": "fa103b-p11-item-018",
+      "code": "GB70",
+      "nameZh": "螺钉 M5X12",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M5X12",
+      "dimensions": [
+        "M5X12"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 18,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          175.2,
+          458.88,
+          192.96
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-018",
+      "auditIssues": [
+        "第18—22项件号同为GB70，但规格、数量不同，按厂家序号建立独立recordKey。"
+      ]
+    },
+    {
+      "item": 19,
+      "recordKey": "fa103b-p11-item-019",
+      "code": "GB70",
+      "nameZh": "螺钉 M5X16",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M5X16",
+      "dimensions": [
+        "M5X16"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 19,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          157.2,
+          458.88,
+          175.2
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-019",
+      "auditIssues": [
+        "第18—22项件号同为GB70，但规格、数量不同，按厂家序号建立独立recordKey。"
+      ]
+    },
+    {
+      "item": 20,
+      "recordKey": "fa103b-p11-item-020",
+      "code": "GB70",
+      "nameZh": "螺钉 M6X30",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6X30",
+      "dimensions": [
+        "M6X30"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 20,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          139.44,
+          458.88,
+          157.2
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-020",
+      "auditIssues": [
+        "第18—22项件号同为GB70，但规格、数量不同，按厂家序号建立独立recordKey。"
+      ]
+    },
+    {
+      "item": 21,
+      "recordKey": "fa103b-p11-item-021",
+      "code": "GB70",
+      "nameZh": "螺钉 M8X12",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 92,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M8X12",
+      "dimensions": [
+        "M8X12"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 21,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          121.68,
+          458.88,
+          139.44
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-021",
+      "auditIssues": [
+        "第18—22项件号同为GB70，但规格、数量不同，按厂家序号建立独立recordKey。"
+      ]
+    },
+    {
+      "item": 22,
+      "recordKey": "fa103b-p11-item-022",
+      "code": "GB70",
+      "nameZh": "螺钉 M10X20",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M10X20",
+      "dimensions": [
+        "M10X20"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 22,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          103.92,
+          458.88,
+          121.68
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-022",
+      "auditIssues": [
+        "第18—22项件号同为GB70，但规格、数量不同，按厂家序号建立独立recordKey。"
+      ]
+    },
+    {
+      "item": 23,
+      "recordKey": "fa103b-p11-item-023",
+      "code": "GB818",
+      "nameZh": "螺钉 M5X16",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 10,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M5X16",
+      "dimensions": [
+        "M5X16"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 23,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          86.16,
+          458.88,
+          103.92
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-023",
+      "auditIssues": []
+    },
+    {
+      "item": 24,
+      "recordKey": "fa103b-p11-item-024",
+      "code": "GB12618",
+      "nameZh": "抽芯铆钉 5X12",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 26,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "5X12",
+      "dimensions": [
+        "5X12"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 24,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          68.4,
+          458.88,
+          86.16
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-024",
+      "auditIssues": []
+    },
+    {
+      "item": 25,
+      "recordKey": "fa103b-p11-item-025",
+      "code": "GB879",
+      "nameZh": "销 8X20",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "8X20",
+      "dimensions": [
+        "8X20"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 25,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          50.64,
+          458.88,
+          68.4
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-025",
+      "auditIssues": []
+    },
+    {
+      "item": 26,
+      "recordKey": "fa103b-p11-item-026",
+      "code": "GB1096-79",
+      "nameZh": "键 5X20",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "5X20",
+      "dimensions": [
+        "5X20"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "左表",
+        "row": 26,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          32.88,
+          458.88,
+          50.64
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-026",
+      "auditIssues": []
+    },
+    {
+      "item": 27,
+      "recordKey": "fa103b-p11-item-027",
+      "code": "GB62",
+      "nameZh": "螺母 M6",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 12,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6",
+      "dimensions": [
+        "M6"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          477.6,
+          814.32,
+          495.36
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-027",
+      "auditIssues": []
+    },
+    {
+      "item": 28,
+      "recordKey": "fa103b-p11-item-028",
+      "code": "GB6170",
+      "nameZh": "螺母 M5",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 18,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M5",
+      "dimensions": [
+        "M5"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          459.84,
+          814.32,
+          477.6
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-028",
+      "auditIssues": []
+    },
+    {
+      "item": 29,
+      "recordKey": "fa103b-p11-item-029",
+      "code": "GB93",
+      "nameZh": "垫圈 6",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "6",
+      "dimensions": [
+        "6"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          442.08,
+          814.32,
+          459.84
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-029",
+      "auditIssues": [
+        "第29、30项件号同为GB93，但规格、数量不同，按厂家序号建立独立recordKey。"
+      ]
+    },
+    {
+      "item": 30,
+      "recordKey": "fa103b-p11-item-030",
+      "code": "GB93",
+      "nameZh": "垫圈 8",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 138,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "8",
+      "dimensions": [
+        "8"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          424.32,
+          814.32,
+          442.08
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-030",
+      "auditIssues": [
+        "第29、30项件号同为GB93，但规格、数量不同，按厂家序号建立独立recordKey。"
+      ]
+    },
+    {
+      "item": 31,
+      "recordKey": "fa103b-p11-item-031",
+      "code": "GB96",
+      "nameZh": "垫圈 5",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "5",
+      "dimensions": [
+        "5"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 5,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          406.56,
+          814.32,
+          424.32
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-031",
+      "auditIssues": []
+    },
+    {
+      "item": 32,
+      "recordKey": "fa103b-p11-item-032",
+      "code": "GB97.1",
+      "nameZh": "垫圈 5",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 26,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "5",
+      "dimensions": [
+        "5"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 6,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          388.56,
+          814.32,
+          406.56
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-032",
+      "auditIssues": [
+        "第32—35项件号同为GB97.1，但规格、数量不同，按厂家序号建立独立recordKey。"
+      ]
+    },
+    {
+      "item": 33,
+      "recordKey": "fa103b-p11-item-033",
+      "code": "GB97.1",
+      "nameZh": "垫圈 6",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 12,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "6",
+      "dimensions": [
+        "6"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 7,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          370.8,
+          814.32,
+          388.56
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-033",
+      "auditIssues": [
+        "第32—35项件号同为GB97.1，但规格、数量不同，按厂家序号建立独立recordKey。"
+      ]
+    },
+    {
+      "item": 34,
+      "recordKey": "fa103b-p11-item-034",
+      "code": "GB97.1",
+      "nameZh": "垫圈 10",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "10",
+      "dimensions": [
+        "10"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 8,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          353.04,
+          814.32,
+          370.8
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-034",
+      "auditIssues": [
+        "第32—35项件号同为GB97.1，但规格、数量不同，按厂家序号建立独立recordKey。"
+      ]
+    },
+    {
+      "item": 35,
+      "recordKey": "fa103b-p11-item-035",
+      "code": "GB97.1",
+      "nameZh": "垫圈 16",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "16",
+      "dimensions": [
+        "16"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 9,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          335.28,
+          814.32,
+          353.04
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-035",
+      "auditIssues": [
+        "第32—35项件号同为GB97.1，但规格、数量不同，按厂家序号建立独立recordKey。"
+      ]
+    },
+    {
+      "item": 36,
+      "recordKey": "fa103b-p11-item-036",
+      "code": "JB/T7271.1-94",
+      "nameZh": "手柄球 M12X40",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M12X40",
+      "dimensions": [
+        "M12X40"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 10,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          317.52,
+          814.32,
+          335.28
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-036",
+      "auditIssues": [
+        "厂家原文为“手柄球 M12X40”；既有索引漏掉“球”字，本次按原格纠正。"
+      ]
+    },
+    {
+      "item": 37,
+      "recordKey": "fa103b-p11-item-037",
+      "code": "JB/T7274.4-94",
+      "nameZh": "把手 BM16X63",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "BM16X63",
+      "dimensions": [
+        "BM16X63"
+      ],
+      "dimensionSource": "厂家名称栏明确规格原文",
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 11,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          299.76,
+          814.32,
+          317.52
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-037",
+      "auditIssues": []
+    },
+    {
+      "item": 38,
+      "recordKey": "fa103b-p11-item-038",
+      "code": "FA103B-0300-5",
+      "nameZh": "尘棒结合件",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 46,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 12,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          282,
+          814.32,
+          299.76
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-038",
+      "auditIssues": []
+    },
+    {
+      "item": 39,
+      "recordKey": "fa103b-p11-item-039",
+      "code": "FA103B-0316",
+      "nameZh": "调节板",
+      "nameEn": null,
+      "sourceNameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "dimensions": [],
+      "dimensionSource": null,
+      "remark": null,
+      "assembly": "FA103B-0300",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "table": "右表",
+        "row": 13,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          264,
+          814.32,
+          282
+        ]
+      },
+      "sourceSlug": "fa103b-p11-item-039",
+      "auditIssues": [
+        "第12、13、39项均为调节板，但件号、数量和结构位置不同，分别独立建档。"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3822 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1206",
+  "manualTitle": "JWF1206型梳棉机机件略图",
+  "sourcePdf": "assets/manuals/jwf1206/original.pdf",
+  "sourcePdfSha256": "33c4ef5ea44819870120ffac91da3f5c0e60473c6b52d20ed98ea70dee730ca3",
+  "scope": {
+    "pdfPages": [
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73
+    ],
+    "recordCount": 101,
+    "recordCountsByPage": {
+      "62": 5,
+      "63": 9,
+      "64": 8,
+      "65": 13,
+      "66": 5,
+      "67": 12,
+      "68": 7,
+      "69": 7,
+      "70": 14,
+      "71": 2,
+      "72": 8,
+      "73": 11
+    },
+    "quantityTotalsByUnit": {
+      "件": 134,
+      "dm": 132
+    },
+    "assemblies": [
+      "JWF1206-7500",
+      "JWF1206-7600",
+      "JWF1206-8000",
+      "JWF1206-8100",
+      "JWF1202-8200A",
+      "JWF1202-8300",
+      "JWF1202-8400",
+      "JWF1202-8500",
+      "FA225-8600",
+      "JWF1206-8700"
+    ]
+  },
+  "method": {
+    "pageRenderDpi": 220,
+    "cellCropDpi": 600,
+    "fullPageDpi": 600,
+    "review": "先按矢量表格边界生成600dpi原格，再逐格复核身份、数量与尺寸。",
+    "cellRule": "只录入非空厂家零件格。",
+    "quantityRule": "名称右侧数字为单台设备用量；原格标dm时按长度单位保存。",
+    "identityRule": "件号、中文、英文、数量只认厂家原格。",
+    "dimensionRule": "仅记录厂家明确尺寸。",
+    "materialRule": "吸尘软管、密封条、密封圈、观察窗、气弹簧等按物理语境建模。"
+  },
+  "pageHeaders": [
+    {
+      "pdfPage": 62,
+      "assembly": "JWF1206-7500",
+      "sheetPageZh": "共2页第2页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 63,
+      "assembly": "JWF1206-7600",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 64,
+      "assembly": "JWF1206-8000",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 65,
+      "assembly": "JWF1206-8100",
+      "sheetPageZh": "共2页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 66,
+      "assembly": "JWF1206-8100",
+      "sheetPageZh": "共2页第2页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 67,
+      "assembly": "JWF1202-8200A",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 68,
+      "assembly": "JWF1202-8300",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 69,
+      "assembly": "JWF1202-8400",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 70,
+      "assembly": "JWF1202-8500",
+      "sheetPageZh": "共2页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 71,
+      "assembly": "JWF1202-8500",
+      "sheetPageZh": "共2页第2页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 72,
+      "assembly": "FA225-8600",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 73,
+      "assembly": "JWF1206-8700",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null
+    }
+  ],
+  "coordinateSystem": {
+    "unit": "PDF pt",
+    "origin": "bottom-left",
+    "pageSizePt": [
+      595,
+      842
+    ],
+    "cropPolicy": "严格采用零件大单元四条外边界。",
+    "pages": {
+      "62": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      },
+      "63": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      },
+      "64": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      },
+      "65": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      },
+      "66": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      },
+      "67": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      },
+      "68": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      },
+      "69": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      },
+      "70": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      },
+      "71": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      },
+      "72": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      },
+      "73": {
+        "xBoundariesPt": [
+          80.4,
+          199.2,
+          318,
+          437.04,
+          555.84
+        ],
+        "yCellBoundariesTopToBottomPt": [
+          778.8,
+          598.8,
+          418.56,
+          238.56,
+          58.32
+        ]
+      }
+    }
+  },
+  "fullPageAssets": [
+    {
+      "pdfPage": 62,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p62-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p62-full-page.pdf"
+    },
+    {
+      "pdfPage": 63,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p63-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p63-full-page.pdf"
+    },
+    {
+      "pdfPage": 64,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p64-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p64-full-page.pdf"
+    },
+    {
+      "pdfPage": 65,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p65-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p65-full-page.pdf"
+    },
+    {
+      "pdfPage": 66,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p66-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p66-full-page.pdf"
+    },
+    {
+      "pdfPage": 67,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p67-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p67-full-page.pdf"
+    },
+    {
+      "pdfPage": 68,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p68-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p68-full-page.pdf"
+    },
+    {
+      "pdfPage": 69,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p69-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p69-full-page.pdf"
+    },
+    {
+      "pdfPage": 70,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p70-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p70-full-page.pdf"
+    },
+    {
+      "pdfPage": 71,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p71-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p71-full-page.pdf"
+    },
+    {
+      "pdfPage": 72,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p72-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p72-full-page.pdf"
+    },
+    {
+      "pdfPage": 73,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p73-full-page.png",
+      "sourceVector": "assets/manuals/jwf1206/crops/jwf1206-p73-full-page.pdf"
+    }
+  ],
+  "sourceAmbiguities": [
+    {
+      "recordKey": "jwf1206-p68-item-007",
+      "field": "code",
+      "sourceValue": "QD25",
+      "note": "厂家件号栏为空，QD25写在中文名称“气弹簧QD25”中；检索件号沿用QD25。"
+    },
+    {
+      "recordKey": "jwf1206-p69-item-006",
+      "field": "dimensions",
+      "sourceValue": null,
+      "note": "厂家原格未标箭头牌尺寸。"
+    },
+    {
+      "recordKey": "jwf1206-p69-item-007",
+      "field": "dimensions",
+      "sourceValue": null,
+      "note": "厂家原格未标箭头牌尺寸。"
+    },
+    {
+      "recordKey": "jwf1206-p73-item-007",
+      "field": "dimensions",
+      "sourceValue": null,
+      "note": "厂家原格未标拉绳尺寸。"
+    },
+    {
+      "recordKey": "jwf1206-p73-item-011",
+      "field": "quantity",
+      "sourceValue": "132 dm",
+      "note": "厂家数量栏明确使用dm，不能误作132件。"
+    }
+  ],
+  "existingIndexComparison": {
+    "existingFile": "data/jwf1206-pages-51-73.js",
+    "recordCountInScope": 101,
+    "issues": [
+      {
+        "recordKey": "jwf1206-p63-item-006",
+        "field": "dimensions",
+        "old": "φ127×45",
+        "verified": "φ122×45"
+      },
+      {
+        "recordKey": "jwf1206-p65-item-005",
+        "field": "dimensions",
+        "old": "219.5×135×30.5",
+        "verified": "219.5×135×304.5"
+      },
+      {
+        "recordKey": "jwf1206-p65-item-006",
+        "field": "dimensions",
+        "old": "149.5×135×30.5",
+        "verified": "149.5×135×304.5"
+      },
+      {
+        "recordKey": "jwf1206-p65-item-007",
+        "field": "dimensions",
+        "old": "127×85×101.5",
+        "verified": "127×85×104.5"
+      },
+      {
+        "recordKey": "jwf1206-p69-item-002",
+        "field": "dimensions",
+        "old": "178×158×16",
+        "verified": "φ158/φ128×16"
+      },
+      {
+        "recordKey": "jwf1206-p70-item-006",
+        "field": "dimensions",
+        "old": "276×223×15",
+        "verified": "276×223；折弯深50"
+      },
+      {
+        "recordKey": "jwf1206-p73-item-011",
+        "field": "quantityUnit",
+        "old": "件",
+        "verified": "dm"
+      }
+    ]
+  },
+  "parts": [
+    {
+      "pdfPage": 62,
+      "item": 1,
+      "recordKey": "jwf1206-p62-item-001",
+      "assembly": "JWF1206-7500",
+      "code": "JWF1206-7504",
+      "nameZh": "标牌座",
+      "sourceNameEn": "TRADEMARK SEAT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "75×32×5"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p62-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 62,
+      "item": 2,
+      "recordKey": "jwf1206-p62-item-002",
+      "assembly": "JWF1206-7500",
+      "code": "JWF1206-7505",
+      "nameZh": "刻度牌",
+      "sourceNameEn": "MARKED PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "22×20"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p62-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 62,
+      "item": 3,
+      "recordKey": "jwf1206-p62-item-003",
+      "assembly": "JWF1206-7500",
+      "code": "JWF1206-7507",
+      "nameZh": "撑挡",
+      "sourceNameEn": "CROSSBEAM",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ20×1082"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p62-item-003",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 62,
+      "item": 4,
+      "recordKey": "jwf1206-p62-item-004",
+      "assembly": "JWF1206-7500",
+      "code": "JWF1206-7203",
+      "nameZh": "调节螺柱",
+      "sourceNameEn": "ADJUSTING BOLT",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "M12×1×80"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p62-item-004",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 62,
+      "item": 5,
+      "recordKey": "jwf1206-p62-item-005",
+      "assembly": "JWF1206-7500",
+      "code": "JWF1206-7401",
+      "nameZh": "轴",
+      "sourceNameEn": "SHAFT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ12×72"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p62-item-005",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 63,
+      "item": 1,
+      "recordKey": "jwf1206-p63-item-001",
+      "assembly": "JWF1206-7600",
+      "code": "JWF1206-7601",
+      "nameZh": "电机安装板",
+      "sourceNameEn": "FIXING-PLATE OF MOTOR",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "380×260"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p63-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 63,
+      "item": 2,
+      "recordKey": "jwf1206-p63-item-002",
+      "assembly": "JWF1206-7600",
+      "code": "FA225-7602",
+      "nameZh": "轴套",
+      "sourceNameEn": "BEARING SLEEVE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ70×45"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p63-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 63,
+      "item": 3,
+      "recordKey": "jwf1206-p63-item-003",
+      "assembly": "JWF1206-7600",
+      "code": "FA225-7603",
+      "nameZh": "刺辊电机带轮",
+      "sourceNameEn": "MOTOR PULLEY OF TAKER-IN",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ85×45"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p63-item-003",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 63,
+      "item": 4,
+      "recordKey": "jwf1206-p63-item-004",
+      "assembly": "JWF1206-7600",
+      "code": "FA225-7604",
+      "nameZh": "刺辊电机带轮",
+      "sourceNameEn": "MOTOR PULLEY OF TAKER-IN",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ94×45"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p63-item-004",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 63,
+      "item": 5,
+      "recordKey": "jwf1206-p63-item-005",
+      "assembly": "JWF1206-7600",
+      "code": "FA225-7605",
+      "nameZh": "刺辊电机带轮",
+      "sourceNameEn": "MOTOR PULLEY OF TAKER-IN",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ112×45"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          418.56,
+          318,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p63-item-005",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 63,
+      "item": 6,
+      "recordKey": "jwf1206-p63-item-006",
+      "assembly": "JWF1206-7600",
+      "code": "FA225-7606",
+      "nameZh": "刺辊电机带轮",
+      "sourceNameEn": "MOTOR PULLEY OF TAKER-IN",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ122×45"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p63-item-006",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 63,
+      "item": 7,
+      "recordKey": "jwf1206-p63-item-007",
+      "assembly": "JWF1206-7600",
+      "code": "FA225-7607",
+      "nameZh": "刺辊电机带轮",
+      "sourceNameEn": "MOTOR PULLEY OF TAKER-IN",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ145×45"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p63-item-007",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 63,
+      "item": 8,
+      "recordKey": "jwf1206-p63-item-008",
+      "assembly": "JWF1206-7600",
+      "code": "FA225-7608",
+      "nameZh": "刺辊电机带轮",
+      "sourceNameEn": "MOTOR PULLEY OF TAKER-IN",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ155×45"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p63-item-008",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 63,
+      "item": 9,
+      "recordKey": "jwf1206-p63-item-009",
+      "assembly": "JWF1206-7600",
+      "code": "FA225-7609",
+      "nameZh": "刺辊电机带轮",
+      "sourceNameEn": "MOTOR PULLEY OF TAKER-IN",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ170×45"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          238.56,
+          318,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p63-item-009",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 64,
+      "item": 1,
+      "recordKey": "jwf1206-p64-item-001",
+      "assembly": "JWF1206-8000",
+      "code": "JWF1202-8000-1A",
+      "nameZh": "喂棉扁管结合件（一）",
+      "sourceNameEn": "FEED DUCT SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "925×290"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p64-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 64,
+      "item": 2,
+      "recordKey": "jwf1206-p64-item-002",
+      "assembly": "JWF1206-8000",
+      "code": "JWF1202-8001",
+      "nameZh": "左立柱",
+      "sourceNameEn": "LEFT SUPPORT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "525×506×170"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p64-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 64,
+      "item": 3,
+      "recordKey": "jwf1206-p64-item-003",
+      "assembly": "JWF1206-8000",
+      "code": "JWF1202-8002",
+      "nameZh": "右立柱",
+      "sourceNameEn": "RIGHT SUPPORT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "525×506×170"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p64-item-003",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 64,
+      "item": 4,
+      "recordKey": "jwf1206-p64-item-004",
+      "assembly": "JWF1206-8000",
+      "code": "JWF1202-8003",
+      "nameZh": "管接头",
+      "sourceNameEn": "PIPE COUNECTOR",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ98×100"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p64-item-004",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 64,
+      "item": 5,
+      "recordKey": "jwf1206-p64-item-005",
+      "assembly": "JWF1206-8000",
+      "code": "JWF1202-8004",
+      "nameZh": "右弯板",
+      "sourceNameEn": "RIGHT BEND PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "100×25×4"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          418.56,
+          318,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p64-item-005",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 64,
+      "item": 6,
+      "recordKey": "jwf1206-p64-item-006",
+      "assembly": "JWF1206-8000",
+      "code": "JWF1202-8005",
+      "nameZh": "吸尘软管",
+      "sourceNameEn": "DUST ABSORPTION HOSE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ100×1350"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p64-item-006",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 64,
+      "item": 7,
+      "recordKey": "jwf1206-p64-item-007",
+      "assembly": "JWF1206-8000",
+      "code": "JWF1202-8006",
+      "nameZh": "吸尘软管",
+      "sourceNameEn": "DUST ABSORPTION HOSE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ100×1650"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p64-item-007",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 64,
+      "item": 8,
+      "recordKey": "jwf1206-p64-item-008",
+      "assembly": "JWF1206-8000",
+      "code": "JWF1202-8007",
+      "nameZh": "左弯板",
+      "sourceNameEn": "LEFT BEND PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "100×25×4"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p64-item-008",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 1,
+      "recordKey": "jwf1206-p65-item-001",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1206-8100-1",
+      "nameZh": "棉箱左立柱结合件",
+      "sourceNameEn": "SUPPORT SUB-ASS FOR TRUNK(L)",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1240×700×280"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 2,
+      "recordKey": "jwf1206-p65-item-002",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1206-8100-2",
+      "nameZh": "棉箱右立柱结合件",
+      "sourceNameEn": "SUPPORT SUB-ASS FOR TRUNK(R)",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1240×700×280"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 3,
+      "recordKey": "jwf1206-p65-item-003",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1206-8100-3",
+      "nameZh": "撑挡结合件",
+      "sourceNameEn": "BAFFLE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1200×102×50"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-003",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 4,
+      "recordKey": "jwf1206-p65-item-004",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1202-8100-1",
+      "nameZh": "挡板结合件（一）",
+      "sourceNameEn": "FEED DUCT SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "127×85×54.5"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-004",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 5,
+      "recordKey": "jwf1206-p65-item-005",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1202-8100-2",
+      "nameZh": "挡板结合件（二）",
+      "sourceNameEn": "FEED DUCT SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "219.5×135×304.5"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          418.56,
+          318,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-005",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 6,
+      "recordKey": "jwf1206-p65-item-006",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1202-8100-5",
+      "nameZh": "挡板结合件（三）",
+      "sourceNameEn": "FEED DUCT SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "149.5×135×304.5"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-006",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 7,
+      "recordKey": "jwf1206-p65-item-007",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1202-8100-6",
+      "nameZh": "挡板结合件（四）",
+      "sourceNameEn": "FEED DUCT SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "127×85×104.5"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-007",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 8,
+      "recordKey": "jwf1206-p65-item-008",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1202-8100-7",
+      "nameZh": "后顶板结合件",
+      "sourceNameEn": "REAR TOP PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1200×392"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-008",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 9,
+      "recordKey": "jwf1206-p65-item-009",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1202-8100-8",
+      "nameZh": "前顶板结合件",
+      "sourceNameEn": "FRONT TOP PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1200×213"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          238.56,
+          318,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-009",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 10,
+      "recordKey": "jwf1206-p65-item-010",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1202-8100-9",
+      "nameZh": "上护板结合件",
+      "sourceNameEn": "FEED DUCT SUB-ASS(U)",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "337.5×233"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          238.56,
+          437.04,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-010",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 11,
+      "recordKey": "jwf1206-p65-item-011",
+      "assembly": "JWF1206-8100",
+      "code": "ZFA177-0100-16B",
+      "nameZh": "观察窗结合件",
+      "sourceNameEn": "VIEW WINDOW SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "276×100"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          58.32,
+          199.2,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-011",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 12,
+      "recordKey": "jwf1206-p65-item-012",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1202-8101",
+      "nameZh": "搭钩",
+      "sourceNameEn": "HANGER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "135×25"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          58.32,
+          437.04,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-012",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 65,
+      "item": 13,
+      "recordKey": "jwf1206-p65-item-013",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1202-8102",
+      "nameZh": "定位板",
+      "sourceNameEn": "LIMITED PLATE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "85×70×2"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          58.32,
+          555.84,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p65-item-013",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 66,
+      "item": 1,
+      "recordKey": "jwf1206-p66-item-001",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1202-8103",
+      "nameZh": "左护板",
+      "sourceNameEn": "LEFT SHIELD",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "585.5×30"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p66-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 66,
+      "item": 2,
+      "recordKey": "jwf1206-p66-item-002",
+      "assembly": "JWF1206-8100",
+      "code": "JWF1202-8104",
+      "nameZh": "右护板",
+      "sourceNameEn": "RIGHT SHIELD",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "585.5×30"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p66-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 66,
+      "item": 3,
+      "recordKey": "jwf1206-p66-item-003",
+      "assembly": "JWF1206-8100",
+      "code": "FA225-8101",
+      "nameZh": "搭钩座",
+      "sourceNameEn": "HANGER SEAT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "50×35×25"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p66-item-003",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 66,
+      "item": 4,
+      "recordKey": "jwf1206-p66-item-004",
+      "assembly": "JWF1206-8100",
+      "code": "ZFA211-0116",
+      "nameZh": "挂钩螺钉",
+      "sourceNameEn": "HANGER SCREW",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ14×18"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p66-item-004",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 66,
+      "item": 5,
+      "recordKey": "jwf1206-p66-item-005",
+      "assembly": "JWF1206-8100",
+      "code": "FA177A-0148",
+      "nameZh": "小滤网",
+      "sourceNameEn": "SMALL FILTRATION SCREEN",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "295×120"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p66-item-005",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 1,
+      "recordKey": "jwf1206-p67-item-001",
+      "assembly": "JWF1202-8200A",
+      "code": "JWF1202-8200-1A",
+      "nameZh": "打手后弧板结合件",
+      "sourceNameEn": "REAR ARC PLATE FOR BEATER SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1200×206×124.5"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 2,
+      "recordKey": "jwf1206-p67-item-002",
+      "assembly": "JWF1202-8200A",
+      "code": "JWF1202-8200-2A",
+      "nameZh": "横撑结合件（一）",
+      "sourceNameEn": "TRANSVERSE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "长1200"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 3,
+      "recordKey": "jwf1206-p67-item-003",
+      "assembly": "JWF1202-8200A",
+      "code": "JWF1202-8200-3A",
+      "nameZh": "网眼板结合件",
+      "sourceNameEn": "PERFORATED PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1198×313×61"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-003",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 4,
+      "recordKey": "jwf1206-p67-item-004",
+      "assembly": "JWF1202-8200A",
+      "code": "JWF1202-8200-4A",
+      "nameZh": "挡板结合件",
+      "sourceNameEn": "BAFFLE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1200×154×35"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-004",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 5,
+      "recordKey": "jwf1206-p67-item-005",
+      "assembly": "JWF1202-8200A",
+      "code": "JWF1202-8200-5",
+      "nameZh": "调节架结合件",
+      "sourceNameEn": "ADJUSTING FRAME SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1160×70×30"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-005",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 6,
+      "recordKey": "jwf1206-p67-item-006",
+      "assembly": "JWF1202-8200A",
+      "code": "JWF1202-8200-6",
+      "nameZh": "滤网箱结合件（一）",
+      "sourceNameEn": "FILTRATION SCREEN BOX SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1190×288×80"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          418.56,
+          318,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-006",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 7,
+      "recordKey": "jwf1206-p67-item-007",
+      "assembly": "JWF1202-8200A",
+      "code": "JWF1202-8200-7A",
+      "nameZh": "封板结合件",
+      "sourceNameEn": "SYNCHRONOUS PULLEY SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1200×464×203"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-007",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 8,
+      "recordKey": "jwf1206-p67-item-008",
+      "assembly": "JWF1202-8200A",
+      "code": "JWF1202-8200-8",
+      "nameZh": "给棉板结合件",
+      "sourceNameEn": "FEED PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "长1200",
+        "R110",
+        "R130"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-008",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 9,
+      "recordKey": "jwf1206-p67-item-009",
+      "assembly": "JWF1202-8200A",
+      "code": "JWF1202-8200-9A",
+      "nameZh": "打手前弧板结合件",
+      "sourceNameEn": "FRONT ARC PLATE FOR BEATER SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "长920",
+        "R130"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-009",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 10,
+      "recordKey": "jwf1206-p67-item-010",
+      "assembly": "JWF1202-8200A",
+      "code": "JWF1202-8200-10A",
+      "nameZh": "打手下弧板结合件",
+      "sourceNameEn": "LOWER ARC PLATE FOR BEATER SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "长1200",
+        "弧弦139"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          238.56,
+          318,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-010",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 11,
+      "recordKey": "jwf1206-p67-item-011",
+      "assembly": "JWF1202-8200A",
+      "code": "JWF1202-8201",
+      "nameZh": "上调节板",
+      "sourceNameEn": "ADJUSTING PLATE(UP)",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "475×115"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          238.56,
+          555.84,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-011",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 67,
+      "item": 12,
+      "recordKey": "jwf1206-p67-item-012",
+      "assembly": "JWF1202-8200A",
+      "code": "TF2228",
+      "nameZh": "搭扣",
+      "sourceNameEn": "AGRAFFE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "58×20"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          58.32,
+          199.2,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p67-item-012",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 68,
+      "item": 1,
+      "recordKey": "jwf1206-p68-item-001",
+      "assembly": "JWF1202-8300",
+      "code": "JWF1202-8300-1",
+      "nameZh": "转动臂结合件",
+      "sourceNameEn": "CURSOR SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "长110",
+        "宽30",
+        "偏置38"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p68-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 68,
+      "item": 2,
+      "recordKey": "jwf1206-p68-item-002",
+      "assembly": "JWF1202-8300",
+      "code": "JWF1202-8300-2",
+      "nameZh": "风道外罩结合件",
+      "sourceNameEn": "AIR-DUCT COVER SUB-ASS(OUTER)",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1115×495"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p68-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 68,
+      "item": 3,
+      "recordKey": "jwf1206-p68-item-003",
+      "assembly": "JWF1202-8300",
+      "code": "JWF1202-8300-3",
+      "nameZh": "风道内罩结合件",
+      "sourceNameEn": "AIR-DUCT COVER SUB-ASS(INNER)",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "长1118",
+        "R120"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p68-item-003",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 68,
+      "item": 4,
+      "recordKey": "jwf1206-p68-item-004",
+      "assembly": "JWF1202-8300",
+      "code": "JWF1202-8300-4",
+      "nameZh": "拉手结合件",
+      "sourceNameEn": "HANDLE SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ8×51"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p68-item-004",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 68,
+      "item": 5,
+      "recordKey": "jwf1206-p68-item-005",
+      "assembly": "JWF1202-8300",
+      "code": "ZFA177-0100-16A",
+      "nameZh": "观察窗结合件",
+      "sourceNameEn": "VIEW WINDOW SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "276×100"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p68-item-005",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 68,
+      "item": 6,
+      "recordKey": "jwf1206-p68-item-006",
+      "assembly": "JWF1202-8300",
+      "code": "TZH1091-20X11.5",
+      "nameZh": "带肩轴衬",
+      "sourceNameEn": "SHOULDERED BUSH",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ30/φ23×11.5"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p68-item-006",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 68,
+      "item": 7,
+      "recordKey": "jwf1206-p68-item-007",
+      "assembly": "JWF1202-8300",
+      "code": "QD25",
+      "nameZh": "气弹簧",
+      "sourceNameEn": "AIR SPRING",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家原格未标几何尺寸",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p68-item-007",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 69,
+      "item": 1,
+      "recordKey": "jwf1206-p69-item-001",
+      "assembly": "JWF1202-8400",
+      "code": "JWF1202-8400-1",
+      "nameZh": "给棉罗拉结合件",
+      "sourceNameEn": "FEED ROLL SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "总长1439",
+        "辊体长1191"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p69-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 69,
+      "item": 2,
+      "recordKey": "jwf1206-p69-item-002",
+      "assembly": "JWF1202-8400",
+      "code": "JWF1172A-0600-5",
+      "nameZh": "密封圈结合件",
+      "sourceNameEn": "SEALING RING",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ158/φ128×16"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p69-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 69,
+      "item": 3,
+      "recordKey": "jwf1206-p69-item-003",
+      "assembly": "JWF1202-8400",
+      "code": "JWF1202-8401",
+      "nameZh": "电机法兰",
+      "sourceNameEn": "MOTOR FLANGE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "宽260"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p69-item-003",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 69,
+      "item": 4,
+      "recordKey": "jwf1206-p69-item-004",
+      "assembly": "JWF1202-8400",
+      "code": "JWF1202-8402",
+      "nameZh": "法兰（左）",
+      "sourceNameEn": "LEFT FLANGE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ264"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          418.56,
+          318,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p69-item-004",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 69,
+      "item": 5,
+      "recordKey": "jwf1206-p69-item-005",
+      "assembly": "JWF1202-8400",
+      "code": "JWF1202-8403",
+      "nameZh": "法兰（右）",
+      "sourceNameEn": "RIGHT FLANGE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ264"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p69-item-005",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 69,
+      "item": 6,
+      "recordKey": "jwf1206-p69-item-006",
+      "assembly": "JWF1202-8400",
+      "code": "TZH1100-L",
+      "nameZh": "箭头牌",
+      "sourceNameEn": "ARROW PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家原格未标几何尺寸",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p69-item-006",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 69,
+      "item": 7,
+      "recordKey": "jwf1206-p69-item-007",
+      "assembly": "JWF1202-8400",
+      "code": "TZH1100-R",
+      "nameZh": "箭头牌",
+      "sourceNameEn": "ARROW PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家原格未标几何尺寸",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          238.56,
+          318,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p69-item-007",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 1,
+      "recordKey": "jwf1206-p70-item-001",
+      "assembly": "JWF1202-8500",
+      "code": "JWF1202-8500-1",
+      "nameZh": "打手结合件",
+      "sourceNameEn": "BEATER SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "长1349"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 2,
+      "recordKey": "jwf1206-p70-item-002",
+      "assembly": "JWF1202-8500",
+      "code": "JWF1202-8501",
+      "nameZh": "打手带轮",
+      "sourceNameEn": "BEATER PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ205×50"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 3,
+      "recordKey": "jwf1206-p70-item-003",
+      "assembly": "JWF1202-8500",
+      "code": "JWF1202-8502",
+      "nameZh": "活节螺栓",
+      "sourceNameEn": "EYELET BOLT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "M10×90"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-003",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 4,
+      "recordKey": "jwf1206-p70-item-004",
+      "assembly": "JWF1202-8500",
+      "code": "JWF1202-8503",
+      "nameZh": "电机带轮",
+      "sourceNameEn": "MOTOR PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ117×50"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-004",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 5,
+      "recordKey": "jwf1206-p70-item-005",
+      "assembly": "JWF1202-8500",
+      "code": "JWF1202-8504",
+      "nameZh": "电机带轮",
+      "sourceNameEn": "MOTOR PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ98×50"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          418.56,
+          318,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-005",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 6,
+      "recordKey": "jwf1206-p70-item-006",
+      "assembly": "JWF1202-8500",
+      "code": "JWF1202-8505",
+      "nameZh": "电机底板",
+      "sourceNameEn": "MOTOER BOTTOM PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "276×223",
+        "折弯深50"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-006",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 7,
+      "recordKey": "jwf1206-p70-item-007",
+      "assembly": "JWF1202-8500",
+      "code": "JWF1202-8506",
+      "nameZh": "接近开关座",
+      "sourceNameEn": "APPROACH SWITCH SEAT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "112×80×50"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-007",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 8,
+      "recordKey": "jwf1206-p70-item-008",
+      "assembly": "JWF1202-8500",
+      "code": "JWF1202-8507",
+      "nameZh": "偏心轴",
+      "sourceNameEn": "ECCENTRIC SHAFT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ20×47.5"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-008",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 9,
+      "recordKey": "jwf1206-p70-item-009",
+      "assembly": "JWF1202-8500",
+      "code": "JWF1202-8508",
+      "nameZh": "固定板",
+      "sourceNameEn": "FIXED PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "80×30×3"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          238.56,
+          318,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-009",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 10,
+      "recordKey": "jwf1206-p70-item-010",
+      "assembly": "JWF1202-8500",
+      "code": "FA225-8501",
+      "nameZh": "法兰",
+      "sourceNameEn": "FLANGE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ145×10"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          238.56,
+          555.84,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-010",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 11,
+      "recordKey": "jwf1206-p70-item-011",
+      "assembly": "JWF1202-8500",
+      "code": "TZH1051-35",
+      "nameZh": "轴承座",
+      "sourceNameEn": "BEARING SEAT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ135×22.5"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          58.32,
+          199.2,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-011",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 12,
+      "recordKey": "jwf1206-p70-item-012",
+      "assembly": "JWF1202-8500",
+      "code": "TZH1083-190/160",
+      "nameZh": "密封圈",
+      "sourceNameEn": "SEALING RING",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ190/φ160×14"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          58.32,
+          318,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-012",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 13,
+      "recordKey": "jwf1206-p70-item-013",
+      "assembly": "JWF1202-8500",
+      "code": "TZH1091-15X17",
+      "nameZh": "带肩轴衬",
+      "sourceNameEn": "SHOULDERED BUSH",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ23/φ17×17"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          58.32,
+          437.04,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-013",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 70,
+      "item": 14,
+      "recordKey": "jwf1206-p70-item-014",
+      "assembly": "JWF1202-8500",
+      "code": "TZH1091-20X11.5",
+      "nameZh": "带肩轴衬",
+      "sourceNameEn": "SHOULDERED BUSH",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ30/φ23×11.5"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          58.32,
+          555.84,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p70-item-014",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 71,
+      "item": 1,
+      "recordKey": "jwf1206-p71-item-001",
+      "assembly": "JWF1202-8500",
+      "code": "TZH1100-L",
+      "nameZh": "箭头牌",
+      "sourceNameEn": "ARROW PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家原格未标几何尺寸",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p71-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 71,
+      "item": 2,
+      "recordKey": "jwf1206-p71-item-002",
+      "assembly": "JWF1202-8500",
+      "code": "TZH1100-R",
+      "nameZh": "箭头牌",
+      "sourceNameEn": "ARROW PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家原格未标几何尺寸",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p71-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 72,
+      "item": 1,
+      "recordKey": "jwf1206-p72-item-001",
+      "assembly": "FA225-8600",
+      "code": "FA225-8600-1",
+      "nameZh": "吸风罩结合件",
+      "sourceNameEn": "SUCTION COVER SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "长440",
+        "接口φ96"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p72-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 72,
+      "item": 2,
+      "recordKey": "jwf1206-p72-item-002",
+      "assembly": "FA225-8600",
+      "code": "ZFA177-0902",
+      "nameZh": "吹气风机蜗壳",
+      "sourceNameEn": "BLOWING FAN VOLUTE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "长205"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p72-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 72,
+      "item": 3,
+      "recordKey": "jwf1206-p72-item-003",
+      "assembly": "FA225-8600",
+      "code": "ZFA177-0903",
+      "nameZh": "叶轮",
+      "sourceNameEn": "IMPELLER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ300",
+        "叶轮φ290"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p72-item-003",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 72,
+      "item": 4,
+      "recordKey": "jwf1206-p72-item-004",
+      "assembly": "FA225-8600",
+      "code": "ZFA177-0904",
+      "nameZh": "挡圈",
+      "sourceNameEn": "COLLAR",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ36×9"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p72-item-004",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 72,
+      "item": 5,
+      "recordKey": "jwf1206-p72-item-005",
+      "assembly": "FA225-8600",
+      "code": "ZFA177-0905",
+      "nameZh": "调节垫圈",
+      "sourceNameEn": "ADJUSTING WASHER",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ25×1"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          418.56,
+          318,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p72-item-005",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 72,
+      "item": 6,
+      "recordKey": "jwf1206-p72-item-006",
+      "assembly": "FA225-8600",
+      "code": "ZFA177-0906",
+      "nameZh": "垫片",
+      "sourceNameEn": "GASKET",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ140×1.5",
+        "安装宽120"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p72-item-006",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 72,
+      "item": 7,
+      "recordKey": "jwf1206-p72-item-007",
+      "assembly": "FA225-8600",
+      "code": "ZFA177-0907",
+      "nameZh": "垫片",
+      "sourceNameEn": "GASKET",
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ25×0.5"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p72-item-007",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 72,
+      "item": 8,
+      "recordKey": "jwf1206-p72-item-008",
+      "assembly": "FA225-8600",
+      "code": "ZFA177-0908",
+      "nameZh": "叶轮",
+      "sourceNameEn": "IMPELLER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ300",
+        "叶轮φ240"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p72-item-008",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 73,
+      "item": 1,
+      "recordKey": "jwf1206-p73-item-001",
+      "assembly": "JWF1206-8700",
+      "code": "JWF1206-8700-1",
+      "nameZh": "前门结合件",
+      "sourceNameEn": "FRONT DOOR SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1270×438.5×30"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p73-item-001",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 73,
+      "item": 2,
+      "recordKey": "jwf1206-p73-item-002",
+      "assembly": "JWF1206-8700",
+      "code": "JWF1202-8700-4",
+      "nameZh": "后门结合件",
+      "sourceNameEn": "REAR DOOR SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1270×795×30"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p73-item-002",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 73,
+      "item": 3,
+      "recordKey": "jwf1206-p73-item-003",
+      "assembly": "JWF1206-8700",
+      "code": "FA225-8300-4",
+      "nameZh": "门锁结合件",
+      "sourceNameEn": "DOOR LOCK SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "长52"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p73-item-003",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 73,
+      "item": 4,
+      "recordKey": "jwf1206-p73-item-004",
+      "assembly": "JWF1206-8700",
+      "code": "JWF1206-8702",
+      "nameZh": "左侧门",
+      "sourceNameEn": "LEFT DOOR",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "630×450"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "sourceSlug": "jwf1206-p73-item-004",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 73,
+      "item": 5,
+      "recordKey": "jwf1206-p73-item-005",
+      "assembly": "JWF1206-8700",
+      "code": "ZFA211-0116",
+      "nameZh": "挂钩螺钉",
+      "sourceNameEn": "HANGER SCREW",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ14×18"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p73-item-005",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 73,
+      "item": 6,
+      "recordKey": "jwf1206-p73-item-006",
+      "assembly": "JWF1206-8700",
+      "code": "FA225-8701",
+      "nameZh": "拉手",
+      "sourceNameEn": "HANDLE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ32×35"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          238.56,
+          437.04,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p73-item-006",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 73,
+      "item": 7,
+      "recordKey": "jwf1206-p73-item-007",
+      "assembly": "JWF1206-8700",
+      "code": "FA225-8702",
+      "nameZh": "拉绳",
+      "sourceNameEn": "PULL ROPE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家原格未标几何尺寸",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          238.56,
+          555.84,
+          418.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p73-item-007",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 73,
+      "item": 8,
+      "recordKey": "jwf1206-p73-item-008",
+      "assembly": "JWF1206-8700",
+      "code": "TF24A-36-00",
+      "nameZh": "门锁装置",
+      "sourceNameEn": "DOOR LOCK",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ28",
+        "36×45"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          58.32,
+          199.2,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p73-item-008",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 73,
+      "item": 9,
+      "recordKey": "jwf1206-p73-item-009",
+      "assembly": "JWF1206-8700",
+      "code": "TF2237-00",
+      "nameZh": "铰链",
+      "sourceNameEn": "HINGE",
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "高38"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          58.32,
+          318,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p73-item-009",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 73,
+      "item": 10,
+      "recordKey": "jwf1206-p73-item-010",
+      "assembly": "JWF1206-8700",
+      "code": "TF2238-00",
+      "nameZh": "铰链",
+      "sourceNameEn": "HINGE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "高38"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          318,
+          58.32,
+          437.04,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p73-item-010",
+      "remark": null,
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 73,
+      "item": 11,
+      "recordKey": "jwf1206-p73-item-011",
+      "assembly": "JWF1206-8700",
+      "code": "TZH1075",
+      "nameZh": "密封条",
+      "sourceNameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 132,
+        "unit": "dm",
+        "meaning": "单台设备长度用量"
+      },
+      "dimensions": [
+        "截面21×9"
+      ],
+      "dimensionSource": "厂家600dpi单格工程图明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          58.32,
+          555.84,
+          238.56
+        ]
+      },
+      "sourceSlug": "jwf1206-p73-item-011",
+      "remark": "厂家数量栏单位为dm",
+      "auditIssues": []
+    }
+  ]
+}
+

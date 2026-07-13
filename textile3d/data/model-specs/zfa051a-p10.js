@@ -1,0 +1,21 @@
+// ZFA051A-120机件略图第10页：12项独立3D规格。
+import {zfa051aP07P12Verified as verified} from '../zfa051a-p07-p12-verified.js';
+
+const row=item=>verified.find(part=>part.page===10&&part.item===item);
+const source=(item,assumptions)=>{const part=row(item);return {page:10,item,code:part.code,recordKey:part.recordKey,nameZh:part.name,quantity:{value:part.quantity,unit:part.quantityUnit,meaning:part.quantityMeaning},dimensions:part.dims,views:[`第10页厂家零件格${item}`],assumptions}};
+const spec=(item,{level='尺寸级',material='paintedMetal',primitives,assumptions})=>({level,material,source:source(item,assumptions),primitives});
+
+export const zfa051aP10ModelSpecs={
+  'ZFA051A-0517':spec(1,{assumptions:['厂家明确手柄高54、旋钮Φ50；轴径和台阶按图估算','模型按圆形握柄、中心轴和底座建立'],primitives:[{type:'cylinder',radius:25,length:18,axis:'z',material:'plastic'},{type:'cylinder',radius:8,length:54,axis:'z',position:[0,0,-30],material:'metal'},{type:'cylinder',radius:14,length:8,axis:'z',position:[0,0,-58],material:'darkMetal'}]}),
+  'ZFA051A-0518':spec(2,{assumptions:['厂家明确调节杆总长140；杆径、螺纹与端部台阶按图估算','模型按阶梯轴与端部螺纹杆建立'],primitives:[{type:'cylinder',radius:6,length:140,axis:'x',material:'metal'},{type:'cylinder',radius:11,length:24,axis:'x',position:[-58,0,0],material:'darkMetal'},{type:'torus',radius:7,tube:1.5,rotation:[0,Math.PI/2,0],position:[70,0,0],material:'darkMetal'}]}),
+  'TZH1087-10X3X5500':spec(3,{material:'rubber',assumptions:['厂家件号和图纸明确5500×10×3','密封条按黑色橡胶矩形截面建立'],primitives:[{type:'box',size:[5500,10,3],material:'rubber'}]}),
+  'TF24A-36-00':spec(4,{assumptions:['厂家明确门锁宽36、旋轴Φ28、高45；锁舌和安装孔按图估算','模型建立方形锁体、圆形锁芯和转动锁舌'],primitives:[{type:'box',size:[36,28,45],material:'darkMetal'},{type:'cylinder',radius:14,length:22,axis:'z',position:[0,0,28],material:'metal'},{type:'box',size:[62,12,8],position:[22,0,-25],material:'metal'}]}),
+  'TF2225-00':spec(5,{assumptions:['厂家明确安装杆Φ12；磁吸座直径、长度和螺母尺寸按图估算','模型按圆柱磁吸头、M12连接杆与锁紧螺母建立'],primitives:[{type:'cylinder',radius:28,length:22,axis:'x',material:'darkMetal'},{type:'cylinder',radius:6,length:70,axis:'x',position:[45,0,0],material:'metal'},{type:'cylinder',radius:11,length:10,axis:'x',position:[72,0,0],material:'metal'}]}),
+  'TF2236':spec(6,{assumptions:['厂家明确铰链长32；叶片宽、厚度、轴径和孔位按图估算','模型建立两片铰链叶、中轴和安装孔'],primitives:[{type:'box',size:[32,24,3],position:[0,13,0],material:'metal'},{type:'box',size:[32,24,3],position:[0,-13,0],material:'metal'},{type:'cylinder',radius:4,length:32,axis:'x',material:'darkMetal'},...[-10,10].flatMap(x=>[-1,1].map(y=>({type:'torus',radius:2.5,tube:.7,position:[x,y*13,3],material:'darkMetal'})))]}),
+  'TF2601-00-03':spec(7,{level:'轮廓级',material:'plastic',assumptions:['厂家未标注尺寸；外形、厚度和孔位均按图形语义估算','模型仅表达圆角矩形标牌和四角安装孔，不宣称尺寸级精度'],primitives:[{type:'extrude',points:[[-60,-38],[60,-38],[64,-34],[64,34],[60,38],[-60,38],[-64,34],[-64,-34]],depth:2,holes:[{kind:'circle',center:[-54,-28],radius:2},{kind:'circle',center:[54,-28],radius:2},{kind:'circle',center:[-54,28],radius:2},{kind:'circle',center:[54,28],radius:2}],bevel:2,material:'plastic'}]}),
+  'TZH1073-II':spec(8,{material:'rubber',assumptions:['厂家明确截面6×9.5；长度栏为空且图示“长度按需要定”','模型用短样段表达橡胶密封条截面，样段长不是厂家数据'],primitives:[{type:'box',size:[180,6,9.5],material:'rubber'}]}),
+  'TZH1077-1.5X3':spec(9,{material:'rubber',assumptions:['厂家明确截面1.5×3；长度栏为空且图示“长度按需要定”','模型用短样段表达柔性嵌条，样段长不是厂家数据'],primitives:[{type:'box',size:[180,1.5,3],material:'rubber'}]}),
+  'TZH1078-6X7':spec(10,{material:'rubber',assumptions:['厂家明确截面7×6；长度栏为空且图示“长度按需要定”','模型用短样段表达橡胶嵌芯，样段长不是厂家数据'],primitives:[{type:'cylinder',radiusTop:3,radiusBottom:3.5,length:180,axis:'x',material:'rubber'}]}),
+  'TF25':spec(11,{assumptions:['厂家明确钥匙总长84、头部宽40；厚度、环孔与齿形按图估算','模型按圆头钥匙柄、中孔、长柄和端部齿形建立'],primitives:[{type:'extrude',points:[[-42,-8],[22,-8],[22,-20],[42,-20],[42,20],[22,20],[22,8],[-42,8]],depth:3,holes:[{kind:'circle',center:[28,0],radius:9}],bevel:2,material:'metal'},{type:'box',size:[18,18,3],position:[-34,0,0],material:'darkMetal'}]}),
+  'TF2227':spec(12,{assumptions:['厂家明确拉手安装跨162.8、跨度102.4、高34.5；管径和脚座尺寸按图估算','模型按U形拉手、两端支脚与安装座建立'],primitives:[{type:'tube',points:[[-81.4,-51.2,0],[-81.4,-51.2,34.5],[-60,-51.2,48],[-20,-51.2,52],[20,-51.2,52],[60,-51.2,48],[81.4,-51.2,34.5],[81.4,-51.2,0]],radius:8,material:'metal'},{type:'box',size:[28,18,6],position:[-81.4,-51.2,0],material:'darkMetal'},{type:'box',size:[28,18,6],position:[81.4,-51.2,0],material:'darkMetal'}]}),
+};

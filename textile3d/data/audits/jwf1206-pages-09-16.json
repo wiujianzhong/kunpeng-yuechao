@@ -1,0 +1,2606 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1206",
+  "manualTitle": "JWF1206 型梳棉机机件略图",
+  "sourcePdf": "assets/manuals/jwf1206/original.pdf",
+  "comparedDataFile": "data/jwf1206-pages-09-30.js",
+  "comparedPartsJsAtCommit": "781146f",
+  "scope": {
+    "pdfPages": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "assemblies": [
+      "JWF1206-0200",
+      "JWF1202-0300(SMC)",
+      "JWF1206-1100",
+      "JWF1206-1300"
+    ],
+    "recordCount": 93,
+    "recordsWithManufacturerPartCode": 92,
+    "recordsWithBlankManufacturerPartCode": 1
+  },
+  "method": {
+    "pageRenderDpi": 300,
+    "ambiguityCropDpi": 600,
+    "review": "300dpi全页逐页逐格核对；英文拼写、相邻尺寸和空件号格再做600dpi单格复核",
+    "cellRule": "只抄本格件号、中英文、数量和图形区明确尺寸，不从相邻格、件号规格或经验补值",
+    "blankCodeRule": "厂家件号格为空则code=null，不把名称中的型号冒充件号"
+  },
+  "coordinateSystem": {
+    "unit": "pt",
+    "origin": "PDF左下角",
+    "pageSizePt": [
+      595,
+      842
+    ],
+    "cropPolicy": "[left,bottom,right,top]取整格边框中心线",
+    "standardColumnBoundsPt": [
+      80.4,
+      199.2,
+      318.0,
+      437.04,
+      555.84
+    ],
+    "standardRowBoundsPt": [
+      778.8,
+      598.8,
+      418.56,
+      238.56,
+      58.32
+    ],
+    "page13ColumnBoundsPt": [
+      60.0,
+      182.4,
+      304.8,
+      427.2,
+      549.6
+    ],
+    "page13RowBoundsPt": [
+      787.44,
+      601.92,
+      416.16,
+      230.64,
+      44.88
+    ]
+  },
+  "coverageIssues": [
+    "现有data在原页9-16共93条，均缺单台用量、格子裁切坐标和高清原格资产",
+    "原页10第2行第1列件号格为空，现有data误把名称中的ZT12-42X75当件号",
+    "本审计不代表3D模型已核准"
+  ],
+  "sourceAmbiguities": [
+    "JWF1206-1100-1/-2厂家英文为WALLBOARE，疑似WALLBOARD拼写错误，按原格保留",
+    "TZH1091-12X17厂家英文为DUSH，疑似BUSH拼写错误，按原格保留",
+    "JWF1206-1301中文撑杆，厂家英文MOTOR SPROCKET，语义不一致",
+    "ZFA211-0203~0205为一个格内三种厚度变体，数量栏只标1，不拆格推断",
+    "FA225-11120五位尾号为厂家原格写法",
+    "TZH1076的92 dm在数量栏，不是尺寸"
+  ],
+  "issueSummary": {
+    "recordsWithAnyExistingContentIssue": 16,
+    "recordsWithDimensionMismatch": 12,
+    "recordsWithEnglishSourceDifference": 3,
+    "recordsWithPartCodeMismatch": 1
+  },
+  "parts": [
+    {
+      "code": "JWF1206-0200-1",
+      "nameZh": "张紧轮结合件",
+      "nameEn": "TENSION PULLEY SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ90",
+        "长127"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-0201",
+      "nameZh": "调节螺栓",
+      "nameEn": "BOLT",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318.0,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "M12",
+        "长270"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-0202",
+      "nameZh": "锡林电机底板",
+      "nameEn": "CYLINDER MOTOR BASE PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "300×440"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-0203",
+      "nameZh": "张紧轮座",
+      "nameEn": "TENSION PULLEY SEAT",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "140×50×25"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-0204",
+      "nameZh": "导向键",
+      "nameEn": "KEY",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "32×16×10"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221B-0203",
+      "nameZh": "电机带轮（φ135）",
+      "nameEn": "MOTOR PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "φ135×82"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221B-0204",
+      "nameZh": "电机带轮（φ155）",
+      "nameEn": "MOTOR PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "φ155×82"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221B-0205",
+      "nameZh": "电机带轮（φ175）",
+      "nameEn": "MOTOR PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "φ175×82"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225B-0201",
+      "nameZh": "电机带轮（φ190）",
+      "nameEn": "MOTOR PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          238.56,
+          318.0,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "φ190×82"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225B-0202",
+      "nameZh": "电机带轮（φ210）",
+      "nameEn": "MOTOR PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          238.56,
+          437.04,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "φ210×82"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225B-0203",
+      "nameZh": "电机带轮（φ230）",
+      "nameEn": "MOTOR PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          238.56,
+          555.84,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "φ230×82"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-0203",
+      "nameZh": "锡林主带轮",
+      "nameEn": "MAIN PULLEY FOR CYLINDER",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          58.32,
+          199.2,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "φ590×80"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "ZFA211-0201A",
+      "nameZh": "带轮",
+      "nameEn": "PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          58.32,
+          437.04,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "φ110×90"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "ZFA211-0203~0205",
+      "nameZh": "平衡块",
+      "nameEn": "BALANCE WEIGHT",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 9,
+      "sheetPage": "共2页第1页",
+      "cell": {
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          58.32,
+          555.84,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "35×25",
+        "厚2/3/8"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "ZFA211-0206",
+      "nameZh": "垫圈",
+      "nameEn": "WASHER",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 10,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ80×10"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "ZFA211-1212",
+      "nameZh": "大垫圈",
+      "nameEn": "BIG WASHER",
+      "quantity": {
+        "value": 12,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 10,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318.0,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ30×6"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "ZFA211-4142",
+      "nameZh": "活节螺栓",
+      "nameEn": "BOLT",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 10,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "M12",
+        "长55"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "ZFA211A-0201A",
+      "nameZh": "检测盘",
+      "nameEn": "INSPECTING DISK",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 10,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ130×24.5"
+      ],
+      "existingIssues": []
+    },
+    {
+      "recordKey": "jwf1206:p10:r2:c1",
+      "code": null,
+      "sourceCodeCell": "空白",
+      "nameZh": "胀套ZT12-42X75",
+      "nameEn": "EXPAND SLEEVE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-0200",
+      "pdfPage": 10,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "φ75",
+        "φ42",
+        "54"
+      ],
+      "existingIssues": [
+        "现有data把名称中的ZT12-42X75当作code，但厂家件号格为空白"
+      ]
+    },
+    {
+      "code": "JWF1202-0301(SMC)",
+      "nameZh": "底板",
+      "nameEn": "BOTTOM PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1202-0300(SMC)",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "190×250×20"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1202-0302",
+      "nameZh": "气管",
+      "nameEn": "AIR PIPE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1202-0300(SMC)",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318.0,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ8×6000"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1202-0303",
+      "nameZh": "气管",
+      "nameEn": "AIR PIPE",
+      "quantity": {
+        "value": 3,
+        "unit": "件"
+      },
+      "assembly": "JWF1202-0300(SMC)",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ6×100"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1202-0304",
+      "nameZh": "气管",
+      "nameEn": "AIR PIPE",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1202-0300(SMC)",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ6×2100"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1202-0305",
+      "nameZh": "气管",
+      "nameEn": "AIR PIPE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1202-0300(SMC)",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "φ6×200"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1202-0306",
+      "nameZh": "气管",
+      "nameEn": "AIR PIPE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1202-0300(SMC)",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          418.56,
+          318.0,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "φ6×2600"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1202-0307",
+      "nameZh": "气管",
+      "nameEn": "AIR PIPE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1202-0300(SMC)",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "φ6×700"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1202-0308",
+      "nameZh": "气管",
+      "nameEn": "AIR PIPE",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1202-0300(SMC)",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "φ6×400"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "ZFA211A-0302",
+      "nameZh": "连接叉",
+      "nameEn": "CONNECTING FORK",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1202-0300(SMC)",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "88×44×28",
+        "中心长74"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "ZFA211A-0303",
+      "nameZh": "销轴",
+      "nameEn": "SHAFT",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1202-0300(SMC)",
+      "pdfPage": 11,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          238.56,
+          318.0,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "φ14×53"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1100-1",
+      "nameZh": "左墙板结合件",
+      "nameEn": "WALLBOARE SUB-ASS (L)",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "宽260",
+        "斜边275"
+      ],
+      "existingIssues": [
+        "现有nameEn写WALLBOARD；厂家原格为WALLBOARE，疑似厂家拼写错误"
+      ]
+    },
+    {
+      "code": "JWF1206-1100-2",
+      "nameZh": "右墙板结合件",
+      "nameEn": "WALLBOARE SUB-ASS (R)",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318.0,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "宽260",
+        "斜边275"
+      ],
+      "existingIssues": [
+        "现有nameEn写WALLBOARD；厂家原格为WALLBOARE，疑似厂家拼写错误"
+      ]
+    },
+    {
+      "code": "JWF1206-1100-3",
+      "nameZh": "右支架结合件",
+      "nameEn": "BRACKET SUB-ASS (R)",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "157×95"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1100-4",
+      "nameZh": "棉道结合件",
+      "nameEn": "COTTON CHANNELS SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "长1016"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1100-5",
+      "nameZh": "上风箱结合件",
+      "nameEn": "UP AIR BOX SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "939×231"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1100-6",
+      "nameZh": "封板结合件",
+      "nameEn": "ENVELOPING PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          418.56,
+          318.0,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "1010×121"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1100-7",
+      "nameZh": "给棉板结合件",
+      "nameEn": "FEED PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "长1010"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1100-8",
+      "nameZh": "下风箱结合件",
+      "nameEn": "DOWN AIR BOX SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "939×368×324"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1100-9",
+      "nameZh": "横撑结合件",
+      "nameEn": "CROSSBEAM SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "936×76"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1100-10",
+      "nameZh": "调节板结合件",
+      "nameEn": "ADJUSTING PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          238.56,
+          318.0,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "100×50"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1100-11",
+      "nameZh": "给棉罗拉结合件",
+      "nameEn": "FEED ROLL SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          238.56,
+          437.04,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "φ100×1338"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1100-12",
+      "nameZh": "调节板结合件",
+      "nameEn": "ADJUSTING PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          238.56,
+          555.84,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "939×70"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1100-3",
+      "nameZh": "加压臂结合件",
+      "nameEn": "PRESSURE ARM SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          58.32,
+          318.0,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "46",
+        "170",
+        "50",
+        "53"
+      ],
+      "existingIssues": [
+        "现有dims漏本格尺寸46"
+      ]
+    },
+    {
+      "code": "FA221D-1100-4",
+      "nameZh": "密封垫结合件",
+      "nameEn": "SEALING GASKET SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          58.32,
+          437.04,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "φ93/φ85×10"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1100-5",
+      "nameZh": "探测头结合件",
+      "nameEn": "EXPLORER SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 12,
+      "sheetPage": "共4页第1页",
+      "cell": {
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          58.32,
+          555.84,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "M12×1-6g",
+        "长36"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225-1100-1",
+      "nameZh": "拉手结合件",
+      "nameEn": "HANDLE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          60.0,
+          601.92,
+          182.4,
+          787.44
+        ]
+      },
+      "dimensions": [
+        "M12",
+        "长36"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225-1100-2A",
+      "nameZh": "左支架结合件",
+      "nameEn": "BRACKET SUB-ASS (L)",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          182.4,
+          601.92,
+          304.8,
+          787.44
+        ]
+      },
+      "dimensions": [
+        "157×125×95"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225-1100-13A",
+      "nameZh": "吸口结合件",
+      "nameEn": "SUCTION HOOD SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          304.8,
+          601.92,
+          427.2,
+          787.44
+        ]
+      },
+      "dimensions": [
+        "207×196",
+        "接口φ99"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1101",
+      "nameZh": "左侧板",
+      "nameEn": "LEFT SIDE PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          60.0,
+          416.16,
+          182.4,
+          601.92
+        ]
+      },
+      "dimensions": [
+        "190×50×30"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1102",
+      "nameZh": "右侧板",
+      "nameEn": "RIGHT SIDE PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          182.4,
+          416.16,
+          304.8,
+          601.92
+        ]
+      },
+      "dimensions": [
+        "190×50×30"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1103",
+      "nameZh": "丝杠",
+      "nameEn": "BOLT",
+      "quantity": {
+        "value": 4,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          304.8,
+          416.16,
+          427.2,
+          601.92
+        ]
+      },
+      "dimensions": [
+        "M8×115",
+        "六角14"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1104",
+      "nameZh": "螺杆",
+      "nameEn": "SCREW",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          427.2,
+          416.16,
+          549.6,
+          601.92
+        ]
+      },
+      "dimensions": [
+        "M10×100"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1105",
+      "nameZh": "左端安装座",
+      "nameEn": "INSTALLATION SEAT (L)",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          60.0,
+          230.64,
+          182.4,
+          416.16
+        ]
+      },
+      "dimensions": [
+        "150×95×80"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1106",
+      "nameZh": "右端安装座",
+      "nameEn": "INSTALLATION SEAT (R)",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          182.4,
+          230.64,
+          304.8,
+          416.16
+        ]
+      },
+      "dimensions": [
+        "150×95×80"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1101",
+      "nameZh": "压缩弹簧",
+      "nameEn": "COMPRESSED SPRING",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          304.8,
+          230.64,
+          427.2,
+          416.16
+        ]
+      },
+      "dimensions": [
+        "φ36×142.5"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1102",
+      "nameZh": "调节螺母",
+      "nameEn": "ADJUSTING NUT",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          427.2,
+          230.64,
+          549.6,
+          416.16
+        ]
+      },
+      "dimensions": [
+        "76",
+        "61",
+        "φ67"
+      ],
+      "existingIssues": [
+        "现有dims漏本格尺寸61"
+      ]
+    },
+    {
+      "code": "FA221D-1103",
+      "nameZh": "套筒",
+      "nameEn": "SLEEVE",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          60.0,
+          44.88,
+          182.4,
+          230.64
+        ]
+      },
+      "dimensions": [
+        "φ15×16",
+        "孔φ8"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1104",
+      "nameZh": "弹簧支座",
+      "nameEn": "SPRING SEAT",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          182.4,
+          44.88,
+          304.8,
+          230.64
+        ]
+      },
+      "dimensions": [
+        "φ35",
+        "φ25",
+        "φ20",
+        "40",
+        "50"
+      ],
+      "existingIssues": [
+        "现有dims漏本格尺寸40"
+      ]
+    },
+    {
+      "code": "FA221D-1105",
+      "nameZh": "左侧轴承座",
+      "nameEn": "BEARING SEAT (L)",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          304.8,
+          44.88,
+          427.2,
+          230.64
+        ]
+      },
+      "dimensions": [
+        "106",
+        "75",
+        "54",
+        "90"
+      ],
+      "existingIssues": [
+        "现有dims漏本格尺寸75"
+      ]
+    },
+    {
+      "code": "FA221D-1106",
+      "nameZh": "右端轴承座",
+      "nameEn": "BEARING SEAT (R)",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 13,
+      "sheetPage": "共4页第2页",
+      "cell": {
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          427.2,
+          44.88,
+          549.6,
+          230.64
+        ]
+      },
+      "dimensions": [
+        "147×65×37",
+        "φ87"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1107",
+      "nameZh": "偏心套",
+      "nameEn": "ECCENTRIC SLEEVE",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "六角24×16",
+        "台阶厚8"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1108",
+      "nameZh": "右侧轴承座",
+      "nameEn": "BEARING SEAT (R)",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318.0,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "75",
+        "106",
+        "90",
+        "54"
+      ],
+      "existingIssues": [
+        "现有dims漏54，并串入本格未标的φ87"
+      ]
+    },
+    {
+      "code": "FA221D-1109",
+      "nameZh": "左端轴承座",
+      "nameEn": "BEARING SEAT (L)",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ87",
+        "147",
+        "37"
+      ],
+      "existingIssues": [
+        "现有dims串入本格未标的90"
+      ]
+    },
+    {
+      "code": "FA221D-1110",
+      "nameZh": "板",
+      "nameEn": "PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "100×48×3"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1111",
+      "nameZh": "接近开关安装板",
+      "nameEn": "APPROACH SWITCH PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "88×50"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1120",
+      "nameZh": "销轴",
+      "nameEn": "SHAFT",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          418.56,
+          318.0,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "φ8×61"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1123",
+      "nameZh": "轴承盖",
+      "nameEn": "BEARING COVER",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "φ100/φ87×13"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1124",
+      "nameZh": "轴承盖",
+      "nameEn": "BEARING COVER",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "φ100/φ87×15"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1125",
+      "nameZh": "绝缘套",
+      "nameEn": "INSULATED SLEEVE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          238.56,
+          318.0,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "φ76/φ72×24"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1126",
+      "nameZh": "绝缘垫",
+      "nameEn": "INSULATED GASKET",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          238.56,
+          437.04,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "φ76/φ63×2"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1127",
+      "nameZh": "绝缘套",
+      "nameEn": "INSULATED SLEEVE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          238.56,
+          555.84,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "φ76/φ72×26.5"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1128",
+      "nameZh": "绝缘垫",
+      "nameEn": "INSULATED GASKET",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          58.32,
+          199.2,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "φ76/φ63×3"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1129",
+      "nameZh": "绝缘套",
+      "nameEn": "INSULATED SLEEVE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          58.32,
+          318.0,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "φ76/φ72×38"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1130",
+      "nameZh": "绝缘垫",
+      "nameEn": "INSULATED GASKET",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          58.32,
+          437.04,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "φ84/φ73×3"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1134",
+      "nameZh": "隔圈",
+      "nameEn": "SLEEVE",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 14,
+      "sheetPage": "共4页第3页",
+      "cell": {
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          58.32,
+          555.84,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "φ32/φ28×8"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA221D-1135",
+      "nameZh": "隔垫",
+      "nameEn": "WASHER",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ50",
+        "3"
+      ],
+      "existingIssues": [
+        "现有dims漏本格尺寸φ50"
+      ]
+    },
+    {
+      "code": "FA221D-1147",
+      "nameZh": "绝缘套",
+      "nameEn": "INSULATED SLEEVE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          598.8,
+          318.0,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ84/φ80×42"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225-1109",
+      "nameZh": "软管",
+      "nameEn": "DUST ABSORPTION HOSE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ6×1500"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225-1115",
+      "nameZh": "撑挡",
+      "nameEn": "SUPPORTING TRANSOM",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ20×936"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225-1116",
+      "nameZh": "17Z齿轮",
+      "nameEn": "GEAR",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "φ20",
+        "18"
+      ],
+      "existingIssues": [
+        "现有dims把名称中的17齿当成图形区尺寸"
+      ]
+    },
+    {
+      "code": "FA225-1117",
+      "nameZh": "齿轮轴",
+      "nameEn": "GEAR WHEEL AXIS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          418.56,
+          318.0,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "M12×1039"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225-1118",
+      "nameZh": "导向键",
+      "nameEn": "KEY",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          418.56,
+          437.04,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "70×10"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225-1119",
+      "nameZh": "隔距套",
+      "nameEn": "COLLAR",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          418.56,
+          555.84,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "35×10"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225-1120",
+      "nameZh": "指针",
+      "nameEn": "POINTER",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          238.56,
+          199.2,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "60×35×14"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225-1127",
+      "nameZh": "挡片",
+      "nameEn": "BAFFLE FLACK",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          199.2,
+          238.56,
+          318.0,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "5",
+        "φ48"
+      ],
+      "existingIssues": [
+        "现有dims把φ48写成48"
+      ]
+    },
+    {
+      "code": "FA225-1130",
+      "nameZh": "同步带轮（56Z）",
+      "nameEn": "SYNCHRONOUS PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          238.56,
+          437.04,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "φ142.6",
+        "32"
+      ],
+      "existingIssues": [
+        "现有dims把名称中的56齿当成图形区尺寸"
+      ]
+    },
+    {
+      "code": "FA225-1141",
+      "nameZh": "刻度牌",
+      "nameEn": "GRADUATION SCUTCHEON",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          238.56,
+          555.84,
+          418.56
+        ]
+      },
+      "dimensions": [
+        "15×37"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "FA225-11120",
+      "nameZh": "密封垫",
+      "nameEn": "SEALING RING",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          58.32,
+          199.2,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "φ112×3"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "TZH1091-12X17",
+      "nameZh": "带肩轴衬",
+      "nameEn": "DUSH",
+      "quantity": {
+        "value": 2,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          58.32,
+          437.04,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "φ55×26"
+      ],
+      "existingIssues": [
+        "现有nameEn写BUSH；厂家原格为DUSH，疑似厂家拼写错误"
+      ]
+    },
+    {
+      "code": "TZH1076",
+      "nameZh": "密封条",
+      "nameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 92,
+        "unit": "dm"
+      },
+      "assembly": "JWF1206-1100",
+      "pdfPage": 15,
+      "sheetPage": "共4页第4页",
+      "cell": {
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          58.32,
+          555.84,
+          238.56
+        ]
+      },
+      "dimensions": [
+        "8"
+      ],
+      "existingIssues": [
+        "现有dims把数量栏92 dm当长度；图形区只标8"
+      ]
+    },
+    {
+      "code": "JWF1206-1300-1",
+      "nameZh": "同步带轮结合件（26Z）",
+      "nameEn": "MOTOR SPROCKET SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1300",
+      "pdfPage": 16,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          598.8,
+          199.2,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "φ75",
+        "41"
+      ],
+      "existingIssues": [
+        "现有dims把名称中的26齿当成图形区尺寸"
+      ]
+    },
+    {
+      "code": "JWF1206-1301",
+      "nameZh": "撑杆",
+      "nameEn": "MOTOR SPROCKET",
+      "quantity": {
+        "value": 4,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1300",
+      "pdfPage": 16,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318.0,
+          598.8,
+          437.04,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "M12×55",
+        "六角18"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1302",
+      "nameZh": "电机安装板",
+      "nameEn": "MOTOR PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1300",
+      "pdfPage": 16,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          437.04,
+          598.8,
+          555.84,
+          778.8
+        ]
+      },
+      "dimensions": [
+        "180×160"
+      ],
+      "existingIssues": []
+    },
+    {
+      "code": "JWF1206-1303",
+      "nameZh": "垫圈",
+      "nameEn": "WASHER",
+      "quantity": {
+        "value": 1,
+        "unit": "件"
+      },
+      "assembly": "JWF1206-1300",
+      "pdfPage": 16,
+      "sheetPage": "共1页第1页",
+      "cell": {
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          80.4,
+          418.56,
+          199.2,
+          598.8
+        ]
+      },
+      "dimensions": [
+        "φ40×5"
+      ],
+      "existingIssues": []
+    }
+  ],
+  "validation": {
+    "recordsByPdfPage": {
+      "9": 14,
+      "10": 5,
+      "11": 10,
+      "12": 15,
+      "13": 15,
+      "14": 15,
+      "15": 15,
+      "16": 4
+    },
+    "recordCount": 93,
+    "uniqueNonEmptyCodeCount": 92,
+    "duplicateNonEmptyCodes": [],
+    "blankCodeRecords": [
+      "jwf1206:p10:r2:c1"
+    ],
+    "duplicatePageCells": [],
+    "existingDataRecordsInSamePageRange": 93,
+    "coverageResult": "93/93条，覆盖原页9-16所有非空零件格"
+  }
+}

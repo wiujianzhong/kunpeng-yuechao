@@ -1,0 +1,152 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1124c",
+  "manualTitle": "JWF1124C-160 外供立体图",
+  "sourcePdf": "assets/manuals/jwf1124c/original.pdf",
+  "sourcePdfSha256": "ec42899a1a8e5ede55ffbe298582ab9df153e5ae34dc246b2f1d996b4762d4c4",
+  "comparedDataFile": "data/jwf1124c-parts.js",
+  "scope": {
+    "pdfPages": [9, 10],
+    "assembly": "JWF1124C-160-0200B",
+    "partsTablePage": 9,
+    "sheetPage": "共3页第3页",
+    "itemRange": [51, 54],
+    "recordCount": 4,
+    "nextPageConfirmation": {
+      "pdfPage": 10,
+      "pageType": "给棉部件轴测爆炸总图",
+      "assembly": "JWF1124C-160-0300",
+      "nameZh": "给棉部件",
+      "nameEnSource": "FEED ASS.",
+      "sheetPageZh": "共5页第1页",
+      "sheetPageEn": "PAGE 1 OF 5",
+      "auditBoundary": "仅确认第10页已切换到给棉部件及其页眉、标题栏；本审计不展开第10页标号或装配关系"
+    }
+  },
+  "method": {
+    "pageRenderDpi": 500,
+    "cellCropDpi": 600,
+    "review": "第9—10页高清渲染复核；第9页逐格核对除尘部件最后4项，第10页只确认总成切换",
+    "cellRule": "第9页左表项目51—54，四边取PDF矢量格框中心线，恰好保留零件所在整格",
+    "quantityRule": "厂家表格数量栏按用户确认解释为单台设备用量",
+    "englishRule": "厂家明细行没有逐项英文；nameEn为辅助翻译并明确标注非厂家原文",
+    "dimensionRule": "只记录厂家名称栏明确规格"
+  },
+  "coordinateSystem": {
+    "unit": "pt",
+    "origin": "PDF左下角",
+    "pageSizePt": [842, 595],
+    "cropPolicy": "[left,bottom,right,top]沿格框中心线",
+    "leftTableXBoundsPt": [103.2, 455.52],
+    "rightTableXBoundsPt": [455.52, 808.08],
+    "rowBoundsPt": [493.2, 475.68, 457.92, 440.4, 422.64, 405.12, 387.36, 369.84, 352.32, 334.56, 317.04, 299.28, 281.76, 264, 246.48, 228.96, 211.2, 193.68, 175.92, 158.4, 140.88, 123.12, 105.6, 87.84, 70.32, 52.56, 35.04]
+  },
+  "partsTableOverview": {
+    "pdfPage": 9,
+    "pageType": "除尘部件明细表续页",
+    "companyZh": "恒天重工股份有限公司",
+    "companyEnSource": "HI-TECH HEAVY INDUSTRY CO.,LTD.",
+    "machineZh": "JWF1124C-160型开棉机",
+    "machineEnSource": "TYPE JWF1124C-160 OPENER",
+    "titleBlock": {
+      "code": "JWF1124C-160-0200B",
+      "nameZh": "除尘部件",
+      "nameEnSource": "DEDUST ASS.",
+      "sheetPageZh": "共3页第3页",
+      "sheetPageEn": "PAGE 3 OF 3"
+    },
+    "confirmedItems": [51, 52, 53, 54]
+  },
+  "coverageIssues": [
+    "现有索引第9页4项件号、中文名称和明确规格与厂家表一致",
+    "现有索引缺少第9页4项的单台设备用量、逐格cropBox和厂家原格资产",
+    "厂家第9页明细行没有逐项英文，辅助英文不得冒充厂家原文"
+  ],
+  "issueSummary": {
+    "recordCount": 4,
+    "codeMismatch": 0,
+    "nameZhMismatch": 0,
+    "dimensionMismatch": 0,
+    "missingQuantityInExistingIndex": 4,
+    "missingSourceCropInExistingIndex": 4,
+    "sourceEnglishUnavailable": 4,
+    "normalizedEnglishSpecExpanded": 4,
+    "duplicateSourceCode": {
+      "GB879": 3
+    }
+  },
+  "parts": [
+    {
+      "item": 51,
+      "recordKey": "jwf1124c-p09-item-51",
+      "code": "GB97.1",
+      "nameZh": "垫圈 10",
+      "nameEn": "WASHER 10",
+      "sourceNameEn": null,
+      "englishNote": "厂家第9页明细行未提供英文；nameEn为核对后的辅助翻译",
+      "quantity": {"value": 12, "unit": "件", "meaning": "单台设备用量"},
+      "assembly": "JWF1124C-160-0200B",
+      "pdfPage": 9,
+      "sheetPage": "共3页第3页",
+      "cell": {"table": "左表", "row": 1, "column": 1, "cropBoxPt": [103.2, 475.68, 455.52, 493.2]},
+      "dimensions": ["10"],
+      "dimensionSource": "厂家名称栏明确规格：10",
+      "sourceSlug": "p09-item-51-GB97.1",
+      "existingIssues": ["现有索引nameEn只保留类别，未带厂家规格；本核对数据补全规格"]
+    },
+    {
+      "item": 52,
+      "recordKey": "jwf1124c-p09-item-52",
+      "code": "GB879",
+      "nameZh": "销 4X18",
+      "nameEn": "PIN 4X18",
+      "sourceNameEn": null,
+      "englishNote": "厂家第9页明细行未提供英文；nameEn为核对后的辅助翻译",
+      "quantity": {"value": 2, "unit": "件", "meaning": "单台设备用量"},
+      "assembly": "JWF1124C-160-0200B",
+      "pdfPage": 9,
+      "sheetPage": "共3页第3页",
+      "cell": {"table": "左表", "row": 2, "column": 1, "cropBoxPt": [103.2, 457.92, 455.52, 475.68]},
+      "dimensions": ["4X18"],
+      "dimensionSource": "厂家名称栏明确规格：4X18",
+      "sourceSlug": "p09-item-52-GB879",
+      "existingIssues": ["现有索引nameEn只保留类别，未带厂家规格；本核对数据补全规格"]
+    },
+    {
+      "item": 53,
+      "recordKey": "jwf1124c-p09-item-53",
+      "code": "GB879",
+      "nameZh": "销 5X12",
+      "nameEn": "PIN 5X12",
+      "sourceNameEn": null,
+      "englishNote": "厂家第9页明细行未提供英文；nameEn为核对后的辅助翻译",
+      "quantity": {"value": 4, "unit": "件", "meaning": "单台设备用量"},
+      "assembly": "JWF1124C-160-0200B",
+      "pdfPage": 9,
+      "sheetPage": "共3页第3页",
+      "cell": {"table": "左表", "row": 3, "column": 1, "cropBoxPt": [103.2, 440.4, 455.52, 457.92]},
+      "dimensions": ["5X12"],
+      "dimensionSource": "厂家名称栏明确规格：5X12",
+      "sourceSlug": "p09-item-53-GB879",
+      "existingIssues": ["现有索引nameEn只保留类别，未带厂家规格；本核对数据补全规格"]
+    },
+    {
+      "item": 54,
+      "recordKey": "jwf1124c-p09-item-54",
+      "code": "GB879",
+      "nameZh": "销 6X20",
+      "nameEn": "PIN 6X20",
+      "sourceNameEn": null,
+      "englishNote": "厂家第9页明细行未提供英文；nameEn为核对后的辅助翻译",
+      "quantity": {"value": 12, "unit": "件", "meaning": "单台设备用量"},
+      "assembly": "JWF1124C-160-0200B",
+      "pdfPage": 9,
+      "sheetPage": "共3页第3页",
+      "cell": {"table": "左表", "row": 4, "column": 1, "cropBoxPt": [103.2, 422.64, 455.52, 440.4]},
+      "dimensions": ["6X20"],
+      "dimensionSource": "厂家名称栏明确规格：6X20",
+      "sourceSlug": "p09-item-54-GB879",
+      "existingIssues": ["现有索引nameEn只保留类别，未带厂家规格；本核对数据补全规格"]
+    }
+  ]
+}

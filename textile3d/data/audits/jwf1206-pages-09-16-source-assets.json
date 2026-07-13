@@ -1,0 +1,1030 @@
+{
+  "output_dir": "assets/manuals/jwf1206/crops",
+  "crop_dpi": 600,
+  "full_page": false,
+  "items": [
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        80.4,
+        598.8,
+        199.2,
+        778.8
+      ],
+      "slug": "JWF1206-0200-1"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        199.2,
+        598.8,
+        318.0,
+        778.8
+      ],
+      "slug": "JWF1206-0201"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        318.0,
+        598.8,
+        437.04,
+        778.8
+      ],
+      "slug": "JWF1206-0202"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        437.04,
+        598.8,
+        555.84,
+        778.8
+      ],
+      "slug": "JWF1206-0203"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        80.4,
+        418.56,
+        199.2,
+        598.8
+      ],
+      "slug": "JWF1206-0204"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        318.0,
+        418.56,
+        437.04,
+        598.8
+      ],
+      "slug": "FA221B-0203"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        437.04,
+        418.56,
+        555.84,
+        598.8
+      ],
+      "slug": "FA221B-0204"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        80.4,
+        238.56,
+        199.2,
+        418.56
+      ],
+      "slug": "FA221B-0205"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        199.2,
+        238.56,
+        318.0,
+        418.56
+      ],
+      "slug": "FA225B-0201"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        318.0,
+        238.56,
+        437.04,
+        418.56
+      ],
+      "slug": "FA225B-0202"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        437.04,
+        238.56,
+        555.84,
+        418.56
+      ],
+      "slug": "FA225B-0203"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        80.4,
+        58.32,
+        199.2,
+        238.56
+      ],
+      "slug": "FA221D-0203"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        318.0,
+        58.32,
+        437.04,
+        238.56
+      ],
+      "slug": "ZFA211-0201A"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 9,
+      "crop_box": [
+        437.04,
+        58.32,
+        555.84,
+        238.56
+      ],
+      "slug": "ZFA211-0203_0205"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 10,
+      "crop_box": [
+        80.4,
+        598.8,
+        199.2,
+        778.8
+      ],
+      "slug": "ZFA211-0206"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 10,
+      "crop_box": [
+        199.2,
+        598.8,
+        318.0,
+        778.8
+      ],
+      "slug": "ZFA211-1212"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 10,
+      "crop_box": [
+        318.0,
+        598.8,
+        437.04,
+        778.8
+      ],
+      "slug": "ZFA211-4142"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 10,
+      "crop_box": [
+        437.04,
+        598.8,
+        555.84,
+        778.8
+      ],
+      "slug": "ZFA211A-0201A"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 10,
+      "crop_box": [
+        80.4,
+        418.56,
+        199.2,
+        598.8
+      ],
+      "slug": "jwf1206_p10_r2_c1"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 11,
+      "crop_box": [
+        80.4,
+        598.8,
+        199.2,
+        778.8
+      ],
+      "slug": "JWF1202-0301_SMC_"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 11,
+      "crop_box": [
+        199.2,
+        598.8,
+        318.0,
+        778.8
+      ],
+      "slug": "JWF1202-0302"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 11,
+      "crop_box": [
+        318.0,
+        598.8,
+        437.04,
+        778.8
+      ],
+      "slug": "JWF1202-0303"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 11,
+      "crop_box": [
+        437.04,
+        598.8,
+        555.84,
+        778.8
+      ],
+      "slug": "JWF1202-0304"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 11,
+      "crop_box": [
+        80.4,
+        418.56,
+        199.2,
+        598.8
+      ],
+      "slug": "JWF1202-0305"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 11,
+      "crop_box": [
+        199.2,
+        418.56,
+        318.0,
+        598.8
+      ],
+      "slug": "JWF1202-0306"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 11,
+      "crop_box": [
+        318.0,
+        418.56,
+        437.04,
+        598.8
+      ],
+      "slug": "JWF1202-0307"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 11,
+      "crop_box": [
+        437.04,
+        418.56,
+        555.84,
+        598.8
+      ],
+      "slug": "JWF1202-0308"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 11,
+      "crop_box": [
+        80.4,
+        238.56,
+        199.2,
+        418.56
+      ],
+      "slug": "ZFA211A-0302"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 11,
+      "crop_box": [
+        199.2,
+        238.56,
+        318.0,
+        418.56
+      ],
+      "slug": "ZFA211A-0303"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        80.4,
+        598.8,
+        199.2,
+        778.8
+      ],
+      "slug": "JWF1206-1100-1"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        199.2,
+        598.8,
+        318.0,
+        778.8
+      ],
+      "slug": "JWF1206-1100-2"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        318.0,
+        598.8,
+        437.04,
+        778.8
+      ],
+      "slug": "JWF1206-1100-3"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        437.04,
+        598.8,
+        555.84,
+        778.8
+      ],
+      "slug": "JWF1206-1100-4"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        80.4,
+        418.56,
+        199.2,
+        598.8
+      ],
+      "slug": "JWF1206-1100-5"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        199.2,
+        418.56,
+        318.0,
+        598.8
+      ],
+      "slug": "JWF1206-1100-6"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        318.0,
+        418.56,
+        437.04,
+        598.8
+      ],
+      "slug": "JWF1206-1100-7"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        437.04,
+        418.56,
+        555.84,
+        598.8
+      ],
+      "slug": "JWF1206-1100-8"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        80.4,
+        238.56,
+        199.2,
+        418.56
+      ],
+      "slug": "JWF1206-1100-9"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        199.2,
+        238.56,
+        318.0,
+        418.56
+      ],
+      "slug": "JWF1206-1100-10"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        318.0,
+        238.56,
+        437.04,
+        418.56
+      ],
+      "slug": "JWF1206-1100-11"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        437.04,
+        238.56,
+        555.84,
+        418.56
+      ],
+      "slug": "JWF1206-1100-12"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        199.2,
+        58.32,
+        318.0,
+        238.56
+      ],
+      "slug": "FA221D-1100-3"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        318.0,
+        58.32,
+        437.04,
+        238.56
+      ],
+      "slug": "FA221D-1100-4"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 12,
+      "crop_box": [
+        437.04,
+        58.32,
+        555.84,
+        238.56
+      ],
+      "slug": "FA221D-1100-5"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        60.0,
+        601.92,
+        182.4,
+        787.44
+      ],
+      "slug": "FA225-1100-1"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        182.4,
+        601.92,
+        304.8,
+        787.44
+      ],
+      "slug": "FA225-1100-2A"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        304.8,
+        601.92,
+        427.2,
+        787.44
+      ],
+      "slug": "FA225-1100-13A"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        60.0,
+        416.16,
+        182.4,
+        601.92
+      ],
+      "slug": "JWF1206-1101"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        182.4,
+        416.16,
+        304.8,
+        601.92
+      ],
+      "slug": "JWF1206-1102"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        304.8,
+        416.16,
+        427.2,
+        601.92
+      ],
+      "slug": "JWF1206-1103"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        427.2,
+        416.16,
+        549.6,
+        601.92
+      ],
+      "slug": "JWF1206-1104"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        60.0,
+        230.64,
+        182.4,
+        416.16
+      ],
+      "slug": "JWF1206-1105"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        182.4,
+        230.64,
+        304.8,
+        416.16
+      ],
+      "slug": "JWF1206-1106"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        304.8,
+        230.64,
+        427.2,
+        416.16
+      ],
+      "slug": "FA221D-1101"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        427.2,
+        230.64,
+        549.6,
+        416.16
+      ],
+      "slug": "FA221D-1102"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        60.0,
+        44.88,
+        182.4,
+        230.64
+      ],
+      "slug": "FA221D-1103"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        182.4,
+        44.88,
+        304.8,
+        230.64
+      ],
+      "slug": "FA221D-1104"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        304.8,
+        44.88,
+        427.2,
+        230.64
+      ],
+      "slug": "FA221D-1105"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 13,
+      "crop_box": [
+        427.2,
+        44.88,
+        549.6,
+        230.64
+      ],
+      "slug": "FA221D-1106"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        80.4,
+        598.8,
+        199.2,
+        778.8
+      ],
+      "slug": "FA221D-1107"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        199.2,
+        598.8,
+        318.0,
+        778.8
+      ],
+      "slug": "FA221D-1108"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        318.0,
+        598.8,
+        437.04,
+        778.8
+      ],
+      "slug": "FA221D-1109"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        437.04,
+        598.8,
+        555.84,
+        778.8
+      ],
+      "slug": "FA221D-1110"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        80.4,
+        418.56,
+        199.2,
+        598.8
+      ],
+      "slug": "FA221D-1111"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        199.2,
+        418.56,
+        318.0,
+        598.8
+      ],
+      "slug": "FA221D-1120"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        437.04,
+        418.56,
+        555.84,
+        598.8
+      ],
+      "slug": "FA221D-1123"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        80.4,
+        238.56,
+        199.2,
+        418.56
+      ],
+      "slug": "FA221D-1124"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        199.2,
+        238.56,
+        318.0,
+        418.56
+      ],
+      "slug": "FA221D-1125"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        318.0,
+        238.56,
+        437.04,
+        418.56
+      ],
+      "slug": "FA221D-1126"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        437.04,
+        238.56,
+        555.84,
+        418.56
+      ],
+      "slug": "FA221D-1127"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        80.4,
+        58.32,
+        199.2,
+        238.56
+      ],
+      "slug": "FA221D-1128"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        199.2,
+        58.32,
+        318.0,
+        238.56
+      ],
+      "slug": "FA221D-1129"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        318.0,
+        58.32,
+        437.04,
+        238.56
+      ],
+      "slug": "FA221D-1130"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 14,
+      "crop_box": [
+        437.04,
+        58.32,
+        555.84,
+        238.56
+      ],
+      "slug": "FA221D-1134"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        80.4,
+        598.8,
+        199.2,
+        778.8
+      ],
+      "slug": "FA221D-1135"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        199.2,
+        598.8,
+        318.0,
+        778.8
+      ],
+      "slug": "FA221D-1147"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        318.0,
+        598.8,
+        437.04,
+        778.8
+      ],
+      "slug": "FA225-1109"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        437.04,
+        598.8,
+        555.84,
+        778.8
+      ],
+      "slug": "FA225-1115"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        80.4,
+        418.56,
+        199.2,
+        598.8
+      ],
+      "slug": "FA225-1116"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        199.2,
+        418.56,
+        318.0,
+        598.8
+      ],
+      "slug": "FA225-1117"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        318.0,
+        418.56,
+        437.04,
+        598.8
+      ],
+      "slug": "FA225-1118"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        437.04,
+        418.56,
+        555.84,
+        598.8
+      ],
+      "slug": "FA225-1119"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        80.4,
+        238.56,
+        199.2,
+        418.56
+      ],
+      "slug": "FA225-1120"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        199.2,
+        238.56,
+        318.0,
+        418.56
+      ],
+      "slug": "FA225-1127"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        318.0,
+        238.56,
+        437.04,
+        418.56
+      ],
+      "slug": "FA225-1130"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        437.04,
+        238.56,
+        555.84,
+        418.56
+      ],
+      "slug": "FA225-1141"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        80.4,
+        58.32,
+        199.2,
+        238.56
+      ],
+      "slug": "FA225-11120"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        318.0,
+        58.32,
+        437.04,
+        238.56
+      ],
+      "slug": "TZH1091-12X17"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 15,
+      "crop_box": [
+        437.04,
+        58.32,
+        555.84,
+        238.56
+      ],
+      "slug": "TZH1076"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 16,
+      "crop_box": [
+        80.4,
+        598.8,
+        199.2,
+        778.8
+      ],
+      "slug": "JWF1206-1300-1"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 16,
+      "crop_box": [
+        318.0,
+        598.8,
+        437.04,
+        778.8
+      ],
+      "slug": "JWF1206-1301"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 16,
+      "crop_box": [
+        437.04,
+        598.8,
+        555.84,
+        778.8
+      ],
+      "slug": "JWF1206-1302"
+    },
+    {
+      "source_pdf": "assets/manuals/jwf1206/original.pdf",
+      "page": 16,
+      "crop_box": [
+        80.4,
+        418.56,
+        199.2,
+        598.8
+      ],
+      "slug": "JWF1206-1303"
+    }
+  ]
+}

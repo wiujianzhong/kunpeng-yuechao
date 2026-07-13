@@ -1,0 +1,4145 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1012",
+  "manualTitle": "JWF1012机件略图",
+  "sourcePdf": "assets/manuals/jwf1012/original.pdf",
+  "sourcePdfSha256": "052bfa5053b5cb5077fab0b9ec77e9d6cc07be213bc7904c7e7439c45873c691",
+  "scope": {
+    "pdfPages": [
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33
+    ],
+    "recordCount": 107,
+    "recordCountsByPage": {
+      "26": 15,
+      "27": 16,
+      "28": 8,
+      "29": 15,
+      "30": 14,
+      "31": 15,
+      "32": 14,
+      "33": 10
+    },
+    "quantityTotalsByUnit": {
+      "件": 529
+    },
+    "assemblies": [
+      "FA006C-1300",
+      "FA006C-1600",
+      "FA006C-1700",
+      "FA006C-1800",
+      "FA006C-1900",
+      "FA006C-2100A",
+      "FA006C-2900"
+    ]
+  },
+  "method": {
+    "pageRenderDpi": 600,
+    "cellCropDpi": 600,
+    "fullPageDpi": 600,
+    "review": "第26—33页先按600dpi整页逐格阅读，再沿PDF矢量四列×四行主格边界裁出107个非空零件单格。",
+    "cellRule": "每个cropBox恰好沿该零件格四条外框中心线，完整保留件号、中英文名、单台数量和工程图；空格不生成记录。",
+    "quantityRule": "名称右侧数字只按单台设备用量记录，不解释为库存或包装数。",
+    "identityRule": "件号、中文名、英文原文、数量、页眉和页码只认厂家原格；第32页三个E2项以recordKey独立保留，不因重复件号合并。",
+    "dimensionRule": "dimensions只保存厂家单格工程图或名称中可确认的明确规格；未标尺寸保持空数组，不从旧索引反填。",
+    "englishRule": "英文名按厂家原格逐字保存；第30页卷帘（二）的英文仍为SUB-ASS(A)，不静默改成B。"
+  },
+  "pageHeaders": [
+    {
+      "pdfPage": 26,
+      "assembly": "FA006C-1300",
+      "sheetPageZh": "共2页第2页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 27,
+      "assembly": "FA006C-1600",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 28,
+      "assembly": "FA006C-1700",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 29,
+      "assembly": "FA006C-1800",
+      "sheetPageZh": "共2页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 30,
+      "assembly": "FA006C-1900",
+      "sheetPageZh": "共2页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 31,
+      "assembly": "FA006C-1900",
+      "sheetPageZh": "共2页第2页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 32,
+      "assembly": "FA006C-2100A",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null
+    },
+    {
+      "pdfPage": 33,
+      "assembly": "FA006C-2900",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null
+    }
+  ],
+  "coordinateSystem": {
+    "unit": "pt",
+    "origin": "PDF左下角",
+    "pageSizePt": [
+      595,
+      842
+    ],
+    "cropPolicy": "cropBoxPt为[left,bottom,right,top]，沿各页实际矢量主格四边中心线",
+    "pages": {
+      "26": {
+        "xBoundsPt": [
+          87.12,
+          202.8,
+          318.72,
+          434.4,
+          550.32
+        ],
+        "yBoundsPtTopToBottom": [
+          754.32,
+          587.04,
+          420,
+          252.72,
+          85.68
+        ]
+      },
+      "27": {
+        "xBoundsPt": [
+          87.12,
+          202.8,
+          318.72,
+          434.4,
+          550.32
+        ],
+        "yBoundsPtTopToBottom": [
+          754.32,
+          587.04,
+          420,
+          252.72,
+          85.68
+        ]
+      },
+      "28": {
+        "xBoundsPt": [
+          87.12,
+          202.8,
+          318.72,
+          434.4,
+          550.32
+        ],
+        "yBoundsPtTopToBottom": [
+          754.32,
+          587.04,
+          420,
+          252.72,
+          85.68
+        ]
+      },
+      "29": {
+        "xBoundsPt": [
+          87.12,
+          202.8,
+          318.72,
+          434.4,
+          550.32
+        ],
+        "yBoundsPtTopToBottom": [
+          758.16,
+          588.96,
+          420,
+          250.8,
+          81.84
+        ]
+      },
+      "30": {
+        "xBoundsPt": [
+          87.12,
+          204.24,
+          321.36,
+          438.48,
+          555.36
+        ],
+        "yBoundsPtTopToBottom": [
+          754.32,
+          587.04,
+          420,
+          252.72,
+          85.44
+        ]
+      },
+      "31": {
+        "xBoundsPt": [
+          87.12,
+          204.24,
+          321.36,
+          438.48,
+          555.36
+        ],
+        "yBoundsPtTopToBottom": [
+          754.32,
+          587.04,
+          420,
+          252.72,
+          85.44
+        ]
+      },
+      "32": {
+        "xBoundsPt": [
+          87.12,
+          203.52,
+          319.68,
+          436.08,
+          552.48
+        ],
+        "yBoundsPtTopToBottom": [
+          758.16,
+          588.96,
+          420,
+          250.8,
+          81.84
+        ]
+      },
+      "33": {
+        "xBoundsPt": [
+          87.12,
+          197.52,
+          308.16,
+          418.56,
+          529.2
+        ],
+        "yBoundsPtTopToBottom": [
+          754.56,
+          587.28,
+          420,
+          252.72,
+          85.44
+        ]
+      }
+    }
+  },
+  "sheetDrawings": [
+    {
+      "pdfPage": 26,
+      "assembly": "FA006C-1300",
+      "sheetPageZh": "共2页第2页",
+      "sheetPageEn": null,
+      "sourceSlug": "jwf1012-p26-full-page",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-full-page.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-full-page.pdf",
+      "cropBoxPt": [
+        0,
+        0,
+        595,
+        842
+      ]
+    },
+    {
+      "pdfPage": 27,
+      "assembly": "FA006C-1600",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null,
+      "sourceSlug": "jwf1012-p27-full-page",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-full-page.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-full-page.pdf",
+      "cropBoxPt": [
+        0,
+        0,
+        595,
+        842
+      ]
+    },
+    {
+      "pdfPage": 28,
+      "assembly": "FA006C-1700",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null,
+      "sourceSlug": "jwf1012-p28-full-page",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p28-full-page.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p28-full-page.pdf",
+      "cropBoxPt": [
+        0,
+        0,
+        595,
+        842
+      ]
+    },
+    {
+      "pdfPage": 29,
+      "assembly": "FA006C-1800",
+      "sheetPageZh": "共2页第1页",
+      "sheetPageEn": null,
+      "sourceSlug": "jwf1012-p29-full-page",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-full-page.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-full-page.pdf",
+      "cropBoxPt": [
+        0,
+        0,
+        595,
+        842
+      ]
+    },
+    {
+      "pdfPage": 30,
+      "assembly": "FA006C-1900",
+      "sheetPageZh": "共2页第1页",
+      "sheetPageEn": null,
+      "sourceSlug": "jwf1012-p30-full-page",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-full-page.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-full-page.pdf",
+      "cropBoxPt": [
+        0,
+        0,
+        595,
+        842
+      ]
+    },
+    {
+      "pdfPage": 31,
+      "assembly": "FA006C-1900",
+      "sheetPageZh": "共2页第2页",
+      "sheetPageEn": null,
+      "sourceSlug": "jwf1012-p31-full-page",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-full-page.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-full-page.pdf",
+      "cropBoxPt": [
+        0,
+        0,
+        595,
+        842
+      ]
+    },
+    {
+      "pdfPage": 32,
+      "assembly": "FA006C-2100A",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null,
+      "sourceSlug": "jwf1012-p32-full-page",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-full-page.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-full-page.pdf",
+      "cropBoxPt": [
+        0,
+        0,
+        595,
+        842
+      ]
+    },
+    {
+      "pdfPage": 33,
+      "assembly": "FA006C-2900",
+      "sheetPageZh": "共1页第1页",
+      "sheetPageEn": null,
+      "sourceSlug": "jwf1012-p33-full-page",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p33-full-page.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p33-full-page.pdf",
+      "cropBoxPt": [
+        0,
+        0,
+        595,
+        842
+      ]
+    }
+  ],
+  "sourceAmbiguities": [
+    "第28页BDT019-1700-1法兰套结合件的单格只明确标注长度70，未使用旧索引中无原格依据的直径数值。",
+    "第30页卷帘（一）单格未标尺寸；卷帘（二）只标厚0.8，不把导辊的780反填到卷帘。",
+    "第30页卷帘（二）中文为（二），英文却仍印SUB-ASS(A)；两者均保留。",
+    "第32页FA006C-2108图示厚1，旧索引为2；本次以原格为准。",
+    "第32页TZH1087名称1.5×4×0.15与图示150×15×4同时保留，不擅自换算单位。"
+  ],
+  "existingIndexComparison": {
+    "existingFile": "data/jwf1012-parts.js",
+    "issues": [
+      "旧索引的检索维度只用于定位候选格；本次件号、名称、数量和dimensions已逐格回看600dpi原图。",
+      "旧索引把第26页覆盖带厚4记为14、把调节垫片宽45记为15；本次以原格为准。",
+      "旧索引为第28页法兰套反填了单格未标的直径，本次仅保留原格明确的70。",
+      "旧索引为第30页两个卷帘都写了780和0.8；本次按各自原格分别保留空数组与0.8。"
+    ]
+  },
+  "parts": [
+    {
+      "pdfPage": 26,
+      "item": 1,
+      "recordKey": "jwf1012-p26-item-001",
+      "assembly": "FA006C-1300",
+      "code": "FA006C-1309",
+      "nameZh": "覆盖带",
+      "sourceNameEn": "COVER BELT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "宽380",
+        "厚4",
+        "标准长度25米"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          587.04,
+          202.8,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-001",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-001.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 2,
+      "recordKey": "jwf1012-p26-item-002",
+      "assembly": "FA006C-1300",
+      "code": "FA006C-1310",
+      "nameZh": "压板",
+      "sourceNameEn": "PRESS PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "380×20",
+        "孔距68"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          587.04,
+          318.72,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-002",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-002.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-002.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 3,
+      "recordKey": "jwf1012-p26-item-003",
+      "assembly": "FA006C-1300",
+      "code": "BDT019-1301",
+      "nameZh": "盖板",
+      "sourceNameEn": "COVER PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "700×530×25"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          587.04,
+          434.4,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-003",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-003.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 4,
+      "recordKey": "jwf1012-p26-item-004",
+      "assembly": "FA006C-1300",
+      "code": "BDT019-1331",
+      "nameZh": "板",
+      "sourceNameEn": "PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "380×25"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          587.04,
+          550.32,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-004",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-004.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 5,
+      "recordKey": "jwf1012-p26-item-005",
+      "assembly": "FA006C-1300",
+      "code": "BDT019-1332",
+      "nameZh": "垫板",
+      "sourceNameEn": "PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "140×40"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          420,
+          202.8,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-005",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-005.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 6,
+      "recordKey": "jwf1012-p26-item-006",
+      "assembly": "FA006C-1300",
+      "code": "BDT019-1333",
+      "nameZh": "垫板",
+      "sourceNameEn": "PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "105×30"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          420,
+          318.72,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-006",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-006.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 7,
+      "recordKey": "jwf1012-p26-item-007",
+      "assembly": "FA006C-1300",
+      "code": "BDT019-1334",
+      "nameZh": "压板",
+      "sourceNameEn": "PRESS PLATE",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "140×30"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          420,
+          434.4,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-007",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-007.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-007.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 8,
+      "recordKey": "jwf1012-p26-item-008",
+      "assembly": "FA006C-1300",
+      "code": "BDT019-1335",
+      "nameZh": "链轮",
+      "sourceNameEn": "SPROCKET",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ182×40"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          420,
+          550.32,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-008",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-008.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 9,
+      "recordKey": "jwf1012-p26-item-009",
+      "assembly": "FA006C-1300",
+      "code": "TF2244",
+      "nameZh": "铰链",
+      "sourceNameEn": "HINGE",
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "60×30"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          252.72,
+          202.8,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-009",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-009.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-009.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 10,
+      "recordKey": "jwf1012-p26-item-010",
+      "assembly": "FA006C-1300",
+      "code": "TZH1050",
+      "nameZh": "菱形轴承座20",
+      "sourceNameEn": "LOZENGE BEARING SEAT",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "90",
+        "φ60",
+        "φ51"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          252.72,
+          318.72,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-010",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-010.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-010.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 11,
+      "recordKey": "jwf1012-p26-item-011",
+      "assembly": "FA006C-1300",
+      "code": "TZH1051",
+      "nameZh": "圆形轴承座25",
+      "sourceNameEn": "ROUND BEARING SEAT",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ115",
+        "φ92"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          252.72,
+          434.4,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-011",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-011.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-011.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 12,
+      "recordKey": "jwf1012-p26-item-012",
+      "assembly": "FA006C-1300",
+      "code": "TZH1073",
+      "nameZh": "密封条II-7m",
+      "sourceNameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "截面10×14.8×3.8",
+        "名称标II-7m"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          252.72,
+          550.32,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-012",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-012.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-012.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 13,
+      "recordKey": "jwf1012-p26-item-013",
+      "assembly": "FA006C-1300",
+      "code": "FA006C-1321",
+      "nameZh": "调节垫片",
+      "sourceNameEn": "REGULATING GASKET",
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "90×45",
+        "φ15",
+        "t0.1"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          85.68,
+          202.8,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-013",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-013.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-013.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 14,
+      "recordKey": "jwf1012-p26-item-014",
+      "assembly": "FA006C-1300",
+      "code": "FA006C-1322",
+      "nameZh": "调节垫片",
+      "sourceNameEn": "REGULATING GASKET",
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "90×45",
+        "φ15",
+        "t0.15"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          85.68,
+          318.72,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-014",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-014.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-014.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 26,
+      "item": 15,
+      "recordKey": "jwf1012-p26-item-015",
+      "assembly": "FA006C-1300",
+      "code": "FA006C-1323",
+      "nameZh": "调节垫片",
+      "sourceNameEn": "REGULATING GASKET",
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "90×45",
+        "φ15",
+        "t0.5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          85.68,
+          434.4,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p26-item-015",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p26-item-015.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p26-item-015.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 1,
+      "recordKey": "jwf1012-p27-item-001",
+      "assembly": "FA006C-1600",
+      "code": "FA006C-1600-1",
+      "nameZh": "刷子座结合件",
+      "sourceNameEn": "BRUSH SEAT SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "260×40×19"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          587.04,
+          202.8,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-001",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-001.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 2,
+      "recordKey": "jwf1012-p27-item-002",
+      "assembly": "FA006C-1600",
+      "code": "FA006C-1600-2",
+      "nameZh": "刷子座结合件",
+      "sourceNameEn": "BRUSH SEAT SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "238×40×13"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          587.04,
+          318.72,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-002",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-002.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-002.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 3,
+      "recordKey": "jwf1012-p27-item-003",
+      "assembly": "FA006C-1600",
+      "code": "FA006C-1600-3A",
+      "nameZh": "刷子座结合件",
+      "sourceNameEn": "BRUSH SEAT SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "266×20×13"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          587.04,
+          434.4,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-003",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-003.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 4,
+      "recordKey": "jwf1012-p27-item-004",
+      "assembly": "FA006C-1600",
+      "code": "FA006C-1600-4A",
+      "nameZh": "刷子座结合件",
+      "sourceNameEn": "BRUSH SEAT SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "244×20×13"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          587.04,
+          550.32,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-004",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-004.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 5,
+      "recordKey": "jwf1012-p27-item-005",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1600-1",
+      "nameZh": "座架结合件",
+      "sourceNameEn": "SEAT FRAME SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "580×470×210"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          420,
+          202.8,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-005",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-005.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 6,
+      "recordKey": "jwf1012-p27-item-006",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1600-4",
+      "nameZh": "输棉斗结合件",
+      "sourceNameEn": "DELIVERY HOPPER SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "405.5×350×232.5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          420,
+          318.72,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-006",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-006.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 7,
+      "recordKey": "jwf1012-p27-item-007",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1600-6",
+      "nameZh": "输棉方管结合件",
+      "sourceNameEn": "DELIVERY SQUARE TUBE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1335×263×260"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          420,
+          434.4,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-007",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-007.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-007.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 8,
+      "recordKey": "jwf1012-p27-item-008",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1601",
+      "nameZh": "挡风板",
+      "sourceNameEn": "WIND PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "400×244×40"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          420,
+          550.32,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-008",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-008.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 9,
+      "recordKey": "jwf1012-p27-item-009",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1602",
+      "nameZh": "压板",
+      "sourceNameEn": "PRESS PLATE",
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "235×20×5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          252.72,
+          202.8,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-009",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-009.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-009.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 10,
+      "recordKey": "jwf1012-p27-item-010",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1605",
+      "nameZh": "销轴",
+      "sourceNameEn": "SHAFT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "45",
+        "φ12"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          252.72,
+          318.72,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-010",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-010.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-010.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 11,
+      "recordKey": "jwf1012-p27-item-011",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1606",
+      "nameZh": "连接板",
+      "sourceNameEn": "CONNECTING PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "80×60×6"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          252.72,
+          434.4,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-011",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-011.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-011.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 12,
+      "recordKey": "jwf1012-p27-item-012",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1607",
+      "nameZh": "密封条",
+      "sourceNameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "70×20×12.5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          252.72,
+          550.32,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-012",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-012.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-012.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 13,
+      "recordKey": "jwf1012-p27-item-013",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1610",
+      "nameZh": "压板",
+      "sourceNameEn": "PRESS PLATE",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "122×12×5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          85.68,
+          202.8,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-013",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-013.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-013.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 14,
+      "recordKey": "jwf1012-p27-item-014",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1611",
+      "nameZh": "密封板",
+      "sourceNameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ297",
+        "厚2"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          85.68,
+          318.72,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-014",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-014.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-014.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 15,
+      "recordKey": "jwf1012-p27-item-015",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1612",
+      "nameZh": "圆法兰",
+      "sourceNameEn": "ROUND FLANGE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ310",
+        "厚2"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          85.68,
+          434.4,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-015",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-015.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-015.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 27,
+      "item": 16,
+      "recordKey": "jwf1012-p27-item-016",
+      "assembly": "FA006C-1600",
+      "code": "BDT019-1613",
+      "nameZh": "销钉",
+      "sourceNameEn": "PIN",
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ20",
+        "总高21",
+        "杆φ10"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          85.68,
+          550.32,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p27-item-016",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p27-item-016.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p27-item-016.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 28,
+      "item": 1,
+      "recordKey": "jwf1012-p28-item-001",
+      "assembly": "FA006C-1700",
+      "code": "FA006B-0800-4A",
+      "nameZh": "伸缩管结合件",
+      "sourceNameEn": "TELESCOPIC TUBE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "2200",
+        "φ310"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          587.04,
+          202.8,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p28-item-001",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p28-item-001.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p28-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 28,
+      "item": 2,
+      "recordKey": "jwf1012-p28-item-002",
+      "assembly": "FA006C-1700",
+      "code": "FA006C-1700-1",
+      "nameZh": "管卡结合件",
+      "sourceNameEn": "PIPE CLAMP SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ304",
+        "185"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          587.04,
+          318.72,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p28-item-002",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p28-item-002.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p28-item-002.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 28,
+      "item": 3,
+      "recordKey": "jwf1012-p28-item-003",
+      "assembly": "FA006C-1700",
+      "code": "BDT019-1700-1",
+      "nameZh": "法兰套结合件",
+      "sourceNameEn": "FLANGE SLEEVE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "70"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          587.04,
+          434.4,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p28-item-003",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p28-item-003.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p28-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 28,
+      "item": 4,
+      "recordKey": "jwf1012-p28-item-004",
+      "assembly": "FA006C-1700",
+      "code": "BDT019-1700-2",
+      "nameZh": "支架结合件",
+      "sourceNameEn": "BRACKET SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "391×268×136"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          587.04,
+          550.32,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p28-item-004",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p28-item-004.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p28-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 28,
+      "item": 5,
+      "recordKey": "jwf1012-p28-item-005",
+      "assembly": "FA006C-1700",
+      "code": "BDT019-1700-3",
+      "nameZh": "吸棉弯管结合件",
+      "sourceNameEn": "BENDING PIPE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "897×426×263"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          420,
+          202.8,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p28-item-005",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p28-item-005.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p28-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 28,
+      "item": 6,
+      "recordKey": "jwf1012-p28-item-006",
+      "assembly": "FA006C-1700",
+      "code": "BDT019-1700-6",
+      "nameZh": "防护内套结合件",
+      "sourceNameEn": "SHIELD SLEEVE SUB-ASS(INNER)",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "475×189"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          420,
+          318.72,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p28-item-006",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p28-item-006.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p28-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 28,
+      "item": 7,
+      "recordKey": "jwf1012-p28-item-007",
+      "assembly": "FA006C-1700",
+      "code": "BDT019-1700-8",
+      "nameZh": "防护外套结合件",
+      "sourceNameEn": "SHIELD SLEEVE SUB-ASS(OUTER)",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "450",
+        "φ420"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          420,
+          434.4,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p28-item-007",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p28-item-007.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p28-item-007.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 28,
+      "item": 8,
+      "recordKey": "jwf1012-p28-item-008",
+      "assembly": "FA006C-1700",
+      "code": "BDT019-1701",
+      "nameZh": "滑块",
+      "sourceNameEn": "SLIDE BLOCK",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "274×90×8"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          252.72,
+          202.8,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p28-item-008",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p28-item-008.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p28-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 1,
+      "recordKey": "jwf1012-p29-item-001",
+      "assembly": "FA006C-1800",
+      "code": "FA006C-1800-1",
+      "nameZh": "罩门结合件",
+      "sourceNameEn": "HOOD DOOR SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "616×384.5×100"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          588.96,
+          202.8,
+          758.16
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-001",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-001.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 2,
+      "recordKey": "jwf1012-p29-item-002",
+      "assembly": "FA006C-1800",
+      "code": "FA006C-1800-2",
+      "nameZh": "罩门结合件",
+      "sourceNameEn": "HOOD DOOR SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "616×384.5×100"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          588.96,
+          318.72,
+          758.16
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-002",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-002.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-002.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 3,
+      "recordKey": "jwf1012-p29-item-003",
+      "assembly": "FA006C-1800",
+      "code": "FA006C-1800-3",
+      "nameZh": "罩门结合件",
+      "sourceNameEn": "HOOD DOOR SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "330×384.5×100"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          588.96,
+          434.4,
+          758.16
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-003",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-003.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 4,
+      "recordKey": "jwf1012-p29-item-004",
+      "assembly": "FA006C-1800",
+      "code": "FA006C-1800-4",
+      "nameZh": "罩门结合件",
+      "sourceNameEn": "HOOD DOOR SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "391×384.5×100"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          588.96,
+          550.32,
+          758.16
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-004",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-004.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 5,
+      "recordKey": "jwf1012-p29-item-005",
+      "assembly": "FA006C-1800",
+      "code": "FA006C-1800-5",
+      "nameZh": "限位开关结合件",
+      "sourceNameEn": "LIMIT SWITCH SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "235×85×39"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          420,
+          202.8,
+          588.96
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-005",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-005.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 6,
+      "recordKey": "jwf1012-p29-item-006",
+      "assembly": "FA006C-1800",
+      "code": "FA006C-1800-7",
+      "nameZh": "限位开关结合件",
+      "sourceNameEn": "LIMIT SWITCH SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "235×85×39"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          420,
+          318.72,
+          588.96
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-006",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-006.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 7,
+      "recordKey": "jwf1012-p29-item-007",
+      "assembly": "FA006C-1800",
+      "code": "FA006C-1800-9",
+      "nameZh": "刷子结合件",
+      "sourceNameEn": "BRUSH SUB-ASS",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "125×25×9"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          420,
+          434.4,
+          588.96
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-007",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-007.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-007.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 8,
+      "recordKey": "jwf1012-p29-item-008",
+      "assembly": "FA006C-1800",
+      "code": "FA006C-1800-10",
+      "nameZh": "防护罩结合件",
+      "sourceNameEn": "SHIELD HOOD SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1650×384.5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          420,
+          550.32,
+          588.96
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-008",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-008.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 9,
+      "recordKey": "jwf1012-p29-item-009",
+      "assembly": "FA006C-1800",
+      "code": "FA006C-1800-11",
+      "nameZh": "防护罩结合件",
+      "sourceNameEn": "SHIELD HOOD SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1650×384.5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          250.8,
+          202.8,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-009",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-009.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-009.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 10,
+      "recordKey": "jwf1012-p29-item-010",
+      "assembly": "FA006C-1800",
+      "code": "BDT019-1801",
+      "nameZh": "支撑柱",
+      "sourceNameEn": "SUPPORTING ROD",
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "56"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          250.8,
+          434.4,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-010",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-010.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-010.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 11,
+      "recordKey": "jwf1012-p29-item-011",
+      "assembly": "FA006C-1800",
+      "code": "BDT019-1802",
+      "nameZh": "加强板",
+      "sourceNameEn": "STIFFENING RIB",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "310×50×5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          250.8,
+          550.32,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-011",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-011.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-011.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 12,
+      "recordKey": "jwf1012-p29-item-012",
+      "assembly": "FA006C-1800",
+      "code": "BDT019-1803",
+      "nameZh": "弯板",
+      "sourceNameEn": "BENDING PLATE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "74×74×20"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          81.84,
+          202.8,
+          250.8
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-012",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-012.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-012.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 13,
+      "recordKey": "jwf1012-p29-item-013",
+      "assembly": "FA006C-1800",
+      "code": "BDT019-1804",
+      "nameZh": "弯板",
+      "sourceNameEn": "BENDING PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "74×51.4×31.7"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          202.8,
+          81.84,
+          318.72,
+          250.8
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-013",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-013.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-013.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 14,
+      "recordKey": "jwf1012-p29-item-014",
+      "assembly": "FA006C-1800",
+      "code": "BDT019-1805",
+      "nameZh": "弯板",
+      "sourceNameEn": "BENDING PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "74×31.7"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          318.72,
+          81.84,
+          434.4,
+          250.8
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-014",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-014.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-014.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 29,
+      "item": 15,
+      "recordKey": "jwf1012-p29-item-015",
+      "assembly": "FA006C-1800",
+      "code": "BDT019-1806",
+      "nameZh": "玻璃窗",
+      "sourceNameEn": "GLASS WINDOW",
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "100×200"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          434.4,
+          81.84,
+          550.32,
+          250.8
+        ]
+      },
+      "sourceSlug": "jwf1012-p29-item-015",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p29-item-015.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p29-item-015.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 1,
+      "recordKey": "jwf1012-p30-item-001",
+      "assembly": "FA006C-1900",
+      "code": "FA006B-0700-1",
+      "nameZh": "卷帘（一）结合件",
+      "sourceNameEn": "WINDING LATTICE SUB-ASS(A)",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          587.04,
+          204.24,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-001",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-001.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 2,
+      "recordKey": "jwf1012-p30-item-002",
+      "assembly": "FA006C-1900",
+      "code": "FA006B-0700-2",
+      "nameZh": "卷帘（二）结合件",
+      "sourceNameEn": "WINDING LATTICE SUB-ASS(A)",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "0.8"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          204.24,
+          587.04,
+          321.36,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-002",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-002.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-002.pdf",
+      "auditIssues": [
+        "厂家中文为“卷帘（二）结合件”，但英文仍印为WINDING LATTICE SUB-ASS(A)；按原格保留。"
+      ]
+    },
+    {
+      "pdfPage": 30,
+      "item": 3,
+      "recordKey": "jwf1012-p30-item-003",
+      "assembly": "FA006C-1900",
+      "code": "FA006B-0700-3A",
+      "nameZh": "导辊结合件",
+      "sourceNameEn": "GUIDE ROLL SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "780"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          321.36,
+          587.04,
+          438.48,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-003",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-003.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 4,
+      "recordKey": "jwf1012-p30-item-004",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1900-1",
+      "nameZh": "罩门结合件",
+      "sourceNameEn": "HOOD DOOR SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "2440×914×105"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          420,
+          204.24,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-004",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-004.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 5,
+      "recordKey": "jwf1012-p30-item-005",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1900-2",
+      "nameZh": "侧门结合件",
+      "sourceNameEn": "SIDE DOOR SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "2025×436×35.5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          204.24,
+          420,
+          321.36,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-005",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-005.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 6,
+      "recordKey": "jwf1012-p30-item-006",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1900-3",
+      "nameZh": "侧门结合件",
+      "sourceNameEn": "SIDE DOOR SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "2025×705"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          321.36,
+          420,
+          438.48,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-006",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-006.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 7,
+      "recordKey": "jwf1012-p30-item-007",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1900-4",
+      "nameZh": "撑挡结合件",
+      "sourceNameEn": "BRACE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1345.5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          438.48,
+          420,
+          555.36,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-007",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-007.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-007.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 8,
+      "recordKey": "jwf1012-p30-item-008",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1900-5",
+      "nameZh": "撑挡结合件",
+      "sourceNameEn": "BRACE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1345.5×30.5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          252.72,
+          204.24,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-008",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-008.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 9,
+      "recordKey": "jwf1012-p30-item-009",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1900-6",
+      "nameZh": "撑挡结合件",
+      "sourceNameEn": "BRACE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1136×102"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          204.24,
+          252.72,
+          321.36,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-009",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-009.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-009.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 10,
+      "recordKey": "jwf1012-p30-item-010",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1900-7",
+      "nameZh": "撑挡结合件",
+      "sourceNameEn": "BRACE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1136×102"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          321.36,
+          252.72,
+          438.48,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-010",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-010.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-010.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 11,
+      "recordKey": "jwf1012-p30-item-011",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1901",
+      "nameZh": "盖板",
+      "sourceNameEn": "COVER PLATE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1083×418"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          85.44,
+          204.24,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-011",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-011.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-011.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 12,
+      "recordKey": "jwf1012-p30-item-012",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1902",
+      "nameZh": "托板",
+      "sourceNameEn": "SUPPORTING PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "117×98×40"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          204.24,
+          85.44,
+          321.36,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-012",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-012.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-012.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 13,
+      "recordKey": "jwf1012-p30-item-013",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1903",
+      "nameZh": "托板",
+      "sourceNameEn": "SUPPORTING PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "117×98×40"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          321.36,
+          85.44,
+          438.48,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-013",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-013.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-013.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 30,
+      "item": 14,
+      "recordKey": "jwf1012-p30-item-014",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1904",
+      "nameZh": "座",
+      "sourceNameEn": "SEAT",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "90×60×40"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          438.48,
+          85.44,
+          555.36,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p30-item-014",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p30-item-014.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p30-item-014.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 1,
+      "recordKey": "jwf1012-p31-item-001",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1905",
+      "nameZh": "座板",
+      "sourceNameEn": "SEAT PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "102×47.5×40"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          587.04,
+          204.24,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-001",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-001.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 2,
+      "recordKey": "jwf1012-p31-item-002",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1906",
+      "nameZh": "座板",
+      "sourceNameEn": "SEAT PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "102×47.5×40"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          204.24,
+          587.04,
+          321.36,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-002",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-002.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-002.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 3,
+      "recordKey": "jwf1012-p31-item-003",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1907",
+      "nameZh": "隔板",
+      "sourceNameEn": "BAFFLE PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "70×30×4"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          321.36,
+          587.04,
+          438.48,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-003",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-003.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 4,
+      "recordKey": "jwf1012-p31-item-004",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1908",
+      "nameZh": "隔板",
+      "sourceNameEn": "BAFFLE PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "70×30×2"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          438.48,
+          587.04,
+          555.36,
+          754.32
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-004",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-004.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 5,
+      "recordKey": "jwf1012-p31-item-005",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1909",
+      "nameZh": "连接板",
+      "sourceNameEn": "CONNECTING PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "705×25×13"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          420,
+          204.24,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-005",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-005.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 6,
+      "recordKey": "jwf1012-p31-item-006",
+      "assembly": "FA006C-1900",
+      "code": "BDT019-1910",
+      "nameZh": "弯板",
+      "sourceNameEn": "BENDING PLATE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "140×30×20"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          204.24,
+          420,
+          321.36,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-006",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-006.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 7,
+      "recordKey": "jwf1012-p31-item-007",
+      "assembly": "FA006C-1900",
+      "code": "TF24A-0",
+      "nameZh": "门锁",
+      "sourceNameEn": "DOOR LOCK",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ28",
+        "φ15",
+        "22"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          321.36,
+          420,
+          438.48,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-007",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-007.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-007.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 8,
+      "recordKey": "jwf1012-p31-item-008",
+      "assembly": "FA006C-1900",
+      "code": "TF24A-36",
+      "nameZh": "门锁",
+      "sourceNameEn": "DOOR LOCK",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "45×33.5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          438.48,
+          420,
+          555.36,
+          587.04
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-008",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-008.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 9,
+      "recordKey": "jwf1012-p31-item-009",
+      "assembly": "FA006C-1900",
+      "code": "TF2225",
+      "nameZh": "门吸铁",
+      "sourceNameEn": "DOOR MAGNET",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "φ50×10"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          252.72,
+          204.24,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-009",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-009.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-009.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 10,
+      "recordKey": "jwf1012-p31-item-010",
+      "assembly": "FA006C-1900",
+      "code": "TF2227",
+      "nameZh": "拉手装置",
+      "sourceNameEn": "HANDLE DEVICE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          204.24,
+          252.72,
+          321.36,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-010",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-010.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-010.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 11,
+      "recordKey": "jwf1012-p31-item-011",
+      "assembly": "FA006C-1900",
+      "code": "TF2233",
+      "nameZh": "铰链",
+      "sourceNameEn": "HINGE",
+      "quantity": {
+        "value": 7,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          321.36,
+          252.72,
+          438.48,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-011",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-011.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-011.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 12,
+      "recordKey": "jwf1012-p31-item-012",
+      "assembly": "FA006C-1900",
+      "code": "TF2234",
+      "nameZh": "铰链",
+      "sourceNameEn": "HINGE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          438.48,
+          252.72,
+          555.36,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-012",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-012.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-012.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 13,
+      "recordKey": "jwf1012-p31-item-013",
+      "assembly": "FA006C-1900",
+      "code": "TF2235",
+      "nameZh": "铰链",
+      "sourceNameEn": "HINGE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          85.44,
+          204.24,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-013",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-013.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-013.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 14,
+      "recordKey": "jwf1012-p31-item-014",
+      "assembly": "FA006C-1900",
+      "code": "TF2236",
+      "nameZh": "铰链",
+      "sourceNameEn": "HINGE",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          204.24,
+          85.44,
+          321.36,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-014",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-014.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-014.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 31,
+      "item": 15,
+      "recordKey": "jwf1012-p31-item-015",
+      "assembly": "FA006C-1900",
+      "code": "TZH1073-II",
+      "nameZh": "密封条",
+      "sourceNameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "截面10×14.8×3.8"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共2页第2页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          438.48,
+          85.44,
+          555.36,
+          252.72
+        ]
+      },
+      "sourceSlug": "jwf1012-p31-item-015",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p31-item-015.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p31-item-015.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 1,
+      "recordKey": "jwf1012-p32-item-001",
+      "assembly": "FA006C-2100A",
+      "code": "FA006C-2100-2",
+      "nameZh": "电缆架结合件",
+      "sourceNameEn": "CABLE FRAME SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "138×105×92"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          588.96,
+          203.52,
+          758.16
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-001",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-001.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 2,
+      "recordKey": "jwf1012-p32-item-002",
+      "assembly": "FA006C-2100A",
+      "code": "FA006C-2100-3",
+      "nameZh": "垫板结合件",
+      "sourceNameEn": "PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "120×110×40.5"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          203.52,
+          588.96,
+          319.68,
+          758.16
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-002",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-002.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-002.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 3,
+      "recordKey": "jwf1012-p32-item-003",
+      "assembly": "FA006C-2100A",
+      "code": "BDT019-2100-3",
+      "nameZh": "压板结合件",
+      "sourceNameEn": "PRESS PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "105×50×16"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          319.68,
+          588.96,
+          436.08,
+          758.16
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-003",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-003.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 4,
+      "recordKey": "jwf1012-p32-item-004",
+      "assembly": "FA006C-2100A",
+      "code": "FA006C-2101",
+      "nameZh": "电缆盖板",
+      "sourceNameEn": "COVER PLATE FOR CABLE",
+      "quantity": {
+        "value": 5,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "2475×110×39"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          436.08,
+          588.96,
+          552.48,
+          758.16
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-004",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-004.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 5,
+      "recordKey": "jwf1012-p32-item-005",
+      "assembly": "FA006C-2100A",
+      "code": "FA006C-2105",
+      "nameZh": "弯板",
+      "sourceNameEn": "BENDING PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "110×75×30"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          420,
+          203.52,
+          588.96
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-005",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-005.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 6,
+      "recordKey": "jwf1012-p32-item-006",
+      "assembly": "FA006C-2100A",
+      "code": "FA006C-2107",
+      "nameZh": "压线块",
+      "sourceNameEn": "PRESS LINE BLOCK",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "103×21×19"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          203.52,
+          420,
+          319.68,
+          588.96
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-006",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-006.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 7,
+      "recordKey": "jwf1012-p32-item-007",
+      "assembly": "FA006C-2100A",
+      "code": "FA006C-2108",
+      "nameZh": "垫板",
+      "sourceNameEn": "PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "103×15×1"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          319.68,
+          420,
+          436.08,
+          588.96
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-007",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-007.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-007.pdf",
+      "auditIssues": [
+        "厂家图示厚度1；旧索引记为2，本次以单格原图为准。"
+      ]
+    },
+    {
+      "pdfPage": 32,
+      "item": 8,
+      "recordKey": "jwf1012-p32-item-008",
+      "assembly": "FA006C-2100A",
+      "code": "FA006C-2109",
+      "nameZh": "压线块",
+      "sourceNameEn": "PRESS LINE BLOCK",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "93×23×18"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          436.08,
+          420,
+          552.48,
+          588.96
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-008",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-008.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 9,
+      "recordKey": "jwf1012-p32-item-009",
+      "assembly": "FA006C-2100A",
+      "code": "FA006C-2110",
+      "nameZh": "垫板",
+      "sourceNameEn": "PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "93×15×2"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          250.8,
+          203.52,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-009",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-009.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-009.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 10,
+      "recordKey": "jwf1012-p32-item-010",
+      "assembly": "FA006C-2100A",
+      "code": "BDT019-2107",
+      "nameZh": "座板",
+      "sourceNameEn": "PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "110×35×30"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          203.52,
+          250.8,
+          319.68,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-010",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-010.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-010.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 11,
+      "recordKey": "jwf1012-p32-item-011",
+      "assembly": "FA006C-2100A",
+      "code": "TZH1087",
+      "nameZh": "密封条1.5×4×0.15",
+      "sourceNameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "图示150×15×4",
+        "名称1.5×4×0.15"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          436.08,
+          250.8,
+          552.48,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-011",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-011.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-011.pdf",
+      "auditIssues": [
+        "厂家名称含1.5×4×0.15，工程图另标150×15×4；两组原始值均保留，不擅自换算单位。"
+      ]
+    },
+    {
+      "pdfPage": 32,
+      "item": 12,
+      "recordKey": "jwf1012-p32-item-012",
+      "assembly": "FA006C-2100A",
+      "code": "E2",
+      "nameZh": "链条250.07.100.0",
+      "sourceNameEn": "PULLING CHAIN",
+      "quantity": {
+        "value": 286,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "46×35"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          81.84,
+          203.52,
+          250.8
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-012",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-012.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-012.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 13,
+      "recordKey": "jwf1012-p32-item-013",
+      "assembly": "FA006C-2100A",
+      "code": "E2",
+      "nameZh": "竖隔片201.28",
+      "sourceNameEn": "VERTICAL SPACER",
+      "quantity": {
+        "value": 56,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "35×28×9"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          203.52,
+          81.84,
+          319.68,
+          250.8
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-013",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-013.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-013.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 32,
+      "item": 14,
+      "recordKey": "jwf1012-p32-item-014",
+      "assembly": "FA006C-2100A",
+      "code": "E2",
+      "nameZh": "固定接头2070.12PZBK",
+      "sourceNameEn": "FIXED COUPLINGS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "90"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          319.68,
+          81.84,
+          436.08,
+          250.8
+        ]
+      },
+      "sourceSlug": "jwf1012-p32-item-014",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p32-item-014.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p32-item-014.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 33,
+      "item": 1,
+      "recordKey": "jwf1012-p33-item-001",
+      "assembly": "FA006C-2900",
+      "code": "BDT019-2200-1",
+      "nameZh": "立柱结合件",
+      "sourceNameEn": "COLUMN SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "2120×75"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          587.28,
+          197.52,
+          754.56
+        ]
+      },
+      "sourceSlug": "jwf1012-p33-item-001",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p33-item-001.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p33-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 33,
+      "item": 2,
+      "recordKey": "jwf1012-p33-item-002",
+      "assembly": "FA006C-2900",
+      "code": "BDT019-2200-2",
+      "nameZh": "防护罩结合件",
+      "sourceNameEn": "SHIELD HOOD SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "800×330"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          197.52,
+          587.28,
+          308.16,
+          754.56
+        ]
+      },
+      "sourceSlug": "jwf1012-p33-item-002",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p33-item-002.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p33-item-002.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 33,
+      "item": 3,
+      "recordKey": "jwf1012-p33-item-003",
+      "assembly": "FA006C-2900",
+      "code": "FA006C-2901",
+      "nameZh": "线卡",
+      "sourceNameEn": "CLASP",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "90×20"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          308.16,
+          587.28,
+          418.56,
+          754.56
+        ]
+      },
+      "sourceSlug": "jwf1012-p33-item-003",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p33-item-003.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p33-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 33,
+      "item": 4,
+      "recordKey": "jwf1012-p33-item-004",
+      "assembly": "FA006C-2900",
+      "code": "FA006C-2902",
+      "nameZh": "角钢",
+      "sourceNameEn": "ANGLE STEEL",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1196×30×30"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          418.56,
+          587.28,
+          529.2,
+          754.56
+        ]
+      },
+      "sourceSlug": "jwf1012-p33-item-004",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p33-item-004.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p33-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 33,
+      "item": 5,
+      "recordKey": "jwf1012-p33-item-005",
+      "assembly": "FA006C-2900",
+      "code": "BDT019-2201",
+      "nameZh": "角钢",
+      "sourceNameEn": "ANGLE STEEL",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "1196×30×30"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          420,
+          197.52,
+          587.28
+        ]
+      },
+      "sourceSlug": "jwf1012-p33-item-005",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p33-item-005.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p33-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 33,
+      "item": 6,
+      "recordKey": "jwf1012-p33-item-006",
+      "assembly": "FA006C-2900",
+      "code": "BDT019-2203",
+      "nameZh": "弯板",
+      "sourceNameEn": "BENDING PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "200×146×50"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          308.16,
+          420,
+          418.56,
+          587.28
+        ]
+      },
+      "sourceSlug": "jwf1012-p33-item-006",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p33-item-006.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p33-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 33,
+      "item": 7,
+      "recordKey": "jwf1012-p33-item-007",
+      "assembly": "FA006C-2900",
+      "code": "BDT019-2204",
+      "nameZh": "弯板",
+      "sourceNameEn": "BENDING PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "190×145×100"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          418.56,
+          420,
+          529.2,
+          587.28
+        ]
+      },
+      "sourceSlug": "jwf1012-p33-item-007",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p33-item-007.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p33-item-007.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 33,
+      "item": 8,
+      "recordKey": "jwf1012-p33-item-008",
+      "assembly": "FA006C-2900",
+      "code": "BDT019-2205",
+      "nameZh": "垫板",
+      "sourceNameEn": "PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "165×110×6"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          252.72,
+          197.52,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p33-item-008",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p33-item-008.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p33-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 33,
+      "item": 9,
+      "recordKey": "jwf1012-p33-item-009",
+      "assembly": "FA006C-2900",
+      "code": "BDT019-2206",
+      "nameZh": "连接板",
+      "sourceNameEn": "CONNECTING PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "215×175×25"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          197.52,
+          252.72,
+          308.16,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p33-item-009",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p33-item-009.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p33-item-009.pdf",
+      "auditIssues": []
+    },
+    {
+      "pdfPage": 33,
+      "item": 10,
+      "recordKey": "jwf1012-p33-item-010",
+      "assembly": "FA006C-2900",
+      "code": "BDT019-2207",
+      "nameZh": "座板",
+      "sourceNameEn": "SEAT PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "dimensions": [
+        "175×100"
+      ],
+      "dimensionSource": "厂家单格工程图或名称中明确标注（按原图字符串保存）",
+      "pdfSheetPageZh": "共1页第1页",
+      "pdfSheetPageEn": null,
+      "cell": {
+        "table": "四列×四行零件图册",
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          308.16,
+          252.72,
+          418.56,
+          420
+        ]
+      },
+      "sourceSlug": "jwf1012-p33-item-010",
+      "sourceCrop": "assets/manuals/jwf1012/crops/jwf1012-p33-item-010.png",
+      "sourceVector": "assets/manuals/jwf1012/crops/jwf1012-p33-item-010.pdf",
+      "auditIssues": []
+    }
+  ]
+}

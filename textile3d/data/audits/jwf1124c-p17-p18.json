@@ -1,0 +1,1373 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1124c",
+  "manualTitle": "JWF1124C-160 外供立体图",
+  "sourcePdf": "assets/manuals/jwf1124c/original.pdf",
+  "sourcePdfSha256": "ec42899a1a8e5ede55ffbe298582ab9df153e5ae34dc246b2f1d996b4762d4c4",
+  "comparedDataFile": "data/jwf1124c-parts.js",
+  "scope": {
+    "pdfPages": [
+      17,
+      18
+    ],
+    "assembly": "JWF1124C-160-0500",
+    "assemblyDrawingPage": 17,
+    "partsTablePage": 18,
+    "recordCount": 32,
+    "quantityTotal": 222
+  },
+  "method": {
+    "pageRenderDpi": 600,
+    "cellCropDpi": 600,
+    "assemblyCropDpi": 600,
+    "review": "第17—18页600dpi渲染复核；第17页确认排尘部件爆炸总图，第18页32项逐格核对件号、中文名称、单台设备用量和明确规格",
+    "cellRule": "裁格四边取PDF矢量格框中心线；左表项目1—26、右表项目27—32，恰好保留零件所在整格",
+    "quantityRule": "厂家表格数量栏按用户确认解释为单台设备用量",
+    "englishRule": "厂家明细行没有逐项英文；nameEn为辅助翻译并明确标注非厂家原文",
+    "dimensionRule": "只记录厂家件号或名称栏明确的规格串；普通图号数字不当尺寸",
+    "identityRule": "每行均有recordKey；项目9—19虽同名为挡板，仍按项目号、件号和recordKey独立保存"
+  },
+  "coordinateSystem": {
+    "unit": "pt",
+    "origin": "PDF左下角",
+    "pageSizePt": [
+      842,
+      595
+    ],
+    "cropPolicy": "[left,bottom,right,top]沿格框中心线，恰好保留零件所在整格的四条外边",
+    "leftTableXBoundsPt": [
+      103.2,
+      455.76
+    ],
+    "rightTableXBoundsPt": [
+      455.76,
+      808.56
+    ],
+    "rowBoundsPt": [
+      493.44,
+      475.68,
+      458.16,
+      440.64,
+      422.88,
+      405.36,
+      387.84,
+      370.08,
+      352.56,
+      335.04,
+      317.52,
+      299.76,
+      282.24,
+      264.72,
+      246.96,
+      229.44,
+      211.92,
+      194.16,
+      176.64,
+      159.12,
+      141.6,
+      123.84,
+      106.32,
+      88.8,
+      71.04,
+      53.52,
+      36
+    ]
+  },
+  "assemblyOverview": {
+    "pdfPage": 17,
+    "pageType": "排尘部件轴测爆炸总图",
+    "overviewCropBoxPt": [
+      60.24,
+      34.56,
+      808.32,
+      564.48
+    ],
+    "sourceSlug": "JWF1124C-160-0500-assembly-p17",
+    "titleBlock": {
+      "code": "JWF1124C-160-0500",
+      "nameZh": "排尘部件",
+      "nameEnSource": "ELIMINATING ASS.",
+      "sheetPageZh": "共2页第1页",
+      "sheetPageEn": "PAGE 1 OF 2"
+    },
+    "itemMarkerRange": [
+      1,
+      32
+    ],
+    "itemMarkersConfirmed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "confirmedSpatialRelations": [
+      "标号1为左上竖向集尘器，标号2方接圈位于其上方；标号7气管及31接头位于该上部连接区域",
+      "标号20和21为中部三根塑料弹簧软管，端部直接相邻标号32卡箍；标号5方接圈、23螺栓、28螺母和30垫圈位于软管连接端",
+      "标号3、4调风板与标号8—19挡边/挡板分布在左右机架开口周边，附近反复出现22、26、27、30紧固件",
+      "标号6软管位于右下长条构件下方，与标号31接头形成独立连接图组",
+      "两块未编号机架图形作为安装参考基体，不计作本页明细项目"
+    ],
+    "limits": [
+      "仅记录爆炸图直接可见的空间相邻、同轴和重复安装关系，不推断隐藏结构、装配顺序、精确坐标或紧固扭矩",
+      "项目9—19中文名称均为挡板，但件号和安装位置不同，不得合并",
+      "项目31、32厂家代号栏为空，爆炸图标号和第18页recordKey用于唯一定位"
+    ]
+  },
+  "partsTable": {
+    "pdfPage": 18,
+    "pageHeader": {
+      "companyZh": "恒天重工股份有限公司",
+      "companyEn": "HI-TECH HEAVY INDUSTRY CO.,LTD.",
+      "machineZh": "JWF1124C-160型开棉机",
+      "machineEn": "TYPE JWF1124C-160 OPENER"
+    },
+    "columnHeader": {
+      "itemZh": "序号",
+      "itemEn": "ITEM",
+      "codeZh": "代号",
+      "codeEn": "CODE",
+      "nameZh": "名称",
+      "nameEn": "NAME",
+      "quantityZh": "数量",
+      "quantityEnSource": "QUAITY",
+      "remarkZh": "备注",
+      "remarkEn": "REMARK"
+    },
+    "titleBlock": {
+      "code": "JWF1124C-160-0500",
+      "nameZh": "排尘部件",
+      "nameEnSource": "ELIMINATING ASS.",
+      "sheetPageZh": "共2页第2页",
+      "sheetPageEn": "PAGE 2 OF 2"
+    }
+  },
+  "existingIndexDifferences": [
+    {
+      "scope": "assemblyTitle",
+      "field": "nameZh",
+      "existing": "排杂部件",
+      "source": "排尘部件"
+    },
+    {
+      "item": 32,
+      "field": "nameZh punctuation",
+      "existing": "卡箍 130（110-130）",
+      "source": "卡箍 130(110-130)"
+    }
+  ],
+  "sourceAmbiguities": [
+    "第18页英文数量表头印为QUAITY，疑为厂家拼写错误；审计保留厂家原文",
+    "第18页32条明细均没有逐项英文名称",
+    "项目31、32代号栏为空，名称中的QS-1/8-8和130(110-130)仅作为规格，不填入code",
+    "厂家第17—18页总成中文标题为排尘部件；现有总索引曾写为排杂部件"
+  ],
+  "coverageIssues": [
+    "现有第18页32条索引均缺单台设备用量、精确cell cropBox和600dpi原格/矢量裁格",
+    "现有项目22—30辅助英文未包含厂家名称栏中的规格",
+    "同名挡板若只按中文名称检索会产生歧义，必须保留recordKey和件号"
+  ],
+  "issueSummary": {
+    "recordCount": 32,
+    "codeMismatch": 0,
+    "nameZhMismatch": 1,
+    "dimensionMismatch": 0,
+    "missingQuantityInExistingIndex": 32,
+    "missingSourceCropInExistingIndex": 32,
+    "sourceEnglishUnavailable": 32,
+    "normalizedEnglishSpecExpanded": 9,
+    "assemblyChineseTitleDifference": 1,
+    "blankFactoryCode": 2,
+    "independentBaffleRecords": 11
+  },
+  "parts": [
+    {
+      "item": 1,
+      "recordKey": "jwf1124c-p18-item-01",
+      "code": "JWF1124C-160-0500-4A",
+      "nameZh": "集尘器结合件",
+      "nameEn": "DUST COLLECTOR SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          475.68,
+          455.76,
+          493.44
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-01-JWF1124C-160-0500-4A",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 2,
+      "recordKey": "jwf1124c-p18-item-02",
+      "code": "JWF1124C-180-0500-2",
+      "nameZh": "方接圈结合件",
+      "nameEn": "SQUARE COLLAR SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          458.16,
+          455.76,
+          475.68
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-02-JWF1124C-180-0500-2",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 3,
+      "recordKey": "jwf1124c-p18-item-03",
+      "code": "JWF1124C-180-0500-7",
+      "nameZh": "调风板结合件",
+      "nameEn": "AIR ADJUSTING PLATE SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          440.64,
+          455.76,
+          458.16
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-03-JWF1124C-180-0500-7",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 4,
+      "recordKey": "jwf1124c-p18-item-04",
+      "code": "JWF1124C-180-0500-8A",
+      "nameZh": "调风板结合件",
+      "nameEn": "AIR ADJUSTING PLATE SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          422.88,
+          455.76,
+          440.64
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-04-JWF1124C-180-0500-8A",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 5,
+      "recordKey": "jwf1124c-p18-item-05",
+      "code": "JWF1124C-180-0500-9",
+      "nameZh": "方接圈结合件",
+      "nameEn": "SQUARE COLLAR SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 5,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          405.36,
+          455.76,
+          422.88
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-05-JWF1124C-180-0500-9",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 6,
+      "recordKey": "jwf1124c-p18-item-06",
+      "code": "JWF1124-0526",
+      "nameZh": "软管",
+      "nameEn": "HOSE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 6,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          387.84,
+          455.76,
+          405.36
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-06-JWF1124-0526",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 7,
+      "recordKey": "jwf1124c-p18-item-07",
+      "code": "JWF1124C-180-0501",
+      "nameZh": "气管",
+      "nameEn": "AIR PIPE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 7,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          370.08,
+          455.76,
+          387.84
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-07-JWF1124C-180-0501",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 8,
+      "recordKey": "jwf1124c-p18-item-08",
+      "code": "JWF1124C-180-0513",
+      "nameZh": "挡边",
+      "nameEn": "SIDE BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 8,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          352.56,
+          455.76,
+          370.08
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-08-JWF1124C-180-0513",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 9,
+      "recordKey": "jwf1124c-p18-item-09",
+      "code": "JWF1124C-180-0514",
+      "nameZh": "挡板",
+      "nameEn": "BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 9,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          335.04,
+          455.76,
+          352.56
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-09-JWF1124C-180-0514",
+      "identityNote": "同名挡板，身份以recordKey、项目号和件号共同确定",
+      "auditIssues": [
+        "同名“挡板”按本行recordKey独立保存，禁止按名称合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 10,
+      "recordKey": "jwf1124c-p18-item-10",
+      "code": "JWF1124C-180-0524",
+      "nameZh": "挡板",
+      "nameEn": "BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 10,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          317.52,
+          455.76,
+          335.04
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-10-JWF1124C-180-0524",
+      "identityNote": "同名挡板，身份以recordKey、项目号和件号共同确定",
+      "auditIssues": [
+        "同名“挡板”按本行recordKey独立保存，禁止按名称合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 11,
+      "recordKey": "jwf1124c-p18-item-11",
+      "code": "JWF1124C-180-0525",
+      "nameZh": "挡板",
+      "nameEn": "BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 11,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          299.76,
+          455.76,
+          317.52
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-11-JWF1124C-180-0525",
+      "identityNote": "同名挡板，身份以recordKey、项目号和件号共同确定",
+      "auditIssues": [
+        "同名“挡板”按本行recordKey独立保存，禁止按名称合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 12,
+      "recordKey": "jwf1124c-p18-item-12",
+      "code": "JWF1124C-180-0526",
+      "nameZh": "挡边",
+      "nameEn": "SIDE BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 12,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          282.24,
+          455.76,
+          299.76
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-12-JWF1124C-180-0526",
+      "identityNote": "同名挡板，身份以recordKey、项目号和件号共同确定",
+      "auditIssues": [
+        "同名“挡板”按本行recordKey独立保存，禁止按名称合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 13,
+      "recordKey": "jwf1124c-p18-item-13",
+      "code": "JWF1124C-180-0537",
+      "nameZh": "挡板",
+      "nameEn": "BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 13,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          264.72,
+          455.76,
+          282.24
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-13-JWF1124C-180-0537",
+      "identityNote": "同名挡板，身份以recordKey、项目号和件号共同确定",
+      "auditIssues": [
+        "同名“挡板”按本行recordKey独立保存，禁止按名称合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 14,
+      "recordKey": "jwf1124c-p18-item-14",
+      "code": "JWF1124C-180-0538",
+      "nameZh": "挡板",
+      "nameEn": "BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 14,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          246.96,
+          455.76,
+          264.72
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-14-JWF1124C-180-0538",
+      "identityNote": "同名挡板，身份以recordKey、项目号和件号共同确定",
+      "auditIssues": [
+        "同名“挡板”按本行recordKey独立保存，禁止按名称合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 15,
+      "recordKey": "jwf1124c-p18-item-15",
+      "code": "JWF1124C-180-0539",
+      "nameZh": "挡板",
+      "nameEn": "BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 15,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          229.44,
+          455.76,
+          246.96
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-15-JWF1124C-180-0539",
+      "identityNote": "同名挡板，身份以recordKey、项目号和件号共同确定",
+      "auditIssues": [
+        "同名“挡板”按本行recordKey独立保存，禁止按名称合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 16,
+      "recordKey": "jwf1124c-p18-item-16",
+      "code": "JWF1124C-180-0540",
+      "nameZh": "挡板",
+      "nameEn": "BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 16,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          211.92,
+          455.76,
+          229.44
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-16-JWF1124C-180-0540",
+      "identityNote": "同名挡板，身份以recordKey、项目号和件号共同确定",
+      "auditIssues": [
+        "同名“挡板”按本行recordKey独立保存，禁止按名称合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 17,
+      "recordKey": "jwf1124c-p18-item-17",
+      "code": "JWF1124C-180-0541",
+      "nameZh": "挡板",
+      "nameEn": "BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 17,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          194.16,
+          455.76,
+          211.92
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-17-JWF1124C-180-0541",
+      "identityNote": "同名挡板，身份以recordKey、项目号和件号共同确定",
+      "auditIssues": [
+        "同名“挡板”按本行recordKey独立保存，禁止按名称合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 18,
+      "recordKey": "jwf1124c-p18-item-18",
+      "code": "JWF1124C-180-0542",
+      "nameZh": "挡板",
+      "nameEn": "BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 18,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          176.64,
+          455.76,
+          194.16
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-18-JWF1124C-180-0542",
+      "identityNote": "同名挡板，身份以recordKey、项目号和件号共同确定",
+      "auditIssues": [
+        "同名“挡板”按本行recordKey独立保存，禁止按名称合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 19,
+      "recordKey": "jwf1124c-p18-item-19",
+      "code": "JWF1124C-180-0543",
+      "nameZh": "挡板",
+      "nameEn": "BAFFLE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 19,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          159.12,
+          455.76,
+          176.64
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p18-item-19-JWF1124C-180-0543",
+      "identityNote": "同名挡板，身份以recordKey、项目号和件号共同确定",
+      "auditIssues": [
+        "同名“挡板”按本行recordKey独立保存，禁止按名称合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 20,
+      "recordKey": "jwf1124c-p18-item-20",
+      "code": "TZH1108-φ125X1200",
+      "nameZh": "塑料弹簧软管",
+      "nameEn": "PLASTIC SPRING HOSE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 20,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          141.6,
+          455.76,
+          159.12
+        ]
+      },
+      "dimensions": [
+        "φ125X1200"
+      ],
+      "dimensionSource": "厂家件号明确规格：φ125X1200",
+      "sourceSlug": "p18-item-20-TZH1108-φ125X1200",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 21,
+      "recordKey": "jwf1124c-p18-item-21",
+      "code": "TZH1108-φ125X1800",
+      "nameZh": "塑料弹簧软管",
+      "nameEn": "PLASTIC SPRING HOSE",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 21,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          123.84,
+          455.76,
+          141.6
+        ]
+      },
+      "dimensions": [
+        "φ125X1800"
+      ],
+      "dimensionSource": "厂家件号明确规格：φ125X1800",
+      "sourceSlug": "p18-item-21-TZH1108-φ125X1800",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 22,
+      "recordKey": "jwf1124c-p18-item-22",
+      "code": "GB5783",
+      "nameZh": "螺栓 M6X16",
+      "nameEn": "BOLT M6X16",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 24,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 22,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          106.32,
+          455.76,
+          123.84
+        ]
+      },
+      "dimensions": [
+        "M6X16"
+      ],
+      "dimensionSource": "厂家名称栏明确规格：M6X16",
+      "sourceSlug": "p18-item-22-GB5783",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": [
+        "现有索引辅助英文仅保留类别，未带厂家名称栏明确规格；本核对数据补全规格"
+      ]
+    },
+    {
+      "item": 23,
+      "recordKey": "jwf1124c-p18-item-23",
+      "code": "GB5783",
+      "nameZh": "螺栓 M6X20",
+      "nameEn": "BOLT M6X20",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 24,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 23,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          88.8,
+          455.76,
+          106.32
+        ]
+      },
+      "dimensions": [
+        "M6X20"
+      ],
+      "dimensionSource": "厂家名称栏明确规格：M6X20",
+      "sourceSlug": "p18-item-23-GB5783",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": [
+        "现有索引辅助英文仅保留类别，未带厂家名称栏明确规格；本核对数据补全规格"
+      ]
+    },
+    {
+      "item": 24,
+      "recordKey": "jwf1124c-p18-item-24",
+      "code": "GB5783",
+      "nameZh": "螺栓 M6X30",
+      "nameEn": "BOLT M6X30",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 24,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          71.04,
+          455.76,
+          88.8
+        ]
+      },
+      "dimensions": [
+        "M6X30"
+      ],
+      "dimensionSource": "厂家名称栏明确规格：M6X30",
+      "sourceSlug": "p18-item-24-GB5783",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": [
+        "现有索引辅助英文仅保留类别，未带厂家名称栏明确规格；本核对数据补全规格"
+      ]
+    },
+    {
+      "item": 25,
+      "recordKey": "jwf1124c-p18-item-25",
+      "code": "GB818",
+      "nameZh": "螺钉 M5X8",
+      "nameEn": "SCREW M5X8",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 25,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          53.52,
+          455.76,
+          71.04
+        ]
+      },
+      "dimensions": [
+        "M5X8"
+      ],
+      "dimensionSource": "厂家名称栏明确规格：M5X8",
+      "sourceSlug": "p18-item-25-GB818",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": [
+        "现有索引辅助英文仅保留类别，未带厂家名称栏明确规格；本核对数据补全规格"
+      ]
+    },
+    {
+      "item": 26,
+      "recordKey": "jwf1124c-p18-item-26",
+      "code": "GB818",
+      "nameZh": "螺钉 M6X10",
+      "nameEn": "SCREW M6X10",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 12,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 26,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          36,
+          455.76,
+          53.52
+        ]
+      },
+      "dimensions": [
+        "M6X10"
+      ],
+      "dimensionSource": "厂家名称栏明确规格：M6X10",
+      "sourceSlug": "p18-item-26-GB818",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": [
+        "现有索引辅助英文仅保留类别，未带厂家名称栏明确规格；本核对数据补全规格"
+      ]
+    },
+    {
+      "item": 27,
+      "recordKey": "jwf1124c-p18-item-27",
+      "code": "GB835",
+      "nameZh": "螺钉 M6X12",
+      "nameEn": "SCREW M6X12",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 12,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          475.68,
+          808.56,
+          493.44
+        ]
+      },
+      "dimensions": [
+        "M6X12"
+      ],
+      "dimensionSource": "厂家名称栏明确规格：M6X12",
+      "sourceSlug": "p18-item-27-GB835",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": [
+        "现有索引辅助英文仅保留类别，未带厂家名称栏明确规格；本核对数据补全规格"
+      ]
+    },
+    {
+      "item": 28,
+      "recordKey": "jwf1124c-p18-item-28",
+      "code": "GB6170",
+      "nameZh": "螺母 M6",
+      "nameEn": "NUT M6",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 24,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          458.16,
+          808.56,
+          475.68
+        ]
+      },
+      "dimensions": [
+        "M6"
+      ],
+      "dimensionSource": "厂家名称栏明确规格：M6",
+      "sourceSlug": "p18-item-28-GB6170",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": [
+        "现有索引辅助英文仅保留类别，未带厂家名称栏明确规格；本核对数据补全规格"
+      ]
+    },
+    {
+      "item": 29,
+      "recordKey": "jwf1124c-p18-item-29",
+      "code": "GB96",
+      "nameZh": "垫圈 5",
+      "nameEn": "WASHER 5",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          440.64,
+          808.56,
+          458.16
+        ]
+      },
+      "dimensions": [
+        "5"
+      ],
+      "dimensionSource": "厂家名称栏明确规格：5",
+      "sourceSlug": "p18-item-29-GB96",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": [
+        "现有索引辅助英文仅保留类别，未带厂家名称栏明确规格；本核对数据补全规格"
+      ]
+    },
+    {
+      "item": 30,
+      "recordKey": "jwf1124c-p18-item-30",
+      "code": "GB97.1",
+      "nameZh": "垫圈 6",
+      "nameEn": "WASHER 6",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 68,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          422.88,
+          808.56,
+          440.64
+        ]
+      },
+      "dimensions": [
+        "6"
+      ],
+      "dimensionSource": "厂家名称栏明确规格：6",
+      "sourceSlug": "p18-item-30-GB97.1",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": [
+        "现有索引辅助英文仅保留类别，未带厂家名称栏明确规格；本核对数据补全规格"
+      ]
+    },
+    {
+      "item": 31,
+      "recordKey": "jwf1124c-p18-item-31",
+      "code": "",
+      "nameZh": "接头 QS-1/8-8",
+      "nameEn": "COUPLING QS-1/8-8",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 5,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          405.36,
+          808.56,
+          422.88
+        ]
+      },
+      "dimensions": [
+        "QS-1/8-8"
+      ],
+      "dimensionSource": "厂家名称栏明确规格：QS-1/8-8",
+      "sourceSlug": "p18-item-31-NO-CODE",
+      "identityNote": null,
+      "auditIssues": [
+        "厂家代号栏为空；recordKey仅用于数据库区分，不把名称中的规格冒充件号"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 32,
+      "recordKey": "jwf1124c-p18-item-32",
+      "code": "",
+      "nameZh": "卡箍 130(110-130)",
+      "nameEn": "CLAMP 130 (110-130)",
+      "sourceNameEn": null,
+      "englishNote": "厂家第18页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "assembly": "JWF1124C-160-0500",
+      "pdfPage": 18,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 6,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          387.84,
+          808.56,
+          405.36
+        ]
+      },
+      "dimensions": [
+        "130(110-130)"
+      ],
+      "dimensionSource": "厂家名称栏明确规格：130(110-130)",
+      "sourceSlug": "p18-item-32-NO-CODE",
+      "identityNote": null,
+      "auditIssues": [
+        "厂家代号栏为空；recordKey仅用于数据库区分，不把名称中的规格冒充件号",
+        "厂家原格使用半角括号130(110-130)；现有索引使用全角括号，规格数值一致"
+      ],
+      "existingIssues": [
+        "现有索引名称使用全角括号；厂家原格为半角括号"
+      ]
+    }
+  ]
+}

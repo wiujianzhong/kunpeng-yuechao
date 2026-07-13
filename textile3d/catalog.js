@@ -3,24 +3,51 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {manuals,parts as coreParts} from './data/parts.js?v=20260713-9';
 import {jwf1206Parts09to30} from './data/jwf1206-pages-09-30.js?v=20260713-9';
 import {jwf1206_pages_09_16_verified} from './data/jwf1206-pages-09-16-verified.js?v=20260713-9';
+import {jwf1206P17P26Verified} from './data/jwf1206-p17-p26-verified.js?v=20260713-29';
+import {jwf1206P27P37Verified} from './data/jwf1206-p27-p37-verified.js?v=20260713-29';
+import {jwf1206P38P49Verified} from './data/jwf1206-p38-p49-verified.js?v=20260713-29';
+import {jwf1206P50P61Verified} from './data/jwf1206-p50-p61-verified.js?v=20260713-29';
+import {jwf1206P62P73Verified} from './data/jwf1206-p62-p73-verified.js?v=20260713-29';
 import {jwf1206Parts31to50} from './data/jwf1206-pages-31-50.js?v=20260713-9';
 import {jwf1206Parts51to73} from './data/jwf1206-pages-51-73.js?v=20260713-9';
 import {zfa051aParts} from './data/zfa051a-parts.js?v=20260713-9';
+import {zfa051aP03P06Verified} from './data/zfa051a-p03-p06-verified.js?v=20260713-29';
+import {zfa051aP07P12Verified} from './data/zfa051a-p07-p12-verified.js?v=20260713-29';
 import {jwf1026Parts} from './data/jwf1026-parts.js?v=20260713-9';
+import {jwf1026P03P10Verified} from './data/jwf1026-p03-p10-verified.js?v=20260713-29';
+import {jwf1026P11P18Verified} from './data/jwf1026-p11-p18-verified.js?v=20260713-29';
+import {jwf1026P19P25Verified} from './data/jwf1026-p19-p25-verified.js?v=20260713-29';
 import {jwf1124cParts} from './data/jwf1124c-parts.js?v=20260713-9';
-import {jwf1124cP04Verified} from './data/jwf1124c-p04-verified.js?v=20260713-13';
-import {jwf1124cP06Verified} from './data/jwf1124c-p06-verified.js?v=20260713-13';
-import {jwf1124cP08Verified} from './data/jwf1124c-p08-verified.js?v=20260713-13';
-import {jwf1124cP09Verified} from './data/jwf1124c-p09-verified.js?v=20260713-13';
+import {jwf1124cP04Verified} from './data/jwf1124c-p04-verified.js?v=20260713-29';
+import {jwf1124cP06Verified} from './data/jwf1124c-p06-verified.js?v=20260713-29';
+import {jwf1124cP08Verified} from './data/jwf1124c-p08-verified.js?v=20260713-29';
+import {jwf1124cP09Verified} from './data/jwf1124c-p09-verified.js?v=20260713-29';
+import {jwf1124cP12Verified} from './data/jwf1124c-p12-verified.js?v=20260713-29';
+import {jwf1124cP13P14Verified} from './data/jwf1124c-p13-p14-verified.js?v=20260713-29';
+import {jwf1124cP16Verified} from './data/jwf1124c-p16-verified.js?v=20260713-29';
+import {jwf1124cP18Verified} from './data/jwf1124c-p18-verified.js?v=20260713-29';
+import {jwf1124cP20Verified} from './data/jwf1124c-p20-verified.js?v=20260713-29';
+import {jwf1124cP22Verified} from './data/jwf1124c-p22-verified.js?v=20260713-29';
 import {jwf1012Parts} from './data/jwf1012-parts.js?v=20260713-9';
+import {jwf1012P04P15Verified} from './data/jwf1012-p04-p15-verified.js?v=20260713-29';
+import {jwf1012P16P25Verified} from './data/jwf1012-p16-p25-verified.js?v=20260713-29';
+import {jwf1012P26P33Verified} from './data/jwf1012-p26-p33-verified.js?v=20260713-29';
 import {tf2513Parts} from './data/tf2513-parts.js?v=20260713-9';
 import {fa103bParts} from './data/fa103b-parts.js?v=20260713-9';
+import {fa103bP04Verified} from './data/fa103b-p04-verified.js?v=20260713-29';
+import {fa103bP06P07Verified} from './data/fa103b-p06-p07-verified.js?v=20260713-29';
+import {fa103bP09Verified} from './data/fa103b-p09-verified.js?v=20260713-29';
+import {fa103bP11Verified} from './data/fa103b-p11-verified.js?v=20260713-29';
 import {jwf1102Parts} from './data/jwf1102-parts.js?v=20260713-9';
-import {assemblies} from './data/assemblies.js?v=20260713-13';
+import {jwf1102P05Verified} from './data/jwf1102-p05-verified.js?v=20260713-29';
+import {jwf1102P08P09Verified} from './data/jwf1102-p08-p09-verified.js?v=20260713-29';
+import {jwf1102P11P12Verified} from './data/jwf1102-p11-p12-verified.js?v=20260713-29';
+import {jwf1102P14Verified} from './data/jwf1102-p14-verified.js?v=20260713-29';
+import {assemblies} from './data/assemblies.js?v=20260713-29';
 import {jwf1206_0100_verified} from './data/jwf1206-0100-verified.js?v=20260713-9';
-import {getPartModelSpec} from './data/model-specs/index.js?v=20260713-13';
+import {getPartModelSpec} from './data/model-specs/index.js?v=20260713-31';
 import {createPartModel} from './models/part-models.js?v=20260713-10';
-import {createAssemblyModel} from './models/assembly-models.js?v=20260713-13';
+import {createAssemblyModel} from './models/assembly-models.js?v=20260713-29';
 
 function inferType(part){
   if(part.type!=='unknown')return part.type;
@@ -58,16 +85,71 @@ function mergeVerifiedPage(source,page,verified,label){
   let index=0;
   return source.map(part=>part.page===page?{...part,...verified[index++],type:part.type}:part);
 }
+const verifiedJwf1206Parts09to30With17to26=[17,18,19,20,21,22,23,24,25,26].reduce((result,page)=>mergeVerifiedPage(
+  result,page,jwf1206P17P26Verified.filter(part=>part.page===page),`JWF1206第${page}页`
+),verifiedJwf1206Parts09to30);
+const verifiedJwf1206Parts09to30Through30=[27,28,29,30].reduce((result,page)=>mergeVerifiedPage(
+  result,page,jwf1206P27P37Verified.filter(part=>part.page===page),`JWF1206第${page}页`
+),verifiedJwf1206Parts09to30With17to26);
+const verifiedJwf1206Parts31to50Through37=[31,32,33,34,35,36,37].reduce((result,page)=>mergeVerifiedPage(
+  result,page,jwf1206P27P37Verified.filter(part=>part.page===page),`JWF1206第${page}页`
+),jwf1206Parts31to50);
+const verifiedJwf1206Parts31to50Through49=[38,39,40,41,42,43,44,45,46,47,48,49].reduce((result,page)=>mergeVerifiedPage(
+  result,page,jwf1206P38P49Verified.filter(part=>part.page===page),`JWF1206第${page}页`
+),verifiedJwf1206Parts31to50Through37);
+const verifiedJwf1206Parts31to50Through50=mergeVerifiedPage(
+  verifiedJwf1206Parts31to50Through49,50,jwf1206P50P61Verified.filter(part=>part.page===50),'JWF1206第50页'
+);
+const verifiedJwf1206Parts51to73Through61=[51,52,53,54,55,56,57,58,59,60,61].reduce((result,page)=>mergeVerifiedPage(
+  result,page,jwf1206P50P61Verified.filter(part=>part.page===page),`JWF1206第${page}页`
+),jwf1206Parts51to73);
+const verifiedJwf1206Parts51to73Through73=[62,63,64,65,66,67,68,69,70,71,72,73].reduce((result,page)=>mergeVerifiedPage(
+  result,page,jwf1206P62P73Verified.filter(part=>part.page===page),`JWF1206第${page}页`
+),verifiedJwf1206Parts51to73Through61);
 const verifiedJwf1124cParts=[
   [4,jwf1124cP04Verified,'JWF1124C第4页'],
   [6,jwf1124cP06Verified,'JWF1124C第6页'],
   [8,jwf1124cP08Verified,'JWF1124C第8页'],
-  [9,jwf1124cP09Verified,'JWF1124C第9页']
+  [9,jwf1124cP09Verified,'JWF1124C第9页'],
+  [12,jwf1124cP12Verified,'JWF1124C第12页'],
+  [13,jwf1124cP13P14Verified.filter(part=>part.page===13),'JWF1124C第13页'],
+  [14,jwf1124cP13P14Verified.filter(part=>part.page===14),'JWF1124C第14页'],
+  [16,jwf1124cP16Verified,'JWF1124C第16页'],
+  [18,jwf1124cP18Verified,'JWF1124C第18页'],
+  [20,jwf1124cP20Verified,'JWF1124C第20页'],
+  [22,jwf1124cP22Verified,'JWF1124C第22页']
 ].reduce((result,[page,verified,label])=>mergeVerifiedPage(result,page,verified,label),jwf1124cParts);
+const verifiedJwf1102Parts=[
+  [5,jwf1102P05Verified,'JWF1102第5页'],
+  [8,jwf1102P08P09Verified.filter(part=>part.page===8),'JWF1102第8页'],
+  [9,jwf1102P08P09Verified.filter(part=>part.page===9),'JWF1102第9页'],
+  [11,jwf1102P11P12Verified.filter(part=>part.page===11),'JWF1102第11页'],
+  [12,jwf1102P11P12Verified.filter(part=>part.page===12),'JWF1102第12页'],
+  [14,jwf1102P14Verified,'JWF1102第14页']
+].reduce((result,[page,verified,label])=>mergeVerifiedPage(result,page,verified,label),jwf1102Parts);
+const verifiedFa103bParts=[
+  [4,fa103bP04Verified,'FA103B第4页'],
+  [6,fa103bP06P07Verified.filter(part=>part.page===6),'FA103B第6页'],
+  [7,fa103bP06P07Verified.filter(part=>part.page===7),'FA103B第7页'],
+  [9,fa103bP09Verified,'FA103B第9页'],
+  [11,fa103bP11Verified,'FA103B第11页']
+].reduce((result,[page,verified,label])=>mergeVerifiedPage(result,page,verified,label),fa103bParts);
+const verifiedZfa051aParts=[3,4,5,6,7,8,9,10,11,12].reduce((result,page)=>{
+  const source=page<=6?zfa051aP03P06Verified:zfa051aP07P12Verified;
+  return mergeVerifiedPage(result,page,source.filter(part=>part.page===page),`ZFA051A第${page}页`);
+},zfa051aParts);
+const verifiedJwf1026Parts=[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25].reduce((result,page)=>{
+  const source=page<=10?jwf1026P03P10Verified:page<=18?jwf1026P11P18Verified:jwf1026P19P25Verified;
+  return mergeVerifiedPage(result,page,source.filter(part=>part.page===page),`JWF1026第${page}页`);
+},jwf1026Parts);
+const verifiedJwf1012Parts=[4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33].reduce((result,page)=>{
+  const source=page<=15?jwf1012P04P15Verified:page<=25?jwf1012P16P25Verified:jwf1012P26P33Verified;
+  return mergeVerifiedPage(result,page,source.filter(part=>part.page===page),`JWF1012第${page}页`);
+},jwf1012Parts);
 const indexedParts=[
-  ...verifiedJwf1206Parts09to30,...jwf1206Parts31to50,...jwf1206Parts51to73,
-  ...zfa051aParts,...jwf1026Parts,...verifiedJwf1124cParts,...jwf1012Parts,
-  ...tf2513Parts,...fa103bParts,...jwf1102Parts
+  ...verifiedJwf1206Parts09to30Through30,...verifiedJwf1206Parts31to50Through50,...verifiedJwf1206Parts51to73Through73,
+  ...verifiedZfa051aParts,...verifiedJwf1026Parts,...verifiedJwf1124cParts,...verifiedJwf1012Parts,
+  ...tf2513Parts,...verifiedFa103bParts,...verifiedJwf1102Parts
 ].map(part=>{
   const inferred=inferType(part);
   const verified=part.dataStatus==='厂家资料已核';
@@ -297,7 +379,8 @@ function renderAssemblies(){
   shown.forEach(assembly=>{
     const card=document.createElement('article');
     card.className='part-card assembly-card';
-    card.innerHTML=`<div class="thumb-stage assembly-stage"><img class="model-preview" alt="${assembly.name} 爆炸总成3D预览"><span class="thumb-code">${assembly.code}</span><span class="model-pill verified">视觉级总成</span><span class="explode-mark">可合拢 / 可爆炸</span></div><div class="card-info"><div class="card-name-row"><h2>${assembly.name}</h2><span class="page">爆炸图第${assembly.drawingPage}页</span></div><div class="card-meta"><div><span>厂家英文</span><strong>${assembly.nameEn}</strong></div><div><span>图中标号</span><strong>1–${assembly.itemCount} 项</strong></div></div></div>`;
+    const markerLabel=assembly.markerLabel||`1–${assembly.itemCount}`;
+    card.innerHTML=`<div class="thumb-stage assembly-stage"><img class="model-preview" alt="${assembly.name} 爆炸总成3D预览"><span class="thumb-code">${assembly.code}</span><span class="model-pill verified">视觉级总成</span><span class="explode-mark">可合拢 / 可爆炸</span></div><div class="card-info"><div class="card-name-row"><h2>${assembly.name}</h2><span class="page">爆炸图第${assembly.drawingPage}页</span></div><div class="card-meta"><div><span>厂家英文</span><strong>${assembly.nameEn}</strong></div><div><span>图中标号</span><strong>${markerLabel}</strong></div></div></div>`;
     card.addEventListener('click',()=>openAssemblyDetail(assembly));
     content.append(card);card.querySelector('.model-preview').src=assemblyPreview(assembly);
   });
@@ -436,7 +519,7 @@ function openAssemblyDetail(assembly){
   setCopyCode(assembly.code);
   document.querySelector('#detail-page').textContent=`第 ${assembly.drawingPage} 页`;
   document.querySelector('#detail-status').textContent=assembly.status;
-  document.querySelector('#detail-dims').textContent=`1–${assembly.itemCount}`;
+  document.querySelector('#detail-dims').textContent=assembly.markerLabel||`1–${assembly.itemCount}`;
   document.querySelector('#detail-sheet').textContent=assembly.bomPages.map(page=>`第${page}页`).join('、');
   document.querySelector('#detail-quantity').textContent=`${assembly.itemCount} 项`;
   document.querySelector('#accuracy').textContent=`${assembly.accuracy} 该模型用于理解结构和装配顺序，不可作为加工、配合或维修尺寸依据。`;
@@ -444,7 +527,7 @@ function openAssemblyDetail(assembly){
   const range=document.querySelector('#explode-range');range.value=76;
   document.querySelector('#assembly-legend').innerHTML=assembly.keyParts.map(item=>`<span>${item}</span>`).join('');
   document.querySelector('#origin-image').src=assembly.sourceImage;
-  document.querySelector('#origin-caption').textContent=`厂家原手册第${assembly.drawingPage}页 · 300dpi高清爆炸图（非AI重画）`;
+  document.querySelector('#origin-caption').textContent=`厂家原手册第${assembly.drawingPage}页 · ${assembly.sourceDpi||300}dpi高清爆炸图（非AI重画）`;
   document.querySelector('#origin-preview').classList.add('show');
   document.querySelector('#show-origin').textContent='隐藏厂家爆炸图';
   const vectorLink=document.querySelector('#open-vector');vectorLink.hidden=false;vectorLink.href=assembly.sourceVector;vectorLink.textContent='打开原始PDF页';

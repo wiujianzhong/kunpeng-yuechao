@@ -1,0 +1,1724 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1124c",
+  "manualTitle": "JWF1124C-160 外供立体图",
+  "sourcePdf": "assets/manuals/jwf1124c/original.pdf",
+  "sourcePdfSha256": "ec42899a1a8e5ede55ffbe298582ab9df153e5ae34dc246b2f1d996b4762d4c4",
+  "comparedDataFile": "data/jwf1124c-parts.js",
+  "scope": {
+    "pdfPages": [
+      21,
+      22
+    ],
+    "assembly": "JWF1124-0700A",
+    "assemblyDrawingPage": 21,
+    "partsTablePage": 22,
+    "auditedItemRange": [
+      1,
+      38
+    ],
+    "recordCount": 38,
+    "quantityTotalsByUnit": {
+      "件": 145,
+      "m": 2.3
+    },
+    "blankFactoryCodeItems": [],
+    "independentRecordKeyGroups": {
+      "leftGuardAssemblies": [
+        3,
+        10,
+        14
+      ],
+      "rightGuardAssemblies": [
+        4,
+        11,
+        15
+      ],
+      "bearingSeatBases": [
+        8,
+        9
+      ],
+      "tensionAssemblies": [
+        12,
+        13
+      ],
+      "duplicateStandardCodes": {
+        "GB5783": [
+          19,
+          20
+        ],
+        "GB70": [
+          21,
+          22
+        ],
+        "GB97.1": [
+          30,
+          31
+        ],
+        "GB859": [
+          32,
+          33
+        ]
+      }
+    }
+  },
+  "method": {
+    "pageRenderDpi": 600,
+    "cellCropDpi": 600,
+    "assemblyCropDpi": 600,
+    "review": "第21—22页600dpi渲染复核；第21页确认联接部件爆炸总图，第22页38项逐格核对件号、中文名称、单台设备用量、单位、备注和明确规格",
+    "cellRule": "裁格四边取PDF矢量格框中心线；左表项目1—26、右表项目27—38，恰好保留零件所在整格",
+    "quantityRule": "厂家数量栏为单台设备用量；项目18按长度单位m记录，不换算为件数，也不写入尺寸",
+    "remarkRule": "厂家备注仅项目10、11、14、15有值，按原文保存适用机型，空白备注保持null",
+    "identityRule": "左右护木结合件、轴承座左右底板、张紧支座/张紧轮以及同标准号不同规格，均按原标号与recordKey独立记录",
+    "englishRule": "厂家明细行没有逐项英文；nameEn为辅助翻译并明确标注非厂家原文",
+    "dimensionRule": "只记录厂家名称栏或件号中明确规格；普通图号数字和数量栏长度不当尺寸"
+  },
+  "coordinateSystem": {
+    "unit": "pt",
+    "origin": "PDF左下角",
+    "pageSizePt": [
+      842,
+      595
+    ],
+    "cropPolicy": "[left,bottom,right,top]沿格框中心线，恰好保留零件所在整格的四条外边",
+    "leftTableXBoundsPt": [
+      103.2,
+      455.76
+    ],
+    "rightTableXBoundsPt": [
+      455.76,
+      808.56
+    ],
+    "rowBoundsPt": [
+      493.44,
+      475.68,
+      458.16,
+      440.64,
+      422.88,
+      405.36,
+      387.84,
+      370.08,
+      352.56,
+      335.04,
+      317.52,
+      299.76,
+      282.24,
+      264.72,
+      246.96,
+      229.44,
+      211.92,
+      194.4,
+      176.64,
+      159.12,
+      141.6,
+      123.84,
+      106.32,
+      88.8,
+      71.28,
+      53.52,
+      36
+    ]
+  },
+  "assemblyOverview": {
+    "pdfPage": 21,
+    "pageType": "联接部件轴测爆炸总图",
+    "overviewCropBoxPt": [
+      60.24,
+      35.04,
+      808.08,
+      564.24
+    ],
+    "sourceSlug": "JWF1124-0700A-assembly-p21",
+    "reusedExistingAsset": true,
+    "assetVerification": {
+      "pngPixels": [
+        6232,
+        4410
+      ],
+      "dpi": 600,
+      "vectorPdfSizePt": [
+        747.84,
+        529.2
+      ],
+      "pngSha256": "68039476abbf95e44f42912871a27497648d3511d6ebe0f56bde3404d3bdfb75",
+      "vectorPdfSha256": "7e244590687199f63d4230845066be005b2eadb4b93686421a1d3913ac823427",
+      "visualResult": "完整保留爆炸图、标题栏和四边框，文字与引出线清晰，可复用"
+    },
+    "titleBlock": {
+      "code": "JWF1124-0700A",
+      "nameZh": "联接部件",
+      "nameEnSource": "COUPLING ASS.",
+      "sheetPageZh": "共2页第1页",
+      "sheetPageEn": "PAGE 1 OF 2"
+    },
+    "itemMarkerRange": [
+      1,
+      38
+    ],
+    "itemMarkersConfirmed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38
+    ],
+    "confirmedSpatialRelations": [
+      "标号1气弹簧分布于上部罩板两端；标号2长撑挡、7活门、18密封条和36把手位于上方开合结构",
+      "标号3、4、10、11、14、15为不同位置或不同适用机型的左右护木结合件；爆炸图引出位置各自独立，不合并",
+      "标号5输棉帘传动辊位于中下部长轴位置，标号8、9轴承座左右底板与标号37、38轴承分别位于其两端连接区",
+      "标号12张紧支座和13张紧轮位于右上张紧轴系，附近可见16、34、35、37等挡圈和轴承件",
+      "标号19—33紧固件、螺母、垫圈和销分布于罩板、护木、辊轴及支座连接处；只记录直接可见的相邻关系"
+    ],
+    "limits": [
+      "只记录爆炸图直接可见的空间相邻、同轴和重复安装关系，不推断隐藏结构、装配顺序、精确坐标或紧固扭矩",
+      "图中“10(14)”与“11(15)”表示不同清单标号在相应机型位置复用，不据此合并数据库记录"
+    ]
+  },
+  "partsTable": {
+    "pdfPage": 22,
+    "pageHeader": {
+      "companyZh": "恒天重工股份有限公司",
+      "companyEn": "HI-TECH HEAVY INDUSTRY CO.,LTD.",
+      "machineZh": "JWF1124C-160型开棉机",
+      "machineEn": "TYPE JWF1124C-160 OPENER"
+    },
+    "columnHeader": [
+      "序号 ITEM",
+      "代号 CODE",
+      "名称 NAME",
+      "数量 QUALITY",
+      "备注 REMARK"
+    ],
+    "titleBlock": {
+      "code": "JWF1124-0700A",
+      "nameZh": "联接部件",
+      "nameEnSource": "COUPLING ASS.",
+      "sheetPageZh": "共2页第2页",
+      "sheetPageEn": "PAGE 2 OF 2"
+    }
+  },
+  "sourceAmbiguities": [
+    "项目18数量为2.3m，是单台设备密封条长度用量，不是2.3件，也不是10X3截面尺寸的一部分",
+    "第21页图示“10(14)”和“11(15)”对应不同适用机型的左右护木结合件；第22页四条备注用于区分，记录不得合并",
+    "厂家第22页明细行没有逐项英文，所有nameEn均为辅助翻译",
+    "第22页38项厂家代号栏均有值，没有空件号；后续不得人为改成空值或由名称生成替代件号"
+  ],
+  "existingIndexDifferences": [
+    {
+      "items": [
+        10,
+        11
+      ],
+      "field": "remark",
+      "existing": null,
+      "source": "FA028C-160专用"
+    },
+    {
+      "items": [
+        14,
+        15
+      ],
+      "field": "remark",
+      "existing": null,
+      "source": "JWF1026-160专用"
+    },
+    {
+      "item": 18,
+      "field": "quantity",
+      "existing": null,
+      "source": {
+        "value": 2.3,
+        "unit": "m"
+      }
+    },
+    {
+      "item": 38,
+      "field": "dimensions",
+      "existing": [
+        206
+      ],
+      "source": [
+        "UELFLU206"
+      ]
+    }
+  ],
+  "coverageIssues": [
+    "现有索引第22页38项缺少单台设备用量、数量单位、逐格cropBox和厂家原格资产",
+    "现有索引未保存项目10、11、14、15的厂家适用机型备注",
+    "现有索引把项目38完整规格UELFLU206简化为dims 206；应保留厂家名称栏完整规格串",
+    "厂家逐项无英文，辅助英文不得冒充厂家原文"
+  ],
+  "issueSummary": {
+    "recordCount": 38,
+    "codeMismatch": 0,
+    "nameZhMismatch": 0,
+    "blankFactoryCode": 0,
+    "missingQuantityInExistingIndex": 38,
+    "missingRemarkInExistingIndex": 4,
+    "missingSourceCropInExistingIndex": 38,
+    "sourceEnglishUnavailable": 38,
+    "duplicateNameIndependentRecords": 10,
+    "duplicateCodeSpecVariantRecords": 8,
+    "fullSourceSpecTruncatedInExistingIndex": 1
+  },
+  "parts": [
+    {
+      "item": 1,
+      "recordKey": "jwf1124c-p22-item-01",
+      "code": "FA109-160-0300-21",
+      "nameZh": "气弹簧结合件",
+      "nameEn": "GAS SPRING SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          475.68,
+          455.76,
+          493.44
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-01-FA109-160-0300-21",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 2,
+      "recordKey": "jwf1124c-p22-item-02",
+      "code": "FA109A-0100-6",
+      "nameZh": "撑挡结合件",
+      "nameEn": "BRACE SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          458.16,
+          455.76,
+          475.68
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-02-FA109A-0100-6",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 3,
+      "recordKey": "jwf1124c-p22-item-03",
+      "code": "FA109A-1300-1",
+      "nameZh": "左护木结合件",
+      "nameEn": "LEFT GUARD SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          440.64,
+          455.76,
+          458.16
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-03-FA109A-1300-1",
+      "identityNote": "与项目10、14同名为左护木结合件，但件号、适用机型和爆炸图位置不同；必须按recordKey独立保存",
+      "auditIssues": [
+        "与项目10、14同名为左护木结合件，但件号、适用机型和爆炸图位置不同；必须按recordKey独立保存"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 4,
+      "recordKey": "jwf1124c-p22-item-04",
+      "code": "FA109A-1300-2",
+      "nameZh": "右护木结合件",
+      "nameEn": "RIGHT GUARD SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          422.88,
+          455.76,
+          440.64
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-04-FA109A-1300-2",
+      "identityNote": "与项目11、15同名为右护木结合件，但件号、适用机型和爆炸图位置不同；必须按recordKey独立保存",
+      "auditIssues": [
+        "与项目11、15同名为右护木结合件，但件号、适用机型和爆炸图位置不同；必须按recordKey独立保存"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 5,
+      "recordKey": "jwf1124c-p22-item-05",
+      "code": "FA109A-1300-6A",
+      "nameZh": "输棉帘传动辊结合件",
+      "nameEn": "FEED APRON DRIVE ROLLER SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 5,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          405.36,
+          455.76,
+          422.88
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-05-FA109A-1300-6A",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 6,
+      "recordKey": "jwf1124c-p22-item-06",
+      "code": "FA109A-1300-7",
+      "nameZh": "托板结合件",
+      "nameEn": "SUPPORTING PLATE SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 6,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          387.84,
+          455.76,
+          405.36
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-06-FA109A-1300-7",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 7,
+      "recordKey": "jwf1124c-p22-item-07",
+      "code": "FA109A-1300-8A",
+      "nameZh": "活门结合件",
+      "nameEn": "FLAP SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 7,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          370.08,
+          455.76,
+          387.84
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-07-FA109A-1300-8A",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 8,
+      "recordKey": "jwf1124c-p22-item-08",
+      "code": "FA109A-1300-9",
+      "nameZh": "轴承座左底板结合件",
+      "nameEn": "BEARING SEAT LEFT BASE PLATE SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 8,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          352.56,
+          455.76,
+          370.08
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-08-FA109A-1300-9",
+      "identityNote": "与项目9分别为轴承座左、右底板结合件；方向、件号和安装位置不同，不得合并",
+      "auditIssues": [
+        "与项目9分别为轴承座左、右底板结合件；方向、件号和安装位置不同，不得合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 9,
+      "recordKey": "jwf1124c-p22-item-09",
+      "code": "FA109A-1300-10",
+      "nameZh": "轴承座右底板结合件",
+      "nameEn": "BEARING SEAT RIGHT BASE PLATE SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 9,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          335.04,
+          455.76,
+          352.56
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-09-FA109A-1300-10",
+      "identityNote": "与项目8分别为轴承座右、左底板结合件；方向、件号和安装位置不同，不得合并",
+      "auditIssues": [
+        "与项目8分别为轴承座右、左底板结合件；方向、件号和安装位置不同，不得合并"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 10,
+      "recordKey": "jwf1124c-p22-item-10",
+      "code": "FA109A-1300-11",
+      "nameZh": "左护木结合件",
+      "nameEn": "LEFT GUARD SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": "FA028C-160专用",
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 10,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          317.52,
+          455.76,
+          335.04
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-10-FA109A-1300-11",
+      "identityNote": "厂家备注为FA028C-160专用；与项目3、14同名但不是同一记录",
+      "auditIssues": [
+        "厂家备注为FA028C-160专用；与项目3、14同名但不是同一记录"
+      ],
+      "existingIssues": [
+        "现有索引未保存厂家备注FA028C-160专用"
+      ]
+    },
+    {
+      "item": 11,
+      "recordKey": "jwf1124c-p22-item-11",
+      "code": "FA109A-1300-12",
+      "nameZh": "右护木结合件",
+      "nameEn": "RIGHT GUARD SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": "FA028C-160专用",
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 11,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          299.76,
+          455.76,
+          317.52
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-11-FA109A-1300-12",
+      "identityNote": "厂家备注为FA028C-160专用；与项目4、15同名但不是同一记录",
+      "auditIssues": [
+        "厂家备注为FA028C-160专用；与项目4、15同名但不是同一记录"
+      ],
+      "existingIssues": [
+        "现有索引未保存厂家备注FA028C-160专用"
+      ]
+    },
+    {
+      "item": 12,
+      "recordKey": "jwf1124c-p22-item-12",
+      "code": "FA109A-1300-17",
+      "nameZh": "张紧支座结合件",
+      "nameEn": "TENSION SUPPORT SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 12,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          282.24,
+          455.76,
+          299.76
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-12-FA109A-1300-17",
+      "identityNote": "张紧支座结合件与项目13张紧轮结合件为不同零件和不同标号，分别保留recordKey",
+      "auditIssues": [
+        "张紧支座结合件与项目13张紧轮结合件为不同零件和不同标号，分别保留recordKey"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 13,
+      "recordKey": "jwf1124c-p22-item-13",
+      "code": "FA109A-1300-18",
+      "nameZh": "张紧轮结合件",
+      "nameEn": "TENSION WHEEL SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 13,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          264.72,
+          455.76,
+          282.24
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-13-FA109A-1300-18",
+      "identityNote": "张紧轮结合件与项目12张紧支座结合件为不同零件和不同标号，分别保留recordKey",
+      "auditIssues": [
+        "张紧轮结合件与项目12张紧支座结合件为不同零件和不同标号，分别保留recordKey"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 14,
+      "recordKey": "jwf1124c-p22-item-14",
+      "code": "JWF1124C-180-0700-7",
+      "nameZh": "左护木结合件",
+      "nameEn": "LEFT GUARD SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": "JWF1026-160专用",
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 14,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          246.96,
+          455.76,
+          264.72
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-14-JWF1124C-180-0700-7",
+      "identityNote": "厂家备注为JWF1026-160专用；与项目3、10同名但不是同一记录",
+      "auditIssues": [
+        "厂家备注为JWF1026-160专用；与项目3、10同名但不是同一记录"
+      ],
+      "existingIssues": [
+        "现有索引未保存厂家备注JWF1026-160专用"
+      ]
+    },
+    {
+      "item": 15,
+      "recordKey": "jwf1124c-p22-item-15",
+      "code": "JWF1124C-180-0700-8",
+      "nameZh": "右护木结合件",
+      "nameEn": "RIGHT GUARD SUB-ASS.",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": "JWF1026-160专用",
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 15,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          229.44,
+          455.76,
+          246.96
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-15-JWF1124C-180-0700-8",
+      "identityNote": "厂家备注为JWF1026-160专用；与项目4、11同名但不是同一记录",
+      "auditIssues": [
+        "厂家备注为JWF1026-160专用；与项目4、11同名但不是同一记录"
+      ],
+      "existingIssues": [
+        "现有索引未保存厂家备注JWF1026-160专用"
+      ]
+    },
+    {
+      "item": 16,
+      "recordKey": "jwf1124c-p22-item-16",
+      "code": "FA109A-0315",
+      "nameZh": "轴肩挡圈",
+      "nameEn": "SHOULDER RETAINING RING",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 16,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          211.92,
+          455.76,
+          229.44
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-16-FA109A-0315",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 17,
+      "recordKey": "jwf1124c-p22-item-17",
+      "code": "FA109A-1303",
+      "nameZh": "扁棒",
+      "nameEn": "FLAT BAR",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 17,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          194.4,
+          455.76,
+          211.92
+        ]
+      },
+      "dimensions": [],
+      "dimensionSource": "厂家明细行未标明确尺寸",
+      "sourceSlug": "p22-item-17-FA109A-1303",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 18,
+      "recordKey": "jwf1124c-p22-item-18",
+      "code": "TZH1107-10X3",
+      "nameZh": "密封条",
+      "nameEn": "SEALING STRIP",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 2.3,
+        "unit": "m",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 18,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          176.64,
+          455.76,
+          194.4
+        ]
+      },
+      "dimensions": [
+        "10X3"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：10X3",
+      "sourceSlug": "p22-item-18-TZH1107-10X3",
+      "identityNote": "数量栏2.3m表示单台设备长度用量，不是2.3件，也不是截面尺寸",
+      "auditIssues": [
+        "数量栏2.3m表示单台设备长度用量，不是2.3件，也不是截面尺寸"
+      ],
+      "existingIssues": [
+        "现有索引缺少数量栏2.3m"
+      ]
+    },
+    {
+      "item": 19,
+      "recordKey": "jwf1124c-p22-item-19",
+      "code": "GB5783",
+      "nameZh": "螺栓 M10X16",
+      "nameEn": "BOLT M10X16",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 12,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 19,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          159.12,
+          455.76,
+          176.64
+        ]
+      },
+      "dimensions": [
+        "M10X16"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：M10X16",
+      "sourceSlug": "p22-item-19-GB5783",
+      "identityNote": "与项目20共用标准号GB5783但规格不同；按recordKey区分M10X16",
+      "auditIssues": [
+        "与项目20共用标准号GB5783但规格不同；按recordKey区分M10X16"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 20,
+      "recordKey": "jwf1124c-p22-item-20",
+      "code": "GB5783",
+      "nameZh": "螺栓 M10X25",
+      "nameEn": "BOLT M10X25",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 20,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          141.6,
+          455.76,
+          159.12
+        ]
+      },
+      "dimensions": [
+        "M10X25"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：M10X25",
+      "sourceSlug": "p22-item-20-GB5783",
+      "identityNote": "与项目19共用标准号GB5783但规格不同；按recordKey区分M10X25",
+      "auditIssues": [
+        "与项目19共用标准号GB5783但规格不同；按recordKey区分M10X25"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 21,
+      "recordKey": "jwf1124c-p22-item-21",
+      "code": "GB70",
+      "nameZh": "螺钉 M6X30",
+      "nameEn": "SCREW M6X30",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 21,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          123.84,
+          455.76,
+          141.6
+        ]
+      },
+      "dimensions": [
+        "M6X30"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：M6X30",
+      "sourceSlug": "p22-item-21-GB70",
+      "identityNote": "与项目22共用标准号GB70但规格不同；按recordKey区分M6X30",
+      "auditIssues": [
+        "与项目22共用标准号GB70但规格不同；按recordKey区分M6X30"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 22,
+      "recordKey": "jwf1124c-p22-item-22",
+      "code": "GB70",
+      "nameZh": "螺钉 M10X16",
+      "nameEn": "SCREW M10X16",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 22,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          106.32,
+          455.76,
+          123.84
+        ]
+      },
+      "dimensions": [
+        "M10X16"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：M10X16",
+      "sourceSlug": "p22-item-22-GB70",
+      "identityNote": "与项目21共用标准号GB70但规格不同；按recordKey区分M10X16",
+      "auditIssues": [
+        "与项目21共用标准号GB70但规格不同；按recordKey区分M10X16"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 23,
+      "recordKey": "jwf1124c-p22-item-23",
+      "code": "GB99",
+      "nameZh": "木螺钉 4.5X20",
+      "nameEn": "WOOD SCREW 4.5X20",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 18,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 23,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          88.8,
+          455.76,
+          106.32
+        ]
+      },
+      "dimensions": [
+        "4.5X20"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：4.5X20",
+      "sourceSlug": "p22-item-23-GB99",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 24,
+      "recordKey": "jwf1124c-p22-item-24",
+      "code": "GB12618",
+      "nameZh": "抽芯铆钉 4X8",
+      "nameEn": "BLIND RIVET 4X8",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 15,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 24,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          71.28,
+          455.76,
+          88.8
+        ]
+      },
+      "dimensions": [
+        "4X8"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：4X8",
+      "sourceSlug": "p22-item-24-GB12618",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 25,
+      "recordKey": "jwf1124c-p22-item-25",
+      "code": "GB879",
+      "nameZh": "销 6X12",
+      "nameEn": "PIN 6X12",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 25,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          53.52,
+          455.76,
+          71.28
+        ]
+      },
+      "dimensions": [
+        "6X12"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：6X12",
+      "sourceSlug": "p22-item-25-GB879",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 26,
+      "recordKey": "jwf1124c-p22-item-26",
+      "code": "GB889",
+      "nameZh": "螺母 M6",
+      "nameEn": "NUT M6",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "左表",
+        "row": 26,
+        "column": 1,
+        "cropBoxPt": [
+          103.2,
+          36,
+          455.76,
+          53.52
+        ]
+      },
+      "dimensions": [
+        "M6"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：M6",
+      "sourceSlug": "p22-item-26-GB889",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 27,
+      "recordKey": "jwf1124c-p22-item-27",
+      "code": "GB6170",
+      "nameZh": "螺母 M10",
+      "nameEn": "NUT M10",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          475.68,
+          808.56,
+          493.44
+        ]
+      },
+      "dimensions": [
+        "M10"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：M10",
+      "sourceSlug": "p22-item-27-GB6170",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 28,
+      "recordKey": "jwf1124c-p22-item-28",
+      "code": "GB6172",
+      "nameZh": "螺母 M8",
+      "nameEn": "NUT M8",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          458.16,
+          808.56,
+          475.68
+        ]
+      },
+      "dimensions": [
+        "M8"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：M8",
+      "sourceSlug": "p22-item-28-GB6172",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 29,
+      "recordKey": "jwf1124c-p22-item-29",
+      "code": "GB93",
+      "nameZh": "垫圈 10",
+      "nameEn": "WASHER 10",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          440.64,
+          808.56,
+          458.16
+        ]
+      },
+      "dimensions": [
+        "10"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：10",
+      "sourceSlug": "p22-item-29-GB93",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 30,
+      "recordKey": "jwf1124c-p22-item-30",
+      "code": "GB97.1",
+      "nameZh": "垫圈 6",
+      "nameEn": "WASHER 6",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          422.88,
+          808.56,
+          440.64
+        ]
+      },
+      "dimensions": [
+        "6"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：6",
+      "sourceSlug": "p22-item-30-GB97.1",
+      "identityNote": "与项目31共用标准号GB97.1但公称规格不同；按recordKey区分垫圈6",
+      "auditIssues": [
+        "与项目31共用标准号GB97.1但公称规格不同；按recordKey区分垫圈6"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 31,
+      "recordKey": "jwf1124c-p22-item-31",
+      "code": "GB97.1",
+      "nameZh": "垫圈 10",
+      "nameEn": "WASHER 10",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 5,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          405.36,
+          808.56,
+          422.88
+        ]
+      },
+      "dimensions": [
+        "10"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：10",
+      "sourceSlug": "p22-item-31-GB97.1",
+      "identityNote": "与项目30共用标准号GB97.1但公称规格不同；按recordKey区分垫圈10",
+      "auditIssues": [
+        "与项目30共用标准号GB97.1但公称规格不同；按recordKey区分垫圈10"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 32,
+      "recordKey": "jwf1124c-p22-item-32",
+      "code": "GB859",
+      "nameZh": "垫圈 8",
+      "nameEn": "WASHER 8",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 6,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          387.84,
+          808.56,
+          405.36
+        ]
+      },
+      "dimensions": [
+        "8"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：8",
+      "sourceSlug": "p22-item-32-GB859",
+      "identityNote": "与项目33共用标准号GB859但公称规格不同；按recordKey区分垫圈8",
+      "auditIssues": [
+        "与项目33共用标准号GB859但公称规格不同；按recordKey区分垫圈8"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 33,
+      "recordKey": "jwf1124c-p22-item-33",
+      "code": "GB859",
+      "nameZh": "垫圈 10",
+      "nameEn": "WASHER 10",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 22,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 7,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          370.08,
+          808.56,
+          387.84
+        ]
+      },
+      "dimensions": [
+        "10"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：10",
+      "sourceSlug": "p22-item-33-GB859",
+      "identityNote": "与项目32共用标准号GB859但公称规格不同；按recordKey区分垫圈10",
+      "auditIssues": [
+        "与项目32共用标准号GB859但公称规格不同；按recordKey区分垫圈10"
+      ],
+      "existingIssues": []
+    },
+    {
+      "item": 34,
+      "recordKey": "jwf1124c-p22-item-34",
+      "code": "GB893.1",
+      "nameZh": "挡圈 55",
+      "nameEn": "RETAINING RING 55",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 8,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          352.56,
+          808.56,
+          370.08
+        ]
+      },
+      "dimensions": [
+        "55"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：55",
+      "sourceSlug": "p22-item-34-GB893.1",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 35,
+      "recordKey": "jwf1124c-p22-item-35",
+      "code": "GB894.1",
+      "nameZh": "挡圈 30",
+      "nameEn": "RETAINING RING 30",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 9,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          335.04,
+          808.56,
+          352.56
+        ]
+      },
+      "dimensions": [
+        "30"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：30",
+      "sourceSlug": "p22-item-35-GB894.1",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 36,
+      "recordKey": "jwf1124c-p22-item-36",
+      "code": "JB/T7274.1-94",
+      "nameZh": "把手 CM10X32",
+      "nameEn": "HANDLE CM10X32",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 10,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          317.52,
+          808.56,
+          335.04
+        ]
+      },
+      "dimensions": [
+        "CM10X32"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：CM10X32",
+      "sourceSlug": "p22-item-36-JB_T7274.1-94",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 37,
+      "recordKey": "jwf1124c-p22-item-37",
+      "code": "GB/T276-94",
+      "nameZh": "滚动轴承 6006-RS",
+      "nameEn": "ROLLING BEARING 6006-RS",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 11,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          299.76,
+          808.56,
+          317.52
+        ]
+      },
+      "dimensions": [
+        "6006-RS"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：6006-RS",
+      "sourceSlug": "p22-item-37-GB_T276-94",
+      "identityNote": null,
+      "auditIssues": [],
+      "existingIssues": []
+    },
+    {
+      "item": 38,
+      "recordKey": "jwf1124c-p22-item-38",
+      "code": "GB/T7810-95",
+      "nameZh": "带座外球面轴承 UELFLU206",
+      "nameEn": "PILLOW BLOCK BEARING UELFLU206",
+      "sourceNameEn": null,
+      "englishNote": "厂家第22页明细行未提供逐项英文；nameEn为核对后的辅助翻译",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "JWF1124-0700A",
+      "pdfPage": 22,
+      "sheetPage": "共2页第2页",
+      "cell": {
+        "table": "右表",
+        "row": 12,
+        "column": 2,
+        "cropBoxPt": [
+          455.76,
+          282.24,
+          808.56,
+          299.76
+        ]
+      },
+      "dimensions": [
+        "UELFLU206"
+      ],
+      "dimensionSource": "厂家件号或名称栏明确规格：UELFLU206",
+      "sourceSlug": "p22-item-38-GB_T7810-95",
+      "identityNote": "厂家名称栏完整规格为UELFLU206；现有索引dims仅保留206，需以厂家原格完整串为准",
+      "auditIssues": [
+        "厂家名称栏完整规格为UELFLU206；现有索引dims仅保留206，需以厂家原格完整串为准"
+      ],
+      "existingIssues": [
+        "现有索引dims仅为206，厂家原格完整规格为UELFLU206"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+// ZFA051A-120机件略图第12页：9项独立3D规格。
+import {zfa051aP07P12Verified as verified} from '../zfa051a-p07-p12-verified.js';
+
+const row=item=>verified.find(part=>part.page===12&&part.item===item);
+const source=(item,assumptions)=>{const part=row(item);return {page:12,item,code:part.code,recordKey:part.recordKey,nameZh:part.name,quantity:{value:part.quantity,unit:part.quantityUnit,meaning:part.quantityMeaning},dimensions:part.dims,views:[`第12页厂家零件格${item}`],assumptions}};
+const spec=(item,{level='尺寸级',material='paintedMetal',primitives,assumptions})=>({level,material,source:source(item,assumptions),primitives});
+const wheel=(diameter,hub=34,width=54)=>[{type:'lathe',points:[[hub/2,-width/2],[diameter*.4,-width/2],[diameter/2-7,-width/2+8],[diameter/2,-width/2+14],[diameter/2-6,-6],[diameter/2,0],[diameter/2-6,6],[diameter/2,width/2-14],[diameter/2-7,width/2-8],[diameter*.4,width/2],[hub/2,width/2]],material:'darkMetal'},{type:'cylinder',radius:hub/2,length:width+8,material:'metal'}];
+
+export const zfa051aP12ModelSpecs={
+  'FT202-0028':spec(1,{level:'轮廓级',material:'metal',assumptions:['厂家未标注弹簧尺寸；外径、线径、圈数和自由长按图形比例估算','模型仅表达圆柱螺旋拉伸弹簧与两端挂钩'],primitives:[{type:'tube',points:Array.from({length:121},(_,i)=>{const t=i/120;const a=t*Math.PI*20;return [t*180-90,24*Math.cos(a),24*Math.sin(a)]}),radius:3.2,radialSegments:10,material:'metal'},{type:'torus',radius:18,tube:3.2,rotation:[0,Math.PI/2,0],position:[-98,0,0],material:'metal'},{type:'torus',radius:18,tube:3.2,rotation:[0,Math.PI/2,0],position:[98,0,0],material:'metal'}]}),
+  'FT202-0029':spec(2,{assumptions:['厂家明确短轴Φ22、长111；端部台阶、倒角和键槽按图估算','模型按阶梯短轴、端部倒角和局部键槽语义建立'],primitives:[{type:'cylinder',radius:11,length:111,axis:'x',material:'metal'},{type:'cylinder',radius:8,length:22,axis:'x',position:[-55.5,0,0],material:'darkMetal'},{type:'box',size:[35,5,4],position:[30,10,0],material:'darkMetal'}]}),
+  'ZFA051A-0604':spec(3,{assumptions:['厂家明确张紧轮轴向宽24；外径、轴孔和沟槽尺寸按图估算','模型按单槽张紧轮、中心轴孔和两侧挡边建立'],primitives:[{type:'lathe',points:[[14,-12],[55,-12],[65,-8],[70,-3],[62,0],[70,3],[65,8],[55,12],[14,12]],material:'darkMetal'}]}),
+  'ZFA051A-0617':spec(4,{assumptions:['厂家明确SPA带轮外径Φ355；沟槽数、轮宽、轴孔和轮毂按图估算','模型按多槽SPA带轮、中心轮毂和台阶轮缘建立'],primitives:wheel(355,42,78)}),
+  'ZFA051A-0618':spec(5,{assumptions:['厂家明确SPA带轮外径Φ355、台阶径Φ107；沟槽数、轮宽和轴孔按图估算','模型按多槽SPA带轮与Φ107轮毂台阶建立'],primitives:[...wheel(355,48,82),{type:'cylinder',radius:53.5,length:96,material:'metal'}]}),
+  'ZFA051A-0619':spec(6,{assumptions:['厂家明确SPA带轮外径Φ315；沟槽数、轮宽、轴孔和轮毂按图估算','模型按多槽SPA带轮、中心轮毂和台阶轮缘建立'],primitives:wheel(315,40,72)}),
+  'ZFA051A-0621':spec(7,{assumptions:['厂家明确电机底板主尺寸220；宽、厚度、四个长孔和折边按图估算','模型建立矩形电机底板、四个长孔和两侧折边'],primitives:[{type:'extrude',points:[[-110,-85],[110,-85],[110,85],[-110,85]],depth:8,holes:[{kind:'polygon',points:[[-82,-52],[-42,-52],[-42,-42],[-82,-42]]},{kind:'polygon',points:[[42,-52],[82,-52],[82,-42],[42,-42]]},{kind:'polygon',points:[[-82,42],[-42,42],[-42,52],[-82,52]]},{kind:'polygon',points:[[42,42],[82,42],[82,52],[42,52]]}],bevel:2},{type:'box',size:[220,12,28],position:[0,-79,-14],material:'darkMetal'},{type:'box',size:[220,12,28],position:[0,79,-14],material:'darkMetal'}]}),
+  'ZFA051A-0622':spec(8,{assumptions:['厂家明确封板总长395；宽、厚度、弧形缺口和孔位按图估算','模型表达长方形封板、端部圆角和中心让位缺口'],primitives:[{type:'extrude',points:[[-197.5,-70],[185,-70],[197.5,-57],[197.5,57],[185,70],[-197.5,70]],depth:5,holes:[{kind:'circle',center:[0,0],radius:28},{kind:'circle',center:[-175,-48],radius:4},{kind:'circle',center:[175,-48],radius:4},{kind:'circle',center:[-175,48],radius:4},{kind:'circle',center:[175,48],radius:4}],bevel:4}]}),
+  'TZH1035-M12X95':spec(9,{assumptions:['厂家件号明确M12×95；方头、螺纹尾段与倒角按图估算','模型按M12丝杠、95长杆体、端部方头和螺纹语义建立'],primitives:[{type:'cylinder',radius:6,length:95,axis:'x',material:'metal'},{type:'box',size:[16,16,16],position:[-47.5,0,0],material:'darkMetal'},...Array.from({length:12},(_,i)=>({type:'torus',radius:6.3,tube:.7,rotation:[0,Math.PI/2,0],position:[14+i*2.5,0,0],material:'darkMetal'}))]}),
+};

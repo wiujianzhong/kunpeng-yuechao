@@ -1,0 +1,1673 @@
+{
+  "auditVersion": 1,
+  "manualId": "zfa051a",
+  "manualTitle": "ZFA051A-120 机件略图",
+  "sourcePdf": "assets/manuals/zfa051a/original.pdf",
+  "sourcePdfSha256": "d04ff107ffb1359de7dd9369dc001f9b486426d7332baf3c258d3d4c05ea1212",
+  "scope": {
+    "pdfPages": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "assemblies": [
+      "ZFA051A-120-0100",
+      "ZFA051A-120-0200",
+      "ZFA051A-120-0300"
+    ],
+    "recordsByPage": {
+      "3": 14,
+      "4": 8,
+      "5": 6,
+      "6": 12
+    },
+    "recordCount": 40,
+    "quantityTotal": 65
+  },
+  "method": {
+    "pageRenderDpi": 600,
+    "fullSheetCropDpi": 600,
+    "cellCropDpi": 600,
+    "review": "将第3—6页四张零件图册按完整外框裁为600dpi PNG与原生矢量PDF；再按四列网格的行列边界裁出40个非空整格，以600dpi接触表逐格核对件号、中英文名、单台设备用量和图形尺寸。",
+    "cellRule": "每项裁图恰好保留该零件格的四边框、表头和完整图形；空格不生成记录。item为各PDF页内按从左到右、从上到下的非空格顺序号。",
+    "quantityRule": "表头右侧数字按单台设备用量解释，不是库存或供应数量。",
+    "englishRule": "每项英文名称均取自厂家格内英文行，保留厂家原拼写。",
+    "dimensionRule": "只记录零件图上明确标出的线性尺寸、半径、直径、板厚、孔数孔径或角度；未标尺寸不按旧索引猜补。",
+    "remarkRule": "第3—6页格内没有独立备注栏，remark保持null。",
+    "uncertaintyRule": "件号或文字为空时保持null；不确定处只写auditIssues。"
+  },
+  "coordinateSystem": {
+    "unit": "pt",
+    "origin": "PDF左下角",
+    "pageSizePt": [
+      595,
+      842
+    ],
+    "cropPolicy": "cropBoxPt顺序为[left,bottom,right,top]，四边沿矢量外框或格框中心线。",
+    "pages": {
+      "3": {
+        "xBoundsPt": [
+          87.6,
+          202.56,
+          317.28,
+          432,
+          546.72
+        ],
+        "yBoundsPtTopToBottom": [
+          754.08,
+          582.96,
+          411.84,
+          240.96,
+          69.84
+        ],
+        "fullSheetCropBoxPt": [
+          87.6,
+          69.84,
+          546.72,
+          771.84
+        ]
+      },
+      "4": {
+        "xBoundsPt": [
+          87.12,
+          201.6,
+          316.08,
+          430.8,
+          545.28
+        ],
+        "yBoundsPtTopToBottom": [
+          754.08,
+          582.96,
+          412.08,
+          241.2,
+          70.08
+        ],
+        "fullSheetCropBoxPt": [
+          87.12,
+          70.08,
+          545.28,
+          771.84
+        ]
+      },
+      "5": {
+        "xBoundsPt": [
+          87.12,
+          202.08,
+          317.04,
+          431.76,
+          546.72
+        ],
+        "yBoundsPtTopToBottom": [
+          754.08,
+          582.96,
+          412.08,
+          241.2,
+          70.32
+        ],
+        "fullSheetCropBoxPt": [
+          87.12,
+          70.32,
+          546.72,
+          771.84
+        ]
+      },
+      "6": {
+        "xBoundsPt": [
+          87.12,
+          201.84,
+          316.56,
+          431.28,
+          546
+        ],
+        "yBoundsPtTopToBottom": [
+          754.08,
+          583.2,
+          412.08,
+          240.96,
+          69.84
+        ],
+        "fullSheetCropBoxPt": [
+          87.12,
+          69.84,
+          546,
+          772.08
+        ]
+      }
+    }
+  },
+  "pageHeaders": {
+    "3": {
+      "assembly": "ZFA051A-120-0100",
+      "sheetPage": "共2页第1页"
+    },
+    "4": {
+      "assembly": "ZFA051A-120-0100",
+      "sheetPage": "共2页第2页"
+    },
+    "5": {
+      "assembly": "ZFA051A-120-0200",
+      "sheetPage": "共1页第1页"
+    },
+    "6": {
+      "assembly": "ZFA051A-120-0300",
+      "sheetPage": "共2页第1页"
+    }
+  },
+  "sheetDrawings": [
+    {
+      "pdfPage": 3,
+      "assembly": "ZFA051A-120-0100",
+      "sheetPage": "共2页第1页",
+      "confirmed": true,
+      "cropBoxPt": [
+        87.6,
+        69.84,
+        546.72,
+        771.84
+      ],
+      "sourceCrop": "assets/manuals/zfa051a/crops/ZFA051A-120-0100-sheet-p03.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/ZFA051A-120-0100-sheet-p03.pdf",
+      "recordCount": 14
+    },
+    {
+      "pdfPage": 4,
+      "assembly": "ZFA051A-120-0100",
+      "sheetPage": "共2页第2页",
+      "confirmed": true,
+      "cropBoxPt": [
+        87.12,
+        70.08,
+        545.28,
+        771.84
+      ],
+      "sourceCrop": "assets/manuals/zfa051a/crops/ZFA051A-120-0100-sheet-p04.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/ZFA051A-120-0100-sheet-p04.pdf",
+      "recordCount": 8
+    },
+    {
+      "pdfPage": 5,
+      "assembly": "ZFA051A-120-0200",
+      "sheetPage": "共1页第1页",
+      "confirmed": true,
+      "cropBoxPt": [
+        87.12,
+        70.32,
+        546.72,
+        771.84
+      ],
+      "sourceCrop": "assets/manuals/zfa051a/crops/ZFA051A-120-0200-sheet-p05.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/ZFA051A-120-0200-sheet-p05.pdf",
+      "recordCount": 6
+    },
+    {
+      "pdfPage": 6,
+      "assembly": "ZFA051A-120-0300",
+      "sheetPage": "共2页第1页",
+      "confirmed": true,
+      "cropBoxPt": [
+        87.12,
+        69.84,
+        546,
+        772.08
+      ],
+      "sourceCrop": "assets/manuals/zfa051a/crops/ZFA051A-120-0300-sheet-p06.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/ZFA051A-120-0300-sheet-p06.pdf",
+      "recordCount": 12
+    }
+  ],
+  "indexComparison": {
+    "existingIndexFile": "data/zfa051a-parts.js",
+    "existingScopeRowCount": 40,
+    "sameOrderCount": 40,
+    "exactCodeAndChineseNameCount": 38,
+    "quantityMissingCount": 40,
+    "issues": [
+      "第3页前撑挡结合件高度厂家标321，旧索引写371；进棉顶板厚/高标28，旧索引写20；进棉底板斜段标225，旧索引写233；底板结合件标125，旧索引写725。",
+      "第4页盖板厂家标280X180，旧索引写280X280；密封条弧半径标R288.5与R252，旧索引存在遗漏或写成253。",
+      "第5页厂家名称为“轴承座托脚结合件”且标180，旧索引写“托架”并记480；打手翼板为R87，旧索引误记871；法兰为Φ174，旧索引写175。",
+      "第6页厂家件号为ZFA211-3112，旧索引误写ZFA211-3012。",
+      "旧索引40项均未录入厂家格内的单台设备用量。"
+    ]
+  },
+  "auditIssues": [],
+  "parts": [
+    {
+      "item": 1,
+      "recordKey": "zfa051a-p03-item-001",
+      "code": "ZFA051A-120-0100-1",
+      "nameZh": "前撑挡结合件",
+      "nameEn": "FRONT BRACE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "1200",
+        "321",
+        "28"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.6,
+          582.96,
+          202.56,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-001",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-001.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 2,
+      "recordKey": "zfa051a-p03-item-002",
+      "code": "ZFA051A-120-0100-2",
+      "nameZh": "进棉顶板结合件",
+      "nameEn": "COTTON INLET TOP PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "1070",
+        "28"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          202.56,
+          582.96,
+          317.28,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-002",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-002.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-002.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 3,
+      "recordKey": "zfa051a-p03-item-003",
+      "code": "ZFA051A-120-0100-3A",
+      "nameZh": "进棉底板结合件",
+      "nameEn": "COTTON INLET BASE PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "304.5",
+        "225"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          317.28,
+          582.96,
+          432,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-003",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-003.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 4,
+      "recordKey": "zfa051a-p03-item-004",
+      "code": "ZFA051A-120-0100-4",
+      "nameZh": "撑挡结合件",
+      "nameEn": "BRACE SUB-ASS",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "1200",
+        "55"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          432,
+          582.96,
+          546.72,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-004",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-004.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 5,
+      "recordKey": "zfa051a-p03-item-005",
+      "code": "ZFA051A-120-0100-5",
+      "nameZh": "底板结合件",
+      "nameEn": "BASE PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "640",
+        "1200"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          87.6,
+          411.84,
+          202.56,
+          582.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-005",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-005.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 6,
+      "recordKey": "zfa051a-p03-item-006",
+      "code": "ZFA051A-120-0100-6",
+      "nameZh": "大弧板结合件",
+      "nameEn": "LARGE ARC-PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "R250",
+        "R150"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          202.56,
+          411.84,
+          317.28,
+          582.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-006",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-006.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 7,
+      "recordKey": "zfa051a-p03-item-007",
+      "code": "ZFA051A-120-0100-7",
+      "nameZh": "出棉前板结合件",
+      "nameEn": "OUTLET FRONT PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "1196",
+        "80°"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          317.28,
+          411.84,
+          432,
+          582.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-007",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-007.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-007.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 8,
+      "recordKey": "zfa051a-p03-item-008",
+      "code": "ZFA051A-120-0100-8",
+      "nameZh": "小弧板结合件",
+      "nameEn": "SMALL ARC-PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "497",
+        "153"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          432,
+          411.84,
+          546.72,
+          582.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-008",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-008.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 9,
+      "recordKey": "zfa051a-p03-item-009",
+      "code": "ZFA051A-120-0100-10",
+      "nameZh": "左机架结合件",
+      "nameEn": "LEFT FRAME SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "1100",
+        "1035"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          87.6,
+          240.96,
+          202.56,
+          411.84
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-009",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-009.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-009.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 10,
+      "recordKey": "zfa051a-p03-item-010",
+      "code": "ZFA051A-120-0100-11",
+      "nameZh": "右机架结合件",
+      "nameEn": "RIGHT FRAME SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "1100",
+        "1035"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          202.56,
+          240.96,
+          317.28,
+          411.84
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-010",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-010.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-010.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 11,
+      "recordKey": "zfa051a-p03-item-011",
+      "code": "ZFA051A-120-0100-14",
+      "nameZh": "底板结合件",
+      "nameEn": "BASE PLATE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "125",
+        "25"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          317.28,
+          240.96,
+          432,
+          411.84
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-011",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-011.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-011.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 12,
+      "recordKey": "zfa051a-p03-item-012",
+      "code": "ZFA051A-120-0100-19",
+      "nameZh": "刷子固定座结合件",
+      "nameEn": "BRUSH FIXED SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "210"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          432,
+          240.96,
+          546.72,
+          411.84
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-012",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-012.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-012.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 13,
+      "recordKey": "zfa051a-p03-item-013",
+      "code": "ZFA051A-120-0100-20",
+      "nameZh": "刷子结合件",
+      "nameEn": "BRUSH SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "1196",
+        "60"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          87.6,
+          69.84,
+          202.56,
+          240.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-013",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-013.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-013.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 14,
+      "recordKey": "zfa051a-p03-item-014",
+      "code": "ZFA051A-120-0128",
+      "nameZh": "密封条",
+      "nameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 3,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "1200",
+        "20",
+        "δ4",
+        "6-Φ8"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          432,
+          69.84,
+          546.72,
+          240.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p03-item-014",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p03-item-014.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p03-item-014.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 1,
+      "recordKey": "zfa051a-p04-item-001",
+      "code": "ZFA051A-120-0129",
+      "nameZh": "密封条",
+      "nameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 4,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "1200",
+        "20",
+        "δ4",
+        "8-Φ8"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          582.96,
+          201.6,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p04-item-001",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p04-item-001.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p04-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 2,
+      "recordKey": "zfa051a-p04-item-002",
+      "code": "ZFA051A-120-0140",
+      "nameZh": "盖板",
+      "nameEn": "COVER PLATE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 4,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "280",
+        "180",
+        "δ3"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          201.6,
+          582.96,
+          316.08,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p04-item-002",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p04-item-002.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p04-item-002.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 3,
+      "recordKey": "zfa051a-p04-item-003",
+      "code": "ZFA051A-120-0146",
+      "nameZh": "刷子压板",
+      "nameEn": "BRUSH PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 4,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "1196",
+        "7"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          316.08,
+          582.96,
+          430.8,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p04-item-003",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p04-item-003.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p04-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 4,
+      "recordKey": "zfa051a-p04-item-004",
+      "code": "ZFA051A-0120",
+      "nameZh": "密封条",
+      "nameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 4,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "778",
+        "R288.5",
+        "δ2"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          412.08,
+          201.6,
+          582.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p04-item-004",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p04-item-004.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p04-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 5,
+      "recordKey": "zfa051a-p04-item-005",
+      "code": "ZFA051A-0121",
+      "nameZh": "密封条",
+      "nameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 4,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "304",
+        "279",
+        "δ2"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          201.6,
+          412.08,
+          316.08,
+          582.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p04-item-005",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p04-item-005.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p04-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 6,
+      "recordKey": "zfa051a-p04-item-006",
+      "code": "ZFA051A-0130A",
+      "nameZh": "密封条",
+      "nameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 4,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "55",
+        "δ2"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          316.08,
+          412.08,
+          430.8,
+          582.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p04-item-006",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p04-item-006.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p04-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 7,
+      "recordKey": "zfa051a-p04-item-007",
+      "code": "ZFA051A-0131",
+      "nameZh": "密封条",
+      "nameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 4,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "R252",
+        "R152",
+        "δ2"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          430.8,
+          412.08,
+          545.28,
+          582.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p04-item-007",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p04-item-007.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p04-item-007.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 8,
+      "recordKey": "zfa051a-p04-item-008",
+      "code": "ZFA051A-0132A",
+      "nameZh": "密封条",
+      "nameEn": "SEALING STRIP",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0100",
+      "pdfPage": 4,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "464"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          241.2,
+          201.6,
+          412.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p04-item-008",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p04-item-008.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p04-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 1,
+      "recordKey": "zfa051a-p05-item-001",
+      "code": "ZFA051A-120-0200-1",
+      "nameZh": "打手结合件",
+      "nameEn": "BEATER SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0200",
+      "pdfPage": 5,
+      "sheetPage": "共1页第1页",
+      "dimensions": [
+        "1564"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          582.96,
+          202.08,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p05-item-001",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p05-item-001.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p05-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 2,
+      "recordKey": "zfa051a-p05-item-002",
+      "code": "ZFA051A-0200-1A",
+      "nameZh": "轴承座托脚结合件",
+      "nameEn": "BEARING BRACKET SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0200",
+      "pdfPage": 5,
+      "sheetPage": "共1页第1页",
+      "dimensions": [
+        "180"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          317.04,
+          582.96,
+          431.76,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p05-item-002",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p05-item-002.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p05-item-002.pdf",
+      "auditIssues": [
+        "厂家中文名称清楚为“轴承座托脚结合件”；旧索引误写为“轴承座托架结合件”。"
+      ]
+    },
+    {
+      "item": 3,
+      "recordKey": "zfa051a-p05-item-003",
+      "code": "ZFA051A-120-0201",
+      "nameZh": "打手翼板",
+      "nameEn": "BEATER BARREL PLATE",
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0200",
+      "pdfPage": 5,
+      "sheetPage": "共1页第1页",
+      "dimensions": [
+        "R87"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          412.08,
+          202.08,
+          582.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p05-item-003",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p05-item-003.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p05-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 4,
+      "recordKey": "zfa051a-p05-item-004",
+      "code": "ZFA051A-120-0202",
+      "nameZh": "皮翼",
+      "nameEn": "LEATHER WING",
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0200",
+      "pdfPage": 5,
+      "sheetPage": "共1页第1页",
+      "dimensions": [
+        "1192",
+        "δ4"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          202.08,
+          412.08,
+          317.04,
+          582.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p05-item-004",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p05-item-004.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p05-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 5,
+      "recordKey": "zfa051a-p05-item-005",
+      "code": "ZFA051A-120-0203",
+      "nameZh": "轴",
+      "nameEn": "SHAFT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0200",
+      "pdfPage": 5,
+      "sheetPage": "共1页第1页",
+      "dimensions": [
+        "1564"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          317.04,
+          412.08,
+          431.76,
+          582.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p05-item-005",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p05-item-005.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p05-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 6,
+      "recordKey": "zfa051a-p05-item-006",
+      "code": "LVSAB-0202A",
+      "nameZh": "法兰",
+      "nameEn": "FLANGE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0200",
+      "pdfPage": 5,
+      "sheetPage": "共1页第1页",
+      "dimensions": [
+        "Φ174",
+        "75"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          241.2,
+          202.08,
+          412.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p05-item-006",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p05-item-006.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p05-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 1,
+      "recordKey": "zfa051a-p06-item-001",
+      "code": "ZFA051A-120-0300-1",
+      "nameZh": "尘笼结合件",
+      "nameEn": "DUST CAGE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "1573"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          583.2,
+          201.84,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-001",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-001.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 2,
+      "recordKey": "zfa051a-p06-item-002",
+      "code": "ZFA051A-0300-1",
+      "nameZh": "右法兰结合件",
+      "nameEn": "RIGHT FLANGE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "Φ550"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          201.84,
+          583.2,
+          316.56,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-002",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-002.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-002.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 3,
+      "recordKey": "zfa051a-p06-item-003",
+      "code": "ZFA051A-0300-2",
+      "nameZh": "左法兰结合件",
+      "nameEn": "LEFT FLANGE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "Φ550"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 3,
+        "cropBoxPt": [
+          316.56,
+          583.2,
+          431.28,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-003",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-003.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 4,
+      "recordKey": "zfa051a-p06-item-004",
+      "code": "ZFA051A-0300-3B",
+      "nameZh": "罩壳结合件",
+      "nameEn": "HOOD CASING SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "104"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 1,
+        "column": 4,
+        "cropBoxPt": [
+          431.28,
+          583.2,
+          546,
+          754.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-004",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-004.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 5,
+      "recordKey": "zfa051a-p06-item-005",
+      "code": "ZFA051A-120-0301",
+      "nameZh": "尘笼网板",
+      "nameEn": "DUST CAGE SCREEN PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "1140"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 3,
+        "cropBoxPt": [
+          316.56,
+          412.08,
+          431.28,
+          583.2
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-005",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-005.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 6,
+      "recordKey": "zfa051a-p06-item-006",
+      "code": "ZFA051A-120-0302",
+      "nameZh": "轴",
+      "nameEn": "SHAFT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "1573"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 2,
+        "column": 4,
+        "cropBoxPt": [
+          431.28,
+          412.08,
+          546,
+          583.2
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-006",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-006.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 7,
+      "recordKey": "zfa051a-p06-item-007",
+      "code": "ZFA211-3112",
+      "nameZh": "圆形闷盖",
+      "nameEn": "ROUND COVER",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "20"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 3,
+        "column": 3,
+        "cropBoxPt": [
+          316.56,
+          240.96,
+          431.28,
+          412.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-007",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-007.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-007.pdf",
+      "auditIssues": [
+        "厂家件号清楚为ZFA211-3112；旧索引误写为ZFA211-3012。"
+      ]
+    },
+    {
+      "item": 8,
+      "recordKey": "zfa051a-p06-item-008",
+      "code": "LVSAB-0302A",
+      "nameZh": "尘笼法兰",
+      "nameEn": "DUST CAGE FLANGE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "Φ490"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 3,
+        "column": 4,
+        "cropBoxPt": [
+          431.28,
+          240.96,
+          546,
+          412.08
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-008",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-008.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 9,
+      "recordKey": "zfa051a-p06-item-009",
+      "code": "LVSAB-0306A",
+      "nameZh": "密封环",
+      "nameEn": "SEALING RING",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "Φ480",
+        "14"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          87.12,
+          69.84,
+          201.84,
+          240.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-009",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-009.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-009.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 10,
+      "recordKey": "zfa051a-p06-item-010",
+      "code": "LVSAB-0307",
+      "nameZh": "密封环",
+      "nameEn": "SEALING RING",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "Φ480",
+        "15"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          201.84,
+          69.84,
+          316.56,
+          240.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-010",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-010.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-010.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 11,
+      "recordKey": "zfa051a-p06-item-011",
+      "code": "LVSAB-0308",
+      "nameZh": "密封环",
+      "nameEn": "SEALING RING",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "Φ500"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 4,
+        "column": 3,
+        "cropBoxPt": [
+          316.56,
+          69.84,
+          431.28,
+          240.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-011",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-011.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-011.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 12,
+      "recordKey": "zfa051a-p06-item-012",
+      "code": "LVSAB-0309",
+      "nameZh": "密封环",
+      "nameEn": "SEALING RING",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "remark": null,
+      "assembly": "ZFA051A-120-0300",
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "Φ500"
+      ],
+      "dimensionSource": "厂家零件图中的明确标注",
+      "cell": {
+        "table": "四列零件图册",
+        "row": 4,
+        "column": 4,
+        "cropBoxPt": [
+          431.28,
+          69.84,
+          546,
+          240.96
+        ]
+      },
+      "sourceSlug": "zfa051a-p06-item-012",
+      "sourceCrop": "assets/manuals/zfa051a/crops/zfa051a-p06-item-012.png",
+      "sourceVector": "assets/manuals/zfa051a/crops/zfa051a-p06-item-012.pdf",
+      "auditIssues": []
+    }
+  ]
+}

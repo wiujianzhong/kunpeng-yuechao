@@ -1,0 +1,3630 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1102",
+  "manualTitle": "JWF1102 外供图立体图",
+  "sourcePdf": "assets/manuals/jwf1102/original.pdf",
+  "sourcePdfSha256": "cd2b80ef9b22ccdb50fc023ff300222fd2a16d1b6c74d27fa2c49867df21b2d8",
+  "scope": {
+    "pdfPages": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "assembly": "JWF1102-0100",
+    "assemblyTitleZh": "机架部件",
+    "assemblyTitleEnSource": "FRASS ASS.",
+    "assemblySheetPages": [
+      "共2页第1页",
+      "共2页第2页"
+    ],
+    "partsTableSheetPages": [
+      "共2页第1页",
+      "共2页第2页"
+    ],
+    "populatedItemNumbers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90
+    ],
+    "emptyItemRows": [],
+    "recordCount": 90,
+    "quantityTotal": 757
+  },
+  "method": {
+    "pageRenderDpi": 450,
+    "assemblyCropDpi": 600,
+    "cellCropDpi": 600,
+    "review": "先以450dpi逐页检查第6、7页两张JWF1102-0100爆炸总图与第8、9页整表，再按各页实际矢量格线生成600dpi总图和90个逐格资产，并以四张逐格接触表复核件号、名称、数量与格框。",
+    "assemblyRule": "第6、7页分别沿本页完整外图框中心线裁切；两页外框坐标有细微差异，不共用一个裁框。",
+    "cellRule": "第8页项目1—26取左表、27—50取右表；第9页项目51—76取左表、77—90取右表。每个cropBox四边均沿该零件所在整行外格框中心线。",
+    "quantityRule": "数量栏按用户确认解释为单台设备用量，不是库存或厂家供应数量。",
+    "recordKeyRule": "重复标准件、同名门结合件、同名铰链和同件号同规格但数量不同的条目，均按厂家序号建立独立recordKey。",
+    "codeRule": "本范围90项件号栏均有值；若后续页出现空件号，必须保持null，不能从名称或备注反填。",
+    "englishRule": "第8、9页明细行没有逐项英文名称；nameEn保持null。标题栏英文“FRASS ASS.”按厂家原文记录，不自行改写。",
+    "specificationRule": "名称栏明确规格原样保留X和空格；密封条、嵌条、嵌芯件号中可直接读取的规格另存specification并注明来源；普通图号数字不当尺寸。",
+    "remarkRule": "第8、9页90项备注栏均为空，统一保存null。",
+    "uncertaintyRule": "不确定信息只写auditIssues；禁止用旧索引覆盖厂家原格。"
+  },
+  "coordinateSystem": {
+    "unit": "pt",
+    "origin": "PDF左下角",
+    "pageSizePt": [
+      842,
+      595
+    ],
+    "cropPolicy": "cropBoxPt顺序为[left,bottom,right,top]，四边沿矢量图框或格框中心线。",
+    "assemblyFrameCropBoxesPt": {
+      "6": [
+        60.24,
+        33.36,
+        814.08,
+        566.4
+      ],
+      "7": [
+        60.24,
+        32.64,
+        814.56,
+        566.64
+      ]
+    },
+    "page8": {
+      "leftTableXBoundsPt": [
+        103.44,
+        458.88
+      ],
+      "rightTableXBoundsPt": [
+        458.88,
+        814.56
+      ],
+      "rowBoundsPtTopToBottom": [
+        495.12,
+        477.36,
+        459.6,
+        441.84,
+        424.08,
+        406.32,
+        388.56,
+        370.8,
+        353.04,
+        335.28,
+        317.52,
+        299.52,
+        282,
+        264,
+        246.24,
+        228.48,
+        210.72,
+        192.96,
+        175.2,
+        157.44,
+        139.68,
+        121.92,
+        104.16,
+        86.4,
+        68.4,
+        50.64,
+        32.88
+      ]
+    },
+    "page9": {
+      "leftTableXBoundsPt": [
+        103.44,
+        458.88
+      ],
+      "rightTableXBoundsPt": [
+        458.88,
+        814.56
+      ],
+      "rowBoundsPtTopToBottom": [
+        495.36,
+        477.6,
+        459.84,
+        441.84,
+        424.08,
+        406.32,
+        388.56,
+        370.8,
+        353.04,
+        335.28,
+        317.52,
+        299.76,
+        282,
+        264.24,
+        246.48,
+        228.72,
+        210.96,
+        193.2,
+        175.44,
+        157.68,
+        139.92,
+        122.16,
+        104.4,
+        86.64,
+        68.64,
+        50.88,
+        33.12
+      ]
+    }
+  },
+  "pageHeaders": {
+    "companyZh": "恒天重工股份有限公司",
+    "companyEn": "HI-TECH HEAVY INDUSTRY CO.,LTD.",
+    "machineZh": "JWF1102型单轴流开棉机",
+    "machineEn": "TYPE JWF1102 SINGLE-ROLL OPENER",
+    "assembly": "JWF1102-0100",
+    "titleZh": "机架部件",
+    "titleEnSource": "FRASS ASS.",
+    "columnHeader": [
+      "序号 ITEM",
+      "代号 CODE",
+      "名称 NAME",
+      "数量 QUALITY",
+      "备注 REMARK"
+    ]
+  },
+  "assemblyDrawings": [
+    {
+      "pdfPage": 6,
+      "sheetPage": "共2页第1页",
+      "confirmed": true,
+      "classification": "JWF1102-0100机架部件爆炸总图（框架、前罩、风道、门窗及紧固件分解）",
+      "cropBoxPt": [
+        60.24,
+        33.36,
+        814.08,
+        566.4
+      ],
+      "sourceCrop": "assets/manuals/jwf1102/crops/JWF1102-0100-assembly-p06.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/JWF1102-0100-assembly-p06.pdf",
+      "calloutExamples": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        21,
+        22,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        35,
+        51,
+        52,
+        54,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        68,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        90
+      ],
+      "visibleSpatialRelations": [
+        "左右机架板分列于总图两侧，多根撑挡与排杂罩板沿整机宽度方向爆炸展开。",
+        "前下部防护窗、门板、调节补风板及密封条保持与机架开口的相对位置；紧固件组合以多编号引线标注。",
+        "排尘弯管、排杂管和方管位于机架侧部及下部，局部小件以放大框显示。"
+      ],
+      "uncertainties": [
+        "总图未提供工程尺寸、公差、材质或装配顺序，不能据此生成加工级几何。",
+        "calloutExamples只用于目测追溯，不以爆炸图单页反推全部紧固件安装坐标。"
+      ]
+    },
+    {
+      "pdfPage": 7,
+      "sheetPage": "共2页第2页",
+      "confirmed": true,
+      "classification": "JWF1102-0100机架部件爆炸总图（整机框架、顶部罩壳及侧门分解）",
+      "cropBoxPt": [
+        60.24,
+        32.64,
+        814.56,
+        566.64
+      ],
+      "sourceCrop": "assets/manuals/jwf1102/crops/JWF1102-0100-assembly-p07.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/JWF1102-0100-assembly-p07.pdf",
+      "calloutExamples": [
+        10,
+        18,
+        19,
+        20,
+        23,
+        24,
+        25,
+        26,
+        27,
+        34,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        53,
+        55,
+        59,
+        71,
+        79,
+        81,
+        88
+      ],
+      "visibleSpatialRelations": [
+        "主体机架位于中央，顶板、上部罩壳、窗口和左右门板沿垂直或横向爆炸分离。",
+        "左侧大门及右侧多块门板分别对应不同件号的门结合件；同名不能视为同一记录。",
+        "门锁、拉手、铰链和标准件分布于侧门边缘，右下两块带通风孔门板保持各自独立位置。"
+      ],
+      "uncertainties": [
+        "第89项为清单后补的排杂斜板结合件，本页未确认到清晰独立标号，不据清单反推其爆炸图落点。",
+        "爆炸图只能确认可见相邻关系，不能推断隐藏结构、装配先后或紧固扭矩。"
+      ]
+    }
+  ],
+  "partsTable": {
+    "pages": [
+      {
+        "pdfPage": 8,
+        "sheetPage": "共2页第1页",
+        "items": [
+          1,
+          50
+        ],
+        "leftItems": [
+          1,
+          26
+        ],
+        "rightItems": [
+          27,
+          50
+        ]
+      },
+      {
+        "pdfPage": 9,
+        "sheetPage": "共2页第2页",
+        "items": [
+          51,
+          90
+        ],
+        "leftItems": [
+          51,
+          76
+        ],
+        "rightItems": [
+          77,
+          90
+        ]
+      }
+    ],
+    "allRemarksNull": true,
+    "allCodesPresent": true
+  },
+  "indexComparison": {
+    "existingFile": "data/jwf1102-parts.js",
+    "sameOrderCount": 90,
+    "codeMatchCount": 90,
+    "normalizedChineseNameMatchCount": 89,
+    "quantityMissingCount": 90,
+    "issues": [
+      "现有索引90项均未录入厂家数量栏；本审计补齐单台设备用量，总计757件。",
+      "现有索引第86项误写为“销5×15”、dims为[15,5]；厂家原格明确是“GB879 / 销 6X16 / 数量4”。",
+      "现有索引标准件名称将厂家原格中的X和空格改成×并去空格；本审计按厂家原格保留。",
+      "第86项和第90项同为GB879 / 销 6X16，但数量分别为4和8，必须保留两条独立记录。"
+    ]
+  },
+  "auditIssues": [
+    "厂家标题栏英文原文为“FRASS ASS.”，疑似厂家拼写问题；为可追溯性按原文保留，不擅自改为FRAME ASS.",
+    "第8、9页备注栏全部为空；不得把规格或推测说明写入备注。",
+    "第6、7页爆炸图缺少加工级尺寸与公差，本审计不做3D建模。"
+  ],
+  "parts": [
+    {
+      "item": 1,
+      "recordKey": "jwf1102-p08-item-001",
+      "code": "ZFA113-0100-4",
+      "nameZh": "罩板结合件（一）",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          477.36,
+          458.88,
+          495.12
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-001",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-001.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-001.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 2,
+      "recordKey": "jwf1102-p08-item-002",
+      "code": "ZFA113-0100-11",
+      "nameZh": "托脚结合件（一）",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          459.6,
+          458.88,
+          477.36
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-002",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-002.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-002.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 3,
+      "recordKey": "jwf1102-p08-item-003",
+      "code": "ZFA113-0100-12",
+      "nameZh": "托脚结合件（二）",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          441.84,
+          458.88,
+          459.6
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-003",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-003.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-003.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 4,
+      "recordKey": "jwf1102-p08-item-004",
+      "code": "ZFA113-0100-36",
+      "nameZh": "罩板结合件（四）",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          424.08,
+          458.88,
+          441.84
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-004",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-004.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-004.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 5,
+      "recordKey": "jwf1102-p08-item-005",
+      "code": "ZFA113-0100-39",
+      "nameZh": "排尘弯管结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 5,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          406.32,
+          458.88,
+          424.08
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-005",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-005.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-005.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 6,
+      "recordKey": "jwf1102-p08-item-006",
+      "code": "ZFA113-0100-5A",
+      "nameZh": "罩板结合件（二）",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 6,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          388.56,
+          458.88,
+          406.32
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-006",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-006.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-006.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 7,
+      "recordKey": "jwf1102-p08-item-007",
+      "code": "ZFA113-0100-16A",
+      "nameZh": "上挡板结合件（一）",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 7,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          370.8,
+          458.88,
+          388.56
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-007",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-007.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-007.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 8,
+      "recordKey": "jwf1102-p08-item-008",
+      "code": "ZFA113-0100-17A",
+      "nameZh": "上挡板结合件（二）",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 8,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          353.04,
+          458.88,
+          370.8
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-008",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-008.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-008.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 9,
+      "recordKey": "jwf1102-p08-item-009",
+      "code": "ZFA113B-0100-4",
+      "nameZh": "撑挡结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 9,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          335.28,
+          458.88,
+          353.04
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-009",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-009.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-009.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 10,
+      "recordKey": "jwf1102-p08-item-010",
+      "code": "ZFA113B-0100-7",
+      "nameZh": "门结合件（五）",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 10,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          317.52,
+          458.88,
+          335.28
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-010",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-010.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-010.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 11,
+      "recordKey": "jwf1102-p08-item-011",
+      "code": "ZFA113B-0100-9",
+      "nameZh": "撑挡结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 11,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          299.52,
+          458.88,
+          317.52
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-011",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-011.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-011.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 12,
+      "recordKey": "jwf1102-p08-item-012",
+      "code": "JWF1102-0100-1",
+      "nameZh": "左机架结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 12,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          282,
+          458.88,
+          299.52
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-012",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-012.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-012.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 13,
+      "recordKey": "jwf1102-p08-item-013",
+      "code": "JWF1102-0100-2",
+      "nameZh": "右机架结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 13,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          264,
+          458.88,
+          282
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-013",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-013.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-013.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 14,
+      "recordKey": "jwf1102-p08-item-014",
+      "code": "JWF1102-0100-3",
+      "nameZh": "撑挡结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 14,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          246.24,
+          458.88,
+          264
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-014",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-014.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-014.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 15,
+      "recordKey": "jwf1102-p08-item-015",
+      "code": "JWF1102-0100-4",
+      "nameZh": "撑挡结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 15,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          228.48,
+          458.88,
+          246.24
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-015",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-015.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-015.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 16,
+      "recordKey": "jwf1102-p08-item-016",
+      "code": "JWF1102-0100-5",
+      "nameZh": "排杂罩板结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 16,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          210.72,
+          458.88,
+          228.48
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-016",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-016.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-016.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 17,
+      "recordKey": "jwf1102-p08-item-017",
+      "code": "JWF1102-0100-6",
+      "nameZh": "排杂罩板结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 17,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          192.96,
+          458.88,
+          210.72
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-017",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-017.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-017.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 18,
+      "recordKey": "jwf1102-p08-item-018",
+      "code": "JWF1102-0100-7",
+      "nameZh": "顶板结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 18,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          175.2,
+          458.88,
+          192.96
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-018",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-018.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-018.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 19,
+      "recordKey": "jwf1102-p08-item-019",
+      "code": "JWF1102-0100-8",
+      "nameZh": "导流板结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 19,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          157.44,
+          458.88,
+          175.2
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-019",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-019.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-019.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 20,
+      "recordKey": "jwf1102-p08-item-020",
+      "code": "JWF1102-0100-9",
+      "nameZh": "防护窗结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 20,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          139.68,
+          458.88,
+          157.44
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-020",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-020.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-020.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 21,
+      "recordKey": "jwf1102-p08-item-021",
+      "code": "JWF1102-0100-10",
+      "nameZh": "排杂管结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 21,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          121.92,
+          458.88,
+          139.68
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-021",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-021.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-021.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 22,
+      "recordKey": "jwf1102-p08-item-022",
+      "code": "JWF1102-0100-11",
+      "nameZh": "排杂方管结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 22,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          104.16,
+          458.88,
+          121.92
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-022",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-022.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-022.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 23,
+      "recordKey": "jwf1102-p08-item-023",
+      "code": "JWF1102-0100-12",
+      "nameZh": "门结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 23,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          86.4,
+          458.88,
+          104.16
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-023",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-023.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-023.pdf",
+      "auditIssues": [
+        "厂家将同名“门结合件”按不同件号分列；必须保留独立recordKey，不能按名称合并。"
+      ]
+    },
+    {
+      "item": 24,
+      "recordKey": "jwf1102-p08-item-024",
+      "code": "JWF1102-0100-13",
+      "nameZh": "门结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 24,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          68.4,
+          458.88,
+          86.4
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-024",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-024.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-024.pdf",
+      "auditIssues": [
+        "厂家将同名“门结合件”按不同件号分列；必须保留独立recordKey，不能按名称合并。"
+      ]
+    },
+    {
+      "item": 25,
+      "recordKey": "jwf1102-p08-item-025",
+      "code": "JWF1102-0100-14",
+      "nameZh": "门结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 25,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          50.64,
+          458.88,
+          68.4
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-025",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-025.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-025.pdf",
+      "auditIssues": [
+        "厂家将同名“门结合件”按不同件号分列；必须保留独立recordKey，不能按名称合并。"
+      ]
+    },
+    {
+      "item": 26,
+      "recordKey": "jwf1102-p08-item-026",
+      "code": "JWF1102-0100-15",
+      "nameZh": "门结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 26,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          32.88,
+          458.88,
+          50.64
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-026",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-026.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-026.pdf",
+      "auditIssues": [
+        "厂家将同名“门结合件”按不同件号分列；必须保留独立recordKey，不能按名称合并。"
+      ]
+    },
+    {
+      "item": 27,
+      "recordKey": "jwf1102-p08-item-027",
+      "code": "JWF1102-0100-16",
+      "nameZh": "门结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          477.36,
+          814.56,
+          495.12
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-027",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-027.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-027.pdf",
+      "auditIssues": [
+        "厂家将同名“门结合件”按不同件号分列；必须保留独立recordKey，不能按名称合并。"
+      ]
+    },
+    {
+      "item": 28,
+      "recordKey": "jwf1102-p08-item-028",
+      "code": "MM6-2200-1",
+      "nameZh": "棉箱窗结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          459.6,
+          814.56,
+          477.36
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-028",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-028.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-028.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 29,
+      "recordKey": "jwf1102-p08-item-029",
+      "code": "ZFA113-0103",
+      "nameZh": "观察窗",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          441.84,
+          814.56,
+          459.6
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-029",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-029.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-029.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 30,
+      "recordKey": "jwf1102-p08-item-030",
+      "code": "ZFA113-0105A",
+      "nameZh": "隔板",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          424.08,
+          814.56,
+          441.84
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-030",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-030.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-030.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 31,
+      "recordKey": "jwf1102-p08-item-031",
+      "code": "ZFA113-0108",
+      "nameZh": "行程开关底板",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 5,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          406.32,
+          814.56,
+          424.08
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-031",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-031.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-031.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 32,
+      "recordKey": "jwf1102-p08-item-032",
+      "code": "ZFA113-01108",
+      "nameZh": "门挡边",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 6,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          388.56,
+          814.56,
+          406.32
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-032",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-032.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-032.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 33,
+      "recordKey": "jwf1102-p08-item-033",
+      "code": "ZFA113-01121",
+      "nameZh": "螺栓",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 7,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          370.8,
+          814.56,
+          388.56
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-033",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-033.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-033.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 34,
+      "recordKey": "jwf1102-p08-item-034",
+      "code": "ZFA113-01122",
+      "nameZh": "门开关挡板",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 8,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          353.04,
+          814.56,
+          370.8
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-034",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-034.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-034.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 35,
+      "recordKey": "jwf1102-p08-item-035",
+      "code": "ZFA113B-0102A",
+      "nameZh": "罩板",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 9,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          335.28,
+          814.56,
+          353.04
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-035",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-035.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-035.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 36,
+      "recordKey": "jwf1102-p08-item-036",
+      "code": "JWF1102-0101",
+      "nameZh": "调节补风板（一）",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 10,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          317.52,
+          814.56,
+          335.28
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-036",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-036.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-036.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 37,
+      "recordKey": "jwf1102-p08-item-037",
+      "code": "JWF1102-0102",
+      "nameZh": "调节补风板（二）",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 11,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          299.52,
+          814.56,
+          317.52
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-037",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-037.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-037.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 38,
+      "recordKey": "jwf1102-p08-item-038",
+      "code": "JWF1102-0103",
+      "nameZh": "调节补风板（三）",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 12,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          282,
+          814.56,
+          299.52
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-038",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-038.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-038.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 39,
+      "recordKey": "jwf1102-p08-item-039",
+      "code": "JWF1102-0104",
+      "nameZh": "调节补风板（四）",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 13,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          264,
+          814.56,
+          282
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-039",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-039.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-039.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 40,
+      "recordKey": "jwf1102-p08-item-040",
+      "code": "TF24A-0-00",
+      "nameZh": "门锁装置",
+      "nameEn": null,
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 14,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          246.24,
+          814.56,
+          264
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-040",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-040.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-040.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 41,
+      "recordKey": "jwf1102-p08-item-041",
+      "code": "TF24A-36-00",
+      "nameZh": "门锁装置",
+      "nameEn": null,
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 15,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          228.48,
+          814.56,
+          246.24
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-041",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-041.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-041.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 42,
+      "recordKey": "jwf1102-p08-item-042",
+      "code": "TF24A-40-00",
+      "nameZh": "门锁装置",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 16,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          210.72,
+          814.56,
+          228.48
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-042",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-042.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-042.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 43,
+      "recordKey": "jwf1102-p08-item-043",
+      "code": "TF2227-00",
+      "nameZh": "拉手",
+      "nameEn": null,
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 17,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          192.96,
+          814.56,
+          210.72
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-043",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-043.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-043.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 44,
+      "recordKey": "jwf1102-p08-item-044",
+      "code": "TF2233-00",
+      "nameZh": "铰链",
+      "nameEn": null,
+      "quantity": {
+        "value": 5,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 18,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          175.2,
+          814.56,
+          192.96
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-044",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-044.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-044.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 45,
+      "recordKey": "jwf1102-p08-item-045",
+      "code": "TF2234-00",
+      "nameZh": "铰链",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 19,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          157.44,
+          814.56,
+          175.2
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-045",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-045.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-045.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 46,
+      "recordKey": "jwf1102-p08-item-046",
+      "code": "TF2236-00",
+      "nameZh": "铰链",
+      "nameEn": null,
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 20,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          139.68,
+          814.56,
+          157.44
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-046",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-046.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-046.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 47,
+      "recordKey": "jwf1102-p08-item-047",
+      "code": "TZH1073-II-3406-001",
+      "nameZh": "密封条",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "3406",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "3406"
+      ],
+      "dimensionSource": "厂家件号中的长度编码（名称栏仅写密封条）",
+      "cell": {
+        "table": "右表",
+        "row": 21,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          121.92,
+          814.56,
+          139.68
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-047",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-047.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-047.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 48,
+      "recordKey": "jwf1102-p08-item-048",
+      "code": "TZH1073-II-4498-001",
+      "nameZh": "密封条",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "4498",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "4498"
+      ],
+      "dimensionSource": "厂家件号中的长度编码（名称栏仅写密封条）",
+      "cell": {
+        "table": "右表",
+        "row": 22,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          104.16,
+          814.56,
+          121.92
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-048",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-048.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-048.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 49,
+      "recordKey": "jwf1102-p08-item-049",
+      "code": "TZH1073-II-5150-001",
+      "nameZh": "密封条",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "5150",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "5150"
+      ],
+      "dimensionSource": "厂家件号中的长度编码（名称栏仅写密封条）",
+      "cell": {
+        "table": "右表",
+        "row": 23,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          86.4,
+          814.56,
+          104.16
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-049",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-049.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-049.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 50,
+      "recordKey": "jwf1102-p08-item-050",
+      "code": "TZH1073-II-5614-001",
+      "nameZh": "密封条",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "5614",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 8,
+      "sheetPage": "共2页第1页",
+      "dimensions": [
+        "5614"
+      ],
+      "dimensionSource": "厂家件号中的长度编码（名称栏仅写密封条）",
+      "cell": {
+        "table": "右表",
+        "row": 24,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          68.4,
+          814.56,
+          86.4
+        ]
+      },
+      "sourceSlug": "jwf1102-p08-item-050",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p08-item-050.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p08-item-050.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 51,
+      "recordKey": "jwf1102-p09-item-051",
+      "code": "TZH1077-1.5X3X1420",
+      "nameZh": "嵌条",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "1.5X3X1420",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "1.5",
+        "3",
+        "1420"
+      ],
+      "dimensionSource": "厂家件号中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 1,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          477.6,
+          458.88,
+          495.36
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-051",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-051.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-051.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 52,
+      "recordKey": "jwf1102-p09-item-052",
+      "code": "TZH1078-6X7X1420",
+      "nameZh": "嵌芯",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "6X7X1420",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6",
+        "7",
+        "1420"
+      ],
+      "dimensionSource": "厂家件号中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 2,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          459.84,
+          458.88,
+          477.6
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-052",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-052.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-052.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 53,
+      "recordKey": "jwf1102-p09-item-053",
+      "code": "TZH1082-3150",
+      "nameZh": "密封条",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "3150",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "3150"
+      ],
+      "dimensionSource": "厂家件号中的长度编码（名称栏仅写密封条）",
+      "cell": {
+        "table": "左表",
+        "row": 3,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          441.84,
+          458.88,
+          459.84
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-053",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-053.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-053.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 54,
+      "recordKey": "jwf1102-p09-item-054",
+      "code": "TZH1107-19X3X1600",
+      "nameZh": "密封条",
+      "nameEn": null,
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "19X3X1600",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "19",
+        "3",
+        "1600"
+      ],
+      "dimensionSource": "厂家件号中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 4,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          424.08,
+          458.88,
+          441.84
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-054",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-054.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-054.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 55,
+      "recordKey": "jwf1102-p09-item-055",
+      "code": "TF2058",
+      "nameZh": "底座",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "左表",
+        "row": 5,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          406.32,
+          458.88,
+          424.08
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-055",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-055.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-055.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 56,
+      "recordKey": "jwf1102-p09-item-056",
+      "code": "GB14",
+      "nameZh": "螺栓 M6X20",
+      "nameEn": null,
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6X20",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6",
+        "20"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 6,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          388.56,
+          458.88,
+          406.32
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-056",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-056.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-056.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 57,
+      "recordKey": "jwf1102-p09-item-057",
+      "code": "GB5783",
+      "nameZh": "螺栓 M6X12",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6X12",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6",
+        "12"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 7,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          370.8,
+          458.88,
+          388.56
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-057",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-057.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-057.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 58,
+      "recordKey": "jwf1102-p09-item-058",
+      "code": "GB5783",
+      "nameZh": "螺栓 M6X16",
+      "nameEn": null,
+      "quantity": {
+        "value": 19,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6X16",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6",
+        "16"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 8,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          353.04,
+          458.88,
+          370.8
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-058",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-058.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-058.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 59,
+      "recordKey": "jwf1102-p09-item-059",
+      "code": "GB5783",
+      "nameZh": "螺栓 M6X20",
+      "nameEn": null,
+      "quantity": {
+        "value": 82,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6X20",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6",
+        "20"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 9,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          335.28,
+          458.88,
+          353.04
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-059",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-059.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-059.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 60,
+      "recordKey": "jwf1102-p09-item-060",
+      "code": "GB5783",
+      "nameZh": "螺栓 M6X25",
+      "nameEn": null,
+      "quantity": {
+        "value": 14,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6X25",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6",
+        "25"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 10,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          317.52,
+          458.88,
+          335.28
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-060",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-060.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-060.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 61,
+      "recordKey": "jwf1102-p09-item-061",
+      "code": "GB5783",
+      "nameZh": "螺栓 M8X25",
+      "nameEn": null,
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M8X25",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "8",
+        "25"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 11,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          299.76,
+          458.88,
+          317.52
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-061",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-061.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-061.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 62,
+      "recordKey": "jwf1102-p09-item-062",
+      "code": "GB5783",
+      "nameZh": "螺栓 M10X20",
+      "nameEn": null,
+      "quantity": {
+        "value": 14,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M10X20",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "10",
+        "20"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 12,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          282,
+          458.88,
+          299.76
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-062",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-062.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-062.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 63,
+      "recordKey": "jwf1102-p09-item-063",
+      "code": "GB5783",
+      "nameZh": "螺栓 M10X35",
+      "nameEn": null,
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M10X35",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "10",
+        "35"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 13,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          264.24,
+          458.88,
+          282
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-063",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-063.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-063.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 64,
+      "recordKey": "jwf1102-p09-item-064",
+      "code": "GB5783",
+      "nameZh": "螺栓 M12X45",
+      "nameEn": null,
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M12X45",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "12",
+        "45"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 14,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          246.48,
+          458.88,
+          264.24
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-064",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-064.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-064.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 65,
+      "recordKey": "jwf1102-p09-item-065",
+      "code": "GB70",
+      "nameZh": "螺钉 M4X12",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M4X12",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "4",
+        "12"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 15,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          228.72,
+          458.88,
+          246.48
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-065",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-065.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-065.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 66,
+      "recordKey": "jwf1102-p09-item-066",
+      "code": "GB70",
+      "nameZh": "螺钉 M6X12",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6X12",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6",
+        "12"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 16,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          210.96,
+          458.88,
+          228.72
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-066",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-066.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-066.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 67,
+      "recordKey": "jwf1102-p09-item-067",
+      "code": "GB70",
+      "nameZh": "螺钉 M10X30",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M10X30",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "10",
+        "30"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 17,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          193.2,
+          458.88,
+          210.96
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-067",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-067.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-067.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 68,
+      "recordKey": "jwf1102-p09-item-068",
+      "code": "GB62",
+      "nameZh": "螺母 M6",
+      "nameEn": null,
+      "quantity": {
+        "value": 7,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 18,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          175.44,
+          458.88,
+          193.2
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-068",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-068.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-068.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 69,
+      "recordKey": "jwf1102-p09-item-069",
+      "code": "GB889",
+      "nameZh": "螺母 M4",
+      "nameEn": null,
+      "quantity": {
+        "value": 12,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M4",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "4"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 19,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          157.68,
+          458.88,
+          175.44
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-069",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-069.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-069.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 70,
+      "recordKey": "jwf1102-p09-item-070",
+      "code": "GB889",
+      "nameZh": "螺母 M6",
+      "nameEn": null,
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 20,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          139.92,
+          458.88,
+          157.68
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-070",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-070.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-070.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 71,
+      "recordKey": "jwf1102-p09-item-071",
+      "code": "GB6170",
+      "nameZh": "螺母 M6",
+      "nameEn": null,
+      "quantity": {
+        "value": 101,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M6",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 21,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          122.16,
+          458.88,
+          139.92
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-071",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-071.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-071.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 72,
+      "recordKey": "jwf1102-p09-item-072",
+      "code": "GB6170",
+      "nameZh": "螺母 M10",
+      "nameEn": null,
+      "quantity": {
+        "value": 12,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M10",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "10"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 22,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          104.4,
+          458.88,
+          122.16
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-072",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-072.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-072.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 73,
+      "recordKey": "jwf1102-p09-item-073",
+      "code": "GB6170",
+      "nameZh": "螺母 M12",
+      "nameEn": null,
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "M12",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "12"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 23,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          86.64,
+          458.88,
+          104.4
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-073",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-073.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-073.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 74,
+      "recordKey": "jwf1102-p09-item-074",
+      "code": "GB93",
+      "nameZh": "垫圈 6",
+      "nameEn": null,
+      "quantity": {
+        "value": 12,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "6",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 24,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          68.64,
+          458.88,
+          86.64
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-074",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-074.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-074.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 75,
+      "recordKey": "jwf1102-p09-item-075",
+      "code": "GB93",
+      "nameZh": "垫圈 8",
+      "nameEn": null,
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "8",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "8"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 25,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          50.88,
+          458.88,
+          68.64
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-075",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-075.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-075.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 76,
+      "recordKey": "jwf1102-p09-item-076",
+      "code": "GB93",
+      "nameZh": "垫圈 10",
+      "nameEn": null,
+      "quantity": {
+        "value": 12,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "10",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "10"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "左表",
+        "row": 26,
+        "column": 1,
+        "cropBoxPt": [
+          103.44,
+          33.12,
+          458.88,
+          50.88
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-076",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-076.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-076.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 77,
+      "recordKey": "jwf1102-p09-item-077",
+      "code": "GB93",
+      "nameZh": "垫圈 12",
+      "nameEn": null,
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "12",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "12"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 1,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          477.6,
+          814.56,
+          495.36
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-077",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-077.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-077.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 78,
+      "recordKey": "jwf1102-p09-item-078",
+      "code": "GB96",
+      "nameZh": "垫圈 4",
+      "nameEn": null,
+      "quantity": {
+        "value": 12,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "4",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "4"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 2,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          459.84,
+          814.56,
+          477.6
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-078",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-078.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-078.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 79,
+      "recordKey": "jwf1102-p09-item-079",
+      "code": "GB96",
+      "nameZh": "垫圈 6",
+      "nameEn": null,
+      "quantity": {
+        "value": 49,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "6",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 3,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          441.84,
+          814.56,
+          459.84
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-079",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-079.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-079.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 80,
+      "recordKey": "jwf1102-p09-item-080",
+      "code": "GB97.1",
+      "nameZh": "垫圈 4",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "4",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "4"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 4,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          424.08,
+          814.56,
+          441.84
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-080",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-080.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-080.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 81,
+      "recordKey": "jwf1102-p09-item-081",
+      "code": "GB97.1",
+      "nameZh": "垫圈 6",
+      "nameEn": null,
+      "quantity": {
+        "value": 170,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "6",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 5,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          406.32,
+          814.56,
+          424.08
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-081",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-081.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-081.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 82,
+      "recordKey": "jwf1102-p09-item-082",
+      "code": "GB97.1",
+      "nameZh": "垫圈 8",
+      "nameEn": null,
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "8",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "8"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 6,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          388.56,
+          814.56,
+          406.32
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-082",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-082.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-082.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 83,
+      "recordKey": "jwf1102-p09-item-083",
+      "code": "GB97.1",
+      "nameZh": "垫圈 10",
+      "nameEn": null,
+      "quantity": {
+        "value": 34,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "10",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "10"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 7,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          370.8,
+          814.56,
+          388.56
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-083",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-083.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-083.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 84,
+      "recordKey": "jwf1102-p09-item-084",
+      "code": "GB97.1",
+      "nameZh": "垫圈 12",
+      "nameEn": null,
+      "quantity": {
+        "value": 16,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "12",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "12"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 8,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          353.04,
+          814.56,
+          370.8
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-084",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-084.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-084.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 85,
+      "recordKey": "jwf1102-p09-item-085",
+      "code": "GB859",
+      "nameZh": "垫圈 6",
+      "nameEn": null,
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "6",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 9,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          335.28,
+          814.56,
+          353.04
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-085",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-085.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-085.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 86,
+      "recordKey": "jwf1102-p09-item-086",
+      "code": "GB879",
+      "nameZh": "销 6X16",
+      "nameEn": null,
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "6X16",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6",
+        "16"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 10,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          317.52,
+          814.56,
+          335.28
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-086",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-086.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-086.pdf",
+      "auditIssues": [
+        "厂家第86项明确为“GB879 / 销 6X16 / 4”；现有索引误写为“销5×15”，且本项不能与第90项合并。"
+      ]
+    },
+    {
+      "item": 87,
+      "recordKey": "jwf1102-p09-item-087",
+      "code": "GB12617",
+      "nameZh": "铆钉 4X10",
+      "nameEn": null,
+      "quantity": {
+        "value": 15,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "4X10",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "4",
+        "10"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 11,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          299.76,
+          814.56,
+          317.52
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-087",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-087.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-087.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 88,
+      "recordKey": "jwf1102-p09-item-088",
+      "code": "TF2238-00",
+      "nameZh": "铰链",
+      "nameEn": null,
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 12,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          282,
+          814.56,
+          299.76
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-088",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-088.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-088.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 89,
+      "recordKey": "jwf1102-p09-item-089",
+      "code": "JWF1102-0100-17",
+      "nameZh": "排杂斜板结合件",
+      "nameEn": null,
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": null,
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [],
+      "dimensionSource": null,
+      "cell": {
+        "table": "右表",
+        "row": 13,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          264.24,
+          814.56,
+          282
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-089",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-089.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-089.pdf",
+      "auditIssues": []
+    },
+    {
+      "item": 90,
+      "recordKey": "jwf1102-p09-item-090",
+      "code": "GB879",
+      "nameZh": "销 6X16",
+      "nameEn": null,
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": "6X16",
+      "remark": null,
+      "assembly": "JWF1102-0100",
+      "pdfPage": 9,
+      "sheetPage": "共2页第2页",
+      "dimensions": [
+        "6",
+        "16"
+      ],
+      "dimensionSource": "厂家名称栏中的明确规格",
+      "cell": {
+        "table": "右表",
+        "row": 14,
+        "column": 2,
+        "cropBoxPt": [
+          458.88,
+          246.48,
+          814.56,
+          264.24
+        ]
+      },
+      "sourceSlug": "jwf1102-p09-item-090",
+      "sourceCrop": "assets/manuals/jwf1102/crops/jwf1102-p09-item-090.png",
+      "sourceVector": "assets/manuals/jwf1102/crops/jwf1102-p09-item-090.pdf",
+      "auditIssues": [
+        "与第86项同为“GB879 / 销 6X16”，但厂家分列且单台用量不同；保留独立recordKey。"
+      ]
+    }
+  ]
+}
