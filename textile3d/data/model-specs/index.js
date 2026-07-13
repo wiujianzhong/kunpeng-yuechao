@@ -149,6 +149,30 @@ import {jwf1012P30ModelSpecs} from './jwf1012-p30.js';
 import {jwf1012P31ModelSpecs} from './jwf1012-p31.js';
 import {jwf1012P32ModelSpecs} from './jwf1012-p32.js';
 import {jwf1012P33ModelSpecs} from './jwf1012-p33.js';
+import {tf2513P03ModelSpecs} from './tf2513-p03.js';
+import {tf2513P05ModelSpecs} from './tf2513-p05.js';
+import {tf2513P06ModelSpecs} from './tf2513-p06.js';
+import {tf2513P08ModelSpecs} from './tf2513-p08.js';
+import {tf2513P09ModelSpecs} from './tf2513-p09.js';
+import {tf2513P11ModelSpecs} from './tf2513-p11.js';
+import {tf2513P12ModelSpecs} from './tf2513-p12.js';
+import {tf2513P14ModelSpecs} from './tf2513-p14.js';
+import {tf2513P15ModelSpecs} from './tf2513-p15.js';
+import {tf2513P16ModelSpecs} from './tf2513-p16.js';
+import {tf2513P18ModelSpecs} from './tf2513-p18.js';
+import {tf2513P19ModelSpecs} from './tf2513-p19.js';
+import {tf2513P20ModelSpecs} from './tf2513-p20.js';
+import {tf2513P22ModelSpecs} from './tf2513-p22.js';
+import {tf2513P23ModelSpecs} from './tf2513-p23.js';
+import {tf2513P25ModelSpecs} from './tf2513-p25.js';
+import {tf2513P26ModelSpecs} from './tf2513-p26.js';
+import {tf2513P28ModelSpecs} from './tf2513-p28.js';
+import {tf2513P30ModelSpecs} from './tf2513-p30.js';
+import {tf2513P31ModelSpecs} from './tf2513-p31.js';
+import {tf2513P32ModelSpecs} from './tf2513-p32.js';
+import {tf2513P34ModelSpecs} from './tf2513-p34.js';
+import {tf2513P35ModelSpecs} from './tf2513-p35.js';
+import {tf2513P37ModelSpecs} from './tf2513-p37.js';
 
 function keyedByRecord(specs,manual,page){
   return Object.values(specs).reduce((result,spec,index)=>{
@@ -324,6 +348,32 @@ const specsByManual={
     ...keyedByRecord(jwf1012P31ModelSpecs,'jwf1012',31),
     ...keyedByRecord(jwf1012P32ModelSpecs,'jwf1012',32),
     ...keyedByRecord(jwf1012P33ModelSpecs,'jwf1012',33)
+  },
+  tf2513:{
+    ...keyedByRecord(tf2513P03ModelSpecs,'tf2513',3),
+    ...keyedByRecord(tf2513P05ModelSpecs,'tf2513',5),
+    ...keyedByRecord(tf2513P06ModelSpecs,'tf2513',6),
+    ...keyedByRecord(tf2513P08ModelSpecs,'tf2513',8),
+    ...keyedByRecord(tf2513P09ModelSpecs,'tf2513',9),
+    ...keyedByRecord(tf2513P11ModelSpecs,'tf2513',11),
+    ...keyedByRecord(tf2513P12ModelSpecs,'tf2513',12),
+    ...keyedByRecord(tf2513P14ModelSpecs,'tf2513',14),
+    ...keyedByRecord(tf2513P15ModelSpecs,'tf2513',15),
+    ...keyedByRecord(tf2513P16ModelSpecs,'tf2513',16),
+    ...keyedByRecord(tf2513P18ModelSpecs,'tf2513',18),
+    ...keyedByRecord(tf2513P19ModelSpecs,'tf2513',19),
+    ...keyedByRecord(tf2513P20ModelSpecs,'tf2513',20),
+    ...keyedByRecord(tf2513P22ModelSpecs,'tf2513',22),
+    ...keyedByRecord(tf2513P23ModelSpecs,'tf2513',23),
+    ...keyedByRecord(tf2513P25ModelSpecs,'tf2513',25),
+    ...keyedByRecord(tf2513P26ModelSpecs,'tf2513',26),
+    ...keyedByRecord(tf2513P28ModelSpecs,'tf2513',28),
+    ...keyedByRecord(tf2513P30ModelSpecs,'tf2513',30),
+    ...keyedByRecord(tf2513P31ModelSpecs,'tf2513',31),
+    ...keyedByRecord(tf2513P32ModelSpecs,'tf2513',32),
+    ...keyedByRecord(tf2513P34ModelSpecs,'tf2513',34),
+    ...keyedByRecord(tf2513P35ModelSpecs,'tf2513',35),
+    ...keyedByRecord(tf2513P37ModelSpecs,'tf2513',37)
   }
 };
 const keepExistingCustomModel=new Set(['jwf1206:JWF1204-0100-10']);

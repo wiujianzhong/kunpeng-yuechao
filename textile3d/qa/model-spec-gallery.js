@@ -33,6 +33,9 @@ import {jwf1026P19P25Verified} from '../data/jwf1026-p19-p25-verified.js';
 import {jwf1012P04P15Verified} from '../data/jwf1012-p04-p15-verified.js';
 import {jwf1012P16P25Verified} from '../data/jwf1012-p16-p25-verified.js';
 import {jwf1012P26P33Verified} from '../data/jwf1012-p26-p33-verified.js';
+import {tf2513P03P12Verified} from '../data/tf2513-p03-p12-verified.js';
+import {tf2513P14P23Verified} from '../data/tf2513-p14-p23-verified.js';
+import {tf2513P25P37Verified} from '../data/tf2513-p25-p37-verified.js';
 import {createSpecModel} from '../models/spec-models.js';
 
 const params=new URLSearchParams(location.search);
@@ -46,6 +49,7 @@ const partDataByManual={
   zfa051a:[...zfa051aP03P06Verified,...zfa051aP07P12Verified],
   jwf1026:[...jwf1026P03P10Verified,...jwf1026P11P18Verified,...jwf1026P19P25Verified],
   jwf1012:[...jwf1012P04P15Verified,...jwf1012P16P25Verified,...jwf1012P26P33Verified],
+  tf2513:[...tf2513P03P12Verified,...tf2513P14P23Verified,...tf2513P25P37Verified],
 };
 const partData=partDataByManual[manual]||[];
 const specs=Object.entries(allPartModelSpecs[manual]||{}).filter(([code,spec])=>!page||spec.source.page===page);

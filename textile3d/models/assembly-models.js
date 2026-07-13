@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {createRefinedTf2513Assembly} from './tf2513-assembly-refined.js';
 
 const metal=(color=0x758789,rough=.38)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:.72});
 const dark=()=>new THREE.MeshStandardMaterial({color:0x1d2b2c,roughness:.55,metalness:.42});
@@ -1304,8 +1305,341 @@ function coilingDisk(){
   return root;
 }
 
+function finishTfAssembly(root,components,{scale=.7,y=-.35,rotationY=0,explode=.72}={}){
+  root.userData.setExplode=value=>{
+    const amount=THREE.MathUtils.clamp(Number(value)||0,0,1);
+    components.forEach(item=>item.position.copy(item.userData.closed).lerp(item.userData.exploded,amount));
+    root.userData.explode=amount;
+  };
+  root.userData.setExplode(explode);
+  root.scale.setScalar(scale);root.position.y=y;root.rotation.y=rotationY;
+  return root;
+}
+
+function axisCylinder(group,radius,length,material,x=0,y=0,z=0,axis='y'){
+  const object=mesh(group,new THREE.CylinderGeometry(radius,radius,length,40),material,x,y,z);
+  if(axis==='x')object.rotation.z=Math.PI/2;
+  if(axis==='z')object.rotation.x=Math.PI/2;
+  return object;
+}
+
+function wheel(group,radius,width,material,x=0,y=0,z=0,axis='x'){
+  const object=axisCylinder(group,radius,width,material,x,y,z,axis);
+  const hub=axisCylinder(group,radius*.28,width*1.55,brass(),x,y,z,axis);
+  return [object,hub];
+}
+
+function tf2513Product(){
+  const root=new THREE.Group(),components=[];
+  const frame=component3D(root,'2/7/10 罩壳、圈条盘框与上罩',[0,0,0],[0,2.8,-1.4],group=>{
+    for(const z of [-2.05,2.05])mesh(group,new THREE.BoxGeometry(7.5,.22,.18),metal(0x65787a),0,1.85,z);
+    for(const x of [-3.65,3.65])mesh(group,new THREE.BoxGeometry(.18,.22,4.1),metal(0x65787a),x,1.85,0);
+    mesh(group,new THREE.BoxGeometry(7.35,.18,3.95),metal(0x849394),0,2.05,0);
+    mesh(group,new THREE.BoxGeometry(2.5,.48,2.15),metal(0x718385),-1.75,2.38,-.35);
+    for(const x of [-3.55,-1.9,1.9,3.55])for(const z of [-1.88,1.88])mesh(group,new THREE.BoxGeometry(.12,3.7,.12),metal(0x526668),x,0,z);
+  });components.push(frame);
+  const base=component3D(root,'9 底盘部件',[0,-1.2,.15],[0,-3.2,1.8],group=>{
+    mesh(group,new THREE.BoxGeometry(5.8,.22,3.1),metal(0x596d6f),0,0,0);
+    mesh(group,new THREE.CylinderGeometry(1.15,1.15,.22,72),metal(0x819294),.75,.18,0);
+    mesh(group,new THREE.CylinderGeometry(.58,.58,.5,56),dark(),.75,.48,0);
+    mesh(group,new THREE.BoxGeometry(2.55,.16,.38),green(),-.7,.35,0).rotation.y=-.18;
+  });components.push(base);
+  const coiler=component3D(root,'1/3/4/5/6 圈条、立柱、减速箱与压辊',[.75,-.2,0],[.7,.3,4.3],group=>{
+    axisCylinder(group,.58,2.8,metal(0x65787a),0,0,0);
+    mesh(group,new THREE.BoxGeometry(1.35,.9,1.15),metal(0x718385),0,1.58,0);
+    wheel(group,.62,.25,dark(),-.9,1.65,.25,'x');
+    wheel(group,.48,.25,green(),.9,1.45,.25,'x');
+    mesh(group,new THREE.CylinderGeometry(1.15,1.25,.32,72),metal(0x7c8d8e),0,-1.58,0);
+  });components.push(coiler);
+  const guides=component3D(root,'8/11 导条架与转架',[0,.45,.8],[-4.8,.4,2.7],group=>{
+    axisCylinder(group,.12,5.3,metal(0x65787a),0,0,0,'x');
+    for(const x of [-2.65,2.65]){wheel(group,.48,.18,metal(0x829294),x,0,0,'z');axisCylinder(group,.1,2.3,metal(0x596d6f),x,-1.2,0)}
+    const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(-3.2,-1.5,.2),new THREE.Vector3(0,-1.05,1.25),new THREE.Vector3(3.2,-1.5,.2)]);
+    mesh(group,new THREE.TubeGeometry(curve,48,.07,10,false),green());
+  });components.push(guides);
+  return finishTfAssembly(root,components,{scale:.55,y:-.45,rotationY:.18,explode:.68});
+}
+
+function tf2513ColumnAssembly(){
+  const root=new THREE.Group(),components=[];
+  const columns=component3D(root,'2/6/10/14 前后立柱、长方立柱与罩壳',[0,0,0],[3.6,0,-.8],group=>{
+    for(const x of [-1.25,1.25]){
+      mesh(group,new THREE.BoxGeometry(.82,5.5,.78),metal(x<0?0x718385:0x829294),x,0,0);
+      mesh(group,new THREE.BoxGeometry(1.0,.18,1.0),metal(0x526668),x,-2.8,0);
+      mesh(group,new THREE.BoxGeometry(1.0,.18,1.0),metal(0x526668),x,2.8,0);
+    }
+  });components.push(columns);
+  const shaft=component3D(root,'5/12 同步带轮与立轴',[-1.25,0,.7],[-4.6,0,2.5],group=>{
+    axisCylinder(group,.12,4.8,metal(0xb2bcb9,.2));
+    wheel(group,.65,.28,green(),0,1.8,0,'y');wheel(group,.48,.28,dark(),0,-1.8,0,'y');
+  });components.push(shaft);
+  const drive=component3D(root,'3/4/9 张紧轮底板、调节板与张紧轮',[-1.25,.8,.9],[-4.2,1.1,-2.4],group=>{
+    mesh(group,new THREE.BoxGeometry(1.35,.16,.95),metal(0x65787a));
+    wheel(group,.42,.26,metal(0x879596),0,.45,0,'z');
+    axisCylinder(group,.07,1.15,brass(),0,-.55,0);
+  });components.push(drive);
+  const belt=component3D(root,'34 同步带',[-1.25,.05,.72],[-2.4,.05,3.4],group=>{
+    mesh(group,new THREE.BoxGeometry(.15,4.25,.18),rubber());
+    const top=mesh(group,new THREE.TorusGeometry(.52,.07,10,44),rubber(),0,2.0,0);top.rotation.x=Math.PI/2;
+    const bottom=mesh(group,new THREE.TorusGeometry(.42,.07,10,44),rubber(),0,-2.0,0);bottom.rotation.x=Math.PI/2;
+  });components.push(belt);
+  return finishTfAssembly(root,components,{scale:.72,y:0,rotationY:.28});
+}
+
+function tf2513GearBoxAssembly(){
+  const root=new THREE.Group(),components=[];
+  const housing=component3D(root,'2/7 减速箱体与箱盖',[0,0,0],[0,-2.8,-1.2],group=>{
+    mesh(group,new THREE.BoxGeometry(3.2,2.7,2.5),metal(0x718385),0,0,0);
+    mesh(group,new THREE.BoxGeometry(3.45,.18,2.72),metal(0x829294),0,1.42,0);
+    for(const [x,z] of [[-1.45,-1.1],[-1.45,1.1],[1.45,-1.1],[1.45,1.1]])axisCylinder(group,.07,.42,brass(),x,1.5,z);
+  });components.push(housing);
+  const horizontal=component3D(root,'1/3/4/19/20 蜗杆、同步带轮与齿轮',[-.2,.15,0],[0,.7,4.5],group=>{
+    axisCylinder(group,.18,5.0,metal(0xb2bcb9,.2),0,0,0,'x');
+    wheel(group,.82,.36,green(),-2.05,0,0,'x');wheel(group,.62,.32,dark(),2.0,0,0,'x');
+    wheel(group,.72,.34,metal(0x879596),.85,0,0,'x');
+  });components.push(horizontal);
+  const vertical=component3D(root,'6/8/11 齿轮轴与蜗杆',[.7,.1,.25],[3.8,.6,-.8],group=>{
+    axisCylinder(group,.16,3.8,metal(0xaab4b1,.18));
+    wheel(group,.72,.34,metal(0x65787a),0,1.15,0,'y');
+    wheel(group,.5,.3,green(),0,-1.15,0,'y');
+  });components.push(vertical);
+  const seals=component3D(root,'27—38 轴承、挡圈与油封',[0,.1,0],[-3.6,1.4,-1.5],group=>{
+    for(let i=0;i<7;i++){
+      const ring=mesh(group,new THREE.TorusGeometry(.32+i*.035,.045,10,40),i%2?rubber():brass(),0,(i-3)*.35,0);ring.rotation.x=Math.PI/2;
+    }
+  });components.push(seals);
+  return finishTfAssembly(root,components,{scale:.75,y:-.25,rotationY:.35});
+}
+
+function tf2513CalenderRollAssembly(){
+  const root=new THREE.Group(),components=[];
+  const frames=component3D(root,'1/2/6/7 上下支座与加压架',[0,0,0],[0,-3.1,-1.4],group=>{
+    for(const x of [-2.55,2.55]){
+      mesh(group,new THREE.BoxGeometry(.9,2.7,2.2),metal(x<0?0x65787a:0x718385),x,0,0);
+      mesh(group,new THREE.BoxGeometry(1.25,.3,2.4),metal(0x526668),x,-1.35,0);
+    }
+    mesh(group,new THREE.BoxGeometry(4.4,.25,.45),metal(0x596d6f),0,1.15,-.7);
+  });components.push(frames);
+  const rolls=component3D(root,'3/4/22 压辊、带轮轴与拉杆',[0,0,0],[0,.5,4.0],group=>{
+    for(const [y,z,r] of [[.55,0,.38],[-.55,0,.44],[0,.85,.22]]){
+      axisCylinder(group,r,4.65,metal(0x879596,.24),0,y,z,'x');
+      for(const x of [-2.55,2.55])axisCylinder(group,.13,.55,brass(),x,y,z,'x');
+    }
+  });components.push(rolls);
+  const pulleys=component3D(root,'14/16/23/24/48/49 轴承座与同步带轮',[0,0,.2],[-4.8,.5,1.6],group=>{
+    for(const [x,y,r] of [[-1.1,.6,.65],[-.3,-.55,.58],[.6,.5,.48],[1.25,-.5,.55]])wheel(group,r,.28,x<0?green():dark(),x,y,0,'z');
+  });components.push(pulleys);
+  const spring=component3D(root,'5/31/33/36 受压弹簧与调压件',[0,-.6,-.65],[4.5,-.2,-1.7],group=>{
+    const curve=new THREE.CatmullRomCurve3(Array.from({length:42},(_,i)=>{const a=i*Math.PI*8;return new THREE.Vector3(Math.cos(a)*.3,(i-21)*.055,Math.sin(a)*.3)}));
+    mesh(group,new THREE.TubeGeometry(curve,128,.055,10,false),metal(0x9ca8a6,.25));
+    axisCylinder(group,.13,2.5,brass(),0,0,0);
+  });components.push(spring);
+  return finishTfAssembly(root,components,{scale:.72,y:-.3,rotationY:.2});
+}
+
+function tf2513BrokenEndAssembly(){
+  const root=new THREE.Group(),components=[];
+  const rail=component3D(root,'2/3/11 安装板、底板与导轨',[0,0,0],[0,-2.8,-1.4],group=>{
+    mesh(group,new THREE.BoxGeometry(6.4,.22,1.25),metal(0x65787a));
+    mesh(group,new THREE.BoxGeometry(5.8,.18,.42),metal(0x879596),.2,.35,.1);
+    for(const x of [-2.85,2.85])mesh(group,new THREE.BoxGeometry(.65,.85,1.05),metal(0x526668),x,.45,0);
+  });components.push(rail);
+  const cylinder=component3D(root,'5/15/16/46 气缸、固定座与调速件',[-1.3,.6,0],[0,.8,3.8],group=>{
+    mesh(group,new THREE.BoxGeometry(2.0,1.2,1.0),metal(0x718385));
+    axisCylinder(group,.24,2.2,metal(0xaab4b1,.18),1.9,0,0,'x');
+    for(const z of [-.38,.38])axisCylinder(group,.1,.8,brass(),-.7,.85,z);
+    mesh(group,new THREE.BoxGeometry(.55,.55,.55),dark(),-1.3,-.55,0);
+  });components.push(cylinder);
+  const detector=component3D(root,'4/7/22/25 断头检测盘与防护罩',[2.15,.4,0],[4.6,1.6,-1.8],group=>{
+    mesh(group,new THREE.CylinderGeometry(.95,.95,.38,64),green(),0,0,0).rotation.x=Math.PI/2;
+    mesh(group,new THREE.CylinderGeometry(.52,.52,.58,56),dark(),0,0,.1).rotation.x=Math.PI/2;
+    const hood=mesh(group,new THREE.BoxGeometry(2.1,.18,2.05),metal(0x829294),0,1.05,0);hood.rotation.z=.08;
+    axisCylinder(group,.08,1.8,metal(0xb2bcb9,.2),0,-1.0,0);
+  });components.push(detector);
+  const tubing=component3D(root,'17/43/45/47 气管和接头',[-.1,.2,.45],[-3.8,2.1,1.8],group=>{
+    const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(-2.8,0,0),new THREE.Vector3(-1.2,.7,.25),new THREE.Vector3(.8,.4,-.2),new THREE.Vector3(2.8,1.1,.15)]);
+    mesh(group,new THREE.TubeGeometry(curve,64,.08,12,false),rubber());
+    for(const x of [-2.8,2.8])axisCylinder(group,.15,.35,brass(),x,x<0?0:1.1,x<0?0:.15,'x');
+  });components.push(tubing);
+  return finishTfAssembly(root,components,{scale:.7,y:-.35,rotationY:.15});
+}
+
+function tf2513CanChangingAssembly(){
+  const root=new THREE.Group(),components=[];
+  const shell=component3D(root,'2/7/21 前后罩壳与下罩板',[0,0,0],[3.8,.6,-1.4],group=>{
+    mesh(group,new THREE.BoxGeometry(3.6,4.2,.18),metal(0x718385));
+    mesh(group,new THREE.BoxGeometry(.18,4.2,2.15),metal(0x829294),-1.72,0,-.98);
+    mesh(group,new THREE.BoxGeometry(3.5,.18,2.05),metal(0x65787a),0,-2.05,-.98);
+    mesh(group,new THREE.BoxGeometry(1.15,.45,1.0),metal(0x526668),1.05,-1.65,-.55);
+  });components.push(shell);
+  const drive=component3D(root,'3/31/34 换筒轴、减速电机与安装座',[-.25,-.2,-.8],[-3.8,-.4,-1.0],group=>{
+    mesh(group,new THREE.BoxGeometry(1.5,1.25,1.1),metal(0x596d6f),0,-.35,0);
+    axisCylinder(group,.42,1.5,metal(0x65787a),0,.95,0);
+    axisCylinder(group,.14,3.6,metal(0xb2bcb9,.2),0,2.25,0);
+    wheel(group,.62,.3,green(),0,3.8,0,'y');
+  });components.push(drive);
+  const pulley=component3D(root,'5/6/9/10/13/32/33 带轮、轴承和密封件',[-.25,2.1,-.8],[-.3,5.8,2.8],group=>{
+    wheel(group,.72,.3,dark(),0,-.6,0,'y');wheel(group,.55,.28,green(),0,.35,0,'y');
+    for(const y of [-1.25,1.1]){const ring=mesh(group,new THREE.TorusGeometry(.52,.09,12,48),brass(),0,y,0);ring.rotation.x=Math.PI/2}
+  });components.push(pulley);
+  const handle=component3D(root,'20/24/35 铰链、拉手与紧固件',[1.35,.1,.25],[3.9,-.5,2.4],group=>{
+    mesh(group,new THREE.BoxGeometry(.2,1.45,.18),dark());
+    axisCylinder(group,.08,.85,brass(),0,.9,0,'x');
+    mesh(group,new THREE.BoxGeometry(.7,.15,.22),metal(0x879596),0,-.9,0);
+  });components.push(handle);
+  return finishTfAssembly(root,components,{scale:.68,y:-.2,rotationY:-.18});
+}
+
+function tf2513CoilingFrameAssembly(){
+  const root=new THREE.Group(),components=[];
+  const frame=component3D(root,'2/13/17 圈条盘框、下底板和上盖',[0,0,0],[0,-2.7,-1.5],group=>{
+    for(const z of [-1.7,1.7])mesh(group,new THREE.BoxGeometry(6.2,.38,.18),metal(0x65787a),0,0,z);
+    for(const x of [-3.0,3.0])mesh(group,new THREE.BoxGeometry(.18,.38,3.4),metal(0x65787a),x,0,0);
+    mesh(group,new THREE.BoxGeometry(5.9,.16,3.15),metal(0x829294),0,.3,0);
+    mesh(group,new THREE.BoxGeometry(5.85,.18,3.1),metal(0x718385),0,.62,0);
+  });components.push(frame);
+  const disk=component3D(root,'7 下圈条底盘',[0,-.25,0],[0,-2.8,3.5],group=>{
+    mesh(group,new THREE.CylinderGeometry(1.62,1.62,.18,72),metal(0x879596));
+    mesh(group,new THREE.CylinderGeometry(.58,.58,.28,56),dark(),0,.2,0);
+    for(let i=0;i<10;i++){const a=i*Math.PI*2/10;axisCylinder(group,.04,.35,brass(),Math.cos(a)*1.35,.05,Math.sin(a)*1.35)}
+  });components.push(disk);
+  const duct=component3D(root,'1/4/12/25 软管、接头和卡箍',[-1.65,.8,.3],[-4.1,2.6,1.7],group=>{
+    const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(-1.2,-.6,0),new THREE.Vector3(-.65,.4,.2),new THREE.Vector3(.1,1.3,.1),new THREE.Vector3(1.1,1.65,0)]);
+    mesh(group,new THREE.TubeGeometry(curve,64,.22,16,false),rubber());
+    for(const p of [[-1.2,-.6,0],[1.1,1.65,0]])axisCylinder(group,.28,.24,metal(0x9ca8a6,.2),...p,'y');
+  });components.push(duct);
+  const hinges=component3D(root,'3/8/11/19/24 铰链、拉手与气弹簧',[0,.45,0],[4.2,1.7,-1.8],group=>{
+    for(const x of [-1.9,1.9])axisCylinder(group,.08,1.55,metal(0xb2bcb9,.2),x,0,0,'x');
+    mesh(group,new THREE.BoxGeometry(1.3,.12,.28),dark(),0,.75,0);
+    for(const x of [-.5,.5])axisCylinder(group,.06,.6,brass(),x,-.55,0);
+  });components.push(hinges);
+  return finishTfAssembly(root,components,{scale:.63,y:-.25,rotationY:.22});
+}
+
+function tf2513SliverGuideAssembly(){
+  const root=new THREE.Group(),components=[];
+  const stand=component3D(root,'6/7/9 中心立柱、万向节和底座',[0,0,0],[0,-2.8,-1.4],group=>{
+    axisCylinder(group,.42,2.8,metal(0x65787a),0,-.9,0);
+    mesh(group,new THREE.CylinderGeometry(.82,.82,.18,48),metal(0x526668),0,-2.35,0);
+    mesh(group,new THREE.BoxGeometry(.7,.8,.72),metal(0x718385),0,.7,0);
+  });components.push(stand);
+  const crossbar=component3D(root,'1/10 中间导条架与横管',[0,1.0,0],[0,3.6,2.0],group=>{
+    axisCylinder(group,.2,6.2,metal(0x879596),0,0,0,'x');
+    mesh(group,new THREE.BoxGeometry(1.0,.65,.52),metal(0x596d6f),0,-.4,0);
+  });components.push(crossbar);
+  const left=component3D(root,'3/4/8/11 左端导条轮与检测座',[-2.75,1.0,0],[-4.8,2.6,1.8],group=>{
+    wheel(group,.72,.22,metal(0x829294),0,0,0,'z');
+    mesh(group,new THREE.BoxGeometry(.85,.72,.72),dark(),-.65,.45,0);
+    axisCylinder(group,.1,1.2,brass(),.3,.7,0);
+  });components.push(left);
+  const right=component3D(root,'2/5/12/22 右端导条轮与轴端件',[2.75,1.0,0],[4.8,.5,-1.8],group=>{
+    wheel(group,.72,.22,metal(0x829294),0,0,0,'z');
+    axisCylinder(group,.14,1.35,metal(0xb2bcb9,.2),0,.55,0);
+    const ring=mesh(group,new THREE.TorusGeometry(.28,.05,10,36),brass(),0,1.25,0);ring.rotation.x=Math.PI/2;
+  });components.push(right);
+  return finishTfAssembly(root,components,{scale:.78,y:-.3,rotationY:.15});
+}
+
+function tf2513BaseDiskAssembly(){
+  const root=new THREE.Group(),components=[];
+  const base=component3D(root,'3/14/15 底盘框、支脚与安装板',[0,0,0],[0,-3.0,-1.3],group=>{
+    for(const z of [-1.9,1.9])mesh(group,new THREE.BoxGeometry(6.8,.28,.18),metal(0x65787a),0,0,z);
+    for(const x of [-3.3,3.3])mesh(group,new THREE.BoxGeometry(.18,.28,3.8),metal(0x65787a),x,0,0);
+    mesh(group,new THREE.BoxGeometry(6.45,.18,3.55),metal(0x718385),0,.28,0);
+    for(const x of [-3.05,3.05])for(const z of [-1.65,1.65])axisCylinder(group,.07,1.15,metal(0xaab4b1,.18),x,-.68,z);
+  });components.push(base);
+  const largeDisk=component3D(root,'6/17/34 圈条盘、中心盘和上导盘',[0,.55,0],[0,3.7,2.6],group=>{
+    mesh(group,new THREE.CylinderGeometry(2.25,2.25,.18,80),metal(0x829294));
+    mesh(group,new THREE.CylinderGeometry(1.35,1.35,.24,72),metal(0x879596),0,.28,0);
+    mesh(group,new THREE.TorusGeometry(1.05,.16,18,72),dark(),0,.5,0).rotation.x=Math.PI/2;
+  });components.push(largeDisk);
+  const arm=component3D(root,'1/12/16/49 同步带轮、带轮臂和轴',[0,.5,0],[-4.6,1.6,1.8],group=>{
+    mesh(group,new THREE.BoxGeometry(4.2,.18,.55),green(),0,0,0);
+    wheel(group,.9,.28,dark(),1.55,.1,0,'y');
+    wheel(group,.48,.25,metal(0x879596),-1.75,.1,0,'y');
+    axisCylinder(group,.12,1.25,brass(),-1.75,.8,0);
+  });components.push(arm);
+  const motor=component3D(root,'2/10/11/23 减速电机与检测件',[2.4,.6,1.0],[4.8,2.6,-1.4],group=>{
+    mesh(group,new THREE.BoxGeometry(1.25,1.0,.9),metal(0x596d6f));
+    axisCylinder(group,.42,1.2,green(),0,.85,0);
+    axisCylinder(group,.12,1.35,metal(0xb2bcb9,.2),0,1.95,0);
+  });components.push(motor);
+  const rings=component3D(root,'19—48 轴承、挡圈、垫圈与紧固件',[0,.45,0],[3.4,4.4,2.2],group=>{
+    for(let i=0;i<8;i++){const ring=mesh(group,new THREE.TorusGeometry(.55+i*.045,.045,10,44),i%2?brass():rubber(),0,(i-3.5)*.25,0);ring.rotation.x=Math.PI/2}
+  });components.push(rings);
+  return finishTfAssembly(root,components,{scale:.62,y:-.4,rotationY:.18});
+}
+
+function tf2513CasingAssembly(){
+  const root=new THREE.Group(),components=[];
+  const roof=component3D(root,'1/2/6/8/14 上罩壳、前后罩板与顶板',[0,1.8,0],[0,4.8,-1.8],group=>{
+    mesh(group,new THREE.BoxGeometry(7.2,.28,2.7),metal(0x829294));
+    mesh(group,new THREE.BoxGeometry(1.65,.28,1.15),metal(0x718385),-2.75,.1,1.45);
+    mesh(group,new THREE.BoxGeometry(1.65,.28,1.15),metal(0x718385),2.75,.1,1.45);
+    for(const z of [-1.25,1.25])mesh(group,new THREE.BoxGeometry(7.1,.42,.16),metal(0x526668),0,-.25,z);
+  });components.push(roof);
+  const legs=component3D(root,'3/11/19/20 立柱、连接座与脚件',[0,0,0],[0,-2.6,-1.6],group=>{
+    for(const x of [-3.1,-1.55,1.55,3.1]){
+      mesh(group,new THREE.BoxGeometry(.16,4.0,.16),metal(0x65787a),x,0,0);
+      axisCylinder(group,.14,.45,dark(),x,-2.2,0);
+    }
+  });components.push(legs);
+  const rail=component3D(root,'4/5/13/16 导条弧轨、托架和中间梁',[0,-.4,.4],[0,.5,4.0],group=>{
+    const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(-3.3,0,0),new THREE.Vector3(-1.5,.2,1.1),new THREE.Vector3(1.5,.2,1.1),new THREE.Vector3(3.3,0,0)]);
+    mesh(group,new THREE.TubeGeometry(curve,80,.11,12,false),green());
+    for(const x of [-3.15,3.15])mesh(group,new THREE.BoxGeometry(.55,.35,.65),metal(0x596d6f),x,0,0);
+  });components.push(rail);
+  const platform=component3D(root,'7/9/12/22/27 脚踏板、底架与紧固件',[0,-1.15,.6],[4.6,-1.0,2.0],group=>{
+    mesh(group,new THREE.BoxGeometry(2.15,.18,1.25),metal(0x718385));
+    mesh(group,new THREE.BoxGeometry(1.85,.15,.95),green(),0,.25,0);
+    for(const x of [-.75,.75])axisCylinder(group,.06,.6,brass(),x,-.4,0);
+  });components.push(platform);
+  return finishTfAssembly(root,components,{scale:.6,y:-.2,rotationY:.18});
+}
+
+function tf2513RackingAssembly(){
+  const root=new THREE.Group(),components=[];
+  const hub=component3D(root,'1/6/7 中心转架、轴套和销轴',[0,0,0],[0,2.8,-1.4],group=>{
+    mesh(group,new THREE.BoxGeometry(1.1,.75,.75),metal(0x65787a));
+    axisCylinder(group,.18,2.2,metal(0xb2bcb9,.2),0,-1.2,0);
+    wheel(group,.42,.3,brass(),0,.75,0,'y');
+  });components.push(hub);
+  const arms=component3D(root,'1/2 四向转架长臂与短臂',[0,0,0],[0,-1.8,2.5],group=>{
+    const angles=[0,Math.PI/2,Math.PI,Math.PI*1.5];
+    angles.forEach((angle,index)=>{
+      const length=index%2?2.4:3.0;
+      const arm=mesh(group,new THREE.BoxGeometry(length,.24,.3),metal(index%2?0x718385:0x829294),Math.cos(angle)*length/2,0,Math.sin(angle)*length/2);
+      arm.rotation.y=-angle;
+      const branch=mesh(group,new THREE.BoxGeometry(1.25,.22,.28),green(),Math.cos(angle)*length,0,Math.sin(angle)*length);branch.rotation.y=-angle+(index%2?.55:-.55);
+    });
+  });components.push(arms);
+  const feet=component3D(root,'3/4/5 支脚、连接轴与端部座',[0,0,0],[0,-3.0,-1.2],group=>{
+    for(const [x,z] of [[-3,0],[3,0],[0,-2.4],[0,2.4],[-2.5,-1.35],[2.5,1.35]]){
+      axisCylinder(group,.08,1.65,metal(0xaab4b1,.18),x,-.85,z);
+      mesh(group,new THREE.CylinderGeometry(.28,.32,.34,32),dark(),x,-1.75,z);
+    }
+  });components.push(feet);
+  const pads=component3D(root,'8/9/10/11 垫圈、挡圈与紧固件',[0,.15,0],[3.8,2.6,2.0],group=>{
+    for(let i=0;i<5;i++){const ring=mesh(group,new THREE.TorusGeometry(.24+i*.035,.035,10,32),i%2?brass():rubber(),0,(i-2)*.22,0);ring.rotation.x=Math.PI/2}
+  });components.push(pads);
+  return finishTfAssembly(root,components,{scale:.75,y:-.3,rotationY:.35});
+}
+
 export function createAssemblyModel(assembly){
+  const refinedTf2513=createRefinedTf2513Assembly(assembly.model);
+  if(refinedTf2513)return refinedTf2513;
   if(assembly.model==='coilingDisk')return coilingDisk();
+  if(assembly.model==='tf2513Product')return tf2513Product();
+  if(assembly.model==='tf2513ColumnAssembly')return tf2513ColumnAssembly();
+  if(assembly.model==='tf2513GearBoxAssembly')return tf2513GearBoxAssembly();
+  if(assembly.model==='tf2513CalenderRollAssembly')return tf2513CalenderRollAssembly();
+  if(assembly.model==='tf2513BrokenEndAssembly')return tf2513BrokenEndAssembly();
+  if(assembly.model==='tf2513CanChangingAssembly')return tf2513CanChangingAssembly();
+  if(assembly.model==='tf2513CoilingFrameAssembly')return tf2513CoilingFrameAssembly();
+  if(assembly.model==='tf2513SliverGuideAssembly')return tf2513SliverGuideAssembly();
+  if(assembly.model==='tf2513BaseDiskAssembly')return tf2513BaseDiskAssembly();
+  if(assembly.model==='tf2513CasingAssembly')return tf2513CasingAssembly();
+  if(assembly.model==='tf2513RackingAssembly')return tf2513RackingAssembly();
   if(assembly.model==='openerProduct')return openerProduct();
   if(assembly.model==='feedAssembly')return feedAssembly();
   if(assembly.model==='beaterAssembly')return beaterAssembly();

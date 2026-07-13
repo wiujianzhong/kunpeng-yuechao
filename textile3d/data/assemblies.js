@@ -1,6 +1,22 @@
 export const assemblies = [
   {
     manual:'tf2513',
+    code:'TF2513-0000',
+    name:'产品装配图',
+    nameEn:'PRODUCTS DIAGRAM',
+    drawingPage:2,
+    bomPages:[3],
+    model:'tf2513Product',
+    itemCount:15,
+    status:'整机装配图与15项明细已核·视觉级3D',
+    sourceImage:'assets/manuals/tf2513/crops/tf2513-p02-assembly-full-frame.png',
+    sourceVector:'assets/manuals/tf2513/crops/tf2513-p02-assembly-full-frame.pdf',
+    sourceDpi:600,
+    accuracy:'按厂家第2页产品装配图还原上罩壳、圈条盘框、底盘、立柱、减速箱、压辊、导条架和转架的主要空间关系；BOM页眉为“TF2513型圈条器”，未给的整机尺寸、配合与隐藏结构不作推测。',
+    keyParts:['1 圈条盘部件','2 立柱部件','3 减速箱部件','4 压辊部件','5 断头装置部件','6 换筒装置部件','7 圈条盘框部件','8 导条架部件','9 底盘部件','10 罩壳部件','11 转架部件']
+  },
+  {
+    manual:'tf2513',
     code:'TF2502-0300',
     name:'圈条盘部件',
     nameEn:'COILING DISK ASS',
@@ -8,9 +24,10 @@ export const assemblies = [
     bomPages:[5,6],
     model:'coilingDisk',
     itemCount:25,
-    status:'爆炸图已核·视觉级3D',
-    sourceImage:'assets/manuals/tf2513/pages-hd/page-04.jpg',
-    sourceVector:'assets/manuals/tf2513/original.pdf#page=4',
+    status:'爆炸图与25项明细已核·视觉级3D',
+    sourceImage:'assets/manuals/tf2513/crops/tf2513-p04-assembly-full-frame.png',
+    sourceVector:'assets/manuals/tf2513/crops/tf2513-p04-assembly-full-frame.pdf',
+    sourceDpi:600,
     accuracy:'按厂家爆炸图还原主要构件、中心轴线和上下装配层级；未提供的精确尺寸、配合公差与内部结构不作推测。',
     keyParts:[
       '3 圈条盘结合件',
@@ -21,6 +38,86 @@ export const assemblies = [
       '5 安装板',
       '8 喂条嘴（下）'
     ]
+  },
+  {
+    manual:'tf2513',
+    code:'TF2502-0600',
+    name:'立柱部件',
+    nameEn:'COLUMN ASS',
+    drawingPage:7,
+    bomPages:[8,9],
+    model:'tf2513ColumnAssembly',
+    itemCount:34,
+    status:'爆炸图与34项明细已核·视觉级3D',
+    sourceImage:'assets/manuals/tf2513/crops/tf2513-p07-assembly-full-frame.png',
+    sourceVector:'assets/manuals/tf2513/crops/tf2513-p07-assembly-full-frame.pdf',
+    sourceDpi:600,
+    accuracy:'按厂家第7页爆炸图还原前后立柱、长方立柱、立轴、同步带轮、张紧轮、调节板和罩壳的主要装配层级；未标尺寸与带路只作结构视觉。',
+    keyParts:['2 前方立柱结合件','3 张紧轮底板结合件','4 调节板结合件','5 同步带轮结合件（18T）','6 后方立柱结合件','10 立柱罩壳','12 立轴','14 长方立柱结合件','34 同步带1250H100']
+  },
+  {
+    manual:'tf2513',
+    code:'TF2503-0200',
+    name:'减速箱部件',
+    nameEn:'GEAR-DOWN BOX ASS',
+    drawingPage:10,
+    bomPages:[11,12],
+    model:'tf2513GearBoxAssembly',
+    itemCount:41,
+    status:'爆炸图与41项明细已核·视觉级3D',
+    sourceImage:'assets/manuals/tf2513/crops/tf2513-p10-assembly-full-frame.png',
+    sourceVector:'assets/manuals/tf2513/crops/tf2513-p10-assembly-full-frame.pdf',
+    sourceDpi:600,
+    accuracy:'按厂家第10页爆炸图还原减速箱体、箱盖、蜗杆、两组齿轮轴、齿轮、同步带轮、轴承和油封的主要空间关系；齿形、润滑系统和内部配合不作加工级推测。',
+    keyParts:['1 蜗杆结合件','2 减速箱体结合件','3/4 同步带轮结合件','6 齿轮轴（一）','7 箱盖','8 齿轮轴（二）','11 蜗杆','19/20 齿轮','35—39 轴承与油封']
+  },
+  {
+    manual:'tf2513',code:'TF2511-0200',name:'压辊部件',nameEn:'CALENDER ROLL ASS',drawingPage:13,bomPages:[14,15,16],model:'tf2513CalenderRollAssembly',itemCount:49,
+    status:'爆炸图与49项明细已核·视觉级3D',sourceImage:'assets/manuals/tf2513/crops/tf2513-p13-assembly-frame.png',sourceVector:'assets/manuals/tf2513/crops/tf2513-p13-assembly-frame.pdf',sourceDpi:600,
+    accuracy:'按厂家第13页爆炸图还原上下罗拉座、拉杆、加压支座、压辊、同步带轮、受压弹簧、心轴和轴承座的主要轴线与装配层级；弹簧刚度、轴承配合与齿形不作推测。',
+    keyParts:['1 拉杆结合件','2 加压支座结合件','3/4 同步带轮结合件','5 受压弹簧','6 罗拉上座','7 罗拉下座','8 心轴','16 调节同步带轮','17 调节轮轴','21/22 刮刀与刮刀轴']
+  },
+  {
+    manual:'tf2513',code:'TF2511-0400A',name:'断头装置部件',nameEn:'BROKEN-END DEVICE ASS',drawingPage:17,bomPages:[18,19,20],model:'tf2513BrokenEndAssembly',itemCount:51,
+    status:'爆炸图与51项明细已核·视觉级3D',sourceImage:'assets/manuals/tf2513/crops/tf2513-p17-assembly-frame.png',sourceVector:'assets/manuals/tf2513/crops/tf2513-p17-assembly-frame.pdf',sourceDpi:600,
+    accuracy:'按厂家第17页旋转90°的爆炸图还原长底板、翻板盖、喇叭口、气缸安装座、换向轮、导轮、钢丝绳和气管的主要空间关系；管线走向与气动原理只作视觉还原。',
+    keyParts:['1/2 钢丝绳与钢丝绳结合件','3 翻板盖结合件','4 喇叭口结合件','5 气缸安装座结合件','7 固定座','8 拉簧','9 罩壳','13 换向轮','14 导轮','15—17 软管','20 气管']
+  },
+  {
+    manual:'tf2513',code:'TF2511-0800A',name:'换筒装置部件',nameEn:'CAN-CHANGING DEVICE ASS',drawingPage:21,bomPages:[22,23],model:'tf2513CanChangingAssembly',itemCount:35,
+    status:'爆炸图与35项明细已核·视觉级3D',sourceImage:'assets/manuals/tf2513/crops/tf2513-p21-assembly-frame.png',sourceVector:'assets/manuals/tf2513/crops/tf2513-p21-assembly-frame.pdf',sourceDpi:600,
+    accuracy:'按厂家第21页爆炸图还原箱体、安全罩、护板、换筒轴、轴承座、上下带轮和减速电机的主要垂直装配层级；带路张力、轴承配合与箱体内部结构不作推测。',
+    keyParts:['1 减震块','2 箱体结合件','3 定位片结合件','5/9 轴承座','6 轴','7 安全罩','8 护板','11 盖板','12 安装板']
+  },
+  {
+    manual:'tf2513',code:'TF2512-0100',name:'圈条盘框部件',nameEn:'COILING FRAME ASS',drawingPage:24,bomPages:[25,26],model:'tf2513CoilingFrameAssembly',itemCount:26,
+    status:'爆炸图与26项明细已核·视觉级3D',sourceImage:'assets/manuals/tf2513/crops/tf2513-p24-assembly-full-frame.png',sourceVector:'assets/manuals/tf2513/crops/tf2513-p24-assembly-full-frame.pdf',sourceDpi:600,
+    accuracy:'按厂家第24页爆炸图还原盘框、上盖、下底盘、吸尘软管、箱盖铰链和密封条的主要装配层级；原图未标总成尺寸，管路曲率与隐藏支撑只作结构视觉。',
+    keyParts:['1 吸尘软管','2 盘框结合件','3 上盖结合件','4 箱盖铰链座结合件','6 罩壳结合件','7 护板结合件','8 密封条','11 把手','12 管接头','13 罩板']
+  },
+  {
+    manual:'tf2513',code:'TF2512-0600',name:'导条架部件',nameEn:'SLIVER GUIDE WHEEL ASS',drawingPage:27,bomPages:[28],model:'tf2513SliverGuideAssembly',itemCount:22,
+    status:'爆炸图与22项明细已核·视觉级3D',sourceImage:'assets/manuals/tf2513/crops/tf2513-p27-assembly-full-frame.png',sourceVector:'assets/manuals/tf2513/crops/tf2513-p27-assembly-full-frame.pdf',sourceDpi:600,
+    accuracy:'按厂家第27页爆炸图还原横向导条架、中心支座、左右导条轮、心轴、卡箍和端帽的主要空间关系；导条轮槽型和内部轴承不作加工级推测。',
+    keyParts:['1 导条轮结合件','2 端帽','3 固定板','4 座板','5 心轴','6/7 卡箍','8 支座','9 底座','10 导条柱']
+  },
+  {
+    manual:'tf2513',code:'TF2513-0100',name:'底盘部件',nameEn:'BASE DISK ASS',drawingPage:29,bomPages:[30,31,32],model:'tf2513BaseDiskAssembly',itemCount:51,
+    status:'爆炸图与51项明细已核·视觉级3D',sourceImage:'assets/manuals/tf2513/crops/tf2513-p29-assembly-full-frame.png',sourceVector:'assets/manuals/tf2513/crops/tf2513-p29-assembly-full-frame.pdf',sourceDpi:600,
+    accuracy:'按厂家第29页爆炸图还原底框、底盘、大小皮带轮、张紧轮、带轮臂、轴承座和减速电机的主要装配层级；带路张力、配合与隐藏结构不作推测。',
+    keyParts:['1 小皮带轮结合件','2 压轮杆结合件','3 底框结合件','4 大轴承座结合件','5 调节板结合件','6 底盘结合件','11 压轮','12 张紧轮','16 大皮带轮']
+  },
+  {
+    manual:'tf2513',code:'TF2513-0300',name:'罩壳部件',nameEn:'CASING ASS',drawingPage:33,bomPages:[34,35],model:'tf2513CasingAssembly',itemCount:33,
+    status:'爆炸图与33项明细已核·视觉级3D',sourceImage:'assets/manuals/tf2513/crops/tf2513-p33-assembly-full-frame.png',sourceVector:'assets/manuals/tf2513/crops/tf2513-p33-assembly-full-frame.pdf',sourceDpi:600,
+    accuracy:'按厂家第33页爆炸图还原顶部罩板、前后侧盖板、立柱、弧形导条、支架和脚踏板的主要空间关系；板金折弯细节、密封压缩和安装公差不作推测。',
+    keyParts:['1/2 密封条','3 立柱结合件','4 短立柱结合件','5 左侧盖板结合件','6 盖板结合件','7 支架结合件','8 右侧盖板结合件','13 导条','14 后侧盖板','17 前盖板']
+  },
+  {
+    manual:'tf2513',code:'TF2513-1100',name:'转架部件',nameEn:'RACKING ASSEMBLY',drawingPage:36,bomPages:[37],model:'tf2513RackingAssembly',itemCount:11,
+    status:'爆炸图与11项明细已核·视觉级3D',sourceImage:'assets/manuals/tf2513/crops/tf2513-p36-assembly-full-frame.png',sourceVector:'assets/manuals/tf2513/crops/tf2513-p36-assembly-full-frame.pdf',sourceDpi:600,
+    accuracy:'按厂家第36页爆炸图还原转架结合件、支架、多个压轮、长短轴、轴套和定位块的放射式空间关系；臂长、安装孔位与轮子内部结构只作视觉还原。',
+    keyParts:['1 转架结合件','2 支架结合件','3 压轮','4 长轴','5 短轴','6 轴套','7 定位块','8—11 紧固与挡圈']
   },
   {
     manual:'jwf1124c',

@@ -33,6 +33,9 @@ import {jwf1012P04P15Verified} from './data/jwf1012-p04-p15-verified.js?v=202607
 import {jwf1012P16P25Verified} from './data/jwf1012-p16-p25-verified.js?v=20260713-29';
 import {jwf1012P26P33Verified} from './data/jwf1012-p26-p33-verified.js?v=20260713-29';
 import {tf2513Parts} from './data/tf2513-parts.js?v=20260713-9';
+import {tf2513P03P12Verified} from './data/tf2513-p03-p12-verified.js?v=20260713-31';
+import {tf2513P14P23Verified} from './data/tf2513-p14-p23-verified.js?v=20260713-31';
+import {tf2513P25P37Verified} from './data/tf2513-p25-p37-verified.js?v=20260713-31';
 import {fa103bParts} from './data/fa103b-parts.js?v=20260713-9';
 import {fa103bP04Verified} from './data/fa103b-p04-verified.js?v=20260713-29';
 import {fa103bP06P07Verified} from './data/fa103b-p06-p07-verified.js?v=20260713-29';
@@ -43,11 +46,11 @@ import {jwf1102P05Verified} from './data/jwf1102-p05-verified.js?v=20260713-29';
 import {jwf1102P08P09Verified} from './data/jwf1102-p08-p09-verified.js?v=20260713-29';
 import {jwf1102P11P12Verified} from './data/jwf1102-p11-p12-verified.js?v=20260713-29';
 import {jwf1102P14Verified} from './data/jwf1102-p14-verified.js?v=20260713-29';
-import {assemblies} from './data/assemblies.js?v=20260713-29';
+import {assemblies} from './data/assemblies.js?v=20260713-36';
 import {jwf1206_0100_verified} from './data/jwf1206-0100-verified.js?v=20260713-9';
 import {getPartModelSpec} from './data/model-specs/index.js?v=20260713-31';
 import {createPartModel} from './models/part-models.js?v=20260713-10';
-import {createAssemblyModel} from './models/assembly-models.js?v=20260713-29';
+import {createAssemblyModel} from './models/assembly-models.js?v=20260713-36';
 
 function inferType(part){
   if(part.type!=='unknown')return part.type;
@@ -146,10 +149,19 @@ const verifiedJwf1012Parts=[4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,2
   const source=page<=15?jwf1012P04P15Verified:page<=25?jwf1012P16P25Verified:jwf1012P26P33Verified;
   return mergeVerifiedPage(result,page,source.filter(part=>part.page===page),`JWF1012第${page}页`);
 },jwf1012Parts);
+const verifiedTf2513PartsEarly=[3,5,6,8,9,11,12].reduce((result,page)=>mergeVerifiedPage(
+  result,page,tf2513P03P12Verified.filter(part=>part.page===page),`TF2513第${page}页`
+),tf2513Parts);
+const verifiedTf2513PartsThroughLate=[25,26,28,30,31,32,34,35,37].reduce((result,page)=>mergeVerifiedPage(
+  result,page,tf2513P25P37Verified.filter(part=>part.page===page),`TF2513第${page}页`
+),verifiedTf2513PartsEarly);
+const verifiedTf2513PartsFull=[14,15,16,18,19,20,22,23].reduce((result,page)=>mergeVerifiedPage(
+  result,page,tf2513P14P23Verified.filter(part=>part.page===page),`TF2513第${page}页`
+),verifiedTf2513PartsThroughLate);
 const indexedParts=[
   ...verifiedJwf1206Parts09to30Through30,...verifiedJwf1206Parts31to50Through50,...verifiedJwf1206Parts51to73Through73,
   ...verifiedZfa051aParts,...verifiedJwf1026Parts,...verifiedJwf1124cParts,...verifiedJwf1012Parts,
-  ...tf2513Parts,...verifiedFa103bParts,...verifiedJwf1102Parts
+  ...verifiedTf2513PartsFull,...verifiedFa103bParts,...verifiedJwf1102Parts
 ].map(part=>{
   const inferred=inferType(part);
   const verified=part.dataStatus==='厂家资料已核';

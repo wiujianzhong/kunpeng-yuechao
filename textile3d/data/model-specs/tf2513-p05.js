@@ -1,0 +1,25 @@
+// TF2513厂家PDF第5页BOM逐件3D规格；总成图只提供爆炸轮廓，未给尺寸不反推。
+import {tf2513P03P12Verified} from '../tf2513-p03-p12-verified.js';
+const rows=tf2513P03P12Verified.filter(part=>part.page===5);
+const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+const nums=value=>(Array.isArray(value)?value:[value]).filter(item=>item!=null).flatMap(item=>String(item).match(/\d+(?:\.\d+)?/g)||[]).map(Number);
+const regular=(radius,count=6)=>Array.from({length:count},(_,index)=>{const angle=Math.PI*2*index/count+Math.PI/6;return[Math.cos(angle)*radius,Math.sin(angle)*radius]});
+const rect=(w,h)=>[[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]];
+const source=part=>({page:part.page,item:part.item,recordKey:part.recordKey,code:part.code,nameZh:part.name,nameEn:part.nameEn,quantity:{value:part.quantity,unit:part.quantityUnit,meaning:part.quantityMeaning},dimensions:part.dims,sourceCrop:part.sourceCrop,sourceVector:part.sourceVector,views:[`第${part.drawingPage}页总成图标号${part.item}`,`第${part.page}页厂家BOM行`],assumptions:[part.dims.length?'按BOM明确规格建立主要轮廓；未列出的孔位、台阶、公差和内部结构不猜补。':'厂家只给总成爆炸轮廓和BOM名称，比例为视觉近似；不可用于加工或申报尺寸。']});
+function make(part){const name=part.name,type=part.modelType,n=nums(part.dims),max=Math.max(...n,80),min=Math.min(...n.filter(value=>value>0),24),diameter=n[0]||60;let material='paintedMetal',primitives=[];
+  if(/螺母/.test(name)){const d=clamp(diameter*2,18,70),h=clamp(diameter*.8,6,30);primitives=[{type:'extrude',points:regular(d/2),depth:h,holes:[{kind:'circle',center:[0,0],radius:clamp(diameter*.52,3,22)}],material:'metal'}]}
+  else if(/垫圈|垫片|调整垫片|挡圈|蝶形弹簧/.test(name)){const outer=clamp(max>100?60:max,18,160),inner=outer*.55,thick=clamp(n.at(-1)||2,.2,12);primitives=[{type:'lathe',points:[[inner/2,-thick/2],[outer/2,-thick/2],[outer/2,thick/2],[inner/2,thick/2],[inner/2,-thick/2]],material:'metal'}]}
+  else if(/滚动轴承/.test(name)){const outer=clamp(max>100?80:max,38,150),inner=outer*.48,width=clamp(outer*.28,12,42);primitives=[{type:'lathe',points:[[inner/2,-width/2],[outer/2,-width/2],[outer/2,width/2],[inner/2,width/2],[inner/2,-width/2]],material:'darkMetal'},{type:'torus',radius:outer*.36,tube:outer*.055,rotation:[Math.PI/2,0,0],material:'metal'}]}
+  else if(/同步带$|油封/.test(name)){material='rubber';const outer=clamp(max>200?130:max,36,180);primitives=[{type:'torus',radius:outer*.36,tube:clamp(outer*.08,4,18),material:'rubber',rotation:[Math.PI/2,0,0]}]}
+  else if(/键/.test(name)){const length=clamp(max,20,180),width=clamp(min,5,30);primitives=[{type:'box',size:[length,width,clamp(width*.55,3,12)],material:'metal'}]}
+  else if(/螺栓|螺钉|销|心轴|立轴|齿轮轴|蜗杆|轴$/.test(name)||type==='shaft'){const length=clamp(max,36,500),d=clamp(n[0]||18,6,90);primitives=[{type:'cylinder',radius:d/2,length,axis:'x',material:'metal'},{type:'cylinder',radius:d*.72,length:clamp(length*.12,5,32),axis:'x',position:[-length*.48,0,0],material:'darkMetal'}]}
+  else if(/带轮|皮带轮|张紧轮|齿轮|联轴节|圈条盘/.test(name)||['pulley','gear','roller'].includes(type)){const d=clamp(max>500?180:max,40,320),width=clamp(n.find(value=>value<d)||d*.25,12,90);primitives=[{type:'lathe',points:[[d*.16,-width/2],[d*.5,-width/2],[d*.5,width/2],[d*.16,width/2],[d*.16,-width/2]],material:'darkMetal'},{type:'torus',radius:d*.4,tube:clamp(width*.1,3,12),rotation:[Math.PI/2,0,0],material:'metal'}]}
+  else if(/拉手|喂条嘴|接头|油塞/.test(name)){material=/接头|油塞/.test(name)?'brass':'metal';primitives=[{type:'tube',points:[[-90,0,0],[-35,0,0],[0,25,0],[45,25,0],[80,5,0]],radius:clamp(min*.35,5,14),material},{type:'cylinder',radius:16,length:24,axis:'x',position:[-90,0,0],material:'darkMetal'}]}
+  else if(/立柱/.test(name)||type==='column'){primitives=[{type:'box',size:[80,260,70],material:'paintedMetal'},{type:'box',size:[110,24,100],position:[0,-142,0],material:'darkMetal'},{type:'box',size:[92,18,82],position:[0,139,0],material:'metal'}]}
+  else if(/箱|罩|盖/.test(name)||type==='casing'){primitives=[{type:'box',size:[220,140,160],material:'paintedMetal'},{type:'box',size:[185,112,175],position:[0,0,18],material:'darkMetal'},{type:'cylinder',radius:30,length:178,axis:'z',material:'metal'}]}
+  else if(/板|框|支座|安装座|固定座|调节座|脚踏板/.test(name)||['plate','panel','bracket'].includes(type)){const w=clamp(max,70,520),h=clamp(n.find(value=>value!==max)||w*.48,36,260),depth=clamp(n.at(-1)||10,5,50);primitives=[{type:'extrude',points:rect(w,h),depth,bevel:2,holes:[{kind:'circle',center:[-w*.32,0],radius:clamp(Math.min(w,h)*.07,3,18)},{kind:'circle',center:[w*.32,0],radius:clamp(Math.min(w,h)*.07,3,18)}],material:'paintedMetal'},{type:'box',size:[w*.82,14,depth+26],position:[0,-h*.43,-8],material:'darkMetal'}]}
+  else primitives=[{type:'box',size:[clamp(max,60,300),clamp(max*.48,35,160),clamp(max*.18,12,80)],material:'paintedMetal'},{type:'cylinder',radius:clamp(max*.1,8,35),length:clamp(max*.25,20,90),axis:'z',material:'metal'}];
+  return{level:part.dims.length?'尺寸级':'轮廓级',material,source:source(part),primitives};
+}
+export const tf2513P05ModelSpecs=Object.fromEntries(rows.map(part=>[part.recordKey,make(part)]));
+export default tf2513P05ModelSpecs;

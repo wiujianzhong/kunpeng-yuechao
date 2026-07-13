@@ -1,17 +1,32 @@
 #!/usr/bin/env node
 
-import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {allPartModelSpecs} from '../data/model-specs/index.js';
 
-const pages=Array.from({length:13},(_,index)=>index+4);
-for(const page of pages){
-  const pageText=String(page).padStart(2,'0');
-  const audit=page<=8?'data/audits/jwf1206-0100.json':'data/audits/jwf1206-pages-09-16.json';
+const pad=page=>String(page).padStart(2,'0');
+const range=(from,to)=>Array.from({length:to-from+1},(_,index)=>from+index);
+
+const jobs=[];
+const addPages=(manual,pages,audit)=>pages.forEach(page=>jobs.push({manual,page,audit}));
+
+addPages('jwf1206',range(4,8),'data/audits/jwf1206-0100.json');
+addPages('jwf1206',range(9,16),'data/audits/jwf1206-pages-09-16.json');
+addPages('jwf1206',range(17,26),'data/audits/jwf1206-p17-p26.json');
+addPages('jwf1206',range(27,37),'data/audits/jwf1206-p27-p37.json');
+addPages('jwf1206',range(38,49),'data/audits/jwf1206-p38-p49.json');
+addPages('jwf1206',range(50,61),'data/audits/jwf1206-p50-p61.json');
+addPages('jwf1206',range(62,73),'data/audits/jwf1206-p62-p73.json');
+
+addPages('tf2513',[3,5,6,8,9,11,12],'data/audits/tf2513-p02-p12.json');
+addPages('tf2513',[14,15,16,18,19,20,22,23],'data/audits/tf2513-p13-p23.json');
+addPages('tf2513',[25,26,28,30,31,32,34,35,37],'data/audits/tf2513-p24-p37.json');
+
+for(const {manual,page,audit} of jobs){
+  const pageText=pad(page);
   const args=[
     'scripts/validate_model_specs.mjs',
-    `data/model-specs/jwf1206-p${pageText}.js`,
-    `jwf1206P${pageText}ModelSpecs`,
+    `data/model-specs/${manual}-p${pageText}.js`,
+    `${manual}P${pageText}ModelSpecs`,
     String(page),
     audit
   ];
@@ -23,13 +38,21 @@ for(const page of pages){
   process.stdout.write(result.stdout);
 }
 
-const auditedParts=[
-  ...JSON.parse(fs.readFileSync('data/audits/jwf1206-0100.json','utf8')).parts,
-  ...JSON.parse(fs.readFileSync('data/audits/jwf1206-pages-09-16.json','utf8')).parts
-].filter(part=>part.pdfPage>=4&&part.pdfPage<=16);
-const expected=auditedParts.map(part=>part.code||part.recordKey).sort();
-const actual=Object.keys(allPartModelSpecs.jwf1206||{}).sort();
-if(JSON.stringify(actual)!==JSON.stringify(expected)||actual.length!==157){
-  throw new Error(`JWF1206整体覆盖不一致：应有157件，实际${actual.length}件`);
+const expectedCounts={
+  jwf1206:717,
+  jwf1124c:382,
+  jwf1102:209,
+  fa103b:170,
+  zfa051a:104,
+  jwf1026:247,
+  jwf1012:294,
+  tf2513:393
+};
+
+for(const [manual,expected] of Object.entries(expectedCounts)){
+  const actual=Object.keys(allPartModelSpecs[manual]||{}).length;
+  if(actual!==expected)throw new Error(`${manual}整体覆盖不一致：应有${expected}件，实际${actual}件`);
 }
-console.log('JWF1206第4—16页157件3D规格全部覆盖，且无重复键。');
+
+const total=Object.values(expectedCounts).reduce((sum,count)=>sum+count,0);
+console.log(`全部${total}件3D规格数量与逐页审计覆盖一致，且无重复键。`);

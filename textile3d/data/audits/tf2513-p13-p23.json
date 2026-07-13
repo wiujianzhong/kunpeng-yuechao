@@ -1,0 +1,5343 @@
+{
+  "auditVersion": 1,
+  "manualId": "tf2513",
+  "manualTitle": "TF2513外供图",
+  "sourcePdf": "assets/manuals/tf2513/original.pdf",
+  "sourcePdfSha256": "1f7104517fec17fc8b90073a1f70f87534344afdd6e48960fa62cff94dce5c4f",
+  "scope": {
+    "bomPages": [
+      14,
+      15,
+      16,
+      18,
+      19,
+      20,
+      22,
+      23
+    ],
+    "assemblyDrawingPages": [
+      13,
+      17,
+      21
+    ],
+    "recordCount": 135,
+    "recordCountsByPage": {
+      "14": 24,
+      "15": 24,
+      "16": 1,
+      "18": 23,
+      "19": 24,
+      "20": 4,
+      "22": 23,
+      "23": 12
+    },
+    "quantityTotalsByUnit": {
+      "件": 270
+    },
+    "assemblies": [
+      "TF2511-0200",
+      "TF2511-0400A",
+      "TF2511-0800A"
+    ]
+  },
+  "method": {
+    "pageRenderDpi": 220,
+    "cellCropDpi": 600,
+    "assemblyFrameDpi": 600,
+    "review": "按厂家矢量表格线裁出BOM整行四边框，再逐行核对序号、代号、名称、英文、数量和备注。",
+    "cellRule": "每条记录为厂家BOM的一整行，包含序号、代号、名称、数量及备注。",
+    "quantityRule": "数量栏为单台设备用量。",
+    "identityRule": "身份字段只认厂家BOM原行；代号栏为点号时保存null。",
+    "dimensionRule": "BOM未提供三视图尺寸，只保存件号或名称中明确出现的规格。",
+    "rotationRule": "第17页总成图及第18—20页BOM原内容侧置，矢量页设置90°显示旋转、PNG顺时针校正。"
+  },
+  "pageHeaders": [
+    {
+      "pdfPage": 14,
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "sheetPage": "4-2",
+      "printedPageNumber": 13,
+      "displayRotation": 0
+    },
+    {
+      "pdfPage": 15,
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "sheetPage": "4-3",
+      "printedPageNumber": 14,
+      "displayRotation": 0
+    },
+    {
+      "pdfPage": 16,
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "sheetPage": "4-4",
+      "printedPageNumber": 15,
+      "displayRotation": 0
+    },
+    {
+      "pdfPage": 18,
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "sheetPage": "4-2",
+      "printedPageNumber": 17,
+      "displayRotation": 90
+    },
+    {
+      "pdfPage": 19,
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "sheetPage": "4-3",
+      "printedPageNumber": 18,
+      "displayRotation": 90
+    },
+    {
+      "pdfPage": 20,
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "sheetPage": "4-4",
+      "printedPageNumber": 19,
+      "displayRotation": 90
+    },
+    {
+      "pdfPage": 22,
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "sheetPage": "3-2",
+      "printedPageNumber": 21,
+      "displayRotation": 0
+    },
+    {
+      "pdfPage": 23,
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "sheetPage": "3-3",
+      "printedPageNumber": 22,
+      "displayRotation": 0
+    }
+  ],
+  "coordinateSystem": {
+    "unit": "PDF pt",
+    "origin": "bottom-left",
+    "pages": {
+      "14": {
+        "pageSizePt": [
+          842,
+          595
+        ],
+        "rowLeft": 96.24,
+        "rowRight": 750.48,
+        "rowBoundariesTopPt": [
+          112.6,
+          129.64,
+          146.92,
+          163.96,
+          181.24,
+          198.28,
+          215.32,
+          232.6,
+          249.64,
+          266.92,
+          283.96,
+          301.24,
+          318.28,
+          335.56,
+          352.6,
+          369.88,
+          386.92,
+          403.96,
+          421.24,
+          438.28,
+          455.56,
+          472.6,
+          489.88,
+          506.92,
+          524.2
+        ],
+        "rowStartIndex": 0
+      },
+      "15": {
+        "pageSizePt": [
+          842,
+          595
+        ],
+        "rowLeft": 96.24,
+        "rowRight": 750.48,
+        "rowBoundariesTopPt": [
+          112.6,
+          129.64,
+          146.92,
+          163.96,
+          181.24,
+          198.28,
+          215.32,
+          232.6,
+          249.64,
+          266.92,
+          283.96,
+          301.24,
+          318.28,
+          335.56,
+          352.6,
+          369.88,
+          386.92,
+          403.96,
+          421.24,
+          438.28,
+          455.56,
+          472.6,
+          489.88,
+          506.92,
+          524.2
+        ],
+        "rowStartIndex": 0
+      },
+      "16": {
+        "pageSizePt": [
+          842,
+          595
+        ],
+        "rowLeft": 96.24,
+        "rowRight": 750.48,
+        "rowBoundariesTopPt": [
+          112.6,
+          129.64,
+          146.92,
+          163.96,
+          181.24,
+          198.28,
+          215.32,
+          232.6,
+          249.64,
+          266.92,
+          283.96,
+          301.24,
+          318.28,
+          335.56,
+          352.6,
+          369.88,
+          386.92,
+          403.96,
+          421.24,
+          438.28,
+          455.56,
+          472.6,
+          489.88,
+          506.92,
+          524.2
+        ],
+        "rowStartIndex": 0
+      },
+      "18": {
+        "pageSizePt": [
+          595,
+          842
+        ],
+        "rowBottom": 94.8,
+        "rowTop": 786.72,
+        "rowBoundariesXPt": [
+          80.88,
+          99.36,
+          117.84,
+          136.32,
+          154.8,
+          173.28,
+          191.76,
+          210.24,
+          228.72,
+          247.2,
+          265.68,
+          284.16,
+          302.64,
+          321.12,
+          339.6,
+          358.08,
+          376.56,
+          395.04,
+          413.52,
+          432,
+          450.48,
+          469.2,
+          487.68,
+          506.16,
+          524.64
+        ],
+        "rowStartIndex": 1,
+        "displayRotation": 90
+      },
+      "19": {
+        "pageSizePt": [
+          595,
+          842
+        ],
+        "rowBottom": 94.8,
+        "rowTop": 786.72,
+        "rowBoundariesXPt": [
+          80.88,
+          99.36,
+          117.84,
+          136.32,
+          154.8,
+          173.28,
+          191.76,
+          210.24,
+          228.72,
+          247.2,
+          265.68,
+          284.16,
+          302.64,
+          321.12,
+          339.6,
+          358.08,
+          376.56,
+          395.04,
+          413.52,
+          432,
+          450.48,
+          469.2,
+          487.68,
+          506.16,
+          524.64
+        ],
+        "rowStartIndex": 0,
+        "displayRotation": 90
+      },
+      "20": {
+        "pageSizePt": [
+          595,
+          842
+        ],
+        "rowBottom": 94.8,
+        "rowTop": 786.72,
+        "rowBoundariesXPt": [
+          80.88,
+          99.36,
+          117.84,
+          136.32,
+          154.8,
+          173.28,
+          191.76,
+          210.24,
+          228.72,
+          247.2,
+          265.68,
+          284.16,
+          302.64,
+          321.12,
+          339.6,
+          358.08,
+          376.56,
+          395.04,
+          413.52,
+          432,
+          450.48,
+          469.2,
+          487.68,
+          506.16,
+          524.64
+        ],
+        "rowStartIndex": 0,
+        "displayRotation": 90
+      },
+      "22": {
+        "pageSizePt": [
+          842,
+          595
+        ],
+        "rowLeft": 96.24,
+        "rowRight": 750.48,
+        "rowBoundariesTopPt": [
+          112.6,
+          129.64,
+          146.92,
+          163.96,
+          181.24,
+          198.28,
+          215.32,
+          232.6,
+          249.64,
+          266.92,
+          283.96,
+          301.24,
+          318.28,
+          335.56,
+          352.6,
+          369.88,
+          386.92,
+          403.96,
+          421.24,
+          438.28,
+          455.56,
+          472.6,
+          489.88,
+          506.92,
+          524.2
+        ],
+        "rowStartIndex": 1
+      },
+      "23": {
+        "pageSizePt": [
+          842,
+          595
+        ],
+        "rowLeft": 96.24,
+        "rowRight": 750.48,
+        "rowBoundariesTopPt": [
+          112.6,
+          129.64,
+          146.92,
+          163.96,
+          181.24,
+          198.28,
+          215.32,
+          232.6,
+          249.64,
+          266.92,
+          283.96,
+          301.24,
+          318.28,
+          335.56,
+          352.6,
+          369.88,
+          386.92,
+          403.96,
+          421.24,
+          438.28,
+          455.56,
+          472.6,
+          489.88,
+          506.92,
+          524.2
+        ],
+        "rowStartIndex": 0
+      }
+    }
+  },
+  "assemblyFrames": [
+    {
+      "pdfPage": 13,
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "assemblyNameEn": "CALENDER ROLL ASS",
+      "sheetPage": "4-1",
+      "printedPageNumber": 12,
+      "cropBoxPt": [
+        34.08,
+        24.24,
+        775.44,
+        538.8
+      ],
+      "displayRotation": 0,
+      "sourceSlug": "tf2513-p13-assembly-frame",
+      "sourceCrop": "assets/manuals/tf2513/crops/tf2513-p13-assembly-frame.png",
+      "sourceVector": "assets/manuals/tf2513/crops/tf2513-p13-assembly-frame.pdf"
+    },
+    {
+      "pdfPage": 17,
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "assemblyNameEn": "BROKEN-END DEVICE ASS",
+      "sheetPage": "4-1",
+      "printedPageNumber": 16,
+      "cropBoxPt": [
+        20.16,
+        29.04,
+        574.56,
+        813.12
+      ],
+      "displayRotation": 90,
+      "sourceSlug": "tf2513-p17-assembly-frame",
+      "sourceCrop": "assets/manuals/tf2513/crops/tf2513-p17-assembly-frame.png",
+      "sourceVector": "assets/manuals/tf2513/crops/tf2513-p17-assembly-frame.pdf"
+    },
+    {
+      "pdfPage": 21,
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "assemblyNameEn": "CAN-CHANGING DEVICE ASS",
+      "sheetPage": "3-1",
+      "printedPageNumber": 20,
+      "cropBoxPt": [
+        34.08,
+        24.24,
+        775.44,
+        538.8
+      ],
+      "displayRotation": 0,
+      "sourceSlug": "tf2513-p21-assembly-frame",
+      "sourceCrop": "assets/manuals/tf2513/crops/tf2513-p21-assembly-frame.png",
+      "sourceVector": "assets/manuals/tf2513/crops/tf2513-p21-assembly-frame.pdf"
+    }
+  ],
+  "sourceAmbiguities": [
+    {
+      "recordKey": "tf2513-p16-item-001",
+      "field": "code",
+      "sourceValue": null,
+      "note": "厂家代号栏为点号，轴承型号6205-2RZ写在名称中，备注SKF。"
+    },
+    {
+      "recordKey": "tf2513-p18-item-002",
+      "field": "sourceNameEn",
+      "sourceValue": "CYLINDER INSTALLED SEAT SUB-ASS",
+      "note": "厂家中文为钢丝绳结合件，英文语义不一致，双语均按原行保留。"
+    },
+    {
+      "recordKey": "tf2513-p18-item-013",
+      "field": "sourceNameEn",
+      "sourceValue": "HUNGLING WHEEL",
+      "note": "厂家英文原行存在拼写，按原文保留。"
+    },
+    {
+      "recordKey": "tf2513-p20-item-003",
+      "field": "sourceNameEn",
+      "sourceValue": "TRVAL SWITCH",
+      "note": "厂家英文原行存在拼写，按原文保留。"
+    },
+    {
+      "recordKey": "tf2513-p23-item-011",
+      "field": "code",
+      "sourceValue": null,
+      "note": "厂家代号栏为点号，减速机型号写在名称中，备注博山电机。"
+    }
+  ],
+  "existingIndexComparison": {
+    "existingFile": "data/tf2513-parts.js",
+    "recordCountInScope": 135,
+    "issues": [
+      {
+        "recordKey": "tf2513-p18-item-006",
+        "field": "nameZh",
+        "old": "轴套",
+        "verified": "带肩轴衬"
+      },
+      {
+        "recordKey": "tf2513-p18-item-011",
+        "field": "nameZh",
+        "old": "弹簧座",
+        "verified": "弹簧底座"
+      },
+      {
+        "recordKey": "tf2513-p18-item-013",
+        "field": "nameZh",
+        "old": "换向轮",
+        "verified": "挂轮"
+      },
+      {
+        "recordKey": "tf2513-p18-item-014",
+        "field": "nameZh",
+        "old": "导轮",
+        "verified": "导向轮"
+      },
+      {
+        "recordKey": "tf2513-p18-item-019",
+        "field": "nameZh",
+        "old": "活塞",
+        "verified": "半销"
+      },
+      {
+        "recordKey": "tf2513-p20-item-003",
+        "field": "nameZh",
+        "old": "磁性开关 D-M9B-44，5米",
+        "verified": "磁性开关 D-M9B-44，线长7.5米"
+      },
+      {
+        "recordKey": "tf2513-p23-item-011",
+        "field": "nameZh",
+        "old": "减速器 AEA477-0.25-i=175.38，M4",
+        "verified": "减速机 AEA477-0.25-i=175.38，M4"
+      },
+      {
+        "recordKey": "tf2513-p23-item-012",
+        "field": "sourceNameEn",
+        "old": "PIPE CLIP",
+        "verified": "CLAP"
+      }
+    ]
+  },
+  "parts": [
+    {
+      "pdfPage": 14,
+      "item": 1,
+      "recordKey": "tf2513-p14-item-001",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0200-1",
+      "nameZh": "拉杆结合件",
+      "sourceNameEn": "PULL ROD SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 1,
+        "cropBoxPt": [
+          96.24,
+          465.36,
+          750.48,
+          482.4
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-001",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 2,
+      "recordKey": "tf2513-p14-item-002",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0200-4",
+      "nameZh": "加压支座结合件",
+      "sourceNameEn": "PRESSURE SEAT SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 2,
+        "cropBoxPt": [
+          96.24,
+          448.08000000000004,
+          750.48,
+          465.36
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-002",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 3,
+      "recordKey": "tf2513-p14-item-003",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2502-0200-2",
+      "nameZh": "同步带轮结合件（30T）",
+      "sourceNameEn": "SYNCHRONOUS PULLEY SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 3,
+        "cropBoxPt": [
+          96.24,
+          431.03999999999996,
+          750.48,
+          448.08000000000004
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-003",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 4,
+      "recordKey": "tf2513-p14-item-004",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2502-0200-3",
+      "nameZh": "同步带轮结合件（32T）",
+      "sourceNameEn": "SYNCHRONOUS PULLEY SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 4,
+        "cropBoxPt": [
+          96.24,
+          413.76,
+          750.48,
+          431.03999999999996
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-004",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 5,
+      "recordKey": "tf2513-p14-item-005",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TZH1066-4.0X49",
+      "nameZh": "受压弹簧",
+      "sourceNameEn": "PRESSURE SPRING",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "4.0×49"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 5,
+        "cropBoxPt": [
+          96.24,
+          396.72,
+          750.48,
+          413.76
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-005",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "4.0×49"
+      ]
+    },
+    {
+      "pdfPage": 14,
+      "item": 6,
+      "recordKey": "tf2513-p14-item-006",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0202",
+      "nameZh": "罗拉上座",
+      "sourceNameEn": "UPPER SEAT FOR ROLLER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 6,
+        "cropBoxPt": [
+          96.24,
+          379.68,
+          750.48,
+          396.72
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-006",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 7,
+      "recordKey": "tf2513-p14-item-007",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0203A",
+      "nameZh": "罗拉下座",
+      "sourceNameEn": "LOWER SEAT FOR ROLLER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 7,
+        "cropBoxPt": [
+          96.24,
+          362.4,
+          750.48,
+          379.68
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-007",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 8,
+      "recordKey": "tf2513-p14-item-008",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0207",
+      "nameZh": "心轴",
+      "sourceNameEn": "MANDREL",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 8,
+        "cropBoxPt": [
+          96.24,
+          345.36,
+          750.48,
+          362.4
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-008",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 9,
+      "recordKey": "tf2513-p14-item-009",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0208",
+      "nameZh": "轴套",
+      "sourceNameEn": "SLEEVE",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 9,
+        "cropBoxPt": [
+          96.24,
+          328.08,
+          750.48,
+          345.36
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-009",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 10,
+      "recordKey": "tf2513-p14-item-010",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0209",
+      "nameZh": "调整垫片",
+      "sourceNameEn": "ADJUSTING GASKET",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 10,
+        "cropBoxPt": [
+          96.24,
+          311.04,
+          750.48,
+          328.08
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-010",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 11,
+      "recordKey": "tf2513-p14-item-011",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0210",
+      "nameZh": "垫圈",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 11,
+        "cropBoxPt": [
+          96.24,
+          293.76,
+          750.48,
+          311.04
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-011",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 12,
+      "recordKey": "tf2513-p14-item-012",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0211",
+      "nameZh": "轴",
+      "sourceNameEn": "SHAFT",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 12,
+        "cropBoxPt": [
+          96.24,
+          276.72,
+          750.48,
+          293.76
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-012",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 13,
+      "recordKey": "tf2513-p14-item-013",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0212",
+      "nameZh": "挡圈",
+      "sourceNameEn": "CIRCLIP",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 13,
+        "cropBoxPt": [
+          96.24,
+          259.44,
+          750.48,
+          276.72
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-013",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 14,
+      "recordKey": "tf2513-p14-item-014",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0214",
+      "nameZh": "轴套",
+      "sourceNameEn": "SLEEVE",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 14,
+        "cropBoxPt": [
+          96.24,
+          242.39999999999998,
+          750.48,
+          259.44
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-014",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 15,
+      "recordKey": "tf2513-p14-item-015",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0215",
+      "nameZh": "衬垫",
+      "sourceNameEn": "GASKET",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 15,
+        "cropBoxPt": [
+          96.24,
+          225.12,
+          750.48,
+          242.39999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-015",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 16,
+      "recordKey": "tf2513-p14-item-016",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0216A",
+      "nameZh": "调节同步带轮（32T）",
+      "sourceNameEn": "ADJUSTING SYNCHRONOUS PULLEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 16,
+        "cropBoxPt": [
+          96.24,
+          208.07999999999998,
+          750.48,
+          225.12
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-016",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 17,
+      "recordKey": "tf2513-p14-item-017",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0217",
+      "nameZh": "调节轮轴",
+      "sourceNameEn": "ADJUSTING WHEEL SHAFT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 17,
+        "cropBoxPt": [
+          96.24,
+          191.04000000000002,
+          750.48,
+          208.07999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-017",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 18,
+      "recordKey": "tf2513-p14-item-018",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0218",
+      "nameZh": "垫圈",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 18,
+        "cropBoxPt": [
+          96.24,
+          173.76,
+          750.48,
+          191.04000000000002
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-018",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 19,
+      "recordKey": "tf2513-p14-item-019",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0232",
+      "nameZh": "专用扳手",
+      "sourceNameEn": "SPECIAL SPANNER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 19,
+        "cropBoxPt": [
+          96.24,
+          156.72000000000003,
+          750.48,
+          173.76
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-019",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 20,
+      "recordKey": "tf2513-p14-item-020",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2501-0233",
+      "nameZh": "压辊标牌",
+      "sourceNameEn": "INDICATION CARD FOR NIP ROLLER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 20,
+        "cropBoxPt": [
+          96.24,
+          139.44,
+          750.48,
+          156.72000000000003
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-020",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 21,
+      "recordKey": "tf2513-p14-item-021",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2502-0202",
+      "nameZh": "刮刀",
+      "sourceNameEn": "SCRAPER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 21,
+        "cropBoxPt": [
+          96.24,
+          122.39999999999998,
+          750.48,
+          139.44
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-021",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 22,
+      "recordKey": "tf2513-p14-item-022",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2502-0203",
+      "nameZh": "刮刀轴",
+      "sourceNameEn": "SCRAPER SHAFT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 22,
+        "cropBoxPt": [
+          96.24,
+          105.12,
+          750.48,
+          122.39999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-022",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 23,
+      "recordKey": "tf2513-p14-item-023",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2502-0204",
+      "nameZh": "凹罗拉",
+      "sourceNameEn": "CONCAVE ROLLER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 23,
+        "cropBoxPt": [
+          96.24,
+          88.07999999999998,
+          750.48,
+          105.12
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-023",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 14,
+      "item": 24,
+      "recordKey": "tf2513-p14-item-024",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2502-0205",
+      "nameZh": "凸罗拉",
+      "sourceNameEn": "CONVEX ROLLER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 13,
+      "cell": {
+        "row": 24,
+        "cropBoxPt": [
+          96.24,
+          70.79999999999995,
+          750.48,
+          88.07999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p14-item-024",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 15,
+      "item": 25,
+      "recordKey": "tf2513-p15-item-001",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "TF2502-0206",
+      "nameZh": "调整垫片",
+      "sourceNameEn": "ADJUSTING GASKET",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 1,
+        "cropBoxPt": [
+          96.24,
+          465.36,
+          750.48,
+          482.4
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-001",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 15,
+      "item": 26,
+      "recordKey": "tf2513-p15-item-002",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB70",
+      "nameZh": "螺钉 M5X8",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M5×8"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 2,
+        "cropBoxPt": [
+          96.24,
+          448.08000000000004,
+          750.48,
+          465.36
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-002",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M5×8"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 27,
+      "recordKey": "tf2513-p15-item-003",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB70",
+      "nameZh": "螺钉 M8X12",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M8×12"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 3,
+        "cropBoxPt": [
+          96.24,
+          431.03999999999996,
+          750.48,
+          448.08000000000004
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-003",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M8×12"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 28,
+      "recordKey": "tf2513-p15-item-004",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB70",
+      "nameZh": "螺钉 M8X20",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M8×20"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 4,
+        "cropBoxPt": [
+          96.24,
+          413.76,
+          750.48,
+          431.03999999999996
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-004",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M8×20"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 29,
+      "recordKey": "tf2513-p15-item-005",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB73",
+      "nameZh": "螺钉 M3X8",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M3×8"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 5,
+        "cropBoxPt": [
+          96.24,
+          396.72,
+          750.48,
+          413.76
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-005",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M3×8"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 30,
+      "recordKey": "tf2513-p15-item-006",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB78",
+      "nameZh": "螺钉 M6X8",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×8"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 6,
+        "cropBoxPt": [
+          96.24,
+          379.68,
+          750.48,
+          396.72
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-006",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×8"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 31,
+      "recordKey": "tf2513-p15-item-007",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB78",
+      "nameZh": "螺钉 M12X30",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M12×30"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 7,
+        "cropBoxPt": [
+          96.24,
+          362.4,
+          750.48,
+          379.68
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-007",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M12×30"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 32,
+      "recordKey": "tf2513-p15-item-008",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB79",
+      "nameZh": "螺钉 M8X40",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M8×40"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 8,
+        "cropBoxPt": [
+          96.24,
+          345.36,
+          750.48,
+          362.4
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-008",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M8×40"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 33,
+      "recordKey": "tf2513-p15-item-009",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB85",
+      "nameZh": "螺钉 M6X16",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×16"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 9,
+        "cropBoxPt": [
+          96.24,
+          328.08,
+          750.48,
+          345.36
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-009",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×16"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 34,
+      "recordKey": "tf2513-p15-item-010",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB6170",
+      "nameZh": "螺母 M8",
+      "sourceNameEn": "NUT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M8"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 10,
+        "cropBoxPt": [
+          96.24,
+          311.04,
+          750.48,
+          328.08
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-010",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M8"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 35,
+      "recordKey": "tf2513-p15-item-011",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB6172",
+      "nameZh": "螺母 M8",
+      "sourceNameEn": "NUT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M8"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 11,
+        "cropBoxPt": [
+          96.24,
+          293.76,
+          750.48,
+          311.04
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-011",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M8"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 36,
+      "recordKey": "tf2513-p15-item-012",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB6172",
+      "nameZh": "螺母 M12",
+      "sourceNameEn": "NUT",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M12"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 12,
+        "cropBoxPt": [
+          96.24,
+          276.72,
+          750.48,
+          293.76
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-012",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M12"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 37,
+      "recordKey": "tf2513-p15-item-013",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB6173",
+      "nameZh": "螺母 M16X1.5",
+      "sourceNameEn": "NUT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M16×1.5"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 13,
+        "cropBoxPt": [
+          96.24,
+          259.44,
+          750.48,
+          276.72
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-013",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M16×1.5"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 38,
+      "recordKey": "tf2513-p15-item-014",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB93",
+      "nameZh": "垫圈 8",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 14,
+        "cropBoxPt": [
+          96.24,
+          242.39999999999998,
+          750.48,
+          259.44
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-014",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 15,
+      "item": 39,
+      "recordKey": "tf2513-p15-item-015",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB97.1",
+      "nameZh": "垫圈 5",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 15,
+        "cropBoxPt": [
+          96.24,
+          225.12,
+          750.48,
+          242.39999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-015",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 15,
+      "item": 40,
+      "recordKey": "tf2513-p15-item-016",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB97.1",
+      "nameZh": "垫圈 12",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 16,
+        "cropBoxPt": [
+          96.24,
+          208.07999999999998,
+          750.48,
+          225.12
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-016",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 15,
+      "item": 41,
+      "recordKey": "tf2513-p15-item-017",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB879",
+      "nameZh": "销 5X16",
+      "sourceNameEn": "PIN",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "5×16"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 17,
+        "cropBoxPt": [
+          96.24,
+          191.04000000000002,
+          750.48,
+          208.07999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-017",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "5×16"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 42,
+      "recordKey": "tf2513-p15-item-018",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB879",
+      "nameZh": "销 5X20",
+      "sourceNameEn": "PIN",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "5×20"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 18,
+        "cropBoxPt": [
+          96.24,
+          173.76,
+          750.48,
+          191.04000000000002
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-018",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "5×20"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 43,
+      "recordKey": "tf2513-p15-item-019",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB893.1",
+      "nameZh": "挡圈 35",
+      "sourceNameEn": "CIRCLIP",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 19,
+        "cropBoxPt": [
+          96.24,
+          156.72000000000003,
+          750.48,
+          173.76
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-019",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 15,
+      "item": 44,
+      "recordKey": "tf2513-p15-item-020",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB894.1",
+      "nameZh": "挡圈 15",
+      "sourceNameEn": "CIRCLIP",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 20,
+        "cropBoxPt": [
+          96.24,
+          139.44,
+          750.48,
+          156.72000000000003
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-020",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 15,
+      "item": 45,
+      "recordKey": "tf2513-p15-item-021",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB894.1",
+      "nameZh": "挡圈 17",
+      "sourceNameEn": "CIRCLIP",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 21,
+        "cropBoxPt": [
+          96.24,
+          122.39999999999998,
+          750.48,
+          139.44
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-021",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 15,
+      "item": 46,
+      "recordKey": "tf2513-p15-item-022",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB1096",
+      "nameZh": "键 6X20",
+      "sourceNameEn": "KEY",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "6×20"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 22,
+        "cropBoxPt": [
+          96.24,
+          105.12,
+          750.48,
+          122.39999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-022",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "6×20"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 47,
+      "recordKey": "tf2513-p15-item-023",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB1096",
+      "nameZh": "键 6X25",
+      "sourceNameEn": "KEY",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "6×25"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 23,
+        "cropBoxPt": [
+          96.24,
+          88.07999999999998,
+          750.48,
+          105.12
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-023",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "6×25"
+      ]
+    },
+    {
+      "pdfPage": 15,
+      "item": 48,
+      "recordKey": "tf2513-p15-item-024",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": "GB/T276-94",
+      "nameZh": "滚动轴承 6003-Z",
+      "sourceNameEn": "ROLLING BEARING",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 14,
+      "cell": {
+        "row": 24,
+        "cropBoxPt": [
+          96.24,
+          70.79999999999995,
+          750.48,
+          88.07999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p15-item-024",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 16,
+      "item": 49,
+      "recordKey": "tf2513-p16-item-001",
+      "assembly": "TF2511-0200",
+      "assemblyNameZh": "压辊部件",
+      "drawingPage": 13,
+      "code": null,
+      "nameZh": "滚动轴承 6205-2RZ",
+      "sourceNameEn": "ROLLING BEARING",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-4",
+      "printedPageNumber": 15,
+      "cell": {
+        "row": 1,
+        "cropBoxPt": [
+          96.24,
+          465.36,
+          750.48,
+          482.4
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p16-item-001",
+      "remark": "SKF",
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 1,
+      "recordKey": "tf2513-p18-item-001",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TZH1087-9X3X80",
+      "nameZh": "钢丝绳",
+      "sourceNameEn": "STEEL CABLE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "9×3×80"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 2,
+        "cropBoxPt": [
+          99.36,
+          94.8,
+          117.84,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-001",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "9×3×80"
+      ]
+    },
+    {
+      "pdfPage": 18,
+      "item": 2,
+      "recordKey": "tf2513-p18-item-002",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0400-1",
+      "nameZh": "钢丝绳结合件",
+      "sourceNameEn": "CYLINDER INSTALLED SEAT SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 3,
+        "cropBoxPt": [
+          117.84,
+          94.8,
+          136.32,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-002",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 3,
+      "recordKey": "tf2513-p18-item-003",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0400-2B",
+      "nameZh": "翻板盖结合件",
+      "sourceNameEn": "REVERSIBLE COVER SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 4,
+        "cropBoxPt": [
+          136.32,
+          94.8,
+          154.8,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-003",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 4,
+      "recordKey": "tf2513-p18-item-004",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0400-3A",
+      "nameZh": "喇叭口结合件",
+      "sourceNameEn": "TRUMPET MOUTH SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 5,
+        "cropBoxPt": [
+          154.8,
+          94.8,
+          173.28,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-004",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 5,
+      "recordKey": "tf2513-p18-item-005",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0400-4A",
+      "nameZh": "气缸安装座结合件",
+      "sourceNameEn": "INSTALLED SEAT SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 6,
+        "cropBoxPt": [
+          173.28,
+          94.8,
+          191.76,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-005",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 6,
+      "recordKey": "tf2513-p18-item-006",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TZH1091-12X17",
+      "nameZh": "带肩轴衬",
+      "sourceNameEn": "BUSH",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "12×17"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 7,
+        "cropBoxPt": [
+          191.76,
+          94.8,
+          210.24,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-006",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "12×17"
+      ]
+    },
+    {
+      "pdfPage": 18,
+      "item": 7,
+      "recordKey": "tf2513-p18-item-007",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0401",
+      "nameZh": "固定座",
+      "sourceNameEn": "INSTALLED SEAT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 8,
+        "cropBoxPt": [
+          210.24,
+          94.8,
+          228.72,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-007",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 8,
+      "recordKey": "tf2513-p18-item-008",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0402",
+      "nameZh": "拉簧",
+      "sourceNameEn": "EXTENSION SPRING",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 9,
+        "cropBoxPt": [
+          228.72,
+          94.8,
+          247.2,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-008",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 9,
+      "recordKey": "tf2513-p18-item-009",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0403",
+      "nameZh": "罩壳",
+      "sourceNameEn": "CASING",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 10,
+        "cropBoxPt": [
+          247.2,
+          94.8,
+          265.68,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-009",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 10,
+      "recordKey": "tf2513-p18-item-010",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0404",
+      "nameZh": "托垫",
+      "sourceNameEn": "FELT PAD",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 11,
+        "cropBoxPt": [
+          265.68,
+          94.8,
+          284.16,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-010",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 11,
+      "recordKey": "tf2513-p18-item-011",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0405",
+      "nameZh": "弹簧底座",
+      "sourceNameEn": "BASE SEAT FOR SPRING",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 12,
+        "cropBoxPt": [
+          284.16,
+          94.8,
+          302.64,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-011",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 12,
+      "recordKey": "tf2513-p18-item-012",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0406",
+      "nameZh": "固定座",
+      "sourceNameEn": "FIXED SEAT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 13,
+        "cropBoxPt": [
+          302.64,
+          94.8,
+          321.12,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-012",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 13,
+      "recordKey": "tf2513-p18-item-013",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0407",
+      "nameZh": "挂轮",
+      "sourceNameEn": "HUNGLING WHEEL",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 14,
+        "cropBoxPt": [
+          321.12,
+          94.8,
+          339.6,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-013",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 14,
+      "recordKey": "tf2513-p18-item-014",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0408",
+      "nameZh": "导向轮",
+      "sourceNameEn": "GUIDE WHEEL",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 15,
+        "cropBoxPt": [
+          339.6,
+          94.8,
+          358.08,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-014",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 15,
+      "recordKey": "tf2513-p18-item-015",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0409",
+      "nameZh": "软管",
+      "sourceNameEn": "FLEXIBLE PIPE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 16,
+        "cropBoxPt": [
+          358.08,
+          94.8,
+          376.56,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-015",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 16,
+      "recordKey": "tf2513-p18-item-016",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0410",
+      "nameZh": "软管",
+      "sourceNameEn": "FLEXIBLE PIPE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 17,
+        "cropBoxPt": [
+          376.56,
+          94.8,
+          395.04,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-016",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 17,
+      "recordKey": "tf2513-p18-item-017",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0411",
+      "nameZh": "软管",
+      "sourceNameEn": "FLEXIBLE PIPE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 18,
+        "cropBoxPt": [
+          395.04,
+          94.8,
+          413.52,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-017",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 18,
+      "recordKey": "tf2513-p18-item-018",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0412",
+      "nameZh": "销体",
+      "sourceNameEn": "PIN BODY",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 19,
+        "cropBoxPt": [
+          413.52,
+          94.8,
+          432,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-018",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 19,
+      "recordKey": "tf2513-p18-item-019",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0413A",
+      "nameZh": "半销",
+      "sourceNameEn": "PIN",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 20,
+        "cropBoxPt": [
+          432,
+          94.8,
+          450.48,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-019",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 20,
+      "recordKey": "tf2513-p18-item-020",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0428",
+      "nameZh": "气管",
+      "sourceNameEn": "GAS PIPE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 21,
+        "cropBoxPt": [
+          450.48,
+          94.8,
+          469.2,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-020",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 21,
+      "recordKey": "tf2513-p18-item-021",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "TF2511-0429",
+      "nameZh": "软管",
+      "sourceNameEn": "FLEXIBLE PIPE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 22,
+        "cropBoxPt": [
+          469.2,
+          94.8,
+          487.68,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-021",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 18,
+      "item": 22,
+      "recordKey": "tf2513-p18-item-022",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB70",
+      "nameZh": "螺钉 M4X16",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M4×16"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 23,
+        "cropBoxPt": [
+          487.68,
+          94.8,
+          506.16,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-022",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M4×16"
+      ]
+    },
+    {
+      "pdfPage": 18,
+      "item": 23,
+      "recordKey": "tf2513-p18-item-023",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB70",
+      "nameZh": "螺钉 M4X20",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M4×20"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-2",
+      "printedPageNumber": 17,
+      "cell": {
+        "row": 24,
+        "cropBoxPt": [
+          506.16,
+          94.8,
+          524.64,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p18-item-023",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M4×20"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 24,
+      "recordKey": "tf2513-p19-item-001",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB70",
+      "nameZh": "螺钉 M3X12",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M3×12"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 1,
+        "cropBoxPt": [
+          80.88,
+          94.8,
+          99.36,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-001",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M3×12"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 25,
+      "recordKey": "tf2513-p19-item-002",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB70",
+      "nameZh": "螺钉 M6X12",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×12"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 2,
+        "cropBoxPt": [
+          99.36,
+          94.8,
+          117.84,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-002",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×12"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 26,
+      "recordKey": "tf2513-p19-item-003",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB70",
+      "nameZh": "螺钉 M6X16",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×16"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 3,
+        "cropBoxPt": [
+          117.84,
+          94.8,
+          136.32,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-003",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×16"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 27,
+      "recordKey": "tf2513-p19-item-004",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB70",
+      "nameZh": "螺钉 M6X20",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×20"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 4,
+        "cropBoxPt": [
+          136.32,
+          94.8,
+          154.8,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-004",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×20"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 28,
+      "recordKey": "tf2513-p19-item-005",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB70",
+      "nameZh": "螺钉 M6X30",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×30"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 5,
+        "cropBoxPt": [
+          154.8,
+          94.8,
+          173.28,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-005",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×30"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 29,
+      "recordKey": "tf2513-p19-item-006",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB70",
+      "nameZh": "螺钉 M8X16",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M8×16"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 6,
+        "cropBoxPt": [
+          173.28,
+          94.8,
+          191.76,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-006",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M8×16"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 30,
+      "recordKey": "tf2513-p19-item-007",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB818",
+      "nameZh": "螺钉 M6X12",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×12"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 7,
+        "cropBoxPt": [
+          191.76,
+          94.8,
+          210.24,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-007",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×12"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 31,
+      "recordKey": "tf2513-p19-item-008",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB946",
+      "nameZh": "螺钉 M6X8",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×8"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 8,
+        "cropBoxPt": [
+          210.24,
+          94.8,
+          228.72,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-008",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×8"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 32,
+      "recordKey": "tf2513-p19-item-009",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB946",
+      "nameZh": "螺钉 M10X16",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M10×16"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 9,
+        "cropBoxPt": [
+          228.72,
+          94.8,
+          247.2,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-009",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M10×16"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 33,
+      "recordKey": "tf2513-p19-item-010",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB2673",
+      "nameZh": "螺钉 M6X50",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×50"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 10,
+        "cropBoxPt": [
+          247.2,
+          94.8,
+          265.68,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-010",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×50"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 34,
+      "recordKey": "tf2513-p19-item-011",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB6170",
+      "nameZh": "螺母 M3",
+      "sourceNameEn": "NUT",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M3"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 11,
+        "cropBoxPt": [
+          265.68,
+          94.8,
+          284.16,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-011",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M3"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 35,
+      "recordKey": "tf2513-p19-item-012",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB6170",
+      "nameZh": "螺母 M8",
+      "sourceNameEn": "NUT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M8"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 12,
+        "cropBoxPt": [
+          284.16,
+          94.8,
+          302.64,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-012",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M8"
+      ]
+    },
+    {
+      "pdfPage": 19,
+      "item": 36,
+      "recordKey": "tf2513-p19-item-013",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB93",
+      "nameZh": "垫圈 8",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 13,
+        "cropBoxPt": [
+          302.64,
+          94.8,
+          321.12,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-013",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 19,
+      "item": 37,
+      "recordKey": "tf2513-p19-item-014",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB97.1",
+      "nameZh": "垫圈 3",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 14,
+        "cropBoxPt": [
+          321.12,
+          94.8,
+          339.6,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-014",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 19,
+      "item": 38,
+      "recordKey": "tf2513-p19-item-015",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB97.1",
+      "nameZh": "垫圈 6",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 15,
+        "cropBoxPt": [
+          339.6,
+          94.8,
+          358.08,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-015",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 19,
+      "item": 39,
+      "recordKey": "tf2513-p19-item-016",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB97.1",
+      "nameZh": "垫圈 8",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 16,
+        "cropBoxPt": [
+          358.08,
+          94.8,
+          376.56,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-016",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 19,
+      "item": 40,
+      "recordKey": "tf2513-p19-item-017",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "GB894.1",
+      "nameZh": "挡圈 12",
+      "sourceNameEn": "CIRCLIP",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 17,
+        "cropBoxPt": [
+          376.56,
+          94.8,
+          395.04,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-017",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 19,
+      "item": 41,
+      "recordKey": "tf2513-p19-item-018",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": null,
+      "nameZh": "接头 KQ2H06-00A",
+      "sourceNameEn": "JOINT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 18,
+        "cropBoxPt": [
+          395.04,
+          94.8,
+          413.52,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-018",
+      "remark": "SMC",
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 19,
+      "item": 42,
+      "recordKey": "tf2513-p19-item-019",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": null,
+      "nameZh": "接头 KQ2S06-01AS",
+      "sourceNameEn": "JOINT",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 19,
+        "cropBoxPt": [
+          413.52,
+          94.8,
+          432,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-019",
+      "remark": "SMC",
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 19,
+      "item": 43,
+      "recordKey": "tf2513-p19-item-020",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": null,
+      "nameZh": "接头 KQ2L06-11AS",
+      "sourceNameEn": "JOINT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 20,
+        "cropBoxPt": [
+          432,
+          94.8,
+          450.48,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-020",
+      "remark": "SMC",
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 19,
+      "item": 44,
+      "recordKey": "tf2513-p19-item-021",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": null,
+      "nameZh": "接头 KQ2U06-00A",
+      "sourceNameEn": "JOINT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 21,
+        "cropBoxPt": [
+          450.48,
+          94.8,
+          469.2,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-021",
+      "remark": "SMC",
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 19,
+      "item": 45,
+      "recordKey": "tf2513-p19-item-022",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": null,
+      "nameZh": "接头 KQ2T08-06A",
+      "sourceNameEn": "JOINT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 22,
+        "cropBoxPt": [
+          469.2,
+          94.8,
+          487.68,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-022",
+      "remark": "SMC",
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 19,
+      "item": 46,
+      "recordKey": "tf2513-p19-item-023",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": null,
+      "nameZh": "速度控制阀 AS2201-01-06SA",
+      "sourceNameEn": "SPEED CONTROL VALVE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 23,
+        "cropBoxPt": [
+          487.68,
+          94.8,
+          506.16,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-023",
+      "remark": "SMC",
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 19,
+      "item": 47,
+      "recordKey": "tf2513-p19-item-024",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": null,
+      "nameZh": "电磁阀 SY5120-4DZD-01-F2（带安装架）",
+      "sourceNameEn": "MAGNET VALVE WITH ERECTING FRAME",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-3",
+      "printedPageNumber": 18,
+      "cell": {
+        "row": 24,
+        "cropBoxPt": [
+          506.16,
+          94.8,
+          524.64,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p19-item-024",
+      "remark": "SMC",
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 20,
+      "item": 48,
+      "recordKey": "tf2513-p20-item-001",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": null,
+      "nameZh": "消音器 AN10-01",
+      "sourceNameEn": "SILENCE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-4",
+      "printedPageNumber": 19,
+      "cell": {
+        "row": 1,
+        "cropBoxPt": [
+          80.88,
+          94.8,
+          99.36,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p20-item-001",
+      "remark": "SMC",
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 20,
+      "item": 49,
+      "recordKey": "tf2513-p20-item-002",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": null,
+      "nameZh": "气缸 CD55B40-WSC273-50",
+      "sourceNameEn": "CYLINDER",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-4",
+      "printedPageNumber": 19,
+      "cell": {
+        "row": 2,
+        "cropBoxPt": [
+          99.36,
+          94.8,
+          117.84,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p20-item-002",
+      "remark": "SMC",
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 20,
+      "item": 50,
+      "recordKey": "tf2513-p20-item-003",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": null,
+      "nameZh": "磁性开关 D-M9B-44，线长7.5米",
+      "sourceNameEn": "TRVAL SWITCH",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-4",
+      "printedPageNumber": 19,
+      "cell": {
+        "row": 3,
+        "cropBoxPt": [
+          117.84,
+          94.8,
+          136.32,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p20-item-003",
+      "remark": "SMC",
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 20,
+      "item": 51,
+      "recordKey": "tf2513-p20-item-004",
+      "assembly": "TF2511-0400A",
+      "assemblyNameZh": "断头装置部件",
+      "drawingPage": 17,
+      "code": "FZ/T92004-91",
+      "nameZh": "管夹 6",
+      "sourceNameEn": "PIPE CLIP",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "4-4",
+      "printedPageNumber": 19,
+      "cell": {
+        "row": 4,
+        "cropBoxPt": [
+          136.32,
+          94.8,
+          154.8,
+          786.72
+        ],
+        "displayRotation": 90
+      },
+      "sourceSlug": "tf2513-p20-item-004",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 1,
+      "recordKey": "tf2513-p22-item-001",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TZH1113-00",
+      "nameZh": "减震块",
+      "sourceNameEn": "DAMPING DOCK",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 2,
+        "cropBoxPt": [
+          96.24,
+          448.08000000000004,
+          750.48,
+          465.36
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-001",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 2,
+      "recordKey": "tf2513-p22-item-002",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2511-0800-2B",
+      "nameZh": "箱体结合件",
+      "sourceNameEn": "CASING BODY SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 3,
+        "cropBoxPt": [
+          96.24,
+          431.03999999999996,
+          750.48,
+          448.08000000000004
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-002",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 3,
+      "recordKey": "tf2513-p22-item-003",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2511-0800-3A",
+      "nameZh": "定位片结合件",
+      "sourceNameEn": "LOCATING SLICE SUB-ASS",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 4,
+        "cropBoxPt": [
+          96.24,
+          413.76,
+          750.48,
+          431.03999999999996
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-003",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 4,
+      "recordKey": "tf2513-p22-item-004",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2511-0804",
+      "nameZh": "螺栓",
+      "sourceNameEn": "BOLT",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 5,
+        "cropBoxPt": [
+          96.24,
+          396.72,
+          750.48,
+          413.76
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-004",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 5,
+      "recordKey": "tf2513-p22-item-005",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2511-0805",
+      "nameZh": "轴承座",
+      "sourceNameEn": "BEARING SEAT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 6,
+        "cropBoxPt": [
+          96.24,
+          379.68,
+          750.48,
+          396.72
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-005",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 6,
+      "recordKey": "tf2513-p22-item-006",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2511-0808B",
+      "nameZh": "轴",
+      "sourceNameEn": "SHAFT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 7,
+        "cropBoxPt": [
+          96.24,
+          362.4,
+          750.48,
+          379.68
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-006",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 7,
+      "recordKey": "tf2513-p22-item-007",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2511-0809A",
+      "nameZh": "安全罩",
+      "sourceNameEn": "SAFETY HOOD",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 8,
+        "cropBoxPt": [
+          96.24,
+          345.36,
+          750.48,
+          362.4
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-007",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 8,
+      "recordKey": "tf2513-p22-item-008",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2511-0810",
+      "nameZh": "护板",
+      "sourceNameEn": "GUARD PLATE",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 9,
+        "cropBoxPt": [
+          96.24,
+          328.08,
+          750.48,
+          345.36
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-008",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 9,
+      "recordKey": "tf2513-p22-item-009",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2511-0812",
+      "nameZh": "轴承座",
+      "sourceNameEn": "BEARING SEAT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 10,
+        "cropBoxPt": [
+          96.24,
+          311.04,
+          750.48,
+          328.08
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-009",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 10,
+      "recordKey": "tf2513-p22-item-010",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2511-0814",
+      "nameZh": "垫板",
+      "sourceNameEn": "BOTTOM PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 11,
+        "cropBoxPt": [
+          96.24,
+          293.76,
+          750.48,
+          311.04
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-010",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 11,
+      "recordKey": "tf2513-p22-item-011",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2511-0815",
+      "nameZh": "盖板",
+      "sourceNameEn": "COVER PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 12,
+        "cropBoxPt": [
+          96.24,
+          276.72,
+          750.48,
+          293.76
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-011",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 12,
+      "recordKey": "tf2513-p22-item-012",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2511-0827",
+      "nameZh": "安装板",
+      "sourceNameEn": "MOUNTING PLATE",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 13,
+        "cropBoxPt": [
+          96.24,
+          259.44,
+          750.48,
+          276.72
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-012",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 13,
+      "recordKey": "tf2513-p22-item-013",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "TF2531-0804",
+      "nameZh": "垫片",
+      "sourceNameEn": "GASKET",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 14,
+        "cropBoxPt": [
+          96.24,
+          242.39999999999998,
+          750.48,
+          259.44
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-013",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 22,
+      "item": 14,
+      "recordKey": "tf2513-p22-item-014",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB5783",
+      "nameZh": "螺栓 M8X30",
+      "sourceNameEn": "BOLT",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M8×30"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 15,
+        "cropBoxPt": [
+          96.24,
+          225.12,
+          750.48,
+          242.39999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-014",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M8×30"
+      ]
+    },
+    {
+      "pdfPage": 22,
+      "item": 15,
+      "recordKey": "tf2513-p22-item-015",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB5783",
+      "nameZh": "螺栓 M12X30",
+      "sourceNameEn": "BOLT",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M12×30"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 16,
+        "cropBoxPt": [
+          96.24,
+          208.07999999999998,
+          750.48,
+          225.12
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-015",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M12×30"
+      ]
+    },
+    {
+      "pdfPage": 22,
+      "item": 16,
+      "recordKey": "tf2513-p22-item-016",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": null,
+      "nameZh": "膨胀螺栓 M8X80",
+      "sourceNameEn": "EXPANSION BOLT",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M8×80"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 17,
+        "cropBoxPt": [
+          96.24,
+          191.04000000000002,
+          750.48,
+          208.07999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-016",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M8×80"
+      ]
+    },
+    {
+      "pdfPage": 22,
+      "item": 17,
+      "recordKey": "tf2513-p22-item-017",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB70",
+      "nameZh": "螺钉 M5X12",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M5×12"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 18,
+        "cropBoxPt": [
+          96.24,
+          173.76,
+          750.48,
+          191.04000000000002
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-017",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M5×12"
+      ]
+    },
+    {
+      "pdfPage": 22,
+      "item": 18,
+      "recordKey": "tf2513-p22-item-018",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB70",
+      "nameZh": "螺钉 M6X16",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 6,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×16"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 19,
+        "cropBoxPt": [
+          96.24,
+          156.72000000000003,
+          750.48,
+          173.76
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-018",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×16"
+      ]
+    },
+    {
+      "pdfPage": 22,
+      "item": 19,
+      "recordKey": "tf2513-p22-item-019",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB80",
+      "nameZh": "螺钉 M10X12",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M10×12"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 20,
+        "cropBoxPt": [
+          96.24,
+          139.44,
+          750.48,
+          156.72000000000003
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-019",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M10×12"
+      ]
+    },
+    {
+      "pdfPage": 22,
+      "item": 20,
+      "recordKey": "tf2513-p22-item-020",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB818",
+      "nameZh": "螺钉 M5X45",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M5×45"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 21,
+        "cropBoxPt": [
+          96.24,
+          122.39999999999998,
+          750.48,
+          139.44
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-020",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M5×45"
+      ]
+    },
+    {
+      "pdfPage": 22,
+      "item": 21,
+      "recordKey": "tf2513-p22-item-021",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB818",
+      "nameZh": "螺钉 M6X8",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 2,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×8"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 22,
+        "cropBoxPt": [
+          96.24,
+          105.12,
+          750.48,
+          122.39999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-021",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×8"
+      ]
+    },
+    {
+      "pdfPage": 22,
+      "item": 22,
+      "recordKey": "tf2513-p22-item-022",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB818",
+      "nameZh": "螺钉 M6X10",
+      "sourceNameEn": "SCREW",
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M6×10"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 23,
+        "cropBoxPt": [
+          96.24,
+          88.07999999999998,
+          750.48,
+          105.12
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-022",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M6×10"
+      ]
+    },
+    {
+      "pdfPage": 22,
+      "item": 23,
+      "recordKey": "tf2513-p22-item-023",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB889",
+      "nameZh": "螺母 M8",
+      "sourceNameEn": "NUT",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M8"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-2",
+      "printedPageNumber": 21,
+      "cell": {
+        "row": 24,
+        "cropBoxPt": [
+          96.24,
+          70.79999999999995,
+          750.48,
+          88.07999999999998
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p22-item-023",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M8"
+      ]
+    },
+    {
+      "pdfPage": 23,
+      "item": 24,
+      "recordKey": "tf2513-p23-item-001",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB6170",
+      "nameZh": "螺母 M5",
+      "sourceNameEn": "NUT",
+      "quantity": {
+        "value": 8,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M5"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 1,
+        "cropBoxPt": [
+          96.24,
+          465.36,
+          750.48,
+          482.4
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-001",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M5"
+      ]
+    },
+    {
+      "pdfPage": 23,
+      "item": 25,
+      "recordKey": "tf2513-p23-item-002",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB6170",
+      "nameZh": "螺母 M16",
+      "sourceNameEn": "NUT",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "M16"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 2,
+        "cropBoxPt": [
+          96.24,
+          448.08000000000004,
+          750.48,
+          465.36
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-002",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "M16"
+      ]
+    },
+    {
+      "pdfPage": 23,
+      "item": 26,
+      "recordKey": "tf2513-p23-item-003",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB97.1",
+      "nameZh": "垫圈 5",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 18,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 3,
+        "cropBoxPt": [
+          96.24,
+          431.03999999999996,
+          750.48,
+          448.08000000000004
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-003",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 23,
+      "item": 27,
+      "recordKey": "tf2513-p23-item-004",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB97.1",
+      "nameZh": "垫圈 6",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 9,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 4,
+        "cropBoxPt": [
+          96.24,
+          413.76,
+          750.48,
+          431.03999999999996
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-004",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 23,
+      "item": 28,
+      "recordKey": "tf2513-p23-item-005",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB97.1",
+      "nameZh": "垫圈 8",
+      "sourceNameEn": "WASHER",
+      "quantity": {
+        "value": 4,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 5,
+        "cropBoxPt": [
+          96.24,
+          396.72,
+          750.48,
+          413.76
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-005",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 23,
+      "item": 29,
+      "recordKey": "tf2513-p23-item-006",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB894.1",
+      "nameZh": "挡圈 40",
+      "sourceNameEn": "CIRCLIP",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 6,
+        "cropBoxPt": [
+          96.24,
+          379.68,
+          750.48,
+          396.72
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-006",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 23,
+      "item": 30,
+      "recordKey": "tf2513-p23-item-007",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB1096",
+      "nameZh": "键 10X45",
+      "sourceNameEn": "KEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "10×45"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 7,
+        "cropBoxPt": [
+          96.24,
+          362.4,
+          750.48,
+          379.68
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-007",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "10×45"
+      ]
+    },
+    {
+      "pdfPage": 23,
+      "item": 31,
+      "recordKey": "tf2513-p23-item-008",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB1096",
+      "nameZh": "键 10X110",
+      "sourceNameEn": "KEY",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "10×110"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 8,
+        "cropBoxPt": [
+          96.24,
+          345.36,
+          750.48,
+          362.4
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-008",
+      "remark": null,
+      "auditIssues": [],
+      "dims": [
+        "10×110"
+      ]
+    },
+    {
+      "pdfPage": 23,
+      "item": 32,
+      "recordKey": "tf2513-p23-item-009",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB/T3882-95",
+      "nameZh": "带座轴承 UEL207",
+      "sourceNameEn": "BEARING",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 9,
+        "cropBoxPt": [
+          96.24,
+          328.08,
+          750.48,
+          345.36
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-009",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 23,
+      "item": 33,
+      "recordKey": "tf2513-p23-item-010",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "GB/T3882-95",
+      "nameZh": "带座轴承 UEL208",
+      "sourceNameEn": "BEARING",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 10,
+        "cropBoxPt": [
+          96.24,
+          311.04,
+          750.48,
+          328.08
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-010",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    },
+    {
+      "pdfPage": 23,
+      "item": 34,
+      "recordKey": "tf2513-p23-item-011",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": null,
+      "nameZh": "减速机 AEA477-0.25-i=175.38，M4",
+      "sourceNameEn": "REDUCTION GEAR",
+      "quantity": {
+        "value": 1,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [
+        "模数M4"
+      ],
+      "dimensionSource": "厂家BOM件号或名称中的明确规格",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 11,
+        "cropBoxPt": [
+          96.24,
+          293.76,
+          750.48,
+          311.04
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-011",
+      "remark": "博山电机",
+      "auditIssues": [],
+      "dims": [
+        "模数M4"
+      ]
+    },
+    {
+      "pdfPage": 23,
+      "item": 35,
+      "recordKey": "tf2513-p23-item-012",
+      "assembly": "TF2511-0800A",
+      "assemblyNameZh": "换筒装置部件",
+      "drawingPage": 21,
+      "code": "FZ/T92004-91",
+      "nameZh": "管夹 6",
+      "sourceNameEn": "CLAP",
+      "quantity": {
+        "value": 3,
+        "unit": "件",
+        "meaning": "单台设备用量"
+      },
+      "specification": [],
+      "dimensionSource": "厂家BOM未标零件几何尺寸",
+      "pdfSheetPage": "3-3",
+      "printedPageNumber": 22,
+      "cell": {
+        "row": 12,
+        "cropBoxPt": [
+          96.24,
+          276.72,
+          750.48,
+          293.76
+        ],
+        "displayRotation": 0
+      },
+      "sourceSlug": "tf2513-p23-item-012",
+      "remark": null,
+      "auditIssues": [],
+      "dims": []
+    }
+  ]
+}
