@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    const VERSION = '20260711-stable-auth';
+    const VERSION = '20260713-stable-machine';
     const ACTIVATION_KEY = 'jx_ppt_activation';
     const OFFLINE_GRACE_KEY = 'jx_ppt_offline_grace';
     const INSTALLATION_KEY = 'jx_ppt_installation_id';
@@ -97,8 +97,11 @@
         }
     }
 
+    let cachedMachineCode = '';
+
     function getMachineCode() {
-        return simpleHash([
+        if (cachedMachineCode) return cachedMachineCode;
+        cachedMachineCode = simpleHash([
             navigator.userAgent || '',
             navigator.platform || '',
             `${screen.width}x${screen.height}x${screen.colorDepth}`,
@@ -107,6 +110,7 @@
             navigator.deviceMemory || '',
             getCanvasFingerprint()
         ].join('|||'));
+        return cachedMachineCode;
     }
 
     function getTrialFingerprint() {
