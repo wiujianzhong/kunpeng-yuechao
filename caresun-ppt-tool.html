@@ -376,6 +376,13 @@ body > .container > .text-center:first-child h1::before {
     font-weight: 600; cursor: pointer; transition: background 0.2s;
 }
 #activation-btn:hover { background: #15803d; }
+#trial-section { display: none; margin-bottom: 14px; }
+#trial-btn {
+    width: 100%; padding: 12px; background: #eff6ff; color: #1d4ed8;
+    border: 1px solid #bfdbfe; border-radius: 10px; font-size: 1rem;
+    font-weight: 700; cursor: pointer; transition: background 0.2s;
+}
+#trial-btn:hover { background: #dbeafe; }
 #activation-error {
     color: #dc2626; font-size: 0.8rem; margin-top: 10px; display: none;
 }
@@ -399,6 +406,9 @@ body > .container > .text-center:first-child h1::before {
         <h2>嘉新内部工具授权</h2>
         <p class="subtitle">由小伍工作室提供技术支持</p>
         <p class="activation-trust-note">本工具用于嘉新内部问题整改材料排版，不是嘉新集团官网，不提供在线支付。上传的图片、文字和PPT仅在当前浏览器本地处理，不上传业务资料。</p>
+        <div id="trial-section">
+            <button id="trial-btn" onclick="startFreeTrial()">🎉 免费体验7天</button>
+        </div>
         <div class="machine-code-box">
             <div class="label">📱 您的设备机器码</div>
             <div class="code" id="machine-code-display">——</div>
