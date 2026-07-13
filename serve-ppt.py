@@ -145,8 +145,11 @@ def register_or_check(code, installation_id, current_machine):
         installations = []
         if row:
             installations = json.loads(row[2] or "[]")
-        if machine_code != current_machine:
-            if not row or not installation_id or installation_id not in installations:
+        if not row:
+            # 管理员签发的新码首次使用时，以浏览器实际提交的机器码完成登记。
+            machine_code = current_machine
+        elif machine_code != current_machine:
+            if not installation_id or installation_id not in installations:
                 return None, "浏览器记录已变化，请联系管理员恢复授权"
         if installation_id and installation_id not in installations:
             installations.append(installation_id)
