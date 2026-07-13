@@ -1,0 +1,165 @@
+{
+  "manualId": "jwf1206",
+  "page": 40,
+  "source": "JWF1206厂家PDF第40页",
+  "method": "厂家视图区与3D正交投影半透明叠合",
+  "recordCount": 14,
+  "pageEvidence": "tmp/jwf1206-p40-overlay-full-final-current.png",
+  "modelGalleryEvidence": "tmp/jwf1206-p40-model-gallery-final.png",
+  "records": [
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-001",
+      "code": "FA225-4601",
+      "views": ["轴向剖视图", "端视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线"],
+      "material": "金属同步带轮",
+      "verdict": "通过（尺寸级，φ75.44、φ24、32及键槽/两孔关系已闭环；19Z齿形因厂家未给齿形尺寸，不凭名称虚构）",
+      "evidence": ["tmp/jwf1206-p40-overlay-001-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-002",
+      "code": "DK760-4410",
+      "views": ["轴向全剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线"],
+      "material": "柔性橡胶密封垫",
+      "verdict": "通过（尺寸级，φ40、φ10.5、厚5及端缘倒角一致，材质由金属纠正为橡胶）",
+      "evidence": ["tmp/jwf1206-p40-overlay-002-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-003",
+      "code": "DK760-4422",
+      "views": ["轴向全剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "外圆浅槽标记"],
+      "material": "金属刮刀夹头",
+      "verdict": "通过（轮廓级，已识别φ15通孔、48总长和右端下侧夹持开口；主体外径与槽长未标）",
+      "evidence": ["tmp/jwf1206-p40-overlay-003-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-004",
+      "code": "DK760-4423",
+      "views": ["轴向全剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线"],
+      "material": "金属刮刀夹头",
+      "verdict": "通过（轮廓级，φ15已按右段外径而非通孔解释，φ20/φ15两级外径和29总长闭环；内孔未标）",
+      "evidence": ["tmp/jwf1206-p40-overlay-004-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-005",
+      "code": "DK760-4431",
+      "views": ["正视轮廓图", "板厚标注"],
+      "excludedLines": ["尺寸线", "引出线"],
+      "material": "金属连接板",
+      "verdict": "通过（轮廓级，130底边、6厚、三孔和圆角斜边已按厂家轮廓重描；高度及孔径未标）",
+      "evidence": ["tmp/jwf1206-p40-overlay-005-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-006",
+      "code": "DK760-4435",
+      "views": ["主视图", "左视图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线"],
+      "material": "金属轴座及装配紧固件",
+      "verdict": "通过（轮廓级，84高钩形座体、贯通轴孔和40宽左视关系已闭环；左视多边形纠正为紧固件头）",
+      "evidence": ["tmp/jwf1206-p40-overlay-006-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-007",
+      "code": "DK760-4436",
+      "views": ["轴向主视图"],
+      "excludedLines": ["尺寸线", "中心线", "螺纹示意线"],
+      "material": "金属六角头螺栓",
+      "verdict": "通过（尺寸级，M10×32总长、杆部与六角头比例一致）",
+      "evidence": ["tmp/jwf1206-p40-overlay-007-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-008",
+      "code": "DK760-4437",
+      "views": ["轴向主视图"],
+      "excludedLines": ["尺寸线", "中心线", "螺纹示意线"],
+      "material": "金属台阶螺栓",
+      "verdict": "通过（尺寸级，φ12光杆、M10细段和63总长分段正确，不再由φ12实体覆盖细段）",
+      "evidence": ["tmp/jwf1206-p40-overlay-008-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-009",
+      "code": "DK760-4438",
+      "views": ["主视图", "俯视图"],
+      "excludedLines": ["尺寸线", "引出线"],
+      "material": "涂装金属油脂容器及两根弯管",
+      "verdict": "通过（轮廓级，35×50主视、80长俯视及两根沿深度分置的左侧弯管关系闭环；壁厚未标）",
+      "evidence": ["tmp/jwf1206-p40-overlay-009-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-010",
+      "code": "DK760-4439",
+      "views": ["轴向剖视图", "端视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线"],
+      "material": "金属圆盘挡板",
+      "verdict": "通过（轮廓级，φ40×4外廓、中心孔及四等距孔闭环；剖视斜线判定为斜孔空腔，轴向角度未标）",
+      "evidence": ["tmp/jwf1206-p40-overlay-010-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-011",
+      "code": "DK760-4440",
+      "views": ["轴向主视图", "六角端视图"],
+      "excludedLines": ["尺寸线", "中心线", "螺纹示意线"],
+      "material": "金属六角头螺栓",
+      "verdict": "通过（尺寸级，M10杆长60、六角对边16及主/端视遮挡关系闭环）",
+      "evidence": ["tmp/jwf1206-p40-overlay-011-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-012",
+      "code": "DK760-4441",
+      "views": ["俯视图", "端视半圆轮廓"],
+      "excludedLines": ["尺寸线", "引出线", "不可见孔边"],
+      "material": "金属半圆柱螺钉座",
+      "verdict": "通过（轮廓级，已由六边形块重建为55×30、端高25.5的半圆柱座；两孔孔径未标，以凹腔代理）",
+      "evidence": ["tmp/jwf1206-p40-overlay-012-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-013",
+      "code": "TZH1035",
+      "views": ["轴向主视图"],
+      "excludedLines": ["尺寸线", "中心线", "螺纹示意线"],
+      "material": "金属丝杠",
+      "verdict": "通过（尺寸级，整根M12×1、120总长和两端倒角闭环，不再误缩两端）",
+      "evidence": ["tmp/jwf1206-p40-overlay-013-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 40,
+      "recordKey": "jwf1206-p40-item-014",
+      "code": "TZH1037",
+      "views": ["轴向全剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线"],
+      "material": "柔性橡胶密封垫",
+      "verdict": "通过（尺寸级，φ30、φ13、厚6闭环，材质由金属纠正为橡胶）",
+      "evidence": ["tmp/jwf1206-p40-overlay-014-final.png"],
+      "rebuilt": true
+    }
+  ]
+}

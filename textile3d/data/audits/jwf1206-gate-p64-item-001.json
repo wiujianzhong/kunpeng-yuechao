@@ -1,0 +1,10 @@
+{
+  "recordKey":"jwf1206-p64-item-001","page":64,"partNumber":"JWF1202-8000-1A","name":"喂棉扁管结合件（一）","sourceCrop":"tmp/pdfs/jwf1206-p56-p64-review/tiles/p64-001.png","topology":"可确认正面为带观察窗、外周紧固点和下法兰的梯形扁管罩，另一视图显示斜置壳体、上下法兰及一根带两个节点的侧向连杆；但两视图的正式投影方向和壳体/连杆前后连接无法唯一闭合。",
+  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"FEED DUCT SUB-ASS","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"JWF1206-8000"},
+  "views":[
+    {"name":"厂家正面视图","direction":"垂直梯形罩正面观看","region":"原格上方宽视图","projectionRelation":"925只约束下部开口/法兰宽度，无法单独推出另一视图中的斜置深度轴","solidContours":["梯形罩外廓","圆角观察窗三层轮廓","下法兰","外周紧固点"],"holes":["观察窗开口","外周紧固孔"],"excludedLines":["925尺寸线与界线","观察窗内斜向材质/反光示意线","表格线","文字"]},
+    {"name":"厂家斜置侧视","direction":"正式方向待核","region":"原格下方窄长视图","projectionRelation":"290约束该投影纵向尺寸，但与上方视图的前后轴、观察窗层次和连杆安装面不能唯一对应","solidContours":["斜置双层壳体","上端法兰","下端法兰","外侧连杆及两个节点"],"holes":[],"excludedLines":["290尺寸线与界线","中心/节点标记"]}
+  ],
+  "dimensions":{"explicit":["下部宽925","斜置投影尺寸290"],"derived":[],"estimated":[],"unknown":["两个视图的正式观察方向","壳体深度和内部风道截面","观察窗层次与厚度","连杆前后位置、连接方式和尺寸"]},
+  "material":{"value":"未标牌号，预计涂装钣金、透明观察窗和金属连杆","basis":"结合件含罩壳、观察窗和连杆，具体材料牌号未给"},"ambiguities":["厂家未标两个视图名称，925与290无法建立唯一三维投影轴对应","侧向连杆、壳体与观察窗的前后连接关系被遮挡，单凭两图不能唯一闭合"],"preModelOverlays":["tmp/pdfs/jwf1206-p56-p64-review/p64-premodel-overlay-final.png#item-001-blocked"],"readiness":"blocked"
+}

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {createSpecModel} from './spec-models.js?v=20260713-10';
+import {createSpecModel} from './spec-models.js?v=20260714-03';
 
 const metal=(color=0x819294,rough=.34)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:.78});
 const dark=()=>new THREE.MeshStandardMaterial({color:0x1c2929,roughness:.48,metalness:.35});

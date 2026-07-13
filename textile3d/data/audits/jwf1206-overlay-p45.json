@@ -1,0 +1,36 @@
+{
+  "manualId": "jwf1206",
+  "page": 45,
+  "source": "JWF1206厂家PDF第45页",
+  "scope": "第45页1件已回到完整600dpi原格修复被截断的右侧视图，并完成身份核准、建模前二维识图闸门、薄壁3D重建和两视正交叠合",
+  "method": "先修复高清位图和矢量PDF四边裁剪，剔除断裂线、尺寸线、中心线、表格与文字；正视和右侧折弯轮廓同时成立后才建立3D",
+  "recordCount": 1,
+  "interpretationGate": "data/interpretation-gates/jwf1206-p45.json",
+  "records": [
+    {
+      "page": 45,
+      "recordKey": "jwf1206-p45-item-001",
+      "code": "DK760-5600-1A",
+      "dimensions": [
+        "长1036"
+      ],
+      "views": [
+        "正视总图",
+        "右侧折弯轮廓"
+      ],
+      "excludedLines": [
+        "两条波浪断裂符号",
+        "1036尺寸线及尺寸界线",
+        "中心线",
+        "表格线和文字"
+      ],
+      "material": "厂家未标牌号的喷漆薄壁钣金组合件",
+      "verdict": "轮廓级通过：总长1036按厂家明确标注；主体依据完整右侧视图重建为后壁、上部斜折面、前部竖面和下部回折面组成的连续薄壁壳，不再使用实心大板或厚箱；正视中央集棉口、框架、斜撑、托板与下缘四孔的拓扑一致。两条竖向波浪线已确认为断裂画法并排除。除1036外的高度、深度、板厚和中央组件局部尺寸均未标，只作轮廓级估算",
+      "evidence": [
+        "tmp/jwf1206-p45-item001-premodel-overlay.png",
+        "tmp/jwf1206-p45-overlay-001-final.png"
+      ],
+      "rebuilt": true
+    }
+  ]
+}

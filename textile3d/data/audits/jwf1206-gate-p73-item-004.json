@@ -1,0 +1,7 @@
+{
+  "recordKey":"jwf1206-p73-item-004","page":73,"partNumber":"JWF1206-8702","name":"左侧门","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p73-004.png","topology":"630×450矩形左侧门板，右边上下各一铰接安装位，左侧中部一个锁点；只有正面轮廓，深度和折边结构不可知。",
+  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"LEFT DOOR","singleMachineQuantity":2,"quantityMeaning":"单机用量","assembly":"JWF1206-8700"},
+  "views":[{"name":"主视图","direction":"垂直门板正面观看","region":"表头下方唯一视图","projectionRelation":"单视图只约束630×450正面轮廓与三个安装特征位置，不能推出深度","solidContours":["矩形门板外框","右边上下铰接位","左侧锁点"],"holes":[],"excludedLines":["630和450尺寸线与界线","表格线","文字"]}],
+  "dimensions":{"explicit":["宽630","高450"],"derived":[],"estimated":["三个安装特征尺寸与位置"],"unknown":["门板深度","折边结构","钣金厚度"]},
+  "material":{"value":"未标牌号，按涂装钣金展示","basis":"门板名称与矩形薄板轮廓支持钣金展示，但深度不可知"},"ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p73-premodel-overlay-final.png#item-004-main"],"readiness":"ready"
+}

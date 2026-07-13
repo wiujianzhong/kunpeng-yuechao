@@ -1,0 +1,93 @@
+{
+  "manualId": "jwf1206",
+  "page": 45,
+  "method": "600dpi回到完整厂家原格，先重绘正视与右侧折弯轮廓；剔除断裂、尺寸、中心、表格和文字线后才进入3D",
+  "records": [
+    {
+      "recordKey": "jwf1206-p45-item-001",
+      "partNumber": "DK760-5600-1A",
+      "name": "集棉器结合件",
+      "page": 45,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p45-item-001.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "quantity": 1,
+        "quantityMeaning": "单台设备用量"
+      },
+      "views": [
+        {
+          "name": "正视总图",
+          "direction": "垂直1036长壳体的正面观察",
+          "region": "完整原格左侧主体区",
+          "projectionRelation": "1036总长控制横向包络；外壳上下边、三道横向折边、四个下缘安装孔及中央集棉口/支架共同投影，右侧视图约束其前后深度",
+          "solidContours": [
+            "1036长薄壁横向壳体外廓",
+            "三道连续横向折边或搭接边",
+            "中央集棉口与上方收拢壳",
+            "中央左右连接斜边和竖向支承边"
+          ],
+          "holes": [
+            "下缘四个安装孔",
+            "中央集棉口轴向通道"
+          ],
+          "excludedLines": [
+            "两条竖向波浪断裂符号",
+            "1036尺寸线及尺寸界线",
+            "中心线",
+            "表格线",
+            "文字"
+          ]
+        },
+        {
+          "name": "右侧折弯轮廓",
+          "direction": "沿1036长度从右端观察",
+          "region": "完整原格右侧窄视图区",
+          "projectionRelation": "与正视壳体共享高度；折线约束壳体前后深度、上下斜折面、中央开口和下部回折边，证明主体是薄壁折弯件而非实心箱体",
+          "solidContours": [
+            "上部斜折面",
+            "中部竖壁与开口边",
+            "下部阶梯及回折斜边",
+            "薄壁平行搭接边"
+          ],
+          "holes": [
+            "中央前后贯通的集棉通道"
+          ],
+          "excludedLines": [
+            "中心线",
+            "尺寸界线",
+            "相邻表格线",
+            "文字"
+          ]
+        }
+      ],
+      "topology": "沿1036方向延伸的薄壁集棉器组合件：横向壳体由多个连续折弯面和局部搭接板构成，中央连接一个收拢的集棉口及通道，下缘有四个安装孔；右侧视图中的折线是同一薄壁壳体的前后深度轮廓，禁止建成实心大箱。",
+      "dimensions": {
+        "explicit": [
+          "总长1036"
+        ],
+        "derived": [],
+        "estimated": [
+          "总高与前后深度",
+          "板厚",
+          "中央集棉口直径与轴向长度",
+          "各折边、搭接板和四孔的位置与孔径"
+        ],
+        "unknown": [
+          "折弯半径",
+          "材料牌号",
+          "焊接与紧固方式"
+        ]
+      },
+      "material": {
+        "value": "喷漆薄壁钣金组合件，中央通道为中性金属",
+        "basis": "正视和右侧视图均出现连续薄壁折弯/搭接双线；厂家未标材料牌号，不使用高反光材质作精确承诺"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p45-item001-premodel-overlay.png"
+      ],
+      "readiness": "ready"
+    }
+  ]
+}

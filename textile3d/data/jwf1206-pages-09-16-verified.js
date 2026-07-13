@@ -244,12 +244,12 @@ export const jwf1206_pages_09_16_verified = [
     "quantity": 1,
     "quantityUnit": "件",
     "dims": [
-      "φ590×80"
+      "φ550×80"
     ],
     "dataStatus": "厂家资料已核",
     "modelStatus": "待核",
     "status": "资料已核·3D待核",
-    "dimensionNote": "厂家原格明确标注：φ590×80",
+    "dimensionNote": "厂家原格明确标注：φ550×80",
     "sourceCrop": "assets/manuals/jwf1206/crops/FA221D-0203.png",
     "sourceVector": "assets/manuals/jwf1206/crops/FA221D-0203.pdf",
     "auditIssues": []
@@ -1001,13 +1001,14 @@ export const jwf1206_pages_09_16_verified = [
     "quantity": 2,
     "quantityUnit": "件",
     "dims": [
-      "207×196",
+      "上下入口中心距207",
+      "总长196",
       "接口φ99"
     ],
     "dataStatus": "厂家资料已核",
     "modelStatus": "待核",
     "status": "资料已核·3D待核",
-    "dimensionNote": "厂家原格明确标注：207×196、接口φ99",
+    "dimensionNote": "厂家原格明确标注：上下入口中心距207、总长196、右侧接口φ99",
     "sourceCrop": "assets/manuals/jwf1206/crops/FA225-1100-13A.png",
     "sourceVector": "assets/manuals/jwf1206/crops/FA225-1100-13A.pdf",
     "auditIssues": []

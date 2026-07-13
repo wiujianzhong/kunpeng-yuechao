@@ -1,0 +1,663 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1206",
+  "page": 11,
+  "records": [
+    {
+      "recordKey": "jwf1206-p11-item-001",
+      "partNumber": "JWF1202-0301(SMC)",
+      "name": "底板",
+      "page": 11,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1202-0301_SMC_.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "BOTTOM PLATE",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1202-0300(SMC)"
+      },
+      "views": [
+        {
+          "name": "正视图",
+          "direction": "垂直于底板大平面观察",
+          "region": "原格下部左侧",
+          "projectionRelation": "与右侧视图共用250高度；190控制横向宽度，上下带状区域及虚线对应连续折边的投影。",
+          "solidContours": [
+            "190×250板面外廓",
+            "上下翻边可见折边",
+            "16个圆孔轮廓"
+          ],
+          "holes": [
+            "16个贯穿薄板圆孔"
+          ],
+          "excludedLines": [
+            "折边隐藏虚线",
+            "190和250尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        },
+        {
+          "name": "侧视图",
+          "direction": "沿190宽度方向观察",
+          "region": "原格下部右侧",
+          "projectionRelation": "侧面连续Z形薄板轮廓与正视图上下两道折边对应，20控制折弯总深而不是板厚。",
+          "solidContours": [
+            "连续薄板的前板面、上下折弯和短回折边"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "20尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单体连续折弯金属薄板，主体板面上下各有反向折弯和短回折边，16个圆孔贯穿对应板面；不是20毫米厚实心板。",
+      "dimensions": {
+        "explicit": [
+          "宽190",
+          "高250",
+          "折弯总深20"
+        ],
+        "derived": [],
+        "estimated": [
+          "板厚约3",
+          "上下折边宽度和回折高度",
+          "16个孔径及孔位"
+        ],
+        "unknown": [
+          "折弯半径、孔公差和涂层规格"
+        ]
+      },
+      "material": {
+        "value": "涂装金属薄板",
+        "basis": "侧视连续薄板折弯轮廓和底板用途"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0301_SMC_-front-overlay.png",
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0301_SMC_-side-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p11-item-002",
+      "partNumber": "JWF1202-0302",
+      "name": "气管",
+      "page": 11,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1202-0302.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "AIR PIPE",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1202-0300(SMC)"
+      },
+      "views": [
+        {
+          "name": "外形图（断开表示）",
+          "direction": "垂直于气管轴线观察直管外形",
+          "region": "原格下部唯一厂家视图",
+          "projectionRelation": "外侧两条实线控制φ8外径，内部两条隐藏边证明中心贯通孔；中部双折线仅为断开画法，6000为完整展开长度。",
+          "solidContours": [
+            "直管外圆柱的上下可见轮廓",
+            "左右端面边界"
+          ],
+          "holes": [
+            "沿全长贯通的同轴内孔"
+          ],
+          "excludedLines": [
+            "中部断开符号",
+            "中心线",
+            "φ8和6000尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单根柔性空心气管，外径φ8、完整展开长度6000，中心孔沿轴向贯通；断开符号不是实体缺口。",
+      "dimensions": {
+        "explicit": [
+          "外径φ8",
+          "展开长度6000"
+        ],
+        "derived": [],
+        "estimated": [
+          "壁厚按隐藏边比例估计为1"
+        ],
+        "unknown": [
+          "内径的厂家标注值",
+          "材质牌号、颜色和实际安装弯曲路径"
+        ]
+      },
+      "material": {
+        "value": "柔性塑料气管（牌号未知）",
+        "basis": "SMC气动组件语境、气管名称和空心软管画法"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0302-broken-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p11-item-003",
+      "partNumber": "JWF1202-0303",
+      "name": "气管",
+      "page": 11,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1202-0303.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "AIR PIPE",
+        "quantity": 3,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1202-0300(SMC)"
+      },
+      "views": [
+        {
+          "name": "外形图（断开表示）",
+          "direction": "垂直于气管轴线观察直管外形",
+          "region": "原格下部唯一厂家视图",
+          "projectionRelation": "外侧两条实线控制φ6外径，内部两条隐藏边证明中心贯通孔；中部双折线仅为断开画法，100为完整展开长度。",
+          "solidContours": [
+            "直管外圆柱的上下可见轮廓",
+            "左右端面边界"
+          ],
+          "holes": [
+            "沿全长贯通的同轴内孔"
+          ],
+          "excludedLines": [
+            "中部断开符号",
+            "中心线",
+            "φ6和100尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单根柔性空心气管，外径φ6、完整展开长度100，中心孔沿轴向贯通；断开符号不是实体缺口。",
+      "dimensions": {
+        "explicit": [
+          "外径φ6",
+          "展开长度100"
+        ],
+        "derived": [],
+        "estimated": [
+          "壁厚按隐藏边比例估计为1"
+        ],
+        "unknown": [
+          "内径的厂家标注值",
+          "材质牌号、颜色和实际安装弯曲路径"
+        ]
+      },
+      "material": {
+        "value": "柔性塑料气管（牌号未知）",
+        "basis": "SMC气动组件语境、气管名称和空心软管画法"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0303-broken-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p11-item-004",
+      "partNumber": "JWF1202-0304",
+      "name": "气管",
+      "page": 11,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1202-0304.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "AIR PIPE",
+        "quantity": 2,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1202-0300(SMC)"
+      },
+      "views": [
+        {
+          "name": "外形图（断开表示）",
+          "direction": "垂直于气管轴线观察直管外形",
+          "region": "原格下部唯一厂家视图",
+          "projectionRelation": "外侧两条实线控制φ6外径，内部两条隐藏边证明中心贯通孔；中部双折线仅为断开画法，2100为完整展开长度。",
+          "solidContours": [
+            "直管外圆柱的上下可见轮廓",
+            "左右端面边界"
+          ],
+          "holes": [
+            "沿全长贯通的同轴内孔"
+          ],
+          "excludedLines": [
+            "中部断开符号",
+            "中心线",
+            "φ6和2100尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单根柔性空心气管，外径φ6、完整展开长度2100，中心孔沿轴向贯通；断开符号不是实体缺口。",
+      "dimensions": {
+        "explicit": [
+          "外径φ6",
+          "展开长度2100"
+        ],
+        "derived": [],
+        "estimated": [
+          "壁厚按隐藏边比例估计为1"
+        ],
+        "unknown": [
+          "内径的厂家标注值",
+          "材质牌号、颜色和实际安装弯曲路径"
+        ]
+      },
+      "material": {
+        "value": "柔性塑料气管（牌号未知）",
+        "basis": "SMC气动组件语境、气管名称和空心软管画法"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0304-broken-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p11-item-005",
+      "partNumber": "JWF1202-0305",
+      "name": "气管",
+      "page": 11,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1202-0305.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "AIR PIPE",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1202-0300(SMC)"
+      },
+      "views": [
+        {
+          "name": "外形图（断开表示）",
+          "direction": "垂直于气管轴线观察直管外形",
+          "region": "原格下部唯一厂家视图",
+          "projectionRelation": "外侧两条实线控制φ6外径，内部两条隐藏边证明中心贯通孔；中部双折线仅为断开画法，200为完整展开长度。",
+          "solidContours": [
+            "直管外圆柱的上下可见轮廓",
+            "左右端面边界"
+          ],
+          "holes": [
+            "沿全长贯通的同轴内孔"
+          ],
+          "excludedLines": [
+            "中部断开符号",
+            "中心线",
+            "φ6和200尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单根柔性空心气管，外径φ6、完整展开长度200，中心孔沿轴向贯通；断开符号不是实体缺口。",
+      "dimensions": {
+        "explicit": [
+          "外径φ6",
+          "展开长度200"
+        ],
+        "derived": [],
+        "estimated": [
+          "壁厚按隐藏边比例估计为1"
+        ],
+        "unknown": [
+          "内径的厂家标注值",
+          "材质牌号、颜色和实际安装弯曲路径"
+        ]
+      },
+      "material": {
+        "value": "柔性塑料气管（牌号未知）",
+        "basis": "SMC气动组件语境、气管名称和空心软管画法"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0305-broken-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p11-item-006",
+      "partNumber": "JWF1202-0306",
+      "name": "气管",
+      "page": 11,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1202-0306.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "AIR PIPE",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1202-0300(SMC)"
+      },
+      "views": [
+        {
+          "name": "外形图（断开表示）",
+          "direction": "垂直于气管轴线观察直管外形",
+          "region": "原格下部唯一厂家视图",
+          "projectionRelation": "外侧两条实线控制φ6外径，内部两条隐藏边证明中心贯通孔；中部双折线仅为断开画法，2600为完整展开长度。",
+          "solidContours": [
+            "直管外圆柱的上下可见轮廓",
+            "左右端面边界"
+          ],
+          "holes": [
+            "沿全长贯通的同轴内孔"
+          ],
+          "excludedLines": [
+            "中部断开符号",
+            "中心线",
+            "φ6和2600尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单根柔性空心气管，外径φ6、完整展开长度2600，中心孔沿轴向贯通；断开符号不是实体缺口。",
+      "dimensions": {
+        "explicit": [
+          "外径φ6",
+          "展开长度2600"
+        ],
+        "derived": [],
+        "estimated": [
+          "壁厚按隐藏边比例估计为1"
+        ],
+        "unknown": [
+          "内径的厂家标注值",
+          "材质牌号、颜色和实际安装弯曲路径"
+        ]
+      },
+      "material": {
+        "value": "柔性塑料气管（牌号未知）",
+        "basis": "SMC气动组件语境、气管名称和空心软管画法"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0306-broken-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p11-item-007",
+      "partNumber": "JWF1202-0307",
+      "name": "气管",
+      "page": 11,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1202-0307.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "AIR PIPE",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1202-0300(SMC)"
+      },
+      "views": [
+        {
+          "name": "外形图（断开表示）",
+          "direction": "垂直于气管轴线观察直管外形",
+          "region": "原格下部唯一厂家视图",
+          "projectionRelation": "外侧两条实线控制φ6外径，内部两条隐藏边证明中心贯通孔；中部双折线仅为断开画法，700为完整展开长度。",
+          "solidContours": [
+            "直管外圆柱的上下可见轮廓",
+            "左右端面边界"
+          ],
+          "holes": [
+            "沿全长贯通的同轴内孔"
+          ],
+          "excludedLines": [
+            "中部断开符号",
+            "中心线",
+            "φ6和700尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单根柔性空心气管，外径φ6、完整展开长度700，中心孔沿轴向贯通；断开符号不是实体缺口。",
+      "dimensions": {
+        "explicit": [
+          "外径φ6",
+          "展开长度700"
+        ],
+        "derived": [],
+        "estimated": [
+          "壁厚按隐藏边比例估计为1"
+        ],
+        "unknown": [
+          "内径的厂家标注值",
+          "材质牌号、颜色和实际安装弯曲路径"
+        ]
+      },
+      "material": {
+        "value": "柔性塑料气管（牌号未知）",
+        "basis": "SMC气动组件语境、气管名称和空心软管画法"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0307-broken-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p11-item-008",
+      "partNumber": "JWF1202-0308",
+      "name": "气管",
+      "page": 11,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1202-0308.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "AIR PIPE",
+        "quantity": 2,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1202-0300(SMC)"
+      },
+      "views": [
+        {
+          "name": "外形图（断开表示）",
+          "direction": "垂直于气管轴线观察直管外形",
+          "region": "原格下部唯一厂家视图",
+          "projectionRelation": "外侧两条实线控制φ6外径，内部两条隐藏边证明中心贯通孔；中部双折线仅为断开画法，400为完整展开长度。",
+          "solidContours": [
+            "直管外圆柱的上下可见轮廓",
+            "左右端面边界"
+          ],
+          "holes": [
+            "沿全长贯通的同轴内孔"
+          ],
+          "excludedLines": [
+            "中部断开符号",
+            "中心线",
+            "φ6和400尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单根柔性空心气管，外径φ6、完整展开长度400，中心孔沿轴向贯通；断开符号不是实体缺口。",
+      "dimensions": {
+        "explicit": [
+          "外径φ6",
+          "展开长度400"
+        ],
+        "derived": [],
+        "estimated": [
+          "壁厚按隐藏边比例估计为1"
+        ],
+        "unknown": [
+          "内径的厂家标注值",
+          "材质牌号、颜色和实际安装弯曲路径"
+        ]
+      },
+      "material": {
+        "value": "柔性塑料气管（牌号未知）",
+        "basis": "SMC气动组件语境、气管名称和空心软管画法"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0308-broken-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p11-item-009",
+      "partNumber": "ZFA211A-0302",
+      "name": "连接叉",
+      "page": 11,
+      "sourceCrop": "assets/manuals/jwf1206/crops/ZFA211A-0302.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "CONNECTING FORK",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1202-0300(SMC)"
+      },
+      "views": [
+        {
+          "name": "俯视图",
+          "direction": "沿44高度方向观察",
+          "region": "原格中部",
+          "projectionRelation": "88总长和28宽度控制平面外廓；左端圆孔与下方剖视的横孔中心线对应，孔中心至右端74。",
+          "solidContours": [
+            "88×28平面外廓",
+            "左端上下倒角",
+            "右部台阶分界边"
+          ],
+          "holes": [
+            "左端横向贯通圆孔"
+          ],
+          "excludedLines": [
+            "中心线",
+            "88、74、28尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        },
+        {
+          "name": "纵向剖视图",
+          "direction": "沿28宽度方向剖切并观察",
+          "region": "原格下部",
+          "projectionRelation": "剖视外高44与俯视28宽度互相独立；内部白区为从左到右贯通的两级轴向孔，左端横孔与轴向大孔相交。",
+          "solidContours": [
+            "左侧高44主体",
+            "右侧缩径外台阶",
+            "两级轴向孔边界"
+          ],
+          "holes": [
+            "两级轴向贯通孔",
+            "与大孔相交的横向孔"
+          ],
+          "excludedLines": [
+            "剖面填充线",
+            "中心线",
+            "44尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单体金属连接叉，外体左高右低并带端部倒角；内部为从左至右贯通的两级轴向圆孔，左端另有与大孔相交的横向圆孔。",
+      "dimensions": {
+        "explicit": [
+          "总长88",
+          "最大高度44",
+          "宽度28",
+          "横孔中心至右端74"
+        ],
+        "derived": [
+          "横孔中心距左端14=88-74"
+        ],
+        "estimated": [
+          "两级轴向孔径和台阶位置",
+          "横孔孔径",
+          "端部倒角尺寸"
+        ],
+        "unknown": [
+          "孔公差、圆角和表面粗糙度"
+        ]
+      },
+      "material": {
+        "value": "金属",
+        "basis": "纵向剖视填充和连接叉机械件形态"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p11-clean-2d/ZFA211A-0302-top-overlay.png",
+        "tmp/jwf1206-p11-clean-2d/ZFA211A-0302-section-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p11-item-010",
+      "partNumber": "ZFA211A-0303",
+      "name": "销轴",
+      "page": 11,
+      "sourceCrop": "assets/manuals/jwf1206/crops/ZFA211A-0303.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "SHAFT",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1202-0300(SMC)"
+      },
+      "views": [
+        {
+          "name": "外形图",
+          "direction": "垂直于销轴轴线观察",
+          "region": "原格下部唯一厂家视图",
+          "projectionRelation": "φ14控制主轴身直径，53控制左端至右挡边端面的总长；左端斜线为倒角，近左两道竖线为环槽边界，右端为薄挡边。",
+          "solidContours": [
+            "φ14主轴身",
+            "左端倒角",
+            "近左环槽",
+            "右端薄挡边"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "中心线",
+            "φ14和53尺寸线",
+            "尺寸界线",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单体实心金属销轴，主轴身φ14，左端倒角，近左端有一道周向凹槽，右端为连续薄挡边。",
+      "dimensions": {
+        "explicit": [
+          "主轴身φ14",
+          "总长53"
+        ],
+        "derived": [],
+        "estimated": [
+          "倒角长度",
+          "环槽宽度和深度",
+          "右挡边厚度和外径"
+        ],
+        "unknown": [
+          "配合公差、槽底圆角和表面粗糙度"
+        ]
+      },
+      "material": {
+        "value": "金属",
+        "basis": "销轴标准件名称和车削外形"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p11-clean-2d/ZFA211A-0303-side-overlay.png"
+      ],
+      "readiness": "ready"
+    }
+  ]
+}

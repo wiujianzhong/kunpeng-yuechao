@@ -1,6 +1,22 @@
-// JWF1206厂家PDF第50页：逐格核验后的独立3D规格。
+// JWF1206厂家PDF第50页：逐格显式建模。
 import {jwf1206P50P61Verified} from '../jwf1206-p50-p61-verified.js';
-import {createJwf1206P50P61Spec} from './jwf1206-p50-p61-factory.js';
+import {annulus,box,buildPageSpecs,extrude,hole,plate,spec} from './jwf1206-rebuild-p38-p55-helpers.js';
 const rows=jwf1206P50P61Verified.filter(part=>part.page===50);
-export const jwf1206P50ModelSpecs=Object.fromEntries(rows.map(part=>[part.recordKey,createJwf1206P50P61Spec(part)]));
+const threadedRod=(length,bodyLength,across=16)=>[annulus(across,8,bodyLength,{material:'metal'}),annulus(12,8,(length-bodyLength)/2,{position:[-(bodyLength/2+(length-bodyLength)/4),0,0],material:'darkMetal'}),annulus(12,8,(length-bodyLength)/2,{position:[bodyLength/2+(length-bodyLength)/4,0,0],material:'darkMetal'})];
+const builders={
+  'jwf1206-p50-item-001':part=>spec(part,{views:['正视图','侧视图'],assumptions:['长200、高115、侧向深85.5按标注','上方小耳板、斜边和三孔孔径未标'],primitives:[extrude([[-100,-57.5],[100,-57.5],[100,38],[55,38],[15,12],[-100,-10]],6,{holes:[hole(-82,-32,4),hole(72,18,4),hole(82,48,4)],bevel:1}),box([70,115,85.5],'darkMetal',[65,0,-42.75])]}),
+  'jwf1206-p50-item-002':part=>spec(part,{views:['轴向剖视图','六角端视图'],assumptions:['总长60、六角对边16、端部M8按标注','内孔与螺纹段长按原格比例'],material:'metal',primitives:threadedRod(60,42)}),
+  'jwf1206-p50-item-003':part=>spec(part,{views:['正视异形板','俯视U形折边','右侧视图'],assumptions:['总高220、U形开口宽200、侧向深35按标注','板厚、斜边起止和三孔孔径未标'],primitives:[extrude([[-100,-110],[100,-110],[100,110],[25,110],[-15,45],[-100,45]],6,{holes:[hole(87,-88,4),hole(87,0,4),hole(87,88,4)],bevel:1}),box([200,6,35],'darkMetal',[0,-107,-17.5]),box([6,220,35],'paintedMetal',[-97,0,-17.5]),box([6,220,35],'paintedMetal',[97,0,-17.5])]}),
+  'jwf1206-p50-item-004':part=>spec(part,{views:['轴向剖视图','六角端视图'],assumptions:['总长96、六角对边16、端部M8按标注','中孔和螺纹段长未标'],material:'metal',primitives:threadedRod(96,74)}),
+  'jwf1206-p50-item-005':part=>spec(part,{views:['正视图','侧视图'],assumptions:['底200、高150按标注','侧向深度、中间座板和四个孔径未标'],level:'轮廓级',primitives:[extrude([[-100,-75],[100,-75],[100,75],[40,75],[10,30],[-100,5]],6,{holes:[hole(-82,-58,4),hole(-82,58,4),hole(72,-15,4),hole(72,40,4)],bevel:1}),box([70,85,90],'darkMetal',[65,-10,-45])]}),
+  'jwf1206-p50-item-006':part=>spec(part,{views:['正视图','侧视图'],assumptions:['高290、宽200、侧向深90按标注','折线外廓、长圆槽和四孔尺寸未标'],primitives:[extrude([[-100,-145],[-42,-145],[-18,-70],[-72,-18],[-55,70],[10,145],[100,145],[100,105],[30,70],[8,-5],[45,-75],[28,-145]],6,{holes:[hole(-82,-128,4),hole(-65,48,4),hole(82,128,4),hole(72,88,4)],bevel:1}),box([200,6,90],'darkMetal',[0,-142,-45])]}),
+  'jwf1206-p50-item-007':part=>spec(part,{views:['轴向剖视图','六角端视图'],assumptions:['总长48、六角对边14按标注','两端内螺纹规格未标，按原格剖视为贯通孔'],material:'metal',primitives:[annulus(14,7,48,{material:'metal'}),annulus(11,7,12,{position:[-18,0,0],material:'darkMetal'}),annulus(11,7,12,{position:[18,0,0],material:'darkMetal'})]}),
+  'jwf1206-p50-item-008':part=>spec(part,{views:['轴向剖视图','六角端视图'],assumptions:['总长38、六角对边14按标注','两端内螺纹规格未标'],material:'metal',primitives:[annulus(14,7,38,{material:'metal'}),annulus(11,7,10,{position:[-14,0,0],material:'darkMetal'}),annulus(11,7,10,{position:[14,0,0],material:'darkMetal'})]}),
+  'jwf1206-p50-item-009':part=>spec(part,{views:['轴向剖视图','六角端视图'],assumptions:['总长115、主体长105、对边16和端部M8按标注','左端螺纹段长未标'],material:'metal',primitives:[annulus(16,8,105,{position:[5,0,0],material:'metal'}),annulus(12,8,10,{position:[-52.5,0,0],material:'darkMetal'})]}),
+  'jwf1206-p50-item-010':part=>spec(part,{views:['轴向剖视图','六角端视图'],assumptions:['总长200、主体长190、对边16和端部M8按标注','螺纹段长未标'],material:'metal',primitives:[annulus(16,8,190,{position:[5,0,0],material:'metal'}),annulus(12,8,10,{position:[-95,0,0],material:'darkMetal'})]}),
+  'jwf1206-p50-item-011':part=>spec(part,{views:['正视图','U形侧视图'],assumptions:['高180、正视宽75、U形开口深182按标注','板厚、三孔孔径和底部耳板尺寸未标'],primitives:[plate(75,180,6,{holes:[hole(25,80,4),hole(-27,-78,4),hole(27,-78,4)]}),box([6,180,182],'darkMetal',[-34.5,0,-91]),box([6,180,182],'paintedMetal',[34.5,0,-91]),box([75,6,182],'metal',[0,-87,-91])]}),
+  'jwf1206-p50-item-012':part=>spec(part,{views:['正视图','U形侧视图'],assumptions:['高180、正视宽75、U形开口深187按标注','与左支撑板为左右件，孔径和板厚未标'],primitives:[plate(75,180,6,{holes:[hole(-25,80,4),hole(-27,-78,4),hole(27,-78,4)]}),box([6,180,187],'darkMetal',[-34.5,0,-93.5]),box([6,180,187],'paintedMetal',[34.5,0,-93.5]),box([75,6,187],'metal',[0,-87,-93.5])]}),
+  'jwf1206-p50-item-013':part=>spec(part,{views:['正视图','侧视图'],assumptions:['总高410、正视宽100、侧向深99按标注','长方形减重孔、下部斜撑和四孔尺寸未标'],primitives:[extrude([[-50,-205],[50,-205],[50,205],[-15,205],[-15,140],[-50,140]],6,{holes:[{kind:'polygon',points:[[-20,-110],[20,-110],[20,90],[-20,90]]},hole(-38,-190,4),hole(38,-190,4),hole(-38,190,4)],bevel:1}),box([6,410,99],'darkMetal',[47,0,-49.5]),box([90,8,99],'metal',[2,-201,-49.5]),box([8,250,85],'metal',[15,-75,-42],[0,0,-.32])]}),
+};
+export const jwf1206P50ModelSpecs=buildPageSpecs(rows,builders,50);
 export default jwf1206P50ModelSpecs;

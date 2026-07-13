@@ -1,0 +1,53 @@
+{
+  "recordKey": "jwf1206:p10:r2:c1",
+  "partNumber": "（厂家件号格空白）",
+  "name": "胀套ZT12-42X75",
+  "page": 10,
+  "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206_p10_r2_c1.png",
+  "identification": {
+    "partNumberVerified": true,
+    "sourceCodeCell": "空白",
+    "nameVerified": true,
+    "englishDescription": "EXPAND SLEEVE",
+    "quantity": 1,
+    "quantityMeaning": "单机用量",
+    "assembly": "JWF1206-0200"
+  },
+  "views": [
+    {
+      "name": "正视图",
+      "direction": "沿胀套轴线观察端面",
+      "region": "原格中部",
+      "projectionRelation": "φ75外圆、φ42中心孔与下方剖视共轴；六组圆座圈和内六角头每60度均布并整体旋转30度",
+      "solidContours": ["φ75外圆", "六组圆形螺栓座", "六个内六角头"],
+      "holes": ["φ42中心贯通孔"],
+      "excludedLines": ["中心线", "φ75和φ42尺寸线", "引出线", "尺寸箭头", "文字和表格线"]
+    },
+    {
+      "name": "轴向剖视图",
+      "direction": "通过轴线和对置螺栓组剖切",
+      "region": "原格下部",
+      "projectionRelation": "横向φ75/φ42与正视图同轴对应，纵向54控制套体长度；剖视显示独立螺杆穿过套体",
+      "solidContours": ["左右两侧被剖套体", "圆形座圈", "内六角头和轴向螺杆"],
+      "holes": ["φ42中心轴向贯通孔", "六组轴向螺栓孔"],
+      "excludedLines": ["剖面填充线", "中心线", "54尺寸线", "尺寸界线", "文字和表格线"]
+    }
+  ],
+  "topology": "已确认φ75外套、φ42中心孔、54长度和六组紧固件；内部胀紧分层、锥面及剖切平面与六组螺栓的关系仍待厂家装配剖面确认。",
+  "dimensions": {
+    "explicit": ["外径φ75", "中心孔φ42", "轴向长度54"],
+    "derived": ["六组螺栓周向间隔60度"],
+    "estimated": ["螺栓分布圆直径", "座圈、内六角头和螺杆直径"],
+    "unknown": ["螺栓规格", "胀套锥度和配合公差"]
+  },
+  "material": {"value": "金属装配件", "basis": "厂家剖面填充、标准胀套名称及六组紧固件画法"},
+  "ambiguities": [
+    "厂家轴向剖视只画出切到的两组紧固件，现有资料未给出剖切线方向，不能由正视图唯一映射到六组螺栓的三维剖面。",
+    "胀套内部是否包含独立锥形环、分层套体或配合间隙未给出，当前单一环套模型证据不足。"
+  ],
+  "preModelOverlays": [
+    "tmp/jwf1206-p10-clean-2d/jwf1206_p10_r2_c1-front-overlay.png",
+    "tmp/jwf1206-p10-clean-2d/jwf1206_p10_r2_c1-section-overlay.png"
+  ],
+  "readiness": "blocked"
+}

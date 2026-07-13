@@ -1,0 +1,18 @@
+{
+  "manualId": "jwf1206",
+  "pdfPage": 66,
+  "recordCount": 5,
+  "method": "厂家600dpi原格与真实3D模型正交投影半透明叠合；标注尺寸单独约束模型",
+  "pageEvidence": {
+    "overlay": "tmp/pdfs/jwf1206-p65-p73-review/p66-orthographic-overlay-final.png",
+    "webgl": "tmp/pdfs/jwf1206-p65-p73-review/webgl/p66-gl-rebuild-final.png",
+    "report": "tmp/jwf1206-p66-overlay-audit.md"
+  },
+  "records": [
+    {"recordKey":"jwf1206-p66-item-001","code":"JWF1202-8103","views":["侧向主视图","俯视图"],"excludedLines":["尺寸线","中心线","引出线"],"material":"paintedMetal","verdict":"通过，右端下弯轮廓与俯视左端渐尖同时重合","evidence":"assets/manuals/jwf1206/crops/jwf1206-p66-item-001.png + pageEvidence.overlay第1格","rebuilt":true},
+    {"recordKey":"jwf1206-p66-item-002","code":"JWF1202-8104","views":["侧向主视图","俯视图"],"excludedLines":["尺寸线","中心线","引出线"],"material":"paintedMetal","verdict":"通过，与左护板纵向镜像，弯曲端和渐尖端方向相反","evidence":"assets/manuals/jwf1206/crops/jwf1206-p66-item-002.png + pageEvidence.overlay第2格","rebuilt":true},
+    {"recordKey":"jwf1206-p66-item-003","code":"FA225-8101","views":["侧视主图","正端视图"],"excludedLines":["尺寸线","中心线","引出线"],"material":"metal","verdict":"通过，50底片、35总高、25宽、双倒角耳片与贯穿孔分别重合","evidence":"assets/manuals/jwf1206/crops/jwf1206-p66-item-003.png + pageEvidence.overlay第3格","rebuilt":true},
+    {"recordKey":"jwf1206-p66-item-004","code":"ZFA211-0116","views":["轴向主视图"],"excludedLines":["尺寸线","中心线","螺纹平行示意线","引出线"],"material":"metal","verdict":"通过，φ14盘头、台阶、18总长和右端倒角分别核对","evidence":"assets/manuals/jwf1206/crops/jwf1206-p66-item-004.png + pageEvidence.overlay第4格","rebuilt":true},
+    {"recordKey":"jwf1206-p66-item-005","code":"FA177A-0148","views":["主视图"],"excludedLines":["尺寸线","中心线","引出线"],"material":"metal","verdict":"通过，295×120圆角框、四通孔和偏右双向斜纹网区重合","evidence":"assets/manuals/jwf1206/crops/jwf1206-p66-item-005.png + pageEvidence.overlay第5格","rebuilt":true}
+  ]
+}

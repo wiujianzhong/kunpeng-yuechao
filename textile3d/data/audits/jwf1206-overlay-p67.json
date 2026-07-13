@@ -1,0 +1,232 @@
+{
+  "manualId": "jwf1206",
+  "pdfPage": 67,
+  "recordCount": 12,
+  "method": "厂家600dpi原格与真实3D模型正交投影半透明叠合；标注尺寸单独约束模型",
+  "pageEvidence": {
+    "overlay": "tmp/pdfs/jwf1206-p65-p73-review/p67-orthographic-overlay-final.png",
+    "webgl": "tmp/pdfs/jwf1206-p65-p73-review/webgl/p67-gl-rebuild-final.png",
+    "report": "tmp/jwf1206-p67-overlay-audit.md"
+  },
+  "records": [
+    {
+      "recordKey": "jwf1206-p67-item-001",
+      "code": "JWF1202-8200-1A",
+      "dimensions": ["1200×206×124.5"],
+      "views": [
+        "长向主视图",
+        "端面图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线",
+        "紧固标记黑点"
+      ],
+      "material": "paintedMetal",
+      "verdict": "通过，重建为1200长空心梯形薄壳，206高和124.5底宽符合端视轮廓",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-001.png + pageEvidence.overlay第1格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p67-item-002",
+      "code": "JWF1202-8200-2A",
+      "dimensions": ["长1200"],
+      "views": [
+        "长向主视图",
+        "端面图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线"
+      ],
+      "material": "paintedMetal",
+      "verdict": "通过（轮廓级），按1200总长重建双横撑、双刷毛区、紧固件和异形端板；未标端面尺寸不作加工依据",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-002.png + pageEvidence.overlay第2格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p67-item-003",
+      "code": "JWF1202-8200-3A",
+      "dimensions": ["1198×313×61"],
+      "views": [
+        "主视图",
+        "右端视图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线"
+      ],
+      "material": "paintedMetal",
+      "verdict": "通过，1198×313开口框、开口周边网眼带和61深折边分别重合",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-003.png + pageEvidence.overlay第3格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p67-item-004",
+      "code": "JWF1202-8200-4A",
+      "dimensions": ["1200×154×35"],
+      "views": [
+        "长向主视图",
+        "端面图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线"
+      ],
+      "material": "paintedMetal",
+      "verdict": "通过，修正为1200×154主腹板和35深折边，中缝与两下孔保留",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-004.png + pageEvidence.overlay第4格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p67-item-005",
+      "code": "JWF1202-8200-5",
+      "dimensions": ["1160×70×30"],
+      "views": [
+        "长向主视图",
+        "工字形端面图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线"
+      ],
+      "material": "paintedMetal",
+      "verdict": "通过，1160长、70高、30宽工字型端面和两端竖长槽完整重建",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-005.png + pageEvidence.overlay第5格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p67-item-006",
+      "code": "JWF1202-8200-6",
+      "dimensions": ["1190×288×80"],
+      "views": [
+        "长向主视图",
+        "端面图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线"
+      ],
+      "material": "paintedMetal",
+      "verdict": "通过，重建1190×288×80箱体、长网区及上缘4个搭扣",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-006.png + pageEvidence.overlay第6格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p67-item-007",
+      "code": "JWF1202-8200-7A",
+      "dimensions": ["1200×464×203"],
+      "views": [
+        "主视图",
+        "右端折弯图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线"
+      ],
+      "material": "paintedMetal",
+      "verdict": "通过，1200×464竖板上缘向后折203，已修正旧模型折边方向",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-007.png + pageEvidence.overlay第7格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p67-item-008",
+      "code": "JWF1202-8200-8",
+      "dimensions": ["长1200", "R110", "R130"],
+      "views": [
+        "长向主视图",
+        "端面剖面图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线",
+        "半径标注线"
+      ],
+      "material": "paintedMetal",
+      "verdict": "通过，1200长主体重建为R110内弧、R130外弧的连续曲板，并保留端板孔和长向紧固件",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-008.png + pageEvidence.overlay第8格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p67-item-009",
+      "code": "JWF1202-8200-9A",
+      "dimensions": ["长920", "R130"],
+      "views": [
+        "长向主视图",
+        "弧形端面图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线",
+        "半径标注线"
+      ],
+      "material": "paintedMetal",
+      "verdict": "通过，920有效长的R130连续弧壳与带上下孔异形端板分离表达",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-009.png + pageEvidence.overlay第9格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p67-item-010",
+      "code": "JWF1202-8200-10A",
+      "dimensions": ["长1200", "弧弦139"],
+      "views": [
+        "长向主视图",
+        "弧弦端面图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线"
+      ],
+      "material": "paintedMetal",
+      "verdict": "通过，1200长、139弦宽的浅凹连续弧板与两端带孔折边重合",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-010.png + pageEvidence.overlay第10格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p67-item-011",
+      "code": "JWF1202-8201",
+      "dimensions": ["475×115"],
+      "views": [
+        "主视图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线"
+      ],
+      "material": "paintedMetal",
+      "verdict": "通过，475×115板两端相向梯形孔和中部两个水平圆头槽均按原图重建",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-011.png + pageEvidence.overlay第11格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p67-item-012",
+      "code": "TF2228",
+      "dimensions": ["58×20"],
+      "views": [
+        "主视图",
+        "右侧机构图"
+      ],
+      "excludedLines": [
+        "尺寸线",
+        "中心线",
+        "引出线",
+        "剖面线"
+      ],
+      "material": "darkMetal",
+      "verdict": "通过，58×20双孔底座、中央转轴、上置搭扣头和向左下摆臂方向已逐视图校正",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p67-item-012.png + pageEvidence.overlay第12格",
+      "rebuilt": true
+    }
+  ]
+}

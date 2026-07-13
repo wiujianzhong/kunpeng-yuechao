@@ -1,0 +1,11 @@
+{
+  "recordKey":"jwf1206-p06-item-004","partNumber":"FA225-0100-1","name":"右后线槽结合件","page":6,"sourceCrop":"assets/manuals/jwf1206/crops/FA225-0100-1.png",
+  "identification":{"partNumberVerified":true,"nameVerified":true,"quantity":1,"quantityMeaning":"单机用量"},
+  "topology":"2490长多片钣金线槽总成：左壁平口，右壁顶部向外折弯并配紧固块，底板贯通，中央L形隔板从底部立起；截面明确不对称。",
+  "views":[
+    {"name":"正视图","direction":"沿槽宽Z观察","region":"原格上部长条视图","projectionRelation":"控制2490长度及一长一短安装条分段。","solidContours":["槽体长边","长安装条","右端短安装条"],"holes":["沿安装条分布的紧固点"],"excludedLines":["2490尺寸线","尺寸界线"]},
+    {"name":"左视图（端面）","direction":"沿长度X观察完整截面","region":"原格下部视图","projectionRelation":"与正视图同一总成；55高度约束双侧壁，端面补充右外翻边、紧固块和中间隔板。","solidContours":["左平口壁","底板","中间隔板","右外翻壁","顶部外翻边","紧固块"],"holes":[],"excludedLines":["剖面填充","55尺寸线","中心十字","引出线"]}
+  ],
+  "dimensions":{"explicit":["总长2490","槽高55"],"derived":[],"estimated":["槽宽参考同页66","板厚","隔板位置","安装条长度"],"unknown":["折弯半径","紧固块规格"]},
+  "material":{"value":"喷漆折弯钣金线槽总成","basis":"端部图显示多片薄板折弯与紧固块"},"ambiguities":[],"preModelOverlays":["tmp/jwf1206-p06-gate-004-final.png","tmp/jwf1206-p06-gate-004-final.png"],"readiness":"ready"
+}

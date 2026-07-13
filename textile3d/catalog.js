@@ -2,10 +2,10 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {manuals,parts as coreParts} from './data/parts.js?v=20260713-9';
 import {jwf1206Parts09to30} from './data/jwf1206-pages-09-30.js?v=20260713-9';
-import {jwf1206_pages_09_16_verified} from './data/jwf1206-pages-09-16-verified.js?v=20260713-9';
+import {jwf1206_pages_09_16_verified} from './data/jwf1206-pages-09-16-verified.js?v=20260714-03';
 import {jwf1206P17P26Verified} from './data/jwf1206-p17-p26-verified.js?v=20260713-29';
 import {jwf1206P27P37Verified} from './data/jwf1206-p27-p37-verified.js?v=20260713-29';
-import {jwf1206P38P49Verified} from './data/jwf1206-p38-p49-verified.js?v=20260713-29';
+import {jwf1206P38P49Verified} from './data/jwf1206-p38-p49-verified.js?v=20260714-03';
 import {jwf1206P50P61Verified} from './data/jwf1206-p50-p61-verified.js?v=20260713-29';
 import {jwf1206P62P73Verified} from './data/jwf1206-p62-p73-verified.js?v=20260713-29';
 import {jwf1206Parts31to50} from './data/jwf1206-pages-31-50.js?v=20260713-9';
@@ -48,8 +48,8 @@ import {jwf1102P11P12Verified} from './data/jwf1102-p11-p12-verified.js?v=202607
 import {jwf1102P14Verified} from './data/jwf1102-p14-verified.js?v=20260713-29';
 import {assemblies} from './data/assemblies.js?v=20260713-36';
 import {jwf1206_0100_verified} from './data/jwf1206-0100-verified.js?v=20260713-9';
-import {getPartModelSpec} from './data/model-specs/index.js?v=20260713-31';
-import {createPartModel} from './models/part-models.js?v=20260713-10';
+import {getPartModelSpec} from './data/model-specs/index.js?v=20260714-03';
+import {createPartModel} from './models/part-models.js?v=20260714-03';
 import {createAssemblyModel} from './models/assembly-models.js?v=20260713-36';
 
 function inferType(part){
@@ -250,12 +250,12 @@ async function copyCurrentCode(){
 
 function createLitScene(){
   const scene=new THREE.Scene();
-  scene.add(new THREE.HemisphereLight(0xeafff8,0x526b68,2.7));
-  scene.add(new THREE.AmbientLight(0xffffff,.58));
-  const key=new THREE.DirectionalLight(0xffffff,4);key.position.set(4,7,5);scene.add(key);
-  const rim=new THREE.DirectionalLight(0x6fffd5,2);rim.position.set(-5,2,-4);scene.add(rim);
-  const lowerFill=new THREE.DirectionalLight(0xd9fff5,1.8);lowerFill.position.set(1,-6,4);scene.add(lowerFill);
-  const frontFill=new THREE.DirectionalLight(0xffffff,1.1);frontFill.position.set(0,1,7);scene.add(frontFill);
+  scene.add(new THREE.HemisphereLight(0xeafff8,0x526b68,1.35));
+  scene.add(new THREE.AmbientLight(0xffffff,.28));
+  const key=new THREE.DirectionalLight(0xffffff,2.15);key.position.set(4,7,5);scene.add(key);
+  const rim=new THREE.DirectionalLight(0x6fffd5,.72);rim.position.set(-5,2,-4);scene.add(rim);
+  const lowerFill=new THREE.DirectionalLight(0xd9fff5,.55);lowerFill.position.set(1,-6,4);scene.add(lowerFill);
+  const frontFill=new THREE.DirectionalLight(0xffffff,.42);frontFill.position.set(0,1,7);scene.add(frontFill);
   return scene;
 }
 
@@ -273,7 +273,7 @@ function getPreviewEngine(){
   try{
     const canvas=document.createElement('canvas');
     const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:true});
-    renderer.setPixelRatio(1);renderer.setSize(640,400,false);renderer.outputColorSpace=THREE.SRGBColorSpace;
+    renderer.setPixelRatio(1);renderer.setSize(640,400,false);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.92;
     const scene=createLitScene();
     const camera=new THREE.PerspectiveCamera(35,640/400,.1,100);camera.position.set(4.8,3.3,5.4);camera.lookAt(0,0,0);
     previewEngine={canvas,renderer,scene,camera};
@@ -311,7 +311,7 @@ function getDetailEngine(){
   const stage=canvas.parentElement;
   try{
     const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
-    renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.92;
     const scene=createLitScene();
     const camera=new THREE.PerspectiveCamera(35,1,.1,100);camera.position.set(4.8,3.3,5.4);camera.lookAt(0,0,0);
     const controls=new OrbitControls(camera,canvas);controls.enableDamping=true;controls.minDistance=2.8;controls.maxDistance=11;
@@ -577,6 +577,6 @@ window.addEventListener('beforeunload',()=>{
 document.querySelectorAll('.view-switch button').forEach(button=>button.classList.toggle('active',button.dataset.view===currentView));
 render();
 const directPart=urlParams.get('part');
-if(directPart){const target=parts.find(part=>part.code===directPart);if(target)openDetail(target)}
+if(directPart){const target=parts.find(part=>part.recordKey===directPart)||parts.find(part=>part.code===directPart);if(target)openDetail(target)}
 const directAssembly=urlParams.get('assembly');
 if(directAssembly){const target=assemblies.find(assembly=>assembly.code===directAssembly);if(target)openAssemblyDetail(target)}

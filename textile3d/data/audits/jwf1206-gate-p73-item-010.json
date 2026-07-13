@@ -1,0 +1,11 @@
+{
+  "recordKey":"jwf1206-p73-item-010","page":73,"partNumber":"TF2238-00","name":"铰链","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p73-010.png","topology":"与TF2237-00为对向铰链装配，能确认外壳缺口、顶部钩、水平调节螺杆、U形侧框、斜臂、枢轴和底脚的左右关系发生变化；仍无法由略图唯一恢复前后装配关系。",
+  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"HINGE","singleMachineQuantity":2,"quantityMeaning":"单机用量","assembly":"JWF1206-8700"},
+  "views":[
+    {"name":"厂家上左视图","direction":"方向待核","region":"原格上方左侧","projectionRelation":"相较TF2237缺口和顶部钩反向，但正式投影方向未标","solidContours":["矩形外壳","反向矩形缺口","顶部钩形件","下销端"],"holes":[],"excludedLines":["表格线","文字"]},
+    {"name":"厂家上右视图","direction":"方向待核","region":"原格上方右侧","projectionRelation":"水平螺杆、中央块、U形侧框和上下销可见，但无法与下方视图唯一对齐前后轴","solidContours":["水平螺杆及螺母","中央方块","U形侧框","上下销轴"],"holes":[],"excludedLines":["中心标记"]},
+    {"name":"厂家下方视图","direction":"方向待核","region":"原格下方","projectionRelation":"斜臂和底脚与TF2237反向，38控制一个投影尺寸但轴向含义未标","solidContours":["底脚","反向斜置摆臂","圆形枢轴","竖直螺杆和螺母"],"holes":["摆臂枢轴孔"],"excludedLines":["38尺寸线与界线"]}
+  ],
+  "dimensions":{"explicit":["厂家标注38"],"derived":[],"estimated":[],"unknown":["三个视图的正式方向","装配前后关系","除38外全部尺寸"]},
+  "material":{"value":"未标牌号，预计金属装配","basis":"铰链、螺杆、销轴为机械金属件，但牌号未给"},"ambiguities":["厂家未标三视图名称，不能只按排版位置强行命名主/右/俯视","对向关系清楚，但前后装配和各零件轴向位置仍不唯一"],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p73-premodel-overlay-final.png#item-010-blocked"],"readiness":"blocked"
+}

@@ -1,0 +1,12 @@
+{
+  "manualId": "jwf1206", "page": 48, "records": [{
+    "recordKey": "jwf1206-p48-item-001", "partNumber": "JWF1206-5100-1", "name": "吸落棉总管结合件", "page": 48,
+    "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p48-item-001.png",
+    "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+    "views": [{"name": "正视总管轮廓图", "direction": "垂直总管正面观察", "region": "原格主体区", "projectionRelation": "只给一个正视图，能确认顶部249口宽、主管和左右五个支口在平面内的轮廓，不能确认各支口前后伸出方向、深度或彼此错层", "solidContours": ["主管正视外廓", "顶部口", "左右五个分支和底部斜口"], "holes": ["各管口内部通道"], "excludedLines": ["249尺寸线", "中心线", "表格与文字"]}],
+    "topology": "正视可确认一根主管及多个分支，但单视图无法唯一确定分支在第三向的连接深度、圆/矩形截面与前后错层；现有3D只能作未验收占位",
+    "dimensions": {"explicit": ["顶部口宽249"], "derived": [], "estimated": ["正视平面内各分支相对位置"], "unknown": ["总高", "主管截面", "全部支口截面/深度/前后方向", "壁厚", "材料牌号"]},
+    "material": {"value": "厂家未标的中性薄壁风管材质", "basis": "名称说明为总管结合件，材料牌号未给"},
+    "ambiguities": ["缺少侧视或剖视，五个支口第三向连接无法唯一闭环"], "preModelOverlays": ["tmp/jwf1206-p48-premodel-overlay.png"], "readiness": "blocked"
+  }]
+}

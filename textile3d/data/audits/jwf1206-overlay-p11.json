@@ -1,0 +1,274 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1206",
+  "page": 11,
+  "recordCount": 10,
+  "acceptanceRule": "先通过件号/名称/单机用量、视图关系、线型、拓扑、尺寸台账和干净二维叠合闸门，再逐厂家视图比较3D正投影；真实孔洞不得用深色实体冒充，断开符号不建成实体。",
+  "parts": [
+    {
+      "recordKey": "jwf1206-p11-item-001",
+      "code": "JWF1202-0301(SMC)",
+      "nameZh": "底板",
+      "views": [
+        "正视图",
+        "侧视图"
+      ],
+      "excludedLines": [
+        "尺寸线和箭头",
+        "尺寸界线",
+        "中心线",
+        "隐藏折边虚线",
+        "表格线和文字"
+      ],
+      "material": "涂装金属薄板",
+      "solidAndVoids": "190×250连续折弯薄板、20总深、上下反向折边和16个贯穿圆孔。",
+      "verdict": "轮廓级通过；建模前两视二维闸门通过，正视16孔、190×250外廓及侧视连续折弯方向同时吻合；20明确解释为折弯总深而非板厚，板厚和孔位仍属比例估计。",
+      "evidence": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0301_SMC_-front-overlay.png",
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0301_SMC_-side-overlay.png",
+        "tmp/jwf1206-p11-overlays/JWF1202-0301_SMC_-front.png",
+        "tmp/jwf1206-p11-overlays/JWF1202-0301_SMC_-side.png",
+        "tmp/jwf1206-p11-orthographic-qa.html?code=JWF1202-0301(SMC)",
+        "assets/manuals/jwf1206/crops/JWF1202-0301_SMC_.png"
+      ],
+      "rebuilt": true,
+      "passed": true
+    },
+    {
+      "recordKey": "jwf1206-p11-item-002",
+      "code": "JWF1202-0302",
+      "nameZh": "气管",
+      "views": [
+        "外形图（断开表示）"
+      ],
+      "excludedLines": [
+        "中部断开符号",
+        "尺寸线和箭头",
+        "尺寸界线",
+        "中心线",
+        "表格线和文字"
+      ],
+      "material": "柔性塑料气管（牌号未知）",
+      "solidAndVoids": "外径φ8、展开长度6000的空心直管，中心孔沿全长贯通。",
+      "verdict": "轮廓级通过；已把旧实心圆柱修正为空心气管，断开式3D正投影的外壁、隐藏内壁和端面同时吻合；6000按完整展开长度记录，壁厚1为比例估计。",
+      "evidence": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0302-broken-overlay.png",
+        "tmp/jwf1206-p11-overlays/JWF1202-0302-broken.png",
+        "tmp/jwf1206-p11-orthographic-qa.html?code=JWF1202-0302",
+        "assets/manuals/jwf1206/crops/JWF1202-0302.png"
+      ],
+      "rebuilt": true,
+      "passed": true
+    },
+    {
+      "recordKey": "jwf1206-p11-item-003",
+      "code": "JWF1202-0303",
+      "nameZh": "气管",
+      "views": [
+        "外形图（断开表示）"
+      ],
+      "excludedLines": [
+        "中部断开符号",
+        "尺寸线和箭头",
+        "尺寸界线",
+        "中心线",
+        "表格线和文字"
+      ],
+      "material": "柔性塑料气管（牌号未知）",
+      "solidAndVoids": "外径φ6、展开长度100的空心直管，中心孔沿全长贯通。",
+      "verdict": "轮廓级通过；已把旧实心圆柱修正为空心气管，断开式3D正投影的外壁、隐藏内壁和端面同时吻合；100按完整展开长度记录，壁厚1为比例估计。",
+      "evidence": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0303-broken-overlay.png",
+        "tmp/jwf1206-p11-overlays/JWF1202-0303-broken.png",
+        "tmp/jwf1206-p11-orthographic-qa.html?code=JWF1202-0303",
+        "assets/manuals/jwf1206/crops/JWF1202-0303.png"
+      ],
+      "rebuilt": true,
+      "passed": true
+    },
+    {
+      "recordKey": "jwf1206-p11-item-004",
+      "code": "JWF1202-0304",
+      "nameZh": "气管",
+      "views": [
+        "外形图（断开表示）"
+      ],
+      "excludedLines": [
+        "中部断开符号",
+        "尺寸线和箭头",
+        "尺寸界线",
+        "中心线",
+        "表格线和文字"
+      ],
+      "material": "柔性塑料气管（牌号未知）",
+      "solidAndVoids": "外径φ6、展开长度2100的空心直管，中心孔沿全长贯通。",
+      "verdict": "轮廓级通过；已把旧实心圆柱修正为空心气管，断开式3D正投影的外壁、隐藏内壁和端面同时吻合；2100按完整展开长度记录，壁厚1为比例估计。",
+      "evidence": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0304-broken-overlay.png",
+        "tmp/jwf1206-p11-overlays/JWF1202-0304-broken.png",
+        "tmp/jwf1206-p11-orthographic-qa.html?code=JWF1202-0304",
+        "assets/manuals/jwf1206/crops/JWF1202-0304.png"
+      ],
+      "rebuilt": true,
+      "passed": true
+    },
+    {
+      "recordKey": "jwf1206-p11-item-005",
+      "code": "JWF1202-0305",
+      "nameZh": "气管",
+      "views": [
+        "外形图（断开表示）"
+      ],
+      "excludedLines": [
+        "中部断开符号",
+        "尺寸线和箭头",
+        "尺寸界线",
+        "中心线",
+        "表格线和文字"
+      ],
+      "material": "柔性塑料气管（牌号未知）",
+      "solidAndVoids": "外径φ6、展开长度200的空心直管，中心孔沿全长贯通。",
+      "verdict": "轮廓级通过；已把旧实心圆柱修正为空心气管，断开式3D正投影的外壁、隐藏内壁和端面同时吻合；200按完整展开长度记录，壁厚1为比例估计。",
+      "evidence": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0305-broken-overlay.png",
+        "tmp/jwf1206-p11-overlays/JWF1202-0305-broken.png",
+        "tmp/jwf1206-p11-orthographic-qa.html?code=JWF1202-0305",
+        "assets/manuals/jwf1206/crops/JWF1202-0305.png"
+      ],
+      "rebuilt": true,
+      "passed": true
+    },
+    {
+      "recordKey": "jwf1206-p11-item-006",
+      "code": "JWF1202-0306",
+      "nameZh": "气管",
+      "views": [
+        "外形图（断开表示）"
+      ],
+      "excludedLines": [
+        "中部断开符号",
+        "尺寸线和箭头",
+        "尺寸界线",
+        "中心线",
+        "表格线和文字"
+      ],
+      "material": "柔性塑料气管（牌号未知）",
+      "solidAndVoids": "外径φ6、展开长度2600的空心直管，中心孔沿全长贯通。",
+      "verdict": "轮廓级通过；已把旧实心圆柱修正为空心气管，断开式3D正投影的外壁、隐藏内壁和端面同时吻合；2600按完整展开长度记录，壁厚1为比例估计。",
+      "evidence": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0306-broken-overlay.png",
+        "tmp/jwf1206-p11-overlays/JWF1202-0306-broken.png",
+        "tmp/jwf1206-p11-orthographic-qa.html?code=JWF1202-0306",
+        "assets/manuals/jwf1206/crops/JWF1202-0306.png"
+      ],
+      "rebuilt": true,
+      "passed": true
+    },
+    {
+      "recordKey": "jwf1206-p11-item-007",
+      "code": "JWF1202-0307",
+      "nameZh": "气管",
+      "views": [
+        "外形图（断开表示）"
+      ],
+      "excludedLines": [
+        "中部断开符号",
+        "尺寸线和箭头",
+        "尺寸界线",
+        "中心线",
+        "表格线和文字"
+      ],
+      "material": "柔性塑料气管（牌号未知）",
+      "solidAndVoids": "外径φ6、展开长度700的空心直管，中心孔沿全长贯通。",
+      "verdict": "轮廓级通过；已把旧实心圆柱修正为空心气管，断开式3D正投影的外壁、隐藏内壁和端面同时吻合；700按完整展开长度记录，壁厚1为比例估计。",
+      "evidence": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0307-broken-overlay.png",
+        "tmp/jwf1206-p11-overlays/JWF1202-0307-broken.png",
+        "tmp/jwf1206-p11-orthographic-qa.html?code=JWF1202-0307",
+        "assets/manuals/jwf1206/crops/JWF1202-0307.png"
+      ],
+      "rebuilt": true,
+      "passed": true
+    },
+    {
+      "recordKey": "jwf1206-p11-item-008",
+      "code": "JWF1202-0308",
+      "nameZh": "气管",
+      "views": [
+        "外形图（断开表示）"
+      ],
+      "excludedLines": [
+        "中部断开符号",
+        "尺寸线和箭头",
+        "尺寸界线",
+        "中心线",
+        "表格线和文字"
+      ],
+      "material": "柔性塑料气管（牌号未知）",
+      "solidAndVoids": "外径φ6、展开长度400的空心直管，中心孔沿全长贯通。",
+      "verdict": "轮廓级通过；已把旧实心圆柱修正为空心气管，断开式3D正投影的外壁、隐藏内壁和端面同时吻合；400按完整展开长度记录，壁厚1为比例估计。",
+      "evidence": [
+        "tmp/jwf1206-p11-clean-2d/JWF1202-0308-broken-overlay.png",
+        "tmp/jwf1206-p11-overlays/JWF1202-0308-broken.png",
+        "tmp/jwf1206-p11-orthographic-qa.html?code=JWF1202-0308",
+        "assets/manuals/jwf1206/crops/JWF1202-0308.png"
+      ],
+      "rebuilt": true,
+      "passed": true
+    },
+    {
+      "recordKey": "jwf1206-p11-item-009",
+      "code": "ZFA211A-0302",
+      "nameZh": "连接叉",
+      "views": [
+        "俯视图",
+        "纵向剖视图"
+      ],
+      "excludedLines": [
+        "剖面填充线",
+        "尺寸线和箭头",
+        "尺寸界线",
+        "中心线",
+        "表格线和文字"
+      ],
+      "material": "金属",
+      "solidAndVoids": "88×44×28外体、左端横向贯通孔，以及从左至右贯通的两级轴向圆孔。",
+      "verdict": "未通过；识图闸门本身通过，但现有3D基础图元不能同时从矩形外体中扣除两级轴向圆孔和相交横孔。已删除用深色实心圆柱冒充孔洞的旧结构；俯视缺横孔、剖视缺真实空腔，正投影证据明确不闭环。",
+      "evidence": [
+        "tmp/jwf1206-p11-clean-2d/ZFA211A-0302-top-overlay.png",
+        "tmp/jwf1206-p11-clean-2d/ZFA211A-0302-section-overlay.png",
+        "tmp/jwf1206-p11-overlays/ZFA211A-0302-top.png",
+        "tmp/jwf1206-p11-overlays/ZFA211A-0302-section.png",
+        "tmp/jwf1206-p11-orthographic-qa.html?code=ZFA211A-0302",
+        "assets/manuals/jwf1206/crops/ZFA211A-0302.png"
+      ],
+      "rebuilt": true,
+      "passed": false
+    },
+    {
+      "recordKey": "jwf1206-p11-item-010",
+      "code": "ZFA211A-0303",
+      "nameZh": "销轴",
+      "views": [
+        "外形图"
+      ],
+      "excludedLines": [
+        "尺寸线和箭头",
+        "尺寸界线",
+        "中心线",
+        "表格线和文字"
+      ],
+      "material": "金属",
+      "solidAndVoids": "φ14实心主轴身、左端倒角、近左周向凹槽和右端薄挡边。",
+      "verdict": "轮廓级通过；已把旧模型方向翻正，并把两道虚构凸环重建为一道周向凹槽，右挡边厚度由4修正为约2；φ14和总长53的外形投影吻合，槽和挡边细节仍为比例估计。",
+      "evidence": [
+        "tmp/jwf1206-p11-clean-2d/ZFA211A-0303-side-overlay.png",
+        "tmp/jwf1206-p11-overlays/ZFA211A-0303-side.png",
+        "tmp/jwf1206-p11-orthographic-qa.html?code=ZFA211A-0303",
+        "assets/manuals/jwf1206/crops/ZFA211A-0303.png"
+      ],
+      "rebuilt": true,
+      "passed": true
+    }
+  ]
+}

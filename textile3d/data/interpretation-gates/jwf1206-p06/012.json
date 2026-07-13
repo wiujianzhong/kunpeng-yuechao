@@ -1,0 +1,6 @@
+{
+  "recordKey":"jwf1206-p06-item-012","partNumber":"JWF1206-0104","name":"左线槽盖（一）","page":6,"sourceCrop":"assets/manuals/jwf1206/crops/JWF1206-0104.png",
+  "identification":{"partNumberVerified":true,"nameVerified":true,"quantity":1,"quantityMeaning":"单机用量"},"topology":"1213×95单片展开薄板，左端有避让台阶，孔位线上六个安装孔。",
+  "views":[{"name":"展开平面图","direction":"沿板厚Z观察","region":"原格唯一视图","projectionRelation":"单视图直接定义展开外廓、台阶和孔位。","solidContours":["1213×95板外廓","左端台阶"],"holes":["六安装孔"],"excludedLines":["尺寸线","孔位中心线","中心十字"]}],
+  "dimensions":{"explicit":["长1213","宽95"],"derived":[],"estimated":["台阶尺寸","孔径与孔距","板厚"],"unknown":["折弯状态"]},"material":{"value":"喷漆薄钢板","basis":"名称为线槽盖且以展开平面图表达"},"ambiguities":[],"preModelOverlays":["tmp/jwf1206-p06-gate-012-final.png"],"readiness":"ready"
+}

@@ -1,0 +1,8 @@
+{
+  "recordKey":"jwf1206-p72-item-003","page":72,"partNumber":"ZFA177-0903","name":"叶轮","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p72-003.png","topology":"单体平面叶轮：φ300外圈、中央轮毂与16片同向后弯叶片连续，叶片有效直径φ290；中心十字是中心线，不是额外实体。",
+  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"IMPELLER","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"FA225-8600"},
+  "views":[{"name":"正视图","direction":"沿叶轮轴向观看叶片面","region":"原格表头下方唯一几何视图","projectionRelation":"单一正视控制外圈、叶片有效直径、叶片数量和旋向；无侧视或剖视可控制轴向深度","solidContours":["φ300外圈","中央轮毂","16片后弯叶片"],"holes":["中心轴孔"],"excludedLines":["φ300与φ290引出线","水平和竖直中心线","表格线","文字"]}],
+  "dimensions":{"explicit":["外缘φ300","叶片有效直径φ290"],"derived":["外圈径向宽度(300-290)/2=5"],"estimated":["中心轮毂内外径","叶片宽度和曲率"],"unknown":["轴向深度","叶片厚度"]},
+  "material":{"value":"未标材质，展示暂用金属","basis":"厂家只标注叶轮名称与几何尺寸，未给材质"},
+  "ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p72-premodel-overlay-final.png#item-003"],"readiness":"ready"
+}

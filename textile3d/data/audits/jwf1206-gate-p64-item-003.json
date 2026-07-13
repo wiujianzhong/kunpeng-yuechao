@@ -1,0 +1,10 @@
+{
+  "recordKey":"jwf1206-p64-item-003","page":64,"partNumber":"JWF1202-8002","name":"右立柱","sourceCrop":"tmp/pdfs/jwf1206-p56-p64-review/tiles/p64-003.png","topology":"与左立柱同为506×525×170框架、中板和底座板装配，但中板大圆孔偏左、主视小孔在右竖梁，俯视的两个端孔、单孔和圆角矩形孔左右对向布置，不能只复制同一模型。",
+  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"RIGHT SUPPORT","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"JWF1206-8000"},
+  "views":[
+    {"name":"主视图","direction":"垂直立柱正面观看","region":"原格中部方框视图","projectionRelation":"与下方俯视共享506宽度，525为总高","solidContours":["上下横梁","左右竖梁","中板"],"holes":["中板偏左大圆孔","右竖梁小孔"],"excludedLines":["525和506尺寸线与界线"]},
+    {"name":"俯视图","direction":"从上向下观看底座深度","region":"原格下方506×170矩形","projectionRelation":"孔槽布局与左立柱对向，170控制前后深度","solidContours":["506×170底座板","左上局部缺口"],"holes":["右端两个安装孔","左端一个安装孔","偏左圆角矩形孔"],"excludedLines":["170尺寸线与界线"]}
+  ],
+  "dimensions":{"explicit":["高525","宽506","深170"],"derived":[],"estimated":["梁宽与板厚","圆孔和底座孔槽尺寸、孔距"],"unknown":[]},
+  "material":{"value":"未标牌号，按涂装金属框架展示","basis":"立柱框架、底座板及安装孔为典型机架金属件"},"ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p56-p64-review/p64-premodel-overlay-final.png#item-003-main","tmp/pdfs/jwf1206-p56-p64-review/p64-premodel-overlay-final.png#item-003-top"],"readiness":"ready"
+}

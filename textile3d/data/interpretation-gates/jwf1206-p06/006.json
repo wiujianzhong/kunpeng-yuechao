@@ -1,0 +1,11 @@
+{
+  "recordKey":"jwf1206-p06-item-006","partNumber":"FA225-0100-3","name":"左后线槽结合件","page":6,"sourceCrop":"assets/manuals/jwf1206/crops/FA225-0100-3.png",
+  "identification":{"partNumberVerified":true,"nameVerified":true,"quantity":1,"quantityMeaning":"单机用量"},
+  "topology":"2490×55×66单槽折弯件，左壁为55高平口，底板贯通至右壁，右壁顶部向外折弯并在下方配紧固块；不是对称U槽。",
+  "views":[
+    {"name":"正视图","direction":"沿槽宽Z观察","region":"原格中部长条视图","projectionRelation":"控制2490总长与沿顶边紧固点分布。","solidContours":["长槽体"],"holes":["顶边紧固点"],"excludedLines":["2490尺寸线","尺寸界线"]},
+    {"name":"左视图（端面）","direction":"沿长度X观察完整截面","region":"原格下部视图","projectionRelation":"与正视图同一总成；66宽与55高共同约束不对称折弯截面。","solidContours":["左平口壁","底板","右外翻壁","顶部外翻边","紧固块"],"holes":[],"excludedLines":["剖面填充","66/55尺寸线","中心十字"]}
+  ],
+  "dimensions":{"explicit":["总长2490","槽高55","槽宽66"],"derived":[],"estimated":["板厚","顶部外翻长度","紧固块大小"],"unknown":["折弯半径"]},
+  "material":{"value":"喷漆折弯钣金线槽","basis":"端部剖视明确为薄板折弯截面"},"ambiguities":[],"preModelOverlays":["tmp/jwf1206-p06-gate-006-final.png","tmp/jwf1206-p06-gate-006-final.png"],"readiness":"ready"
+}

@@ -1,0 +1,47 @@
+{
+  "manualId": "jwf1206",
+  "page": 47,
+  "source": "JWF1206厂家PDF第47页",
+  "scope": "第47页6件完成身份核准、线型/视图/拓扑/尺寸台账、建模前二维叠合、3D重建和厂家对应正投影叠合",
+  "method": "按mechanical-drawing-to-3d-audit执行；尺寸线、中心线、剖面填充、弹簧简化线和表格文字全部排除",
+  "recordCount": 6,
+  "interpretationGate": "data/interpretation-gates/jwf1206-p47.json",
+  "records": [
+    {
+      "page": 47, "recordKey": "jwf1206-p47-item-001", "code": "DK760-5721A", "dimensions": ["φ16×25"],
+      "views": ["轴向局部剖视图"], "excludedLines": ["φ16/25尺寸线", "中心线", "剖面填充"], "material": "厂家未标的中性金属",
+      "verdict": "轮廓级通过：φ16外径和总长25按明确标注；模型为左端圆钝封闭、右端轴向盲孔的单体圆座，已纠正贯通圆管式表达。盲孔φ6、深12和圆钝过渡未标，仅按剖视比例估算",
+      "evidence": ["tmp/jwf1206-p47-premodel-overlay.png", "tmp/jwf1206-p47-overlay-final.png"], "rebuilt": true
+    },
+    {
+      "page": 47, "recordKey": "jwf1206-p47-item-002", "code": "DK760-5725", "dimensions": ["φ9×44.9"],
+      "views": ["拉簧主视图"], "excludedLines": ["φ9/44.9尺寸线", "中心线", "弹簧简化线"], "material": "弹簧钢中性金属",
+      "verdict": "轮廓级通过：φ9外径和44.9总长按明确标注；模型保持同一根连续密绕簧体，左端开口圆眼、右端长直折钩不对称，已删除旧对称双圆钩模板。线径、圈数和钩部尺寸仅按比例估算",
+      "evidence": ["tmp/jwf1206-p47-premodel-overlay.png", "tmp/jwf1206-p47-overlay-final.png"], "rebuilt": true
+    },
+    {
+      "page": 47, "recordKey": "jwf1206-p47-item-003", "code": "DK760-5728", "dimensions": ["φ3×200"],
+      "views": ["轴向主视图"], "excludedLines": ["φ3/200尺寸线", "中心线", "隐藏线不作独立实体"], "material": "低反光柔性塑料气管",
+      "verdict": "轮廓级通过：φ3外径和200长度按明确标注建立为一根连续中空低反光气管；贯通内孔保留，内径未标仅按图估为φ1.8，不作尺寸级结论",
+      "evidence": ["tmp/jwf1206-p47-premodel-overlay.png", "tmp/jwf1206-p47-overlay-final.png"], "rebuilt": true
+    },
+    {
+      "page": 47, "recordKey": "jwf1206-p47-item-004", "code": "FA221B-1107A", "dimensions": ["15×6"],
+      "views": ["主视台阶轮廓", "端视凹顶轮廓"], "excludedLines": ["15/6尺寸线", "尺寸界线", "表格线"], "material": "厂家未标的中性金属键",
+      "verdict": "轮廓级通过：总长15和宽6按明确标注；主视右端识别为降台而非顶部凸块，端视保留6宽浅凹顶轮廓。总高、降台长度/高度和凹弧深度未标，按两视叠合估算",
+      "evidence": ["tmp/jwf1206-p47-premodel-overlay.png", "tmp/jwf1206-p47-overlay-final.png"], "rebuilt": true
+    },
+    {
+      "page": 47, "recordKey": "jwf1206-p47-item-005", "code": "TZH1040", "dimensions": ["φ14/φ8×0.5"],
+      "views": ["轴向全剖视图", "端视图"], "excludedLines": ["尺寸线", "中心线", "剖面填充", "中心十字"], "material": "厂家未标的中性垫片材质",
+      "verdict": "尺寸级通过：外径φ14、同心贯通孔φ8和厚0.5全部按厂家明确标注；轴向投影为超薄环形材料区，端视为φ14/φ8同心圆，不虚构倒角",
+      "evidence": ["tmp/jwf1206-p47-premodel-overlay.png", "tmp/jwf1206-p47-overlay-final.png"], "rebuilt": true
+    },
+    {
+      "page": 47, "recordKey": "jwf1206-p47-item-006", "code": "TZH1091", "dimensions": ["φ18/φ12×7"],
+      "views": ["轴向局部剖视图"], "excludedLines": ["φ18/φ12/7尺寸线", "中心线", "剖面填充"], "material": "厂家未标的中性轴衬材质",
+      "verdict": "轮廓级通过：φ12筒体、φ18肩和总长7按明确标注；名称10X7与剖视共同确认φ10贯通薄壁衬套，筒壁在右端连续翻肩而非两个厚圆环叠加。肩宽和圆滑过渡未标，只按剖视比例估算",
+      "evidence": ["tmp/jwf1206-p47-premodel-overlay.png", "tmp/jwf1206-p47-overlay-final.png"], "rebuilt": true
+    }
+  ]
+}

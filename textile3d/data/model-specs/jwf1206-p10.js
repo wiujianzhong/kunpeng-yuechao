@@ -1,5 +1,13 @@
 // JWF1206 原PDF第10页：逐格按厂家剖面、旋转轮廓和明示尺寸建立。
 // 坐标单位为毫米，X=宽、Y=高、Z=深；未标参数只记录在 assumptions。
+const detectionDiskOutline = Array.from({ length: 128 }, (_, index) => {
+  const angle = Math.PI * 2 * index / 128;
+  const notchDistance = Math.min(...[Math.PI / 4, 3 * Math.PI / 4, 5 * Math.PI / 4, 7 * Math.PI / 4]
+    .map((center) => Math.abs(Math.atan2(Math.sin(angle - center), Math.cos(angle - center)))));
+  const radius = notchDistance < 0.16 ? 55 + 10 * notchDistance / 0.16 : 65;
+  return [Math.cos(angle) * radius, Math.sin(angle) * radius];
+});
+
 export const jwf1206P10ModelSpecs = {
   'ZFA211-0206': {
     level: '轮廓级',
@@ -44,19 +52,12 @@ export const jwf1206P10ModelSpecs = {
       page: 10,
       dimensions: ['M12', '长55'],
       views: ['主视图'],
-      assumptions: ['螺杆大径按M12取12，眼环中心至杆端长度按55建立', '眼环内外径、颈部长度和螺距未标，按主视图比例估算；螺纹仅用环纹作视觉表达'],
+      assumptions: ['螺杆大径按M12取12，眼环中心至杆端长度按55建立', '眼环内外径、颈部长度和螺距未标，按主视图比例估算；厂家未画独立闭合螺纹牙型，不添加实体环纹'],
     },
     primitives: [
-      { type: 'torus', radius: 10, tube: 4, position: [-27.5, 0, 0] },
-      { type: 'cylinder', radius: 8, length: 9, axis: 'x', position: [-14.5, 0, 0] },
-      { type: 'cylinder', radius: 6, length: 45, axis: 'x', position: [5, 0, 0] },
-      { type: 'torus', radius: 6, tube: 0.45, position: [-5, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 6, tube: 0.45, position: [0, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 6, tube: 0.45, position: [5, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 6, tube: 0.45, position: [10, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 6, tube: 0.45, position: [15, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 6, tube: 0.45, position: [20, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 6, tube: 0.45, position: [25, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
+      { type: 'torus', radius: 7.5, tube: 2.5, position: [-27.5, 0, 0] },
+      { type: 'extrude', points: [[-17.5, 0], [-13.5, -6], [-10, -6], [-10, 6], [-13.5, 6]], depth: 5, position: [0, 0, -2.5] },
+      { type: 'cylinder', radius: 6, length: 41, axis: 'x', position: [7, 0, 0] },
     ],
   },
 
@@ -67,28 +68,31 @@ export const jwf1206P10ModelSpecs = {
       page: 10,
       dimensions: ['φ130×24.5'],
       views: ['正视图', '侧视图'],
-      assumptions: ['最大外径130和总厚24.5按厂家标注', '中央盘直径、双侧凸缘厚度及四处径向缺口的深度和角度未标，按两视图比例估算'],
+      assumptions: ['最大外径130和总厚24.5按厂家标注', '两端环形槽的内外径与深度，以及四处径向缺口的深度和角度未标，按两视图比例估算'],
     },
     primitives: [
-      { type: 'cylinder', radius: 52, length: 24.5, axis: 'z' },
       {
         type: 'extrude',
-        points: [[65, 0], [60.1, 24.9], [39.6, 39.6], [24.9, 60.1], [0, 65], [-24.9, 60.1], [-39.6, 39.6], [-60.1, 24.9], [-65, 0], [-60.1, -24.9], [-39.6, -39.6], [-24.9, -60.1], [0, -65], [24.9, -60.1], [39.6, -39.6], [60.1, -24.9]],
-        depth: 3.25,
-        position: [0, 0, -12.25],
-        holes: [{ kind: 'circle', center: [0, 0], radius: 52 }],
-        bevel: 1,
+        points: detectionDiskOutline,
+        depth: 18,
+        position: [0, 0, -9],
       },
       {
         type: 'extrude',
-        points: [[65, 0], [60.1, 24.9], [39.6, 39.6], [24.9, 60.1], [0, 65], [-24.9, 60.1], [-39.6, 39.6], [-60.1, 24.9], [-65, 0], [-60.1, -24.9], [-39.6, -39.6], [-24.9, -60.1], [0, -65], [24.9, -60.1], [39.6, -39.6], [60.1, -24.9]],
+        points: detectionDiskOutline,
         depth: 3.25,
-        position: [0, 0, 9],
+        position: [0, 0, -10.625],
         holes: [{ kind: 'circle', center: [0, 0], radius: 52 }],
-        bevel: 1,
       },
-      { type: 'torus', radius: 52, tube: 1.1, position: [0, 0, 12.25], material: 'darkMetal' },
-      { type: 'torus', radius: 52, tube: 1.1, position: [0, 0, -12.25], material: 'darkMetal' },
+      {
+        type: 'extrude',
+        points: detectionDiskOutline,
+        depth: 3.25,
+        position: [0, 0, 10.625],
+        holes: [{ kind: 'circle', center: [0, 0], radius: 52 }],
+      },
+      { type: 'cylinder', radius: 50, length: 3.25, axis: 'z', position: [0, 0, -10.625] },
+      { type: 'cylinder', radius: 50, length: 3.25, axis: 'z', position: [0, 0, 10.625] },
     ],
   },
 
@@ -107,19 +111,38 @@ export const jwf1206P10ModelSpecs = {
         points: [[21, -27], [37.5, -27], [37.5, 27], [21, 27], [21, -27]],
         rotation: [1.5708, 0, 0],
       },
-      { type: 'torus', radius: 29, tube: 1, position: [0, 0, -1], material: 'darkMetal' },
-      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [29, 0, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 7, length: 4, axis: 'z', position: [29, 0, 29], material: 'darkMetal' },
-      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [14.5, 25.115, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 7, length: 4, axis: 'z', position: [14.5, 25.115, 29], material: 'darkMetal' },
-      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [-14.5, 25.115, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 7, length: 4, axis: 'z', position: [-14.5, 25.115, 29], material: 'darkMetal' },
-      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [-29, 0, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 7, length: 4, axis: 'z', position: [-29, 0, 29], material: 'darkMetal' },
-      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [-14.5, -25.115, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 7, length: 4, axis: 'z', position: [-14.5, -25.115, 29], material: 'darkMetal' },
-      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [14.5, -25.115, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 7, length: 4, axis: 'z', position: [14.5, -25.115, 29], material: 'darkMetal' },
+      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [25.115, 14.5, 0], material: 'darkMetal' },
+      { type: 'cylinder', radius: 7, length: 2, axis: 'z', position: [25.115, 14.5, 28], material: 'metal' },
+      { type: 'cylinder', radius: 4.5, length: 4, axis: 'z', segments: 6, position: [25.115, 14.5, 29], material: 'darkMetal' },
+      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [0, 29, 0], material: 'darkMetal' },
+      { type: 'cylinder', radius: 7, length: 2, axis: 'z', position: [0, 29, 28], material: 'metal' },
+      { type: 'cylinder', radius: 4.5, length: 4, axis: 'z', segments: 6, position: [0, 29, 29], material: 'darkMetal' },
+      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [-25.115, 14.5, 0], material: 'darkMetal' },
+      { type: 'cylinder', radius: 7, length: 2, axis: 'z', position: [-25.115, 14.5, 28], material: 'metal' },
+      { type: 'cylinder', radius: 4.5, length: 4, axis: 'z', segments: 6, position: [-25.115, 14.5, 29], material: 'darkMetal' },
+      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [-25.115, -14.5, 0], material: 'darkMetal' },
+      { type: 'cylinder', radius: 7, length: 2, axis: 'z', position: [-25.115, -14.5, 28], material: 'metal' },
+      { type: 'cylinder', radius: 4.5, length: 4, axis: 'z', segments: 6, position: [-25.115, -14.5, 29], material: 'darkMetal' },
+      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [0, -29, 0], material: 'darkMetal' },
+      { type: 'cylinder', radius: 7, length: 2, axis: 'z', position: [0, -29, 28], material: 'metal' },
+      { type: 'cylinder', radius: 4.5, length: 4, axis: 'z', segments: 6, position: [0, -29, 29], material: 'darkMetal' },
+      { type: 'cylinder', radius: 3.8, length: 60, axis: 'z', position: [25.115, -14.5, 0], material: 'darkMetal' },
+      { type: 'cylinder', radius: 7, length: 2, axis: 'z', position: [25.115, -14.5, 28], material: 'metal' },
+      { type: 'cylinder', radius: 4.5, length: 4, axis: 'z', segments: 6, position: [25.115, -14.5, 29], material: 'darkMetal' },
     ],
   },
 };
+
+for (const [partCode, spec] of Object.entries(jwf1206P10ModelSpecs)) {
+  const hasSection = spec.source.views.some((view) => /剖/.test(view));
+  const cropCode = partCode === 'jwf1206:p10:r2:c1' ? 'jwf1206_p10_r2_c1' : partCode;
+  spec.source.sourceCrop = `assets/manuals/jwf1206/crops/${cropCode}.png`;
+  spec.source.sourceVector = `assets/manuals/jwf1206/crops/${cropCode}.pdf`;
+  spec.source.cropDpi = 600;
+  spec.source.excludedLines = [
+    '原格表框、件号、名称、数量栏与文字', '尺寸线、箭头与尺寸数字', '尺寸延长线',
+    '中心线与中心十字', '引出线与标注线', ...(hasSection ? ['剖面填充线'] : []),
+  ];
+  spec.source.unknowns = spec.source.assumptions.filter((text) => /未.*(?:标|给|注明|画|规定|建模)|估算|比例|近似|冒充/.test(text));
+  spec.source.reconstructionRule = '逐格识别主视、辅助视图和剖面；清除非实体标注线后，只按厂家明示尺寸与闭合实体轮廓建模。';
+}

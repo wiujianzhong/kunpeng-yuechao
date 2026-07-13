@@ -117,3 +117,16 @@ export const jwf1206P16ModelSpecs = {
     ],
   },
 };
+
+for (const [partCode, spec] of Object.entries(jwf1206P16ModelSpecs)) {
+  const hasSection = spec.source.views.some((view) => /剖|截面/.test(view));
+  spec.source.sourceCrop = `assets/manuals/jwf1206/crops/${partCode}.png`;
+  spec.source.sourceVector = `assets/manuals/jwf1206/crops/${partCode}.pdf`;
+  spec.source.cropDpi = 600;
+  spec.source.excludedLines = [
+    '原格表框、件号、名称、数量栏与文字', '尺寸线、箭头与尺寸数字', '尺寸延长线',
+    '中心线与中心十字', '引出线与标注线', ...(hasSection ? ['剖面填充线'] : []),
+  ];
+  spec.source.unknowns = spec.source.assumptions.filter((text) => /未.*(?:标|给|注明|画|规定|建模)|估算|比例|近似|不作为|空间走向/.test(text));
+  spec.source.reconstructionRule = '逐格识别主视、辅助视图和剖面；清除非实体标注线后，只按厂家明示尺寸与闭合实体轮廓建模。';
+}

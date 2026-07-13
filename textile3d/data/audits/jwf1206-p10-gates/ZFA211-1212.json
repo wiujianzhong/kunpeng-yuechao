@@ -1,0 +1,35 @@
+{
+  "recordKey": "jwf1206-p10-item-002",
+  "partNumber": "ZFA211-1212",
+  "name": "大垫圈",
+  "page": 10,
+  "sourceCrop": "assets/manuals/jwf1206/crops/ZFA211-1212.png",
+  "identification": {
+    "partNumberVerified": true,
+    "nameVerified": true,
+    "englishDescription": "BIG WASHER",
+    "quantity": 12,
+    "quantityMeaning": "单机用量",
+    "assembly": "JWF1206-0200"
+  },
+  "views": [{
+    "name": "轴向剖视图",
+    "direction": "沿垫圈轴线观察并通过轴线剖切",
+    "region": "原格下部唯一厂家视图",
+    "projectionRelation": "φ30控制横向外径，6控制轴向厚度，中央白区贯穿厚度",
+    "solidContours": ["左右两块被剖环体", "外径端边", "上下端面"],
+    "holes": ["中央轴向贯通孔"],
+    "excludedLines": ["剖面填充线", "中心线", "φ30和6尺寸线", "尺寸界线", "文字和表格线"]
+  }],
+  "topology": "单体金属环形大垫圈，外圆柱和两端面连续，中央为同轴贯通孔。",
+  "dimensions": {
+    "explicit": ["外径φ30", "厚度6"],
+    "derived": [],
+    "estimated": ["中心孔径按剖视比例估计约φ10"],
+    "unknown": ["端面倒角和表面粗糙度"]
+  },
+  "material": {"value": "金属", "basis": "厂家剖面填充和垫圈标准件形态"},
+  "ambiguities": [],
+  "preModelOverlays": ["tmp/jwf1206-p10-clean-2d/ZFA211-1212-section-overlay.png"],
+  "readiness": "ready"
+}

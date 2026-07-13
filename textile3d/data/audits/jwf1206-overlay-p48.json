@@ -1,0 +1,56 @@
+{
+  "manualId": "jwf1206", "page": 48, "source": "JWF1206厂家PDF第48页", "recordCount": 8,
+  "scope": "第48页8件完成身份/视图/线型/拓扑/尺寸台账和建模前二维叠合；第1件因单视图第三向无约束被识图闸门阻断，第2—8件完成3D及对应正投影叠合",
+  "method": "严格区分厂家明确尺寸与比例估计；失败项保留passed:false，现有占位3D不纳入通过",
+  "interpretationGates": ["data/interpretation-gates/jwf1206-p48-blocked.json", "data/interpretation-gates/jwf1206-p48-ready.json"],
+  "records": [
+    {
+      "page": 48, "recordKey": "jwf1206-p48-item-001", "code": "JWF1206-5100-1", "dimensions": ["口宽249"], "passed": false,
+      "views": ["正视总管轮廓图"], "excludedLines": ["249尺寸线", "中心线", "表格与文字"], "material": "厂家未标的中性薄壁风管材质",
+      "verdict": "未通过：厂家只给一个正视图和顶部口宽249；虽然能识别主管、左右五个支口及底部斜口的平面轮廓，但各支口第三向伸出方向、深度、圆/矩形截面和前后错层均无约束。现有3D只作占位，不得声明与厂家图闭环；需补侧视、剖视、轴测图或实物多角度照片",
+      "evidence": ["tmp/jwf1206-p48-premodel-overlay.png", "tmp/jwf1206-p48-overlay-final.png"], "rebuilt": false
+    },
+    {
+      "page": 48, "recordKey": "jwf1206-p48-item-002", "code": "JWF1204-5100-2", "dimensions": ["450×350×183"],
+      "views": ["正视图", "右侧视图"], "excludedLines": ["450/350/183尺寸线", "尺寸界线", "表格线"], "material": "喷漆薄壁金属总成",
+      "verdict": "轮廓级通过：450×350×183三向包络按明确标注；重建为异形前板、顶部带孔耳、后侧竖板、底折边和斜撑组成的薄壁焊接总成，并保留减重孔和安装孔拓扑。板厚、孔径孔位、耳板和筋板局部尺寸未标，按两视比例估算",
+      "evidence": ["tmp/jwf1206-p48-premodel-overlay.png", "tmp/jwf1206-p48-overlay-final.png"], "rebuilt": true
+    },
+    {
+      "page": 48, "recordKey": "jwf1206-p48-item-003", "code": "FA224-5200-3A", "dimensions": ["370×330×205"],
+      "views": ["330向正视图", "370向侧视图"], "excludedLines": ["370/330/205尺寸线", "尺寸界线", "表格线"], "material": "喷漆薄壁金属风管",
+      "verdict": "轮廓级通过：底法兰两向370×330和高度205按明确标注；主体已从厚实板盒改为中空薄壁矩形变径管，底部与顶部均保留贯通开口法兰，两向梯形投影同时吻合。顶部小口、壁厚和法兰局部尺寸未标，按比例估算",
+      "evidence": ["tmp/jwf1206-p48-premodel-overlay.png", "tmp/jwf1206-p48-overlay-final.png"], "rebuilt": true
+    },
+    {
+      "page": 48, "recordKey": "jwf1206-p48-item-004", "code": "FA224-5201", "dimensions": ["φ8×700"],
+      "views": ["轴向主视图"], "excludedLines": ["φ8/700尺寸线", "中心线", "隐藏线不作独立实体"], "material": "低反光柔性塑料气管",
+      "verdict": "轮廓级通过：按φ8×700明确尺寸建立一根连续中空低反光气管，已纠正旧实心圆柱；内径未标，仅按图估为φ6",
+      "evidence": ["tmp/jwf1206-p48-premodel-overlay.png", "tmp/jwf1206-p48-overlay-final.png"], "rebuilt": true
+    },
+    {
+      "page": 48, "recordKey": "jwf1206-p48-item-005", "code": "FA224-5204", "dimensions": ["330×370×3"],
+      "views": ["正视矩形环", "厚度标注"], "excludedLines": ["330/370/δ3尺寸线", "尺寸界线", "表格线"], "material": "柔性橡胶密封材料",
+      "verdict": "轮廓级通过：330×370外廓和厚3按明确标注；中央矩形贯通口及四角孔拓扑吻合，使用低反光橡胶而非金属。内孔和四角孔局部尺寸未标，按比例估算",
+      "evidence": ["tmp/jwf1206-p48-premodel-overlay.png", "tmp/jwf1206-p48-overlay-final.png"], "rebuilt": true
+    },
+    {
+      "page": 48, "recordKey": "jwf1206-p48-item-006", "code": "FA225-5101", "dimensions": ["300×330×20"],
+      "views": ["正视矩形环", "厚度标注"], "excludedLines": ["300/330/δ20尺寸线", "尺寸界线", "表格线"], "material": "柔性橡胶密封材料",
+      "verdict": "轮廓级通过：300×330外廓和厚20按明确标注；模型为中央贯通开口的厚橡胶密封框且无四角孔。内孔尺寸未标，按比例估算",
+      "evidence": ["tmp/jwf1206-p48-premodel-overlay.png", "tmp/jwf1206-p48-overlay-final.png"], "rebuilt": true
+    },
+    {
+      "page": 48, "recordKey": "jwf1206-p48-item-007", "code": "DK760-2137", "dimensions": ["42.7×φ25", "螺纹M21"],
+      "views": ["轴向局部剖视图"], "excludedLines": ["42.7/φ25/M21尺寸线", "中心线", "螺纹示意线"], "material": "厂家未标的中性金属",
+      "verdict": "轮廓级通过：总长42.7、φ25大端和右端M21内螺纹按明确标注；重建为左端连续圆钝锥头、右侧φ25圆柱及M21盲内孔，螺纹示意线不再建成凸环。锥段长度、盲孔深度和牙型未标，按剖视比例估算",
+      "evidence": ["tmp/jwf1206-p48-premodel-overlay.png", "tmp/jwf1206-p48-overlay-final.png"], "rebuilt": true
+    },
+    {
+      "page": 48, "recordKey": "jwf1206-p48-item-008", "code": "DK760-5809", "dimensions": ["72×25×5"],
+      "views": ["正视图", "侧视折弯图"], "excludedLines": ["72/25/5尺寸线", "尺寸界线", "表格线"], "material": "厂家未标的中性薄金属板",
+      "verdict": "轮廓级通过：72×25×5三向尺寸按明确标注；上、下平行竖段通过中部连续斜折面形成S形错位，正视两条横线对应折弯边，上部单孔为真实贯穿孔。孔径、孔位、错位量及折弯半径未标，按两视比例估算",
+      "evidence": ["tmp/jwf1206-p48-premodel-overlay.png", "tmp/jwf1206-p48-overlay-final.png"], "rebuilt": true
+    }
+  ]
+}

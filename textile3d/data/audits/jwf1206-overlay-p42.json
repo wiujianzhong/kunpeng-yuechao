@@ -1,0 +1,165 @@
+{
+  "manualId": "jwf1206",
+  "page": 42,
+  "source": "JWF1206厂家PDF第42页",
+  "method": "逐件分离实体线、孔洞、剖面线、中心线、尺寸线与引出线，再以厂家视图与3D正交投影半透明叠合验收",
+  "recordCount": 14,
+  "pageEvidence": "tmp/jwf1206-p42-overlay-full-final.png",
+  "modelGalleryEvidence": "tmp/jwf1206-p42-model-gallery-final.png",
+  "records": [
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-001",
+      "code": "DK760-4600-1A",
+      "views": ["轴向全剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "轴承滚子交叉线"],
+      "material": "金属总成",
+      "verdict": "通过（轮廓级，φ72最大外径、152.6总长及贯通轴/轴承/壳体轴向关系吻合；未标内部轴承型号不冒充尺寸级）",
+      "evidence": ["tmp/jwf1206-p42-overlay-001-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-002",
+      "code": "DK760-4600-3B",
+      "views": ["主视图", "右视图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线", "隐藏边"],
+      "material": "涂装金属组合件",
+      "verdict": "通过（轮廓级，64宽主体、两紧固件、横向刃板、下方夹持座、横向转轴和右端上折刃口拓扑吻合）",
+      "evidence": ["tmp/jwf1206-p42-overlay-002-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-003",
+      "code": "DK760-4600-4B",
+      "views": ["主视图", "左视图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线", "隐藏边"],
+      "material": "涂装金属组合件",
+      "verdict": "通过（轮廓级，确认不是上刮刀简单翻面；刃板伸出、转轴及左端上折刃口方向与厂家左视一致）",
+      "evidence": ["tmp/jwf1206-p42-overlay-003-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-004",
+      "code": "ZFA211A-4600-11",
+      "views": ["轴向全剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "轴承滚子交叉线"],
+      "material": "金属带轮总成",
+      "verdict": "通过（轮廓级，φ57×35轮体、内部两轴承区和贯通轴关系吻合；厂家未给齿形，未虚构外齿）",
+      "evidence": ["tmp/jwf1206-p42-overlay-004-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-005",
+      "code": "DK760-4601A",
+      "views": ["侧向剖视图", "正视外壳图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "表面盖板线", "紧固件符号"],
+      "material": "涂装金属外壳",
+      "verdict": "通过（轮廓级，272×60外壳外廓、上中下三大孔和右侧中孔位置关系吻合）",
+      "evidence": ["tmp/jwf1206-p42-overlay-005-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-006",
+      "code": "DK760-4602",
+      "views": ["主视图", "俯视图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线"],
+      "material": "涂装金属座体",
+      "verdict": "通过（轮廓级，134×75×47外廓、左侧收腰、底部弧面、大贯穿孔和右耳小孔吻合）",
+      "evidence": ["tmp/jwf1206-p42-overlay-006-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-007",
+      "code": "DK760-4603",
+      "views": ["主视图", "俯视图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线"],
+      "material": "金属板件",
+      "verdict": "通过（轮廓级，80×30×10板体与中部大孔、两端小孔拓扑吻合；孔径未标）",
+      "evidence": ["tmp/jwf1206-p42-overlay-007-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-008",
+      "code": "DK760-4604",
+      "views": ["主视图", "俯视图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线"],
+      "material": "金属板件",
+      "verdict": "通过（轮廓级，82×30×10板体、左侧长圆槽与右侧圆孔吻合；已排除把长槽误建为两个分离孔）",
+      "evidence": ["tmp/jwf1206-p42-overlay-008-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-009",
+      "code": "DK760-4614",
+      "views": ["轴向主视图"],
+      "excludedLines": ["尺寸线", "中心线", "螺纹示意线"],
+      "material": "金属螺钉",
+      "verdict": "通过（轮廓级，M12左螺纹、86总长、中央加粗段、右台阶和末端挡圈槽的左右顺序吻合）",
+      "evidence": ["tmp/jwf1206-p42-overlay-009-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-010",
+      "code": "DK760-4615",
+      "views": ["轴向主视图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线"],
+      "material": "金属销轴",
+      "verdict": "通过（轮廓级，φ20×70两段轴体和中部细颈关系吻合）",
+      "evidence": ["tmp/jwf1206-p42-overlay-010-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-011",
+      "code": "DK760-4616",
+      "views": ["轴向主视图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线"],
+      "material": "金属销轴",
+      "verdict": "通过（轮廓级，φ10×90轴体与右端向内开槽吻合；未再把槽口误建成附加凸块）",
+      "evidence": ["tmp/jwf1206-p42-overlay-011-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-012",
+      "code": "DK760-4622",
+      "views": ["侧视图", "端视图", "俯视图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线"],
+      "material": "折弯金属板",
+      "verdict": "通过（轮廓级，42水平腿、25板宽、21立边、90°折弯、两端倒角和两面孔位拓扑吻合）",
+      "evidence": ["tmp/jwf1206-p42-overlay-012-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-013",
+      "code": "DK760-4623A",
+      "views": ["正视开口长环", "侧视上段偏折"],
+      "excludedLines": ["尺寸线", "中心线", "引出线"],
+      "material": "金属圆杆",
+      "verdict": "通过（轮廓级，φ12、169.5×51、左侧双自由端的连续长环和上段深度偏折吻合）",
+      "evidence": ["tmp/jwf1206-p42-overlay-013-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 42,
+      "recordKey": "jwf1206-p42-item-014",
+      "code": "DK760-4626",
+      "views": ["轴向全剖视图", "六角端视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "螺纹示意线"],
+      "material": "金属六角接头",
+      "verdict": "通过（轮廓级，54总长、对边10六角最大段、四段外台阶和内部阶梯通孔吻合）",
+      "evidence": ["tmp/jwf1206-p42-overlay-014-final.png"],
+      "rebuilt": true
+    }
+  ]
+}

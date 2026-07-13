@@ -2675,7 +2675,7 @@ const rows=[
     "sourceCropBoxPt": [
       80.4,
       598.56,
-      199.2,
+      418.56,
       778.8
     ],
     "auditIssues": []

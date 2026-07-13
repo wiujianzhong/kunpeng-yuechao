@@ -1,0 +1,35 @@
+{
+  "recordKey": "jwf1206-p10-item-003",
+  "partNumber": "ZFA211-4142",
+  "name": "活节螺栓",
+  "page": 10,
+  "sourceCrop": "assets/manuals/jwf1206/crops/ZFA211-4142.png",
+  "identification": {
+    "partNumberVerified": true,
+    "nameVerified": true,
+    "englishDescription": "BOLT",
+    "quantity": 1,
+    "quantityMeaning": "单机用量",
+    "assembly": "JWF1206-0200"
+  },
+  "views": [{
+    "name": "主视图",
+    "direction": "垂直于眼环平面观察",
+    "region": "原格下部唯一厂家视图",
+    "projectionRelation": "眼环、过渡颈与螺杆共用水平中心轴；55从眼环中心控制至杆端",
+    "solidContours": ["圆眼外廓", "锥形过渡颈", "M12杆外廓"],
+    "holes": ["眼环中央贯通孔"],
+    "excludedLines": ["水平和竖直中心线", "55和M12尺寸线", "尺寸界线", "螺纹简化表示细线", "文字和表格线"]
+  }],
+  "topology": "单体金属活节螺栓，由圆眼环、连续锥形颈和M12直杆组成，眼环中央为贯通孔。",
+  "dimensions": {
+    "explicit": ["螺杆M12", "眼环中心至杆端55"],
+    "derived": ["M12公称大径为12"],
+    "estimated": ["眼环外径和孔径", "过渡颈长度和厚度"],
+    "unknown": ["螺距", "眼环倒角和圆角"]
+  },
+  "material": {"value": "金属", "basis": "螺栓标准件形态和厂家实体轮廓"},
+  "ambiguities": [],
+  "preModelOverlays": ["tmp/jwf1206-p10-clean-2d/ZFA211-4142-front-overlay.png"],
+  "readiness": "ready"
+}

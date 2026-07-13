@@ -1,0 +1,64 @@
+{
+  "manualId": "jwf1206", "page": 48, "records": [
+    {
+      "recordKey": "jwf1206-p48-item-002", "partNumber": "JWF1204-5100-2", "name": "支撑板结合件", "page": 48,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p48-item-002.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [
+        {"name": "正视图", "direction": "垂直异形前板观察", "region": "原格左侧", "projectionRelation": "450×350包络、斜底边、减重孔、顶部耳与安装孔共同投影", "solidContours": ["异形前板", "两个顶部耳", "右侧短耳", "斜底边"], "holes": ["长方形减重孔", "多个安装孔"], "excludedLines": ["450/350尺寸线", "尺寸界线"]},
+        {"name": "右侧视图", "direction": "沿450方向观察", "region": "原格右侧", "projectionRelation": "183深度约束后侧竖板、底折边和斜撑与前板的前后关系", "solidContours": ["183深后侧竖板", "底折边", "斜撑"], "holes": [], "excludedLines": ["183尺寸线", "尺寸界线"]}
+      ],
+      "topology": "异形薄前板、顶部带孔耳、后侧竖板、底折边和斜撑组成的焊接支撑板总成，不是单块实心楔块",
+      "dimensions": {"explicit": ["宽450", "高350", "深183"], "derived": [], "estimated": ["板厚", "孔径孔位", "耳板/筋板局部尺寸"], "unknown": ["材料牌号", "焊接方式"]},
+      "material": {"value": "喷漆薄壁金属总成", "basis": "两视图的板、折边和斜撑关系"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p48-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p48-item-003", "partNumber": "FA224-5200-3A", "name": "过渡管结合件（一）", "page": 48,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p48-item-003.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [
+        {"name": "330向正视图", "direction": "沿370方向观察", "region": "原格左侧", "projectionRelation": "底法兰330宽、高205，上口较窄", "solidContours": ["330底法兰", "梯形变径薄壁", "顶部短法兰"], "holes": ["贯通矩形风道"], "excludedLines": ["330/205尺寸线", "尺寸界线"]},
+        {"name": "370向侧视图", "direction": "沿330方向观察", "region": "原格右侧", "projectionRelation": "底法兰370宽，与另一视图共用205高度", "solidContours": ["370底法兰", "梯形变径薄壁", "顶部短法兰"], "holes": ["贯通矩形风道"], "excludedLines": ["370尺寸线", "尺寸界线"]}
+      ],
+      "topology": "底部330×370矩形开口向顶部小矩形口连续收拢的中空薄壁过渡管，两端均带开口法兰",
+      "dimensions": {"explicit": ["底法兰370×330", "高度205"], "derived": [], "estimated": ["顶部小口两向尺寸", "壁厚", "法兰宽厚"], "unknown": ["材料牌号", "法兰孔位"]},
+      "material": {"value": "喷漆薄壁金属风管", "basis": "两向梯形视图和结合件名称确认中空变径管"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p48-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p48-item-004", "partNumber": "FA224-5201", "name": "气管", "page": 48,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p48-item-004.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [{"name": "轴向主视图", "direction": "垂直管轴观察", "region": "原格主体区", "projectionRelation": "φ8外径和700总长定义连续细管，内部虚线对应贯通通道", "solidContours": ["φ8连续外壁"], "holes": ["轴向贯通内孔"], "excludedLines": ["φ8/700尺寸线", "中心线", "隐藏线不作独立实体"]}],
+      "topology": "单根连续中空低反光气管，无实体芯和断口", "dimensions": {"explicit": ["外径φ8", "长700"], "derived": [], "estimated": ["内径φ6"], "unknown": ["壁厚", "材料牌号"]},
+      "material": {"value": "低反光柔性塑料气管", "basis": "中文名称明确为气管"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p48-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p48-item-005", "partNumber": "FA224-5204", "name": "密封垫", "page": 48,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p48-item-005.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [{"name": "正视矩形环", "direction": "垂直垫面观察", "region": "原格主体区", "projectionRelation": "330×370外廓、中央矩形开口和四角孔沿厚3方向贯穿", "solidContours": ["330×370矩形密封框", "厚3"], "holes": ["中央矩形贯通口", "四角安装孔"], "excludedLines": ["330/370/δ3尺寸线", "尺寸界线"]}],
+      "topology": "单体3厚柔性矩形密封垫，中央大开口并有四角贯穿孔", "dimensions": {"explicit": ["外廓330×370", "厚3"], "derived": [], "estimated": ["中央开口尺寸", "四角孔径孔位"], "unknown": ["橡胶牌号"]},
+      "material": {"value": "柔性橡胶密封材料", "basis": "名称明确为密封垫，禁止金属高反光"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p48-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p48-item-006", "partNumber": "FA225-5101", "name": "密封垫", "page": 48,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p48-item-006.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [{"name": "正视矩形环", "direction": "垂直垫面观察", "region": "原格主体区", "projectionRelation": "300×330外廓、中央矩形开口沿厚20方向贯穿", "solidContours": ["300×330厚密封框", "厚20"], "holes": ["中央矩形贯通口"], "excludedLines": ["300/330/δ20尺寸线", "尺寸界线"]}],
+      "topology": "单体20厚柔性矩形密封框，中央大开口，无四角孔", "dimensions": {"explicit": ["外廓300×330", "厚20"], "derived": [], "estimated": ["中央开口尺寸"], "unknown": ["橡胶牌号"]},
+      "material": {"value": "柔性橡胶密封材料", "basis": "名称明确为密封垫"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p48-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p48-item-007", "partNumber": "DK760-2137", "name": "支座", "page": 48,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p48-item-007.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 2, "quantityMeaning": "单台设备用量"},
+      "views": [{"name": "轴向局部剖视图", "direction": "垂直旋转轴观察", "region": "原格主体区", "projectionRelation": "42.7总长、φ25大端及右端M21内螺纹共享水平轴线", "solidContours": ["左端连续圆钝锥头", "右侧φ25圆柱体"], "holes": ["右端M21盲内螺纹孔"], "excludedLines": ["42.7/φ25/M21尺寸线", "中心线", "螺纹示意线"]}],
+      "topology": "单体回转支座，左端圆钝锥头连续过渡至φ25圆柱，右端有M21盲内螺纹孔", "dimensions": {"explicit": ["总长42.7", "大端φ25", "内螺纹M21"], "derived": [], "estimated": ["锥段分段长度", "盲孔深度"], "unknown": ["螺纹牙型细节", "材料牌号"]},
+      "material": {"value": "厂家未标的中性金属", "basis": "回转支座剖视，牌号未给"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p48-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p48-item-008", "partNumber": "DK760-5809", "name": "舌板", "page": 48,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p48-item-008.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 2, "quantityMeaning": "单台设备用量"},
+      "views": [
+        {"name": "正视图", "direction": "垂直25宽板面观察", "region": "原格右侧", "projectionRelation": "72×25外廓、上部圆孔和中间两条折弯边", "solidContours": ["72×25圆角板", "中部两条折弯边"], "holes": ["上部单个贯穿孔"], "excludedLines": ["72/25尺寸线", "尺寸界线"]},
+        {"name": "侧视折弯图", "direction": "沿25宽观察", "region": "原格左侧", "projectionRelation": "厚5，上下竖段经中部连续斜折面形成前后错位", "solidContours": ["厚5上段", "S形中部斜折段", "厚5下段"], "holes": [], "excludedLines": ["5尺寸线", "尺寸界线"]}
+      ],
+      "topology": "单块5厚连续折弯舌板，上下平行竖段由中部S形斜折面连接，上段有一个贯穿孔", "dimensions": {"explicit": ["高72", "宽25", "厚5"], "derived": [], "estimated": ["孔径孔位", "前后错位量", "折弯段高度"], "unknown": ["材料牌号", "折弯半径"]},
+      "material": {"value": "厂家未标的中性薄金属板", "basis": "正视和侧视确认连续折弯板"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p48-premodel-overlay.png"], "readiness": "ready"
+    }
+  ]
+}

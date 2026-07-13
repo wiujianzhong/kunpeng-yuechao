@@ -1,8 +1,7 @@
 // JWF1206厂家PDF第68页：逐格核验后的独立3D规格。
 import {jwf1206P62P73Verified} from '../jwf1206-p62-p73-verified.js';
-import {createJwf1206P62P73Spec} from './jwf1206-p62-p73-factory.js';
+import {createJwf1206P65P73Spec} from './jwf1206-p65-p73-rebuild.js';
 
 const rows=jwf1206P62P73Verified.filter(part=>part.page===68);
-export const jwf1206P68ModelSpecs=Object.fromEntries(rows.map(part=>[part.recordKey,createJwf1206P62P73Spec(part)]));
+export const jwf1206P68ModelSpecs=Object.fromEntries(rows.map(part=>[part.recordKey,createJwf1206P65P73Spec(part)]));
 export default jwf1206P68ModelSpecs;
-

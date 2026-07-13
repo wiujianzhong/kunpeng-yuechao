@@ -1,0 +1,74 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1206",
+  "page": 10,
+  "recordCount": 5,
+  "acceptanceRule": "先通过件号/名称/单机用量、视图关系、线型、拓扑、尺寸台账和干净二维叠合闸门，再比较厂家对应正交视图与3D正投影；任一前置歧义或复合件证据不足均保持passed=false，等轴缩略图不参与验收。",
+  "parts": [
+    {
+      "recordKey": "jwf1206-p10-item-001",
+      "code": "ZFA211-0206",
+      "nameZh": "垫圈",
+      "views": ["轴向剖视图"],
+      "excludedLines": ["尺寸线和箭头", "尺寸延长线", "中心线", "引出线", "剖面填充线", "原格表框和文字"],
+      "material": "金属环形垫圈",
+      "solidAndVoids": "φ80×10环形实体和中心贯通孔。",
+      "verdict": "轴向剖视正交叠合复验通过；外径和厚度吻合，未标中心孔径按剖面比例估算且未添加额外倒角。",
+      "evidence": ["tmp/jwf1206-p10-clean-2d/ZFA211-0206-section-overlay.png", "tmp/jwf1206-p10-overlays/ZFA211-0206-section.png", "tmp/jwf1206-p10-orthographic-qa.html?code=ZFA211-0206", "assets/manuals/jwf1206/crops/ZFA211-0206.png"],
+      "rebuilt": false,
+      "passed": true
+    },
+    {
+      "recordKey": "jwf1206-p10-item-002",
+      "code": "ZFA211-1212",
+      "nameZh": "大垫圈",
+      "views": ["轴向剖视图"],
+      "excludedLines": ["尺寸线和箭头", "尺寸延长线", "中心线", "引出线", "剖面填充线", "原格表框和文字"],
+      "material": "金属环形大垫圈",
+      "solidAndVoids": "φ30×6环形实体和中心贯通孔。",
+      "verdict": "轴向剖视正交叠合复验通过；φ30外径、6厚和贯通孔轮廓一致，未标孔径保持估算。",
+      "evidence": ["tmp/jwf1206-p10-clean-2d/ZFA211-1212-section-overlay.png", "tmp/jwf1206-p10-overlays/ZFA211-1212-section.png", "tmp/jwf1206-p10-orthographic-qa.html?code=ZFA211-1212", "assets/manuals/jwf1206/crops/ZFA211-1212.png"],
+      "rebuilt": false,
+      "passed": true
+    },
+    {
+      "recordKey": "jwf1206-p10-item-003",
+      "code": "ZFA211-4142",
+      "nameZh": "活节螺栓",
+      "views": ["主视图"],
+      "excludedLines": ["尺寸线和箭头", "尺寸延长线", "中心线", "螺纹简化表示线", "原格表框和文字"],
+      "material": "金属M12活节螺栓",
+      "solidAndVoids": "圆眼环、锥形过渡颈和M12直杆；眼环中心至杆端55。",
+      "verdict": "主视正交叠合复验通过；眼环内外廓、锥形颈、M12杆径和55长度一致，旧模型七道实体环纹已删除。",
+      "evidence": ["tmp/jwf1206-p10-clean-2d/ZFA211-4142-front-overlay.png", "tmp/jwf1206-p10-overlays/ZFA211-4142-front.png", "tmp/jwf1206-p10-orthographic-qa.html?code=ZFA211-4142", "assets/manuals/jwf1206/crops/ZFA211-4142.png"],
+      "rebuilt": true,
+      "passed": true
+    },
+    {
+      "recordKey": "jwf1206-p10-item-004",
+      "code": "ZFA211A-0201A",
+      "nameZh": "检测盘",
+      "views": ["正视图", "侧视图"],
+      "excludedLines": ["尺寸线和箭头", "尺寸延长线", "中心线", "引出线", "原格表框和文字"],
+      "material": "金属检测盘",
+      "solidAndVoids": "φ130×24.5盘体、正视双同心圆、带四处缺口的叠层轮廓；各轴向层连接关系未唯一确定。",
+      "verdict": "未通过；侧视实体线与φ130尺寸界线存在重合歧义，正视双圆和带缺口轮廓也不能唯一证明是端面槽还是分层台阶，现有3D两视叠合无法同时闭环。",
+      "evidence": ["tmp/jwf1206-p10-clean-2d/ZFA211A-0201A-front-overlay.png", "tmp/jwf1206-p10-clean-2d/ZFA211A-0201A-side-overlay.png", "tmp/jwf1206-p10-overlays/ZFA211A-0201A-front.png", "tmp/jwf1206-p10-overlays/ZFA211A-0201A-side.png", "tmp/jwf1206-p10-orthographic-qa.html?code=ZFA211A-0201A", "assets/manuals/jwf1206/crops/ZFA211A-0201A.png"],
+      "rebuilt": true,
+      "passed": false
+    },
+    {
+      "recordKey": "jwf1206:p10:r2:c1",
+      "code": "jwf1206:p10:r2:c1",
+      "nameZh": "胀套ZT12-42X75",
+      "views": ["正视图", "轴向剖视图"],
+      "excludedLines": ["尺寸线和箭头", "尺寸延长线", "中心线", "引出线", "剖面填充线", "原格表框和文字"],
+      "material": "金属胀套与六组紧固螺栓",
+      "solidAndVoids": "已确认φ75外套、φ42中心孔、54轴向长度及六组紧固件；内部胀紧分层和剖切关系未唯一确定。",
+      "verdict": "未通过；正视六组孔位能够对应，但厂家剖视仅显示切到的两组紧固件，现有3D投影把六组全部压入剖面；内部锥面或分层套体也无充分证据，且厂家件号格为空。",
+      "evidence": ["tmp/jwf1206-p10-clean-2d/jwf1206_p10_r2_c1-front-overlay.png", "tmp/jwf1206-p10-clean-2d/jwf1206_p10_r2_c1-section-overlay.png", "tmp/jwf1206-p10-overlays/jwf1206_p10_r2_c1-front.png", "tmp/jwf1206-p10-overlays/jwf1206_p10_r2_c1-section.png", "tmp/jwf1206-p10-orthographic-qa.html?code=jwf1206:p10:r2:c1", "assets/manuals/jwf1206/crops/jwf1206_p10_r2_c1.png"],
+      "rebuilt": true,
+      "passed": false
+    }
+  ]
+}

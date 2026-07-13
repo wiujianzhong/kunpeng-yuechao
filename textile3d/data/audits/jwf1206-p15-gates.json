@@ -1,0 +1,962 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1206",
+  "page": 15,
+  "records": [
+    {
+      "recordKey": "jwf1206-p15-item-001",
+      "partNumber": "FA221D-1135",
+      "name": "隔垫",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA221D-1135.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "WASHER",
+        "quantity": 2,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "正视图",
+          "direction": "垂直于零件主要正面观察",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        },
+        {
+          "name": "侧视图",
+          "direction": "沿圆件径向观察轴向厚度",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "φ50薄环形金属隔垫，中心圆孔贯穿3毫米厚度。",
+      "dimensions": {
+        "explicit": [
+          "外径φ50",
+          "厚3"
+        ],
+        "derived": [],
+        "estimated": [
+          "中心孔径"
+        ],
+        "unknown": [
+          "孔公差和材料牌号"
+        ]
+      },
+      "material": {
+        "value": "金属/涂装金属（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA221D-1135-front-overlay.png",
+        "tmp/jwf1206-p15-clean-2d/FA221D-1135-side-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-002",
+      "partNumber": "FA221D-1147",
+      "name": "绝缘套",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA221D-1147.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "INSULATED SLEEVE",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "轴向剖视图",
+          "direction": "按厂家剖切方向观察内部孔腔和壁厚",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "φ84/φ80×42薄壁贯通绝缘套。",
+      "dimensions": {
+        "explicit": [
+          "外径φ84",
+          "内径φ80",
+          "长42"
+        ],
+        "derived": [],
+        "estimated": [],
+        "unknown": [
+          "绝缘材料牌号和公差"
+        ]
+      },
+      "material": {
+        "value": "绝缘非金属材料（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA221D-1147-section-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-003",
+      "partNumber": "FA225-1109",
+      "name": "软管",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA225-1109.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "DUST ABSORPTION HOSE",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "长度示意图",
+          "direction": "垂直于轴线侧向观察轴向外形",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单根φ6柔性软管，厂家以断裂画法表示1500毫米直线展开长度；断裂符号不是切开的两件。",
+      "dimensions": {
+        "explicit": [
+          "外径φ6",
+          "展开长1500"
+        ],
+        "derived": [],
+        "estimated": [],
+        "unknown": [
+          "安装后的空间走向和材料牌号"
+        ]
+      },
+      "material": {
+        "value": "柔性橡胶/软管材料（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA225-1109-axial-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-004",
+      "partNumber": "FA225-1115",
+      "name": "撑挡",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA225-1115.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "SUPPORTING TRANSOM",
+        "quantity": 2,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "轴向主视图",
+          "direction": "垂直于轴线侧向观察轴向外形",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "φ20长实心撑挡，两端同轴收径并带锥肩/端部螺纹示意；螺纹线不逐圈建实体。",
+      "dimensions": {
+        "explicit": [
+          "最大外径φ20",
+          "总长936"
+        ],
+        "derived": [],
+        "estimated": [
+          "两端收径、锥肩和螺纹段长度"
+        ],
+        "unknown": [
+          "螺纹规格、公差和材料牌号"
+        ]
+      },
+      "material": {
+        "value": "金属/涂装金属（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA225-1115-axial-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-005",
+      "partNumber": "FA225-1116",
+      "name": "17Z齿轮",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA225-1116.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "GEAR",
+        "quantity": 2,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "轴向剖视图",
+          "direction": "按厂家剖切方向观察内部孔腔和壁厚",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "17齿外齿轮，中心孔贯穿18毫米齿宽；剖视顶部与端部存在未标槽/台阶，剖面填充不建实体。",
+      "dimensions": {
+        "explicit": [
+          "最大外径φ20",
+          "齿宽18"
+        ],
+        "derived": [],
+        "estimated": [
+          "中心孔、齿根圆、齿高和端面凹槽"
+        ],
+        "unknown": [
+          "模数、压力角、中心孔/槽尺寸和公差"
+        ]
+      },
+      "material": {
+        "value": "金属/涂装金属（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA225-1116-section-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-006",
+      "partNumber": "FA225-1117",
+      "name": "齿轮轴",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA225-1117.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "GEAR WHEEL AXIS",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "轴向主视图",
+          "direction": "垂直于轴线侧向观察轴向外形",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "1039毫米长同轴实心齿轮轴，左端M12，右部有多级轴肩与挡圈槽；螺纹示意线不建凸环。",
+      "dimensions": {
+        "explicit": [
+          "端螺纹M12",
+          "总长1039"
+        ],
+        "derived": [],
+        "estimated": [
+          "轴肩、挡圈槽和各分段直径/长度"
+        ],
+        "unknown": [
+          "螺距、公差和材料牌号"
+        ]
+      },
+      "material": {
+        "value": "金属/涂装金属（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA225-1117-axial-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-007",
+      "partNumber": "FA225-1118",
+      "name": "导向键",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA225-1118.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "KEY",
+        "quantity": 2,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "平面图",
+          "direction": "垂直于薄板平面观察",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "70×10长条导向键，四个同心圆特征均带中心标记，按四个贯穿定位孔表达；外圈沉孔层级未标。",
+      "dimensions": {
+        "explicit": [
+          "长70",
+          "宽10"
+        ],
+        "derived": [],
+        "estimated": [
+          "厚度、四孔孔径/孔位和沉孔层级"
+        ],
+        "unknown": [
+          "孔公差、厚度和材料牌号"
+        ]
+      },
+      "material": {
+        "value": "金属/涂装金属（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA225-1118-plan-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-008",
+      "partNumber": "FA225-1119",
+      "name": "隔距套",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA225-1119.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "COLLAR",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "平面图",
+          "direction": "垂直于薄板平面观察",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "35×10长圆外廓隔距套，中部长圆孔贯穿，形成连续环带。",
+      "dimensions": {
+        "explicit": [
+          "长35",
+          "宽10"
+        ],
+        "derived": [],
+        "estimated": [
+          "套厚和内长圆轮廓"
+        ],
+        "unknown": [
+          "厚度、公差和材料牌号"
+        ]
+      },
+      "material": {
+        "value": "金属/涂装金属（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA225-1119-plan-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-009",
+      "partNumber": "FA225-1120",
+      "name": "指针",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA225-1120.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "POINTER",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "平面图",
+          "direction": "垂直于薄板平面观察",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "单片薄指针板，上部35宽经斜边收至14宽下柄，下柄两个圆孔贯穿。",
+      "dimensions": {
+        "explicit": [
+          "总高60",
+          "上段宽35",
+          "下段宽14"
+        ],
+        "derived": [],
+        "estimated": [
+          "板厚、斜边和两孔孔径/孔位"
+        ],
+        "unknown": [
+          "板厚、孔公差和表面处理"
+        ]
+      },
+      "material": {
+        "value": "金属/涂装金属（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA225-1120-plan-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-010",
+      "partNumber": "FA225-1127",
+      "name": "挡片",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA225-1127.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "BAFFLE FLACK",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "侧视图",
+          "direction": "沿圆件径向观察轴向厚度",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "φ48×5实心圆挡片，厂家未画中心孔。",
+      "dimensions": {
+        "explicit": [
+          "直径φ48",
+          "厚5"
+        ],
+        "derived": [],
+        "estimated": [],
+        "unknown": [
+          "材料牌号和公差"
+        ]
+      },
+      "material": {
+        "value": "金属/涂装金属（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA225-1127-side-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-011",
+      "partNumber": "FA225-1130",
+      "name": "同步带轮（56Z）",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA225-1130.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "SYNCHRONOUS PULLEY",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "轴向剖视图",
+          "direction": "按厂家剖切方向观察内部孔腔和壁厚",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "56齿同步带轮，中心孔贯穿32毫米宽度，外圆逐齿形成真实齿形；56Z来自名称。",
+      "dimensions": {
+        "explicit": [
+          "最大外径φ142.6",
+          "总宽32"
+        ],
+        "derived": [],
+        "estimated": [
+          "中心孔、齿根圆、齿槽宽和齿高"
+        ],
+        "unknown": [
+          "节距、孔公差和材料牌号"
+        ]
+      },
+      "material": {
+        "value": "金属/涂装金属（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA225-1130-section-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-012",
+      "partNumber": "FA225-1141",
+      "name": "刻度牌",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA225-1141.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "GRADUATION SCUTCHEON",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "正视图",
+          "direction": "垂直于零件主要正面观察",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "15×37矩形薄刻度牌；40/50/60/70数字及横线是表面标记，不是凸起实体。",
+      "dimensions": {
+        "explicit": [
+          "宽15",
+          "高37"
+        ],
+        "derived": [],
+        "estimated": [
+          "板厚"
+        ],
+        "unknown": [
+          "板厚、材质和安装方式"
+        ]
+      },
+      "material": {
+        "value": "金属/涂装金属（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA225-1141-front-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-013",
+      "partNumber": "FA225-11120",
+      "name": "密封垫",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA225-11120.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "SEALING RING",
+        "quantity": 2,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "侧视图",
+          "direction": "沿圆件径向观察轴向厚度",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "φ112×3实心圆形橡胶密封垫，厂家图未表达内孔。",
+      "dimensions": {
+        "explicit": [
+          "外径φ112",
+          "厚3"
+        ],
+        "derived": [],
+        "estimated": [],
+        "unknown": [
+          "橡胶牌号和公差"
+        ]
+      },
+      "material": {
+        "value": "柔性橡胶/软管材料（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/FA225-11120-side-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-014",
+      "partNumber": "TZH1091-12X17",
+      "name": "带肩轴衬",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/TZH1091-12X17.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "DUSH",
+        "quantity": 2,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "件",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "轴向剖视图",
+          "direction": "按厂家剖切方向观察内部孔腔和壁厚",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "中空带肩轴衬，细筒与φ55肩部同轴，内孔贯通并在肩侧形成锥形过渡。",
+      "dimensions": {
+        "explicit": [
+          "最大外径φ55",
+          "总长26"
+        ],
+        "derived": [],
+        "estimated": [
+          "内孔、细筒外径、肩长和内锥面"
+        ],
+        "unknown": [
+          "孔公差、铜合金牌号和配合"
+        ]
+      },
+      "material": {
+        "value": "铜合金（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/TZH1091-12X17-section-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p15-item-015",
+      "partNumber": "TZH1076",
+      "name": "密封条",
+      "page": 15,
+      "sourceCrop": "assets/manuals/jwf1206/crops/TZH1076.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "SEALING STRIP",
+        "quantity": 92,
+        "quantityMeaning": "单机用量",
+        "quantityUnit": "dm",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "截面图",
+          "direction": "按厂家剖切方向观察内部孔腔和壁厚",
+          "region": "原格下部对应厂家视图",
+          "projectionRelation": "与同格其他视图共享轴线、外廓和明示尺寸；只采纳实体实线及明确孔腔边界。",
+          "solidContours": [
+            "实体外廓、轴肩、齿形、折边和孔腔边界"
+          ],
+          "holes": [
+            "厂家明确表达的贯穿孔、开口槽或内部空腔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线/点划线",
+            "剖面填充线",
+            "断裂符号",
+            "螺纹示意线",
+            "刻度文字/表面标记",
+            "文字和表格线"
+          ]
+        }
+      ],
+      "topology": "柔性M形密封条截面：左侧夹槽向下开口并带倒钩，右侧为闭合空腔；92dm是单机用量，不是单件几何长度。",
+      "dimensions": {
+        "explicit": [
+          "夹槽口宽8"
+        ],
+        "derived": [],
+        "estimated": [
+          "截面总高、双唇厚度、倒钩和右侧空腔"
+        ],
+        "unknown": [
+          "材料牌号、样段长度和其余截面尺寸"
+        ]
+      },
+      "material": {
+        "value": "柔性橡胶/软管材料（牌号未明示）",
+        "basis": "零件名称、剖面填充及机械结构语境"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p15-clean-2d/TZH1076-section-overlay.png"
+      ],
+      "readiness": "ready"
+    }
+  ]
+}

@@ -16,14 +16,18 @@ export const jwf1206P14ModelSpecs = {
       assumptions: [
         '厂家明确标注六角对边24毫米、总高16毫米、上部台阶高8毫米。',
         '六角外接圆半径按对边24换算为13.856毫米；上部圆台外径未标，按俯视比例估算为18毫米。',
-        '偏心孔直径和偏心距均未标，按俯视轮廓估算为孔径10毫米、偏心距2.5毫米，因此只评为轮廓级。',
+        '偏心孔直径和偏心距均未标，按俯视轮廓估算为孔径10毫米、偏心距2.5毫米；上下两级共用真实贯穿孔，不用深色圆柱冒充。',
       ],
     },
     primitives: [
-      { type: 'cylinder', radius: 13.856, length: 8, axis: 'y', segments: 6, position: [0, -4, 0], rotation: [0, 0.5236, 0], material: 'metal' },
-      { type: 'cylinder', radius: 9, length: 8, axis: 'y', position: [0, 4, 0], rotation: [0, 0, 0], material: 'metal' },
-      { type: 'cylinder', radius: 5, length: 17, axis: 'y', position: [2.5, 0, 0], rotation: [0, 0, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 6, tube: 0.8, position: [2.5, 8.1, 0], rotation: [1.5708, 0, 0], material: 'darkMetal' },
+      {
+        type: 'extrude', points: circlePoints(13.856, 6), depth: 8, position: [0, -4, 0], rotation: [1.5708, 0, 0],
+        holes: [circleHole(2.5, 0, 5)], bevel: 0.4, material: 'metal',
+      },
+      {
+        type: 'extrude', points: circlePoints(9), depth: 8, position: [0, 4, 0], rotation: [1.5708, 0, 0],
+        holes: [circleHole(2.5, 0, 5)], bevel: 0.4, material: 'metal',
+      },
     ],
   },
 
@@ -38,24 +42,22 @@ export const jwf1206P14ModelSpecs = {
         '按正视标注将75解释为主轴心至底脚基准距离，将106解释为主轴心至右端支承孔中心距离；右孔中心按图面约20度方向分解为X=99.6、Y=36.3毫米。',
         '按侧视标注将主轴承座体高度90毫米、右端支承段高度54毫米落实到两级座体；Z向厚度未标，主座与右座分别按40、32毫米估算。',
         '主轴孔、右端孔、四个法兰孔、左上耳孔和各加强臂宽度未标，均按两视图比例估算，因此只评为轮廓级。',
+        '所有孔均按原图白区建立为贯穿负空间，不使用深色实心圆柱替代。',
       ],
     },
     primitives: [
-      { type: 'torus', radius: 37, tube: 8, position: [0, 0, 0], rotation: [0, 0, 0], material: 'metal' },
-      { type: 'cylinder', radius: 31, length: 42, axis: 'z', position: [0, 0, 0], rotation: [0, 0, 0], material: 'darkMetal' },
+      {
+        type: 'extrude', points: circlePoints(45), depth: 40,
+        holes: [circleHole(0, 0, 31), circleHole(-31, 24, 4), circleHole(31, 24, 4), circleHole(-31, -24, 4), circleHole(31, -24, 4)],
+        bevel: 1.2, material: 'metal',
+      },
       { type: 'box', size: [110, 12, 40], position: [52, 26, 0], rotation: [0, 0, 0.35], material: 'metal' },
       { type: 'box', size: [105, 12, 40], position: [51, 8, 0], rotation: [0, 0, 0.1], material: 'metal' },
-      { type: 'cylinder', radius: 27, length: 32, axis: 'z', position: [99.6, 36.3, 0], rotation: [0, 0, 0], material: 'metal' },
-      { type: 'cylinder', radius: 12, length: 34, axis: 'z', position: [99.6, 36.3, 0], rotation: [0, 0, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 13, length: 28, axis: 'z', position: [-34, 54, 0], rotation: [0, 0, 0], material: 'metal' },
-      { type: 'cylinder', radius: 4, length: 30, axis: 'z', position: [-34, 54, 0], rotation: [0, 0, 0], material: 'darkMetal' },
+      { type: 'extrude', points: circlePoints(27), depth: 32, position: [99.6, 36.3, 0], holes: [circleHole(0, 0, 12)], bevel: 1, material: 'metal' },
+      { type: 'extrude', points: circlePoints(13), depth: 28, position: [-34, 54, 0], holes: [circleHole(0, 0, 4)], bevel: 0.8, material: 'metal' },
       { type: 'box', size: [24, 46, 28], position: [-22, 38, 0], rotation: [0, 0, -0.55], material: 'metal' },
       { type: 'box', size: [58, 14, 40], position: [1, -68, 0], rotation: [0, 0, 0], material: 'darkMetal' },
       { type: 'box', size: [18, 34, 30], position: [4, -58, 0], rotation: [0, 0, 0], material: 'metal' },
-      { type: 'cylinder', radius: 4, length: 42, axis: 'z', position: [-31, 24, 0], rotation: [0, 0, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 4, length: 42, axis: 'z', position: [31, 24, 0], rotation: [0, 0, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 4, length: 42, axis: 'z', position: [-31, -24, 0], rotation: [0, 0, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 4, length: 42, axis: 'z', position: [31, -24, 0], rotation: [0, 0, 0], material: 'darkMetal' },
     ],
   },
 
@@ -70,6 +72,7 @@ export const jwf1206P14ModelSpecs = {
         '正视图中的φ87按四个等分安装孔共同所在的分布圆解释，四孔中心半径取43.5毫米。',
         '厂家明确标注含左右安装耳总宽147毫米、Z向总厚37毫米；圆形座体外径、中心轴承孔径及安装孔径未标。',
         '圆形座体外径按110毫米、中心孔按70毫米、安装孔按6毫米估算；两级轴向台阶依侧视轮廓建立，因此只评为轮廓级。',
+        '中心孔、四个分布孔和左右耳孔均为真实负空间；旧凸起圆环和深色实心假孔已删除。',
       ],
     },
     primitives: [
@@ -99,11 +102,8 @@ export const jwf1206P14ModelSpecs = {
       },
       { type: 'box', size: [37, 20, 12], position: [-55, 0, -12.5], rotation: [0, 0, 0], material: 'metal' },
       { type: 'box', size: [37, 20, 12], position: [55, 0, -12.5], rotation: [0, 0, 0], material: 'metal' },
-      { type: 'cylinder', radius: 9.25, length: 12, axis: 'z', position: [-64.25, 0, -12.5], rotation: [0, 0, 0], material: 'metal' },
-      { type: 'cylinder', radius: 9.25, length: 12, axis: 'z', position: [64.25, 0, -12.5], rotation: [0, 0, 0], material: 'metal' },
-      { type: 'cylinder', radius: 4, length: 14, axis: 'z', position: [-64.25, 0, -12.5], rotation: [0, 0, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 4, length: 14, axis: 'z', position: [64.25, 0, -12.5], rotation: [0, 0, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 40, tube: 2.2, position: [0, 0, 18], rotation: [0, 0, 0], material: 'darkMetal' },
+      { type: 'extrude', points: circlePoints(9.25), depth: 12, position: [-64.25, 0, -12.5], holes: [circleHole(0, 0, 4)], bevel: 0.6, material: 'metal' },
+      { type: 'extrude', points: circlePoints(9.25), depth: 12, position: [64.25, 0, -12.5], holes: [circleHole(0, 0, 4)], bevel: 0.6, material: 'metal' },
     ],
   },
 
@@ -167,7 +167,6 @@ export const jwf1206P14ModelSpecs = {
         bevel: 0.6,
         material: 'paintedMetal',
       },
-      { type: 'box', size: [88, 5, 5], position: [0, 2, -1], rotation: [0, 0, 0], material: 'darkMetal' },
     ],
   },
 
@@ -242,7 +241,6 @@ export const jwf1206P14ModelSpecs = {
         bevel: 0.5,
         material: 'darkMetal',
       },
-      { type: 'torus', radius: 35, tube: 1.4, position: [0, 0, 6.2], rotation: [0, 0, 0], material: 'darkMetal' },
     ],
   },
 
@@ -284,7 +282,6 @@ export const jwf1206P14ModelSpecs = {
         material: 'metal',
       },
       { type: 'cylinder', radius: 33, length: 3.5, axis: 'z', position: [0, 0, -0.75], rotation: [0, 0, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 33, tube: 1.4, position: [0, 0, 7], rotation: [0, 0, 0], material: 'darkMetal' },
     ],
   },
 
@@ -407,3 +404,16 @@ export const jwf1206P14ModelSpecs = {
     ],
   },
 };
+
+for (const [partCode, spec] of Object.entries(jwf1206P14ModelSpecs)) {
+  const hasSection = spec.source.views.some((view) => /剖|截面/.test(view));
+  spec.source.sourceCrop = `assets/manuals/jwf1206/crops/${partCode}.png`;
+  spec.source.sourceVector = `assets/manuals/jwf1206/crops/${partCode}.pdf`;
+  spec.source.cropDpi = 600;
+  spec.source.excludedLines = [
+    '原格表框、件号、名称、数量栏与文字', '尺寸线、箭头与尺寸数字', '尺寸延长线',
+    '中心线与中心十字', '引出线与标注线', ...(hasSection ? ['剖面填充线'] : []),
+  ];
+  spec.source.unknowns = spec.source.assumptions.filter((text) => /未.*(?:标|给|注明|画|规定|建模)|估算|比例|近似|不作为|空间走向/.test(text));
+  spec.source.reconstructionRule = '逐格识别主视、辅助视图和剖面；清除非实体标注线后，只按厂家明示尺寸与闭合实体轮廓建模。';
+}

@@ -1,0 +1,67 @@
+{
+  "manualId": "jwf1206",
+  "page": 47,
+  "method": "逐格核准身份和单机用量，剔除尺寸/中心/剖面/表格线，先做六件全部厂家视图的干净二维矢量预叠合",
+  "records": [
+    {
+      "recordKey": "jwf1206-p47-item-001", "partNumber": "DK760-5721A", "name": "圆座", "page": 47,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p47-item-001.png",
+      "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [{"name": "轴向局部剖视图", "direction": "垂直旋转轴观察", "region": "原格主体区", "projectionRelation": "外廓长25、高φ16；剖面白区从右端进入但不到左端，证明为盲孔", "solidContours": ["φ16外圆柱", "左端圆钝封闭实体"], "holes": ["右端轴向盲孔"], "excludedLines": ["25/φ16尺寸线", "中心线", "剖面填充"]}],
+      "topology": "单体圆座，左端实体封闭且外缘圆钝，右端有一个轴向盲孔，不是贯通圆管",
+      "dimensions": {"explicit": ["外径φ16", "总长25"], "derived": [], "estimated": ["盲孔φ6、深12", "左端圆钝过渡"], "unknown": ["材料牌号"]},
+      "material": {"value": "厂家未标的中性金属", "basis": "剖视证明实体/孔关系，材料牌号未给"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p47-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p47-item-002", "partNumber": "DK760-5725", "name": "拉簧", "page": 47,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p47-item-002.png",
+      "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [{"name": "拉簧主视图", "direction": "垂直弹簧轴观察", "region": "原格主体区", "projectionRelation": "φ9簧体和44.9总长共同约束包络；左圆眼与右长折钩属于同一根连续钢丝", "solidContours": ["连续密绕簧体", "左端开口圆眼", "右端长直折钩"], "holes": ["簧体中央空间"], "excludedLines": ["φ9/44.9尺寸线", "中心线", "弹簧简化线"]}],
+      "topology": "单根连续拉簧，两端钩形不对称，禁止复用对称双圆钩模板",
+      "dimensions": {"explicit": ["外径φ9", "总长44.9"], "derived": [], "estimated": ["线径1.2", "圈数", "两端钩局部尺寸"], "unknown": ["旋向", "材料牌号"]},
+      "material": {"value": "弹簧钢中性金属", "basis": "名称明确为拉簧，钢号未标"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p47-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p47-item-003", "partNumber": "DK760-5728", "name": "气管", "page": 47,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p47-item-003.png",
+      "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [{"name": "轴向主视图", "direction": "垂直管轴观察", "region": "原格主体区", "projectionRelation": "200总长和φ3外径定义连续细管，内部虚线对应贯通内孔", "solidContours": ["φ3连续管外壁"], "holes": ["轴向贯通内孔"], "excludedLines": ["200/φ3尺寸线", "中心线", "隐藏线不作独立实体"]}],
+      "topology": "单根连续中空气管，无台阶、断口和实体芯",
+      "dimensions": {"explicit": ["外径φ3", "总长200"], "derived": [], "estimated": ["内径φ1.8"], "unknown": ["材料牌号", "壁厚"]},
+      "material": {"value": "低反光柔性塑料气管", "basis": "中文名称明确为气管，图纸未给具体牌号"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p47-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p47-item-004", "partNumber": "FA221B-1107A", "name": "键", "page": 47,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p47-item-004.png",
+      "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [
+        {"name": "主视台阶轮廓", "direction": "垂直长侧面观察", "region": "原格左侧", "projectionRelation": "总长15，右端上缘向下降台", "solidContours": ["15长主体", "右端降台"], "holes": [], "excludedLines": ["15尺寸线", "尺寸界线"]},
+        {"name": "端视凹顶轮廓", "direction": "沿15长度观察", "region": "原格右侧", "projectionRelation": "6宽端面上缘为浅凹弧，内部横线对应降台高度", "solidContours": ["6宽端面", "上缘浅凹弧", "降台横边"], "holes": [], "excludedLines": ["6尺寸线", "尺寸界线"]}
+      ],
+      "topology": "单体异形键，右端为降台，横向端面上缘为浅凹弧；不是矩形主体上增加凸块",
+      "dimensions": {"explicit": ["总长15", "宽6"], "derived": [], "estimated": ["总高", "降台长高", "凹弧深度"], "unknown": ["材料牌号"]},
+      "material": {"value": "厂家未标的中性金属键", "basis": "名称明确为键，材料牌号未给"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p47-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p47-item-005", "partNumber": "TZH1040", "name": "垫片8", "page": 47,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p47-item-005.png",
+      "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [
+        {"name": "轴向全剖视图", "direction": "垂直旋转轴观察", "region": "原格上部", "projectionRelation": "剖视外径φ14、孔φ8、厚0.5与端视同心圆对应", "solidContours": ["0.5厚环形材料区"], "holes": ["φ8贯通孔"], "excludedLines": ["尺寸线", "中心线", "剖面填充"]},
+        {"name": "端视图", "direction": "沿轴线观察", "region": "原格下部", "projectionRelation": "外内同心圆对应φ14和φ8", "solidContours": ["外圆φ14"], "holes": ["内圆φ8"], "excludedLines": ["中心十字"]}
+      ],
+      "topology": "单体超薄圆环垫片，具有一个φ8同心贯通孔",
+      "dimensions": {"explicit": ["外径φ14", "孔径φ8", "厚0.5"], "derived": [], "estimated": [], "unknown": ["材料牌号"]},
+      "material": {"value": "厂家未标的中性垫片材质", "basis": "剖面填充只证明材料区，不用于猜钢号"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p47-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p47-item-006", "partNumber": "TZH1091", "name": "带肩轴衬10X7", "page": 47,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p47-item-006.png",
+      "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 2, "quantityMeaning": "单台设备用量"},
+      "views": [{"name": "轴向局部剖视图", "direction": "垂直旋转轴观察", "region": "原格主体区", "projectionRelation": "φ12筒体、φ18肩、长7与名称10X7共同说明φ10贯通薄壁衬套", "solidContours": ["φ12薄壁筒体", "右端连续翻肩至φ18"], "holes": ["φ10轴向贯通孔"], "excludedLines": ["φ12/φ18/7尺寸线", "中心线", "剖面填充"]}],
+      "topology": "单体薄壁带肩轴衬，筒壁在右端连续翻成φ18肩，不是两个厚圆环叠加",
+      "dimensions": {"explicit": ["肩外径φ18", "筒外径φ12", "总长7", "名称名义孔径10"], "derived": ["名义壁厚1"], "estimated": ["肩宽与过渡圆角"], "unknown": ["材料牌号"]},
+      "material": {"value": "厂家未标的中性轴衬材质", "basis": "牌号未给，不使用高反光材质作精确承诺"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p47-premodel-overlay.png"], "readiness": "ready"
+    }
+  ]
+}

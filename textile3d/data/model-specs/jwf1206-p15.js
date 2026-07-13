@@ -1,5 +1,20 @@
 // JWF1206 原PDF第15页：逐格依据600dpi厂家原图的轮廓、剖面和明示尺寸建立。
 // 坐标单位为毫米，X=宽、Y=高、Z=深；未标尺寸只作视觉估算并写入 assumptions。
+const capsulePoints = (length, width, segments = 16) => {
+  const radius = width / 2;
+  const straightHalf = length / 2 - radius;
+  return [
+    ...Array.from({length: segments + 1}, (_, index) => {
+      const angle = -Math.PI / 2 + Math.PI * index / segments;
+      return [straightHalf + Math.cos(angle) * radius, Math.sin(angle) * radius];
+    }),
+    ...Array.from({length: segments + 1}, (_, index) => {
+      const angle = Math.PI / 2 + Math.PI * index / segments;
+      return [-straightHalf + Math.cos(angle) * radius, Math.sin(angle) * radius];
+    }),
+  ];
+};
+
 export const jwf1206P15ModelSpecs = {
   'FA221D-1135': {
     level: '尺寸级',
@@ -44,14 +59,14 @@ export const jwf1206P15ModelSpecs = {
       page: 15,
       dimensions: ['φ6', '展开长度=1500'],
       views: ['长度示意图'],
-      assumptions: ['直径和展开长度取自厂家标注', '厂家未规定安装后的空间走向；3D预览按约1500展开长度布置成柔和S形，不把软管建成刚性金属杆'],
+      assumptions: ['直径和展开长度取自厂家标注', '厂家未规定安装后的空间走向；验收模型按厂家长度示意图建立为1500毫米直线展开软管，不虚构安装后的S形走向'],
     },
     primitives: [
       {
         type: 'tube',
-        points: [[-690, -40, 0], [-470, 70, 25], [-210, 105, 65], [40, 35, 20], [285, -80, -45], [510, -95, -20], [690, 20, 0]],
+        points: [[-750, 0, 0], [-375, 0, 0], [0, 0, 0], [375, 0, 0], [750, 0, 0]],
         radius: 3,
-        segments: 128,
+        segments: 32,
         radialSegments: 18,
       },
     ],
@@ -72,10 +87,6 @@ export const jwf1206P15ModelSpecs = {
         points: [[0, -468], [6, -468], [6, -438], [8, -438], [10, -420], [10, 420], [8, 438], [6, 438], [6, 468], [0, 468], [0, -468]],
         rotation: [0, 0, -1.5708],
       },
-      { type: 'torus', radius: 6.4, tube: 0.45, position: [-455, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 6.4, tube: 0.45, position: [-448, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 6.4, tube: 0.45, position: [448, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 6.4, tube: 0.45, position: [455, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
     ],
   },
 
@@ -108,7 +119,7 @@ export const jwf1206P15ModelSpecs = {
   },
 
   'FA225-1117': {
-    level: '尺寸级',
+    level: '轮廓级',
     material: 'metal',
     source: {
       page: 15,
@@ -122,10 +133,6 @@ export const jwf1206P15ModelSpecs = {
         points: [[0, -519.5], [6, -519.5], [6, 240], [7.5, 240], [7.5, 285], [9, 285], [9, 312], [7.5, 312], [7.5, 345], [6, 345], [6, 519.5], [0, 519.5], [0, -519.5]],
         rotation: [0, 0, -1.5708],
       },
-      { type: 'torus', radius: 6.3, tube: 0.45, position: [-506, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 6.3, tube: 0.45, position: [-498, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 7.7, tube: 0.7, position: [274, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 7.7, tube: 0.7, position: [332, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
     ],
   },
 
@@ -136,7 +143,7 @@ export const jwf1206P15ModelSpecs = {
       page: 15,
       dimensions: ['X=70', 'Y=10'],
       views: ['平面图'],
-      assumptions: ['长度和宽度取自厂家标注', '厚度未标，按4估算；原图四个圆形特征按压铆/定位凸点表达，不臆造为贯通大孔'],
+      assumptions: ['长度和宽度取自厂家标注', '厚度未标，按4估算；原图四个同心圆特征均带中心标记，按四个贯穿定位孔表达，孔径及沉孔层级未标'],
     },
     primitives: [
       {
@@ -144,11 +151,13 @@ export const jwf1206P15ModelSpecs = {
         points: [[-35, -3], [-33, -5], [33, -5], [35, -3], [35, 3], [33, 5], [-33, 5], [-35, 3]],
         depth: 4,
         bevel: 0.8,
+        holes: [
+          { kind: 'circle', center: [-30, 0], radius: 3.2 },
+          { kind: 'circle', center: [-10, 0], radius: 2.4 },
+          { kind: 'circle', center: [15, 0], radius: 2.4 },
+          { kind: 'circle', center: [30, 0], radius: 3.2 },
+        ],
       },
-      { type: 'cylinder', radius: 3.2, length: 1.5, axis: 'z', position: [-30, 0, 2.75], material: 'darkMetal' },
-      { type: 'cylinder', radius: 2.4, length: 1.5, axis: 'z', position: [-10, 0, 2.75], material: 'darkMetal' },
-      { type: 'cylinder', radius: 2.4, length: 1.5, axis: 'z', position: [15, 0, 2.75], material: 'darkMetal' },
-      { type: 'cylinder', radius: 3.2, length: 1.5, axis: 'z', position: [30, 0, 2.75], material: 'darkMetal' },
     ],
   },
 
@@ -164,11 +173,11 @@ export const jwf1206P15ModelSpecs = {
     primitives: [
       {
         type: 'extrude',
-        points: [[-17.5, -2], [-16.5, -5], [16.5, -5], [17.5, -2], [17.5, 2], [16.5, 5], [-16.5, 5], [-17.5, 2]],
+        points: capsulePoints(35, 10),
         depth: 5,
         bevel: 1,
         holes: [
-          { kind: 'polygon', points: [[-13.5, -1.5], [-12.5, -3], [12.5, -3], [13.5, -1.5], [13.5, 1.5], [12.5, 3], [-12.5, 3], [-13.5, 1.5]] },
+          { kind: 'polygon', points: capsulePoints(29, 6) },
         ],
       },
     ],
@@ -186,7 +195,7 @@ export const jwf1206P15ModelSpecs = {
     primitives: [
       {
         type: 'extrude',
-        points: [[-17.5, 30], [17.5, 30], [7, 0], [7, -30], [-7, -30], [-7, 0]],
+        points: [[-28, 30], [7, 30], [7, -30], [-7, -30], [-7, 0]],
         depth: 2.5,
         bevel: 0.6,
         holes: [
@@ -246,14 +255,10 @@ export const jwf1206P15ModelSpecs = {
       page: 15,
       dimensions: ['X=15', 'Y=37'],
       views: ['正视图'],
-      assumptions: ['牌宽和牌高取自厂家标注', '板厚未标，按1.5估算；40、50、60、70四道刻线以凸起暗纹表达，数字不作为几何加工特征'],
+      assumptions: ['牌宽和牌高取自厂家标注', '板厚未标，按1.5估算；40、50、60、70刻度线和数字属于表面标记，不建立为凸起实体'],
     },
     primitives: [
       { type: 'box', size: [15, 37, 1.5], position: [0, 0, 0] },
-      { type: 'box', size: [11, 0.7, 0.5], position: [0, 13, 1], material: 'darkMetal' },
-      { type: 'box', size: [11, 0.7, 0.5], position: [0, 4.5, 1], material: 'darkMetal' },
-      { type: 'box', size: [11, 0.7, 0.5], position: [0, -4.5, 1], material: 'darkMetal' },
-      { type: 'box', size: [11, 0.7, 0.5], position: [0, -13, 1], material: 'darkMetal' },
     ],
   },
 
@@ -301,14 +306,26 @@ export const jwf1206P15ModelSpecs = {
     primitives: [
       {
         type: 'extrude',
-        points: [[-8, -8], [-8, 5], [-6.5, 8], [-3.5, 8], [-1.5, 6], [0, 2], [1.5, 6], [3.5, 8], [6.5, 7.5], [8, 5], [8, -5], [6, -8], [3.5, -8], [1.5, -5], [0, -1], [-1.5, -5], [-3.5, -8], [-6, -8]],
+        points: [[-8, -8], [-8, 5], [-6.5, 8], [-3.5, 8], [-1.5, 6], [0, 2], [1.5, 6], [3.5, 8], [6.5, 7.5], [8, 5], [8, -5], [6, -8], [3.5, -8], [1.5, -5], [0, -1], [-1.5, -5], [-2.5, -8], [-3.2, -5], [-2.5, -4], [-3.8, -2], [-3, -1], [-4.2, 1], [-3.2, 4], [-4, 5.5], [-5.5, 5.5], [-6.5, 4], [-6.5, -4], [-6, -8]],
         depth: 80,
         bevel: 0.8,
         holes: [
-          { kind: 'polygon', points: [[-5.5, -4], [-5.5, 4], [-4.3, 5.5], [-3, 5.5], [-2, 4], [-2.8, 0], [-3.8, -4]] },
           { kind: 'polygon', points: [[2.2, -3.5], [2, 4], [3.2, 5.5], [5, 5], [5.8, 3], [5.5, -3.5], [4.2, -5]] },
         ],
       },
     ],
   },
 };
+
+for (const [partCode, spec] of Object.entries(jwf1206P15ModelSpecs)) {
+  const hasSection = spec.source.views.some((view) => /剖|截面/.test(view));
+  spec.source.sourceCrop = `assets/manuals/jwf1206/crops/${partCode}.png`;
+  spec.source.sourceVector = `assets/manuals/jwf1206/crops/${partCode}.pdf`;
+  spec.source.cropDpi = 600;
+  spec.source.excludedLines = [
+    '原格表框、件号、名称、数量栏与文字', '尺寸线、箭头与尺寸数字', '尺寸延长线',
+    '中心线与中心十字', '引出线与标注线', ...(hasSection ? ['剖面填充线'] : []),
+  ];
+  spec.source.unknowns = spec.source.assumptions.filter((text) => /未.*(?:标|给|注明|画|规定|建模)|估算|比例|近似|不作为|空间走向/.test(text));
+  spec.source.reconstructionRule = '逐格识别主视、辅助视图和剖面；清除非实体标注线后，只按厂家明示尺寸与闭合实体轮廓建模。';
+}

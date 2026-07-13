@@ -1,0 +1,97 @@
+{
+  "manualId": "jwf1206",
+  "pdfPage": 68,
+  "recordCount": 7,
+  "method": "厂家600dpi原格与真实3D模型正交投影半透明叠合；标注尺寸单独约束模型",
+  "pageEvidence": {
+    "overlay": "tmp/pdfs/jwf1206-p65-p73-review/p68-orthographic-overlay-final.png",
+    "webgl": "tmp/pdfs/jwf1206-p65-p73-review/webgl/p68-gl-rebuild-final.png",
+    "report": "tmp/jwf1206-p68-overlay-audit.md"
+  },
+  "records": [
+    {
+      "recordKey": "jwf1206-p68-item-001",
+      "pdfPage": 68,
+      "code": "JWF1202-8300-1",
+      "dimensions": ["110×30", "偏置38"],
+      "views": ["轴向侧视图", "正视轮廓图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线"],
+      "material": "metal",
+      "verdict": "通过，110长、30宽倒角臂板、上孔、下孔及三级同轴套分开建模，轴套伸出方向已按侧视翻正，外端至板外面为38",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p68-item-001.png + pageEvidence.overlay第1格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p68-item-002",
+      "pdfPage": 68,
+      "code": "JWF1202-8300-2",
+      "dimensions": ["1115×495"],
+      "views": ["长向主视图", "右端轮廓图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线", "紧固标记黑点"],
+      "material": "paintedMetal",
+      "verdict": "通过，重建1115长、495高外罩；右端内凹前弧带、中部斜撑、右侧阶梯折边与主视双开口均已分开表达，未标孔径和板厚只承诺原格比例",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p68-item-002.png + pageEvidence.overlay第2格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p68-item-003",
+      "pdfPage": 68,
+      "code": "JWF1202-8300-3",
+      "dimensions": ["长1118", "R120"],
+      "views": ["长向主视图", "右端轮廓图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线", "半径标注线"],
+      "material": "paintedMetal",
+      "verdict": "通过，1118长内罩已重建为R120连续内凹曲壳、斜后板和底脚的空心组合，两端异形支撑板及四孔按端视轮廓重建，不再用矩形条代替曲面",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p68-item-003.png + pageEvidence.overlay第3格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p68-item-004",
+      "pdfPage": 68,
+      "code": "JWF1202-8300-4",
+      "dimensions": ["φ8×51"],
+      "views": ["轴向全剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线", "剖面线"],
+      "material": "darkMetal",
+      "verdict": "通过，φ8×51右端轴杆、左端网纹旋钮、锥形过渡、滑套、挡圈及弹簧按全剖关系分件建模；未标的内部尺寸仅保留轮廓级比例",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p68-item-004.png + pageEvidence.overlay第4格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p68-item-005",
+      "pdfPage": 68,
+      "code": "ZFA177-0100-16A",
+      "dimensions": ["276×100"],
+      "views": ["正视图", "右侧折边图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线", "隐线"],
+      "material": "glass",
+      "verdict": "通过，276×100圆角外框、圆角透明窗、左右四孔及侧视压边已逐视图重合，孔径和折边深度未标故不作加工承诺",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p68-item-005.png + pageEvidence.overlay第5格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p68-item-006",
+      "pdfPage": 68,
+      "code": "TZH1091-20X11.5",
+      "dimensions": ["φ30/φ23×11.5"],
+      "views": ["轴向半剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "引出线", "剖面线"],
+      "material": "metal",
+      "verdict": "通过，以单一回转轮廓重建φ20内孔、φ23主体、圆弧肩部和φ30法兰，11.5为含肩部的总长，已取消旧模型两环叠加造成的假接缝",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p68-item-006.png + pageEvidence.overlay第6格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p68-item-007",
+      "pdfPage": 68,
+      "code": "QD25",
+      "dimensions": [],
+      "views": ["厂家外形主视图"],
+      "excludedLines": ["中心线", "表格线"],
+      "material": "darkMetal",
+      "verdict": "通过（轮廓级），原格无几何尺寸；仅按细长圆筒、上端圆顶球铰和横向接头、下端活塞杆及U形叉头重建，不声称加工尺寸",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p68-item-007.png + pageEvidence.overlay第7格",
+      "rebuilt": true
+    }
+  ]
+}

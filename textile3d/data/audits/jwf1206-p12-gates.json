@@ -1,0 +1,1089 @@
+{
+  "auditVersion": 1,
+  "manualId": "jwf1206",
+  "page": 12,
+  "records": [
+    {
+      "recordKey": "jwf1206-p12-item-001",
+      "partNumber": "JWF1206-1100-1",
+      "name": "左墙板结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-1.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "WALLBOARE SUB-ASS (L)",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "主视图",
+          "direction": "垂直于装配长向与高度构成的主平面观察",
+          "region": "原格下部主图",
+          "projectionRelation": "与端面图按同一高度/轴线投影；尺寸线只控制明示外廓，不构成实体。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "左侧异形墙板装配：斜上缘板体、两个贯穿大圆孔、下部圆角矩形检修口及多处安装附件；附件不能全部解释为板上贯穿孔。",
+      "dimensions": {
+        "explicit": [
+          "下部宽260",
+          "上部斜边275"
+        ],
+        "derived": [],
+        "estimated": [
+          "总高、板厚、两大圆孔和检修口尺寸",
+          "附件位置及小孔孔径"
+        ],
+        "unknown": [
+          "墙板各子件明细尺寸、焊缝和孔公差"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-1-front-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-002",
+      "partNumber": "JWF1206-1100-2",
+      "name": "右墙板结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-2.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "WALLBOARE SUB-ASS (R)",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "主视图",
+          "direction": "垂直于装配长向与高度构成的主平面观察",
+          "region": "原格下部主图",
+          "projectionRelation": "与端面图按同一高度/轴线投影；尺寸线只控制明示外廓，不构成实体。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "右侧异形墙板装配：与左件总体对应但附件和孔位独立，包含两个贯穿大圆孔、检修口及安装附件，不能用简单镜像替代全部细节。",
+      "dimensions": {
+        "explicit": [
+          "下部宽260",
+          "上部斜边275"
+        ],
+        "derived": [],
+        "estimated": [
+          "总高、板厚、两大圆孔和检修口尺寸",
+          "附件位置及小孔孔径"
+        ],
+        "unknown": [
+          "墙板各子件明细尺寸、焊缝和孔公差"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-2-front-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-003",
+      "partNumber": "JWF1206-1100-3",
+      "name": "右支架结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-3.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "BRACKET SUB-ASS (R)",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "主视图",
+          "direction": "垂直于装配长向与高度构成的主平面观察",
+          "region": "原格下部主图",
+          "projectionRelation": "与端面图按同一高度/轴线投影；尺寸线只控制明示外廓，不构成实体。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "单体异形支架板带右侧折边和外伸耳板；上下长圆孔及中部小圆孔为真实贯穿孔，右侧圆/矩形轮廓为紧固件与折边。",
+      "dimensions": {
+        "explicit": [
+          "高157",
+          "宽95"
+        ],
+        "derived": [],
+        "estimated": [
+          "板厚、折弯深度、长圆孔和小孔孔径"
+        ],
+        "unknown": [
+          "折弯半径、紧固件规格"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-3-front-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-004",
+      "partNumber": "JWF1206-1100-4",
+      "name": "棉道结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-4.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "COTTON CHANNELS SUB-ASS",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "正视图",
+          "direction": "垂直于装配长向与高度构成的主平面观察",
+          "region": "原格下部主图",
+          "projectionRelation": "与端面图按同一高度/轴线投影；尺寸线只控制明示外廓，不构成实体。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        },
+        {
+          "name": "端面图",
+          "direction": "沿装配长轴观察",
+          "region": "原格下部端面小图",
+          "projectionRelation": "与正视图共享高度，端面宽度/深度及孔道拓扑由本视图确定。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "长条多层棉道装配，包含上下导流板、中央加强板和两端阶梯耳板；端面显示多片斜置板件的相对层级，不是实心矩形梁。",
+      "dimensions": {
+        "explicit": [
+          "总长1016"
+        ],
+        "derived": [],
+        "estimated": [
+          "高度、深度、板厚和端面斜度"
+        ],
+        "unknown": [
+          "导流板间距、紧固件与焊缝尺寸"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-4-front-overlay.png",
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-4-end-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-005",
+      "partNumber": "JWF1206-1100-5",
+      "name": "上风箱结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-5.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "UP AIR BOX SUB-ASS",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "正视图",
+          "direction": "垂直于装配长向与高度构成的主平面观察",
+          "region": "原格下部主图",
+          "projectionRelation": "与端面图按同一高度/轴线投影；尺寸线只控制明示外廓，不构成实体。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        },
+        {
+          "name": "端面图",
+          "direction": "沿装配长轴观察",
+          "region": "原格下部端面小图",
+          "projectionRelation": "与正视图共享高度，端面宽度/深度及孔道拓扑由本视图确定。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "长条上风箱外壳，内部沿长向设圆形贯通风道；端面为非矩形折板壳体并带多个附件，圆环白区是风道孔腔。",
+      "dimensions": {
+        "explicit": [
+          "总长939",
+          "端面深231"
+        ],
+        "derived": [],
+        "estimated": [
+          "总高、圆形风道内外径、板厚和斜面角度"
+        ],
+        "unknown": [
+          "端面各附件规格、内部风道连接细节"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-5-front-overlay.png",
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-5-end-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-006",
+      "partNumber": "JWF1206-1100-6",
+      "name": "封板结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-6.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "ENVELOPING PLATE SUB-ASS",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "正视图",
+          "direction": "垂直于装配长向与高度构成的主平面观察",
+          "region": "原格下部主图",
+          "projectionRelation": "与端面图按同一高度/轴线投影；尺寸线只控制明示外廓，不构成实体。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        },
+        {
+          "name": "端面图",
+          "direction": "沿装配长轴观察",
+          "region": "原格下部端面小图",
+          "projectionRelation": "与正视图共享高度，端面宽度/深度及孔道拓扑由本视图确定。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "长条折弯封板，正视含三道横向折边、两端边板、两道分段加强条及四处紧固位；端面显示薄板斜置而非厚实心板。",
+      "dimensions": {
+        "explicit": [
+          "总长1010",
+          "高度121"
+        ],
+        "derived": [],
+        "estimated": [
+          "深度、板厚、横折边和加强条尺寸"
+        ],
+        "unknown": [
+          "孔径、紧固件与折弯半径"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-6-front-overlay.png",
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-6-end-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-007",
+      "partNumber": "JWF1206-1100-7",
+      "name": "给棉板结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-7.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "FEED PLATE SUB-ASS",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "正视图",
+          "direction": "垂直于装配长向与高度构成的主平面观察",
+          "region": "原格下部主图",
+          "projectionRelation": "与端面图按同一高度/轴线投影；尺寸线只控制明示外廓，不构成实体。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        },
+        {
+          "name": "端面图",
+          "direction": "沿装配长轴观察",
+          "region": "原格下部端面小图",
+          "projectionRelation": "与正视图共享高度，端面宽度/深度及孔道拓扑由本视图确定。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "五段给棉板、上下横轴、调节梁及左右复杂端板组成的装配；端面包含多级孔轴和异形板轮廓，不能仅用平板和两个简化侧板替代。",
+      "dimensions": {
+        "explicit": [
+          "总长1010"
+        ],
+        "derived": [],
+        "estimated": [
+          "总体高度/深度、五块给棉板、横轴和端板尺寸"
+        ],
+        "unknown": [
+          "端部机构内部构造、轴径和孔径"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-7-front-overlay.png",
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-7-end-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-008",
+      "partNumber": "JWF1206-1100-8",
+      "name": "下风箱结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-8.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "DOWN AIR BOX SUB-ASS",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "正视图",
+          "direction": "垂直于装配长向与高度构成的主平面观察",
+          "region": "原格下部主图",
+          "projectionRelation": "与端面图按同一高度/轴线投影；尺寸线只控制明示外廓，不构成实体。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        },
+        {
+          "name": "端面图",
+          "direction": "沿装配长轴观察",
+          "region": "原格下部端面小图",
+          "projectionRelation": "与正视图共享高度，端面宽度/深度及孔道拓扑由本视图确定。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "长条下风箱外壳，内部圆形风道沿长向贯通；端面外壳为带斜角、台阶和附件的异形封闭壳体，中央圆环是孔腔。",
+      "dimensions": {
+        "explicit": [
+          "总长939",
+          "端面宽368",
+          "端面高324"
+        ],
+        "derived": [],
+        "estimated": [
+          "圆形风道内外径、板厚、端面斜角"
+        ],
+        "unknown": [
+          "端面附件与内部风道连接尺寸"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-8-front-overlay.png",
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-8-end-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-009",
+      "partNumber": "JWF1206-1100-9",
+      "name": "横撑结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-9.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "CROSSBEAM SUB-ASS",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "正视图",
+          "direction": "垂直于装配长向与高度构成的主平面观察",
+          "region": "原格下部主图",
+          "projectionRelation": "与端面图按同一高度/轴线投影；尺寸线只控制明示外廓，不构成实体。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [
+            "端板上下两个贯穿圆孔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        },
+        {
+          "name": "端面图",
+          "direction": "沿装配长轴观察",
+          "region": "原格下部端面小图",
+          "projectionRelation": "与正视图共享高度，端面宽度/深度及孔道拓扑由本视图确定。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [
+            "端板上下两个贯穿圆孔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "长条中空矩形框架，内含两道竖撑；两端端板各有上下两个贯穿孔，端部倒角/圆角属于板外廓，孔不能用圆柱实体代替。",
+      "dimensions": {
+        "explicit": [
+          "总长936",
+          "高度76"
+        ],
+        "derived": [],
+        "estimated": [
+          "深度、板厚、内撑位置和孔径"
+        ],
+        "unknown": [
+          "端板圆角、焊缝和紧固件规格"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-9-front-overlay.png",
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-9-end-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-010",
+      "partNumber": "JWF1206-1100-10",
+      "name": "调节板结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-10.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "ADJUSTING PLATE SUB-ASS",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "端面图",
+          "direction": "沿装配长轴观察",
+          "region": "原格下部端面小图",
+          "projectionRelation": "与正视图共享高度，端面宽度/深度及孔道拓扑由本视图确定。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [
+            "长板纵向槽与圆孔、短折边两个圆孔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        },
+        {
+          "name": "俯视图",
+          "direction": "按厂家视图标注方向观察",
+          "region": "原格下部对应视图",
+          "projectionRelation": "与同格其他视图共用中心线和对应外廓；尺寸、中心及剖面线不建模。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [
+            "长板纵向槽与圆孔、短折边两个圆孔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        },
+        {
+          "name": "侧视图",
+          "direction": "按厂家视图标注方向观察",
+          "region": "原格下部对应视图",
+          "projectionRelation": "与同格其他视图共用中心线和对应外廓；尺寸、中心及剖面线不建模。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [
+            "长板纵向槽与圆孔、短折边两个圆孔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "L形折弯调节板：长板面有一条纵向贯穿槽和一个圆孔，垂直短折边有两个贯穿圆孔；三个视图共同确定连续折弯关系。",
+      "dimensions": {
+        "explicit": [
+          "长100",
+          "端面高50"
+        ],
+        "derived": [],
+        "estimated": [
+          "折弯深度、板厚、长槽及三孔孔径"
+        ],
+        "unknown": [
+          "折弯半径与齿形边节距"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-10-end-overlay.png",
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-10-top-overlay.png",
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-10-side-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-011",
+      "partNumber": "JWF1206-1100-11",
+      "name": "给棉罗拉结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-11.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "FEED ROLL SUB-ASS",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "轴向主视图",
+          "direction": "按厂家视图标注方向观察",
+          "region": "原格下部对应视图",
+          "projectionRelation": "与同格其他视图共用中心线和对应外廓；尺寸、中心及剖面线不建模。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "多级同轴实心给棉罗拉，中部φ100辊身，两侧为不同直径轴颈，右端带键槽/端部加工；中心线和端部螺纹画法不构成独立实体圆环。",
+      "dimensions": {
+        "explicit": [
+          "最大辊径φ100",
+          "总长1338"
+        ],
+        "derived": [],
+        "estimated": [
+          "中央辊身长度、各级轴颈直径和键槽尺寸"
+        ],
+        "unknown": [
+          "端螺纹规格、圆角和配合公差"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-11-axial-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-012",
+      "partNumber": "JWF1206-1100-12",
+      "name": "调节板结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/JWF1206-1100-12.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "ADJUSTING PLATE SUB-ASS",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "正视图",
+          "direction": "垂直于装配长向与高度构成的主平面观察",
+          "region": "原格下部主图",
+          "projectionRelation": "与端面图按同一高度/轴线投影；尺寸线只控制明示外廓，不构成实体。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [
+            "三处钥匙孔槽及端板两个圆孔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        },
+        {
+          "name": "端面图",
+          "direction": "沿装配长轴观察",
+          "region": "原格下部端面小图",
+          "projectionRelation": "与正视图共享高度，端面宽度/深度及孔道拓扑由本视图确定。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [
+            "三处钥匙孔槽及端板两个圆孔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "长条调节板，正面有三处钥匙孔形贯穿槽和两道加强分隔；端部折边/端板有两个贯穿孔，端面外廓为台阶异形。",
+      "dimensions": {
+        "explicit": [
+          "总长939",
+          "高度70"
+        ],
+        "derived": [],
+        "estimated": [
+          "深度、板厚、三处钥匙孔槽和端孔孔径"
+        ],
+        "unknown": [
+          "分隔加强板、卷边和折弯半径尺寸"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-12-front-overlay.png",
+        "tmp/jwf1206-p12-clean-2d/JWF1206-1100-12-end-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-013",
+      "partNumber": "FA221D-1100-3",
+      "name": "加压臂结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA221D-1100-3.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "PRESSURE ARM SUB-ASS",
+        "quantity": 2,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "正视图",
+          "direction": "垂直于装配长向与高度构成的主平面观察",
+          "region": "原格下部主图",
+          "projectionRelation": "与端面图按同一高度/轴线投影；尺寸线只控制明示外廓，不构成实体。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [
+            "两叉板的大枢轴孔与底部小孔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        },
+        {
+          "name": "侧视图",
+          "direction": "按厂家视图标注方向观察",
+          "region": "原格下部对应视图",
+          "projectionRelation": "与同格其他视图共用中心线和对应外廓；尺寸、中心及剖面线不建模。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [
+            "两叉板的大枢轴孔与底部小孔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "双叉板加压臂，前后两片叉板均有大枢轴孔和底部小孔，上部横梁承载竖向螺纹调节柱；螺纹示意短线不能逐条拉成实体环。",
+      "dimensions": {
+        "explicit": [
+          "上段宽46",
+          "总高170",
+          "下段宽50",
+          "总深53"
+        ],
+        "derived": [],
+        "estimated": [
+          "大小孔径、叉板厚度、顶部螺纹柱尺寸"
+        ],
+        "unknown": [
+          "螺纹规格、孔公差和焊缝"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/FA221D-1100-3-front-overlay.png",
+        "tmp/jwf1206-p12-clean-2d/FA221D-1100-3-side-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-014",
+      "partNumber": "FA221D-1100-4",
+      "name": "密封垫结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA221D-1100-4.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "SEALING GASKET SUB-ASS",
+        "quantity": 2,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "轴向剖视图",
+          "direction": "按厂家视图标注方向观察",
+          "region": "原格下部对应视图",
+          "projectionRelation": "与同格其他视图共用中心线和对应外廓；尺寸、中心及剖面线不建模。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [
+            "φ85同轴贯通孔"
+          ],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "等截面橡胶圆环垫，φ85中心孔贯穿10厚度；剖面填充只表示材料，不是额外几何。",
+      "dimensions": {
+        "explicit": [
+          "外径φ93",
+          "内径φ85",
+          "厚10"
+        ],
+        "derived": [],
+        "estimated": [],
+        "unknown": [
+          "橡胶牌号和硬度"
+        ]
+      },
+      "material": {
+        "value": "橡胶",
+        "basis": "剖面填充、密封垫名称和用途"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/FA221D-1100-4-section-overlay.png"
+      ],
+      "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p12-item-015",
+      "partNumber": "FA221D-1100-5",
+      "name": "探测头结合件",
+      "page": 12,
+      "sourceCrop": "assets/manuals/jwf1206/crops/FA221D-1100-5.png",
+      "identification": {
+        "partNumberVerified": true,
+        "nameVerified": true,
+        "englishDescription": "EXPLORER SUB-ASS",
+        "quantity": 1,
+        "quantityMeaning": "单机用量",
+        "assembly": "JWF1206-1100"
+      },
+      "views": [
+        {
+          "name": "轴向主视图",
+          "direction": "按厂家视图标注方向观察",
+          "region": "原格下部对应视图",
+          "projectionRelation": "与同格其他视图共用中心线和对应外廓；尺寸、中心及剖面线不建模。",
+          "solidContours": [
+            "厂家实线外廓、折边和可见子件边界"
+          ],
+          "holes": [],
+          "excludedLines": [
+            "尺寸线和箭头",
+            "尺寸界线",
+            "中心线",
+            "隐藏线/剖面填充线",
+            "文字和表格线",
+            "螺纹示意细线"
+          ]
+        }
+      ],
+      "topology": "同轴阶梯探测头，中部法兰，左端M12×1外螺纹及探测端，右端为缩径轴段；螺纹画法不逐圈生成实体圆环。",
+      "dimensions": {
+        "explicit": [
+          "螺纹M12×1-6g",
+          "总长36"
+        ],
+        "derived": [],
+        "estimated": [
+          "法兰和左右各级轴段直径/长度"
+        ],
+        "unknown": [
+          "右端细螺纹规格、探测端材料和公差"
+        ]
+      },
+      "material": {
+        "value": "涂装/机加工金属（具体牌号未知）",
+        "basis": "机械装配件名称、可见板/轴结构及厂家线图"
+      },
+      "ambiguities": [],
+      "preModelOverlays": [
+        "tmp/jwf1206-p12-clean-2d/FA221D-1100-5-axial-overlay.png"
+      ],
+      "readiness": "ready"
+    }
+  ]
+}

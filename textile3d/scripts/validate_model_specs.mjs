@@ -34,7 +34,7 @@ if(JSON.stringify(actualCodes)!==JSON.stringify(expectedCodes)){
 
 const allowedLevels=new Set(['轮廓级','尺寸级']);
 const allowedMaterials=new Set(['paintedMetal','metal','darkMetal','rubber','plastic','glass','brass']);
-const allowedKinds=new Set(['box','extrude','cylinder','lathe','torus','tube']);
+const allowedKinds=new Set(['box','extrude','cylinder','lathe','torus','tube','dualInletDuct','loft']);
 const failures=[];
 const finite=value=>typeof value==='number'&&Number.isFinite(value);
 const vector=(value,length)=>Array.isArray(value)&&value.length===length&&value.every(finite);
@@ -65,6 +65,18 @@ function validatePrimitive(code,primitive,index){
   if(kind==='lathe'&&(!Array.isArray(primitive.points)||primitive.points.length<2||primitive.points.some(point=>!vector(point,2)||point[0]<0)))failures.push(`${label}.points回转轮廓无效`);
   if(kind==='torus'&&(!positive(primitive.radius)||!positive(primitive.tube)))failures.push(`${label}环体半径无效`);
   if(kind==='tube'&&(!Array.isArray(primitive.points)||primitive.points.length<2||primitive.points.some(point=>!vector(point,3))||!positive(primitive.radius)))failures.push(`${label}管线数据无效`);
+  if(kind==='loft'){
+    const sections=primitive.sections;
+    const count=Array.isArray(sections)&&sections.length>1&&Array.isArray(sections[0].points)?sections[0].points.length:0;
+    if(!Array.isArray(sections)||sections.length<2||count<3||sections.some(section=>!finite(section.x)||!Array.isArray(section.points)||section.points.length!==count||section.points.some(point=>!vector(point,2))))failures.push(`${label}放样截面无效`);
+  }
+  if(kind==='dualInletDuct'){
+    for(const key of ['inletStartX','transitionStartX','transitionEndX','outletEndX','inletCenterOffset','inletRadius','outletRadius','thickness']){
+      if(!finite(primitive[key]))failures.push(`${label}.${key}必须是有限数`);
+    }
+    if(!(primitive.inletStartX<primitive.transitionStartX&&primitive.transitionStartX<primitive.transitionEndX&&primitive.transitionEndX<primitive.outletEndX))failures.push(`${label}轴向节点顺序无效`);
+    if(!positive(primitive.inletCenterOffset)||!positive(primitive.inletRadius)||!positive(primitive.outletRadius)||!positive(primitive.thickness)||primitive.thickness>=Math.min(primitive.inletRadius,primitive.outletRadius))failures.push(`${label}双入口风道尺寸无效`);
+  }
 }
 
 for(const part of expected){

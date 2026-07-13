@@ -1,0 +1,76 @@
+{
+  "manualId": "jwf1206",
+  "page": 43,
+  "source": "JWF1206厂家PDF第43页",
+  "method": "先按mechanical-drawing-to-3d-audit完成件号名称核准、视图/线型分类、拓扑与尺寸台账、干净二维矢量叠合闸门，再建模并做对应3D正交投影叠合",
+  "recordCount": 6,
+  "interpretationGate": "data/interpretation-gates/jwf1206-p43.json",
+  "records": [
+    {
+      "page": 43,
+      "recordKey": "jwf1206-p43-item-001",
+      "code": "DK760-4628",
+      "views": ["轴向全剖视图", "端视图"],
+      "excludedLines": ["尺寸线", "尺寸界线", "中心线", "剖面填充"],
+      "material": "厂家未标的垫片中性材质",
+      "verdict": "尺寸级通过：φ28外径、φ13.5同心孔和厚3全部按明确标注建立；端视同心圆完全对应，轴向剖视按厂家版面旋转90°，实体为单体圆环而非实心圆片",
+      "evidence": ["tmp/jwf1206-p43-item001-premodel-overlay.png", "tmp/jwf1206-p43-overlay-001-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 43,
+      "recordKey": "jwf1206-p43-item-002",
+      "code": "DK760-4629",
+      "views": ["轴向全剖视图"],
+      "excludedLines": ["尺寸线", "尺寸界线", "中心线", "剖面填充"],
+      "material": "厂家未标的中性接头材质",
+      "verdict": "轮廓级通过：直筒、环形V槽和φ20喇叭口已按同一连续中空旋转体建立，方向与厂家剖视一致；仅φ20和轴向12为明确尺寸，孔径及V槽细节不冒充尺寸级",
+      "evidence": ["tmp/jwf1206-p43-item002-premodel-overlay.png", "tmp/jwf1206-p43-overlay-002-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 43,
+      "recordKey": "jwf1206-p43-item-003",
+      "code": "DK760-4640",
+      "views": ["主视图", "侧视图"],
+      "excludedLines": ["宽度尺寸线", "厚度尺寸线", "尺寸界线"],
+      "material": "厂家未标的中性板件材质",
+      "verdict": "轮廓级通过：50宽异形板外廓、6厚侧廓、左侧两大孔与右侧两小孔的相对位置和贯穿关系吻合；总高、圆角和孔径未标，按二维叠合估算",
+      "evidence": ["tmp/jwf1206-p43-item003-premodel-overlay.png", "tmp/jwf1206-p43-overlay-003-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 43,
+      "recordKey": "jwf1206-p43-item-004",
+      "code": "TZH1066",
+      "views": ["弹簧主视图"],
+      "excludedLines": ["总长尺寸线", "尺寸界线", "中心线", "剖面端头填充"],
+      "material": "弹簧钢中性金属",
+      "verdict": "轮廓级通过：线径2.8、自由长45.9按明确标注建立，模型为两端密绕、中段大节距的同一根连续螺旋线；厂家中段采用水平直线的弹簧简化画法，外径和圈数仅按整体包络估算，不作线线重合或尺寸级结论",
+      "evidence": ["tmp/jwf1206-p43-item004-premodel-overlay.png", "tmp/jwf1206-p43-overlay-004-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 43,
+      "recordKey": "jwf1206-p43-item-005",
+      "code": "TZH1091",
+      "views": ["轴向半剖视图"],
+      "excludedLines": ["直径尺寸线", "长度尺寸线", "中心线", "剖面填充"],
+      "material": "厂家未标的中性轴衬材质",
+      "verdict": "轮廓级通过：φ23薄壁筒体连续圆滑外翻为φ30肩，总长11.5和左右方向吻合；已纠正原来两个厚圆环叠加的错误，壁厚和过渡圆角未标，不冒充尺寸级",
+      "evidence": ["tmp/jwf1206-p43-item005-premodel-overlay.png", "tmp/jwf1206-p43-overlay-005-final.png"],
+      "rebuilt": true
+    },
+    {
+      "page": 43,
+      "recordKey": "jwf1206-p43-item-006",
+      "code": "TZH1087",
+      "views": ["主视图", "断面图"],
+      "excludedLines": ["长度尺寸线", "宽厚尺寸线", "尺寸界线", "剖面填充"],
+      "material": "柔性橡胶密封材料",
+      "verdict": "尺寸级通过：按120×15×3明确尺寸建立柔性矩形密封条并使用非金属高粗糙材质；厂家示意图横纵比例未按尺寸绘制，验收以明确尺寸和矩形拓扑为准，不强行拉伸模型迎合示意比例",
+      "evidence": ["tmp/jwf1206-p43-item006-premodel-overlay.png", "tmp/jwf1206-p43-overlay-006-final.png"],
+      "rebuilt": true
+    }
+  ]
+}

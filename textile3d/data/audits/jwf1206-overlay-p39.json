@@ -1,0 +1,150 @@
+{
+  "manualId": "jwf1206",
+  "page": 39,
+  "source": "JWF1206厂家PDF第39页",
+  "method": "厂家视图区与3D正交投影半透明叠合",
+  "recordCount": 14,
+  "pageEvidence": "tmp/jwf1206-p39-overlay-full-final-current.png",
+  "records": [
+    {
+      "recordKey": "jwf1206-p39-item-001",
+      "code": "JWF1206-4601",
+      "views": ["正视轮廓图", "右侧视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "空心薄壁涂装金属导轨板",
+      "verdict": "通过（轮廓级，高度、壁厚与底部圆角估算）",
+      "evidence": ["tmp/jwf1206-p39-overlay-001-final.png"],
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p39-item-002",
+      "code": "JWF1206-4602",
+      "views": ["轴向主视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "金属导向轴",
+      "verdict": "通过（尺寸级，中部扁位和径向孔局部估算）",
+      "evidence": ["tmp/jwf1206-p39-overlay-002-final.png"],
+      "rebuilt": false
+    },
+    {
+      "recordKey": "jwf1206-p39-item-003",
+      "code": "JWF1206-4603",
+      "views": ["正视图", "板厚标注"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "异形金属挡板",
+      "verdict": "通过（尺寸级，四孔孔径与孔位估算）",
+      "evidence": ["tmp/jwf1206-p39-overlay-003-final.png"],
+      "rebuilt": false
+    },
+    {
+      "recordKey": "jwf1206-p39-item-004",
+      "code": "ZFA211A-4601",
+      "views": ["轴向主视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "薄壁金属管",
+      "verdict": "通过（尺寸级，φ41×3000按标注，壁厚估算）",
+      "evidence": ["tmp/jwf1206-p39-overlay-004-final.png"],
+      "rebuilt": false
+    },
+    {
+      "recordKey": "jwf1206-p39-item-005",
+      "code": "ZFA211A-4603A",
+      "views": ["轴向主视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "薄壁金属管",
+      "verdict": "通过（尺寸级，φ20×1150按标注，壁厚与径向孔局部估算）",
+      "evidence": ["tmp/jwf1206-p39-overlay-005-final.png"],
+      "rebuilt": false
+    },
+    {
+      "recordKey": "jwf1206-p39-item-006",
+      "code": "ZFA211A-4604",
+      "views": ["正视图", "侧视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "金属底板、连接头及两侧夹板",
+      "verdict": "通过（轮廓级，已将中圆从误判大孔改为实体连接头）",
+      "evidence": ["tmp/jwf1206-p39-overlay-006-final.png"],
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p39-item-007",
+      "code": "ZFA211A-4617A",
+      "views": ["正视图", "侧视折弯图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "折弯金属连杆",
+      "verdict": "通过（尺寸级，正视294×20直臂与侧视50折弯已分离解释）",
+      "evidence": ["tmp/jwf1206-p39-overlay-007-final.png"],
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p39-item-008",
+      "code": "ZFA211A-4621",
+      "views": ["轴向剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "金属轴承内圈",
+      "verdict": "通过（尺寸级，φ15×16.5按标注，内径估算）",
+      "evidence": ["tmp/jwf1206-p39-overlay-008-final.png"],
+      "rebuilt": false
+    },
+    {
+      "recordKey": "jwf1206-p39-item-009",
+      "code": "ZFA211A-4622",
+      "views": ["正视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "涂装金属标牌及暗色印刷标识",
+      "verdict": "通过（尺寸级，两圆、F和弹簧符号用极薄凸纹作视觉代理）",
+      "evidence": ["tmp/jwf1206-p39-overlay-009-final.png"],
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p39-item-010",
+      "code": "ZFA211A-4626",
+      "views": ["主视图", "环眼端视轮廓"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "金属环眼螺栓",
+      "verdict": "通过（尺寸级，环眼已改为与主视平行，环眼直径与颈部估算）",
+      "evidence": ["tmp/jwf1206-p39-overlay-010-final.png"],
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p39-item-011",
+      "code": "ZFA211A-4628",
+      "views": ["轴向全剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "金属同步带轮",
+      "verdict": "通过（尺寸级，φ132.03/φ90/32按标注，33T齿形仅作识别级）",
+      "evidence": ["tmp/jwf1206-p39-overlay-011-final.png"],
+      "rebuilt": false
+    },
+    {
+      "recordKey": "jwf1206-p39-item-012",
+      "code": "ZFA211A-4629",
+      "views": ["轴向全剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "金属同步带轮",
+      "verdict": "通过（尺寸级，φ136.08/φ90/32按标注，34T齿形仅作识别级）",
+      "evidence": ["tmp/jwf1206-p39-overlay-012-final.png"],
+      "rebuilt": false
+    },
+    {
+      "recordKey": "jwf1206-p39-item-013",
+      "code": "ZFA211A-4631",
+      "views": ["正视图", "U形剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "金属双侧板及底板U形支座",
+      "verdict": "通过（轮廓级，已从实心块重建为真实U形支座）",
+      "evidence": ["tmp/jwf1206-p39-overlay-013-final.png"],
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p39-item-014",
+      "code": "ZFA211A-4638",
+      "views": ["轴向剖视图", "端视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线", "引出线", "断裂符号"],
+      "material": "带键槽和两贯通孔的金属同步带轮",
+      "verdict": "通过（尺寸级，键槽与水平两孔已按端视真实贯通，18Z齿形仅作识别级）",
+      "evidence": ["tmp/jwf1206-p39-overlay-014-final.png"],
+      "rebuilt": true
+    }
+  ]
+}

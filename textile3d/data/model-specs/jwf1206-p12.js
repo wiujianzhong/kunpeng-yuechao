@@ -236,19 +236,35 @@ export const jwf1206P12ModelSpecs = {
       page: 12,
       dimensions: ['X=936', 'Y=76'],
       views: ['正视图', '端面图'],
-      assumptions: ['横撑深度未标，按端面比例估算为55', '矩形管框、两根内撑、端部斜角和上下紧固点按两视图建立'],
+      assumptions: ['横撑深度未标，按端面比例估算为55', '矩形管框、两根内撑和端部斜角按两视图建立；端板上下圆形按真实贯穿孔处理，不用圆柱实体冒充'],
     },
     primitives: [
       { type: 'box', size: [936, 8, 55], position: [0, 34, 0] },
       { type: 'box', size: [936, 8, 55], position: [0, -34, 0] },
-      { type: 'box', size: [8, 76, 55], position: [-464, 0, 0] },
-      { type: 'box', size: [8, 76, 55], position: [464, 0, 0] },
+      {
+        type: 'extrude',
+        points: [[-27.5, -38], [22, -38], [27.5, -32.5], [27.5, 32.5], [22, 38], [-27.5, 38]],
+        depth: 8,
+        position: [-464, 0, 0],
+        rotation: [0, 1.5708, 0],
+        holes: [
+          { kind: 'circle', center: [0, -26], radius: 6 },
+          { kind: 'circle', center: [0, 26], radius: 6 },
+        ],
+      },
+      {
+        type: 'extrude',
+        points: [[-27.5, -38], [22, -38], [27.5, -32.5], [27.5, 32.5], [22, 38], [-27.5, 38]],
+        depth: 8,
+        position: [464, 0, 0],
+        rotation: [0, 1.5708, 0],
+        holes: [
+          { kind: 'circle', center: [0, -26], radius: 6 },
+          { kind: 'circle', center: [0, 26], radius: 6 },
+        ],
+      },
       { type: 'box', size: [8, 76, 45], position: [-285, 0, 0], material: 'darkMetal' },
       { type: 'box', size: [8, 76, 45], position: [285, 0, 0], material: 'darkMetal' },
-      { type: 'cylinder', radius: 6, length: 63, axis: 'z', position: [-455, 26, 0], material: 'metal' },
-      { type: 'cylinder', radius: 6, length: 63, axis: 'z', position: [-455, -26, 0], material: 'metal' },
-      { type: 'cylinder', radius: 6, length: 63, axis: 'z', position: [455, 26, 0], material: 'metal' },
-      { type: 'cylinder', radius: 6, length: 63, axis: 'z', position: [455, -26, 0], material: 'metal' },
     ],
   },
 
@@ -259,7 +275,7 @@ export const jwf1206P12ModelSpecs = {
       page: 12,
       dimensions: ['X=100', 'Y=50'],
       views: ['主视图', '俯视图', '侧视图'],
-      assumptions: ['折弯深度和板厚未标，按38和6估算', '两圆孔、纵向调节槽、左端齿形边和下折边按三视图比例估算'],
+      assumptions: ['折弯深度和板厚未标，按38和6估算', '长板纵向调节槽及圆孔、垂直短折边两个圆孔按三视图比例估算，并均按真实贯穿孔处理'],
     },
     primitives: [
       {
@@ -272,10 +288,19 @@ export const jwf1206P12ModelSpecs = {
           { kind: 'polygon', points: [[-42, -4], [18, -4], [22, 0], [18, 4], [-42, 4]] },
         ],
       },
-      { type: 'box', size: [6, 50, 38], position: [-47, 0, 16], material: 'darkMetal' },
+      {
+        type: 'extrude',
+        points: [[-19, -25], [19, -25], [19, 25], [-19, 25]],
+        depth: 6,
+        position: [-47, 0, 19],
+        rotation: [0, 1.5708, 0],
+        holes: [
+          { kind: 'circle', center: [0, -15], radius: 5 },
+          { kind: 'circle', center: [0, 15], radius: 5 },
+        ],
+        material: 'darkMetal',
+      },
       { type: 'box', size: [22, 6, 38], position: [-39, 22, 16], material: 'darkMetal' },
-      { type: 'cylinder', radius: 5, length: 8, axis: 'z', position: [-34, 15, 23], material: 'metal' },
-      { type: 'cylinder', radius: 5, length: 8, axis: 'z', position: [-34, -15, 23], material: 'metal' },
     ],
   },
 
@@ -286,7 +311,7 @@ export const jwf1206P12ModelSpecs = {
       page: 12,
       dimensions: ['φ100', 'X=1338'],
       views: ['轴向主视图'],
-      assumptions: ['辊体最大外径和轴向总长取自厂家标注', '中央辊身长度、左右各级轴颈直径、键槽及端螺纹按主视比例估算'],
+      assumptions: ['辊体最大外径和轴向总长取自厂家标注', '中央辊身长度、左右各级轴颈直径和键槽按主视比例估算；端螺纹线不逐圈生成实体圆环'],
     },
     primitives: [
       {
@@ -295,7 +320,6 @@ export const jwf1206P12ModelSpecs = {
         rotation: [0, 0, -1.5708],
       },
       { type: 'box', size: [95, 8, 8], position: [482, 18, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 10.5, tube: 1, position: [646, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
     ],
   },
 
@@ -306,7 +330,7 @@ export const jwf1206P12ModelSpecs = {
       page: 12,
       dimensions: ['X=939', 'Y=70'],
       views: ['正视图', '端面图'],
-      assumptions: ['调节板深度和板厚未标，按42和8估算', '三处钥匙孔形调节槽、两道分隔加强筋及端部卷边按两视图比例估算'],
+      assumptions: ['调节板深度和板厚未标，按42和8估算', '三处钥匙孔形调节槽、两道分隔加强筋及端部卷边按两视图比例估算；端板圆形按真实贯穿孔处理'],
     },
     primitives: [
       {
@@ -322,8 +346,30 @@ export const jwf1206P12ModelSpecs = {
       },
       { type: 'box', size: [8, 78, 42], position: [-210, 0, 17], material: 'darkMetal' },
       { type: 'box', size: [8, 78, 42], position: [210, 0, 17], material: 'darkMetal' },
-      { type: 'box', size: [8, 70, 42], position: [-465.5, 0, 17], material: 'darkMetal' },
-      { type: 'box', size: [8, 70, 42], position: [465.5, 0, 17], material: 'darkMetal' },
+      {
+        type: 'extrude',
+        points: [[-21, -35], [13, -35], [21, -27], [21, 27], [13, 35], [-21, 35]],
+        depth: 8,
+        position: [-465.5, 0, 17],
+        rotation: [0, 1.5708, 0],
+        holes: [
+          { kind: 'circle', center: [0, -12], radius: 5 },
+          { kind: 'circle', center: [8, 14], radius: 5 },
+        ],
+        material: 'darkMetal',
+      },
+      {
+        type: 'extrude',
+        points: [[-21, -35], [13, -35], [21, -27], [21, 27], [13, 35], [-21, 35]],
+        depth: 8,
+        position: [465.5, 0, 17],
+        rotation: [0, 1.5708, 0],
+        holes: [
+          { kind: 'circle', center: [0, -12], radius: 5 },
+          { kind: 'circle', center: [8, 14], radius: 5 },
+        ],
+        material: 'darkMetal',
+      },
     ],
   },
 
@@ -334,7 +380,7 @@ export const jwf1206P12ModelSpecs = {
       page: 12,
       dimensions: ['上段X=46', 'Y=170', '下段X=50', 'Z=53'],
       views: ['正视图', '侧视图'],
-      assumptions: ['四项外廓尺寸均取自厂家标注', '大、小枢轴孔径、叉板厚度、顶部螺纹柱和横梁高度按两视图比例估算'],
+      assumptions: ['四项外廓尺寸均取自厂家标注', '大、小枢轴孔径、叉板厚度、顶部螺纹柱和横梁高度按两视图比例估算；螺纹短线不逐条生成实体环'],
     },
     primitives: [
       {
@@ -362,10 +408,6 @@ export const jwf1206P12ModelSpecs = {
       { type: 'box', size: [50, 20, 53], position: [0, 25, 0], material: 'metal' },
       { type: 'box', size: [46, 50, 53], position: [0, 60, 0] },
       { type: 'cylinder', radius: 9, length: 50, axis: 'y', position: [0, 60, 0], material: 'metal' },
-      { type: 'torus', radius: 9.5, tube: 1, position: [0, 48, 0], rotation: [1.5708, 0, 0], material: 'metal' },
-      { type: 'torus', radius: 9.5, tube: 1, position: [0, 57, 0], rotation: [1.5708, 0, 0], material: 'metal' },
-      { type: 'torus', radius: 9.5, tube: 1, position: [0, 66, 0], rotation: [1.5708, 0, 0], material: 'metal' },
-      { type: 'torus', radius: 9.5, tube: 1, position: [0, 75, 0], rotation: [1.5708, 0, 0], material: 'metal' },
     ],
   },
 
@@ -394,7 +436,7 @@ export const jwf1206P12ModelSpecs = {
       page: 12,
       dimensions: ['M12×1-6g', 'X=36'],
       views: ['轴向主视图'],
-      assumptions: ['螺纹规格和总长取自厂家标注', '中部法兰、右端六角/螺纹段和左端探测端的分段长度按主视比例估算'],
+      assumptions: ['螺纹规格和总长取自厂家标注', '中部法兰、右端六角/螺纹段和左端探测端的分段长度按主视比例估算；螺纹画法只保留光顺名义外径，不逐圈生成实体环'],
     },
     primitives: [
       {
@@ -402,10 +444,6 @@ export const jwf1206P12ModelSpecs = {
         points: [[0, -18], [3, -18], [3, -13], [5, -13], [5, -8], [8.5, -8], [8.5, 0], [6, 0], [6, 10], [4.5, 10], [4.5, 16], [3.5, 16], [3.5, 18], [0, 18], [0, -18]],
         rotation: [0, 0, -1.5708],
       },
-      { type: 'torus', radius: 5.5, tube: 0.45, position: [-14, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.5, tube: 0.45, position: [-11.5, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 4, tube: 0.4, position: [13, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 4, tube: 0.4, position: [16, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
       { type: 'cylinder', radius: 3, radiusTop: 1.5, radiusBottom: 3, length: 5, axis: 'x', position: [-15.5, 0, 0], material: 'brass' },
     ],
   },

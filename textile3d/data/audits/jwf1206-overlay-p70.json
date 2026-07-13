@@ -1,0 +1,181 @@
+{
+  "manualId": "jwf1206",
+  "pdfPage": 70,
+  "recordCount": 14,
+  "method": "厂家600dpi原格与真实3D模型正交投影半透明叠合；标注尺寸单独约束模型",
+  "pageEvidence": {
+    "overlay": "tmp/pdfs/jwf1206-p65-p73-review/p70-orthographic-overlay-final.png",
+    "webgl": "tmp/pdfs/jwf1206-p65-p73-review/webgl/p70-gl-rebuild-final.png",
+    "report": "tmp/jwf1206-p70-overlay-audit.md"
+  },
+  "records": [
+    {
+      "recordKey": "jwf1206-p70-item-001",
+      "pdfPage": 70,
+      "code": "JWF1202-8500-1",
+      "dimensions": ["长1349"],
+      "views": ["轴向全剖视图", "端视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线"],
+      "material": "darkMetal",
+      "verdict": "通过，总长1349为尺寸约束；打手筒径不再缩小一半，空心筒体、两端内缩端盘、贯通轴和12条纵向打手条与两个厂家视图一致；未标筒径按同图比例表达",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-001.png + pageEvidence.overlay第1格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-002",
+      "pdfPage": 70,
+      "code": "JWF1202-8501",
+      "dimensions": ["φ205×50"],
+      "views": ["轴向剖视图", "正视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线"],
+      "material": "darkMetal",
+      "verdict": "通过，按φ205×50重建外轮缘、中心轮毂和凹入辐板；纠正三辐条误读，改为原图左右两个大腰形孔及上下两个窄长孔",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-002.png + pageEvidence.overlay第2格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-003",
+      "pdfPage": 70,
+      "code": "JWF1202-8502",
+      "dimensions": ["M10×90"],
+      "views": ["轴向主视图"],
+      "excludedLines": ["尺寸线", "中心线", "螺纹示意线"],
+      "material": "metal",
+      "verdict": "通过，识别90为环眼中心线至杆端的长度；环眼平面方向、通孔和φ10杆身已与厂家主视对齐，右端螺纹线不建成额外实体",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-003.png + pageEvidence.overlay第3格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-004",
+      "pdfPage": 70,
+      "code": "JWF1202-8503",
+      "dimensions": ["φ117×50"],
+      "views": ["轴向剖视图", "正视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线"],
+      "material": "darkMetal",
+      "verdict": "通过，φ117×50电机带轮改为全径轮盘、左轮毂和过渡台阶的分段结构，中心孔与水平两面孔均为真实孔洞",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-004.png + pageEvidence.overlay第4格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-005",
+      "pdfPage": 70,
+      "code": "JWF1202-8504",
+      "dimensions": ["φ98×50"],
+      "views": ["轴向剖视图", "正视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线"],
+      "material": "darkMetal",
+      "verdict": "通过，φ98×50小带轮按自身剖视台阶重建，未把φ117件简单缩放代替；中心孔和水平两面孔已建孔",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-005.png + pageEvidence.overlay第5格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-006",
+      "pdfPage": 70,
+      "code": "JWF1202-8505",
+      "dimensions": ["276×223", "折弯深50"],
+      "views": ["主视图", "右侧折弯图"],
+      "excludedLines": ["尺寸线", "折弯虚线", "中心线"],
+      "material": "paintedMetal",
+      "verdict": "通过，识别主板276×223、左上倒角和5孔布局；纠正把折边做在底部的方向错误，两侧竖向折边深50，侧视下部斜边耳板和通孔已按原格重建",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-006.png + pageEvidence.overlay第6格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-007",
+      "pdfPage": 70,
+      "code": "JWF1202-8506",
+      "dimensions": ["112×80×50"],
+      "views": ["主视图", "左侧视图"],
+      "excludedLines": ["尺寸线", "折弯双线"],
+      "material": "paintedMetal",
+      "verdict": "通过，112高、80宽立板的上部双倒角和单孔与原图一致；50深底脚改为真实九十度折弯，不再是立板加厚块",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-007.png + pageEvidence.overlay第7格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-008",
+      "pdfPage": 70,
+      "code": "JWF1202-8507",
+      "dimensions": ["φ20×47.5"],
+      "views": ["轴向剖视图", "端视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线"],
+      "material": "metal",
+      "verdict": "通过，φ20×47.5阶梯轴改为左端开口盲孔、中部φ20台阶和右端小台阶的连续回转体；厂家未标偏心距，不臆造偏置数值",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-008.png + pageEvidence.overlay第8格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-009",
+      "pdfPage": 70,
+      "code": "JWF1202-8508",
+      "dimensions": ["80×30×3"],
+      "views": ["主视图", "侧视图"],
+      "excludedLines": ["尺寸线", "中心线"],
+      "material": "metal",
+      "verdict": "通过，80×30×3薄板四角均倒角，纠正旧模型只做单侧倒角的错误；中大孔和上下两小孔同轴布置",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-009.png + pageEvidence.overlay第9格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-010",
+      "pdfPage": 70,
+      "code": "FA225-8501",
+      "dimensions": ["φ145×10"],
+      "views": ["轴向剖视图", "正视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线"],
+      "material": "metal",
+      "verdict": "通过，φ145×10薄法兰的大中心孔与上下左右4个安装孔已建为真实贯通孔，轴向厚度和正视孔位叠合通过",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-010.png + pageEvidence.overlay第10格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-011",
+      "pdfPage": 70,
+      "code": "TZH1051-35",
+      "dimensions": ["φ135×22.5"],
+      "views": ["轴向剖视图", "正视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线"],
+      "material": "darkMetal",
+      "verdict": "通过，φ135×22.5轴承座纠正为4个对角大孔加上下2个小孔，不再是6个等径孔；中心轴承孔、台阶和挡肩保留",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-011.png + pageEvidence.overlay第11格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-012",
+      "pdfPage": 70,
+      "code": "TZH1083-190/160",
+      "dimensions": ["φ190/φ160×14"],
+      "views": ["轴向全剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线"],
+      "material": "rubber",
+      "verdict": "通过，橡胶密封圈外径φ190、内径φ160、轴向宽14的单一回转环体与厂家全剖轮廓重合",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-012.png + pageEvidence.overlay第12格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-013",
+      "pdfPage": 70,
+      "code": "TZH1091-15X17",
+      "dimensions": ["φ23/φ17×17"],
+      "views": ["轴向半剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线"],
+      "material": "metal",
+      "verdict": "通过，带肩轴衬内孔φ15、主体外径φ17、肩部φ23及总长17已分段建立；纠正旧模型把肩厚加在17总长之外的错误",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-013.png + pageEvidence.overlay第13格",
+      "rebuilt": true
+    },
+    {
+      "recordKey": "jwf1206-p70-item-014",
+      "pdfPage": 70,
+      "code": "TZH1091-20X11.5",
+      "dimensions": ["φ30/φ23×11.5"],
+      "views": ["轴向半剖视图"],
+      "excludedLines": ["尺寸线", "中心线", "剖面线"],
+      "material": "metal",
+      "verdict": "通过，带肩轴衬内孔φ20、主体外径φ23、肩部φ30及总长11.5已分段建立；肩厚包含在11.5总长内",
+      "evidence": "assets/manuals/jwf1206/crops/jwf1206-p70-item-014.png + pageEvidence.overlay第14格",
+      "rebuilt": true
+    }
+  ]
+}

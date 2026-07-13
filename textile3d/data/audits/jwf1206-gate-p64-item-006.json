@@ -1,0 +1,7 @@
+{
+  "recordKey":"jwf1206-p64-item-006","page":64,"partNumber":"JWF1202-8005","name":"吸尘软管","sourceCrop":"tmp/pdfs/jwf1206-p56-p64-review/tiles/p64-006.png","topology":"φ100、长1350的直形中空柔性软管，外表为连续螺旋加强筋；图中斜线是同一条螺旋的可见投影，不是多道独立金属圆环。",
+  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"DUST ABSORPTION HOSE","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"JWF1206-8000"},
+  "views":[{"name":"轴向主视图","direction":"垂直软管轴线侧看","region":"表头下方唯一视图","projectionRelation":"单视图明确外径与总长；中空内径不可由此推出，螺旋节距仅示意","solidContours":["φ100软管外廓","两端口","连续外螺旋加强筋"],"holes":["轴向中空通道"],"excludedLines":["φ100和1350尺寸线与界线","中部中心/拼接示意线"]}],
+  "dimensions":{"explicit":["外径φ100","总长1350"],"derived":[],"estimated":["内径和壁厚","螺旋筋直径与节距"],"unknown":[]},
+  "material":{"value":"橡胶/柔性复合软管","basis":"名称明确为软管，采用柔性橡胶管体；加强筋材质未标"},"ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p56-p64-review/p64-premodel-overlay-final.png#item-006-main"],"readiness":"ready"
+}

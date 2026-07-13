@@ -7,7 +7,7 @@ import {jwf1206P09ModelSpecs} from './jwf1206-p09.js';
 import {jwf1206P10ModelSpecs} from './jwf1206-p10.js';
 import {jwf1206P11ModelSpecs} from './jwf1206-p11.js';
 import {jwf1206P12ModelSpecs} from './jwf1206-p12.js';
-import {jwf1206P13ModelSpecs} from './jwf1206-p13.js';
+import {jwf1206P13ModelSpecs} from './jwf1206-p13.js?v=20260714-02';
 import {jwf1206P14ModelSpecs} from './jwf1206-p14.js';
 import {jwf1206P15ModelSpecs} from './jwf1206-p15.js';
 import {jwf1206P16ModelSpecs} from './jwf1206-p16.js';

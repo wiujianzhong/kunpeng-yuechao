@@ -41,19 +41,6 @@ export const jwf1206P09ModelSpecs = {
     },
     primitives: [
       { type: 'cylinder', radius: 5.35, length: 270, axis: 'x', material: 'metal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [-123, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [-103, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [-83, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [-63, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [-43, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [-23, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [-3, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [17, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [37, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [57, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [77, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [97, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
-      { type: 'torus', radius: 5.45, tube: 0.45, position: [117, 0, 0], rotation: [0, 1.5708, 0], material: 'darkMetal' },
     ],
   },
 
@@ -69,7 +56,7 @@ export const jwf1206P09ModelSpecs = {
     primitives: [
       {
         type: 'extrude',
-        points: [[-150, -220], [150, -220], [150, 220], [-150, 220], [-150, -150], [-180, -150], [-180, -198], [-160, -198], [-150, -220]],
+        points: [[-150, -220], [150, -220], [150, 220], [-150, 220], [-150, -140], [-205, -140], [-205, -195], [-165, -195], [-154, -205]],
         depth: 10,
         bevel: 2,
         holes: [
@@ -83,6 +70,7 @@ export const jwf1206P09ModelSpecs = {
           { kind: 'circle', center: [105, 45], radius: 6 },
           { kind: 'circle', center: [-105, -145], radius: 6 },
           { kind: 'circle', center: [105, -145], radius: 6 },
+          { kind: 'circle', center: [-193, -168], radius: 6 },
         ],
       },
     ],
@@ -104,14 +92,14 @@ export const jwf1206P09ModelSpecs = {
         depth: 25,
         bevel: 1,
         holes: [
-          { kind: 'circle', center: [0, 0], radius: 11 },
+          { kind: 'circle', center: [0, 0], radius: 18 },
           { kind: 'circle', center: [-58, 15], radius: 5 },
           { kind: 'circle', center: [58, 15], radius: 5 },
           { kind: 'circle', center: [58, -15], radius: 5 },
           { kind: 'circle', center: [-15, 0], radius: 4 },
         ],
       },
-      { type: 'torus', radius: 18, tube: 3, position: [0, 0, 12.5], material: 'metal' },
+      { type: 'lathe', points: [[9, -12.5], [18, -12.5], [18, 1.5], [9, 1.5]], rotation: [1.5708, 0, 0], material: 'metal', flatShading: false },
       { type: 'cylinder', radius: 5, length: 58, axis: 'x', position: [41, 0, 0], material: 'metal' },
       { type: 'cylinder', radius: 7, radiusTop: 3, radiusBottom: 7, length: 9, axis: 'x', position: [66, 0, 0], material: 'metal' },
     ],
@@ -132,9 +120,9 @@ export const jwf1206P09ModelSpecs = {
         points: [[-16, -4], [-14, -8], [14, -8], [16, -4], [16, 4], [14, 8], [-14, 8], [-16, 4]],
         depth: 10,
         bevel: 1,
-        holes: [{ kind: 'circle', center: [0, 0], radius: 4 }],
+        holes: [{ kind: 'circle', center: [0, 0], radius: 5.5 }],
       },
-      { type: 'torus', radius: 5.5, tube: 1, position: [0, 0, 5], material: 'darkMetal' },
+      { type: 'lathe', points: [[4, -5], [5.5, -5], [5.5, 0], [4, 0]], rotation: [1.5708, 0, 0], material: 'darkMetal', flatShading: false },
     ],
   },
 
@@ -150,7 +138,7 @@ export const jwf1206P09ModelSpecs = {
     primitives: [
       {
         type: 'lathe',
-        points: [[20, -41], [66.5, -41], [67.5, 0], [66.5, 41], [57.5, 35], [57.5, 20], [35, 20], [35, 41], [20, 41], [20, -41]],
+        points: [[35, -41], [66.5, -41], [67.5, 0], [66.5, 41], [20, 41], [20, 12], [35, 12]],
         rotation: [1.5708, 0, 0],
       },
     ],
@@ -251,14 +239,14 @@ export const jwf1206P09ModelSpecs = {
     material: 'metal',
     source: {
       page: 9,
-      dimensions: ['φ590', 'Z=80'],
+      dimensions: ['φ550', 'Z=80'],
       views: ['正视图', '轴向剖视图'],
-      assumptions: ['外径和总宽取自厂家标注', '中心孔、轮毂、轮缘厚度、五根渐宽轮辐及五个减重开口按两视图比例估算'],
+      assumptions: ['外径和总宽取自厂家标注', '中心孔、轮毂、轮缘厚度、六根渐宽轮辐及六个减重开口按两视图比例估算'],
     },
     primitives: [
       {
         type: 'lathe',
-        points: [[270, -40], [295, -40], [295, 40], [270, 40], [270, -40]],
+        points: [[260, -40], [275, -40], [275, 40], [260, 40], [260, -40]],
         rotation: [1.5708, 0, 0],
         material: 'darkMetal',
       },
@@ -267,13 +255,12 @@ export const jwf1206P09ModelSpecs = {
         points: [[25, -40], [48, -40], [48, 40], [25, 40], [25, -40]],
         rotation: [1.5708, 0, 0],
       },
-      { type: 'extrude', points: [[45, -24], [270, -38], [270, 38], [45, 24]], depth: 22, bevel: 2 },
-      { type: 'extrude', points: [[45, -24], [270, -38], [270, 38], [45, 24]], depth: 22, bevel: 2, rotation: [0, 0, 1.2566] },
-      { type: 'extrude', points: [[45, -24], [270, -38], [270, 38], [45, 24]], depth: 22, bevel: 2, rotation: [0, 0, 2.5133] },
-      { type: 'extrude', points: [[45, -24], [270, -38], [270, 38], [45, 24]], depth: 22, bevel: 2, rotation: [0, 0, 3.7699] },
-      { type: 'extrude', points: [[45, -24], [270, -38], [270, 38], [45, 24]], depth: 22, bevel: 2, rotation: [0, 0, 5.0265] },
-      { type: 'torus', radius: 282.5, tube: 4, position: [0, 0, 40], material: 'darkMetal' },
-      { type: 'torus', radius: 282.5, tube: 4, position: [0, 0, -40], material: 'darkMetal' },
+      { type: 'extrude', points: [[45, -24], [260, -38], [260, 38], [45, 24]], depth: 22, bevel: 2 },
+      { type: 'extrude', points: [[45, -24], [260, -38], [260, 38], [45, 24]], depth: 22, bevel: 2, rotation: [0, 0, 1.0472] },
+      { type: 'extrude', points: [[45, -24], [260, -38], [260, 38], [45, 24]], depth: 22, bevel: 2, rotation: [0, 0, 2.0944] },
+      { type: 'extrude', points: [[45, -24], [260, -38], [260, 38], [45, 24]], depth: 22, bevel: 2, rotation: [0, 0, 3.1416] },
+      { type: 'extrude', points: [[45, -24], [260, -38], [260, 38], [45, 24]], depth: 22, bevel: 2, rotation: [0, 0, 4.1888] },
+      { type: 'extrude', points: [[45, -24], [260, -38], [260, 38], [45, 24]], depth: 22, bevel: 2, rotation: [0, 0, 5.236] },
     ],
   },
 
@@ -292,7 +279,6 @@ export const jwf1206P09ModelSpecs = {
         points: [[22, -45], [48, -45], [55, -38], [55, 38], [48, 45], [22, 45], [22, -45]],
         rotation: [1.5708, 0, 0],
       },
-      { type: 'torus', radius: 51.5, tube: 2.5, position: [0, 0, -38], material: 'darkMetal' },
     ],
   },
 
@@ -303,33 +289,31 @@ export const jwf1206P09ModelSpecs = {
       page: 9,
       dimensions: ['X=35', 'Y=25', 'Z=2/3/8'],
       views: ['正视图', '厚度表'],
-      assumptions: ['厂家在同一格列出0203、0204、0205三种厚度', '原图未标孔径，3D中暂按约φ8呈现', '3D预览将三种明确厚度的平衡块并排展示'],
+      assumptions: ['厂家在同一格列出0203、0204、0205三种厚度', '原图未标孔径，3D中暂按约φ8呈现', '三种零件正视轮廓相同；3D以8毫米厚的0205作为代表实体，2毫米和3毫米厚度保留在厂家尺寸元数据中'],
     },
     primitives: [
       {
         type: 'extrude',
         points: [[-17.5, -12.5], [17.5, -12.5], [17.5, 12.5], [-17.5, 12.5]],
-        depth: 2,
-        position: [-45, 0, 0],
-        bevel: 0.5,
-        holes: [{ kind: 'circle', center: [0, 0], radius: 4 }],
-      },
-      {
-        type: 'extrude',
-        points: [[-17.5, -12.5], [17.5, -12.5], [17.5, 12.5], [-17.5, 12.5]],
-        depth: 3,
-        position: [0, 0, 0],
-        bevel: 0.5,
-        holes: [{ kind: 'circle', center: [0, 0], radius: 4 }],
-      },
-      {
-        type: 'extrude',
-        points: [[-17.5, -12.5], [17.5, -12.5], [17.5, 12.5], [-17.5, 12.5]],
         depth: 8,
-        position: [45, 0, 0],
+        position: [0, 0, 0],
         bevel: 0.5,
         holes: [{ kind: 'circle', center: [0, 0], radius: 4 }],
       },
     ],
   },
 };
+
+for (const [partCode, spec] of Object.entries(jwf1206P09ModelSpecs)) {
+  const hasSection = spec.source.views.some((view) => /剖/.test(view));
+  const cropCode = partCode === 'ZFA211-0203~0205' ? 'ZFA211-0203_0205' : partCode;
+  spec.source.sourceCrop = `assets/manuals/jwf1206/crops/${cropCode}.png`;
+  spec.source.sourceVector = `assets/manuals/jwf1206/crops/${cropCode}.pdf`;
+  spec.source.cropDpi = 600;
+  spec.source.excludedLines = [
+    '原格表框、件号、名称、数量栏与文字', '尺寸线、箭头与尺寸数字', '尺寸延长线',
+    '中心线与中心十字', '引出线与标注线', ...(hasSection ? ['剖面填充线'] : []),
+  ];
+  spec.source.unknowns = spec.source.assumptions.filter((text) => /未.*(?:标|给|注明|画|规定|建模)|估算|比例|近似|代表|暂按/.test(text));
+  spec.source.reconstructionRule = '逐格识别主视、辅助视图和剖面；清除非实体标注线后，只按厂家明示尺寸与闭合实体轮廓建模。';
+}

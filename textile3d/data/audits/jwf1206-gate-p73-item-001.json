@@ -1,0 +1,10 @@
+{
+  "recordKey":"jwf1206-p73-item-001","page":73,"partNumber":"JWF1206-8700-1","name":"前门结合件","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p73-001.png","topology":"薄板折弯形成30深的中空箱形前门，正面为1270×438.5面板，中部有横向加强折边，上缘两个小安装位、下部一个锁点；不是438.5×30实心金属块。",
+  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"FRONT DOOR SUB-ASS","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"JWF1206-8700"},
+  "views":[
+    {"name":"主视图","direction":"垂直门板正面观看","region":"原格左侧大矩形","projectionRelation":"与右侧视图共用438.5高度；1270控制横向宽度","solidContours":["前门外框","中部横向加强折边","上缘两个安装位","下部锁点"],"holes":[],"excludedLines":["1270尺寸线与界线","表格线","文字"]},
+    {"name":"右侧视图","direction":"沿门板1270宽度方向观看","region":"原格右侧窄视图","projectionRelation":"高度438.5与主视一致，30为折弯箱体深度","solidContours":["30深箱形侧廓","中部折边投影"],"holes":[],"excludedLines":["438.5与30尺寸线","尺寸界线"]}
+  ],
+  "dimensions":{"explicit":["宽1270","高438.5","深30"],"derived":[],"estimated":["钣金厚度","横向加强折边高度","安装位尺寸与位置"],"unknown":[]},
+  "material":{"value":"未标牌号，按涂装钣金展示","basis":"门结合件的正侧视与30深度表明是折弯箱形门，不作实心块"},"ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p73-premodel-overlay-final.png#item-001-main","tmp/pdfs/jwf1206-p65-p73-review/p73-premodel-overlay-final.png#item-001-right"],"readiness":"ready"
+}

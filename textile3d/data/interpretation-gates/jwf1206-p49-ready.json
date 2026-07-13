@@ -1,0 +1,59 @@
+{
+  "manualId": "jwf1206", "page": 49, "records": [
+    {
+      "recordKey": "jwf1206-p49-item-009", "partNumber": "FA221E-5200-6", "name": "上通道结合件", "page": 49,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p49-item-009.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [
+        {"name": "正视图", "direction": "垂直通道高度观察", "region": "原格上部", "projectionRelation": "1185总长、两端法兰和直通高度包络", "solidContours": ["中空直通道侧壁", "两端法兰"], "holes": ["贯通矩形风道"], "excludedLines": ["1185尺寸线", "断裂符号", "中心线"]},
+        {"name": "俯视变截面图", "direction": "沿高度观察", "region": "原格下部", "projectionRelation": "与正视共用1185长度，显示宽度沿长度分段收放", "solidContours": ["分段变宽通道外廓", "两端法兰"], "holes": ["贯通风道内腔"], "excludedLines": ["断裂符号", "中心线"]}
+      ],
+      "topology": "沿1185方向贯通的中空矩形风道，俯视宽度分段收放，两端带开口法兰；不是实心盒",
+      "dimensions": {"explicit": ["总长1185"], "derived": [], "estimated": ["通道高宽", "分段变宽位置", "壁厚", "法兰尺寸"], "unknown": ["材料牌号"]},
+      "material": {"value": "喷漆薄壁金属风道", "basis": "两视和通道结合件名称"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p49-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p49-item-010", "partNumber": "JWF1206-5202", "name": "压板", "page": 49,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p49-item-010.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [
+        {"name": "正视闭合轮廓", "direction": "垂直板面观察", "region": "原格左侧", "projectionRelation": "338总长、上端开口挂钩和下端长圆槽沿厚4方向贯穿", "solidContours": ["338长压板外廓", "上端向下开口挂钩"], "holes": ["下端竖向长圆槽"], "excludedLines": ["338尺寸线", "尺寸界线"]},
+        {"name": "侧视厚度", "direction": "沿板宽观察", "region": "原格右侧", "projectionRelation": "侧视直线确认厚4平板", "solidContours": ["厚4侧廓"], "holes": [], "excludedLines": ["4尺寸线", "尺寸界线"]}
+      ],
+      "topology": "单块4厚长压板，上端形成向下开口挂钩，下端有竖向长圆贯通槽",
+      "dimensions": {"explicit": ["总长338", "厚4"], "derived": [], "estimated": ["板宽", "挂钩和长圆槽尺寸"], "unknown": ["材料牌号"]},
+      "material": {"value": "厂家未标的中性金属板", "basis": "正侧视确认板件"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p49-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p49-item-011", "partNumber": "JWF1206-5204", "name": "撑杆", "page": 49,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p49-item-011.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 2, "quantityMeaning": "单台设备用量"},
+      "views": [
+        {"name": "轴向局部剖视图", "direction": "垂直杆轴观察", "region": "原格上部", "projectionRelation": "总长200、中段实心杆和两端M8同轴", "solidContours": ["实心六角中段", "两端M8外螺纹杆"], "holes": [], "excludedLines": ["200/M8尺寸线", "中心线", "剖面填充", "螺纹示意线"]},
+        {"name": "六角端视图", "direction": "沿杆轴观察", "region": "原格下部", "projectionRelation": "对边16六角端面约束中段截面", "solidContours": ["对边16六角形"], "holes": [], "excludedLines": ["中心十字", "16尺寸线"]}
+      ],
+      "topology": "实心对边16六角撑杆，两端为同轴M8外螺纹段，不是空心圆管",
+      "dimensions": {"explicit": ["总长200", "六角对边16", "两端M8"], "derived": [], "estimated": ["两端螺纹段长20"], "unknown": ["材料牌号", "螺纹牙型"]},
+      "material": {"value": "厂家未标的中性金属", "basis": "剖视和六角端视"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p49-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p49-item-012", "partNumber": "JWF1206-5205", "name": "支撑板", "page": 49,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p49-item-012.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 1, "quantityMeaning": "单台设备用量"},
+      "views": [
+        {"name": "侧视图", "direction": "沿185主板宽观察", "region": "原格左侧", "projectionRelation": "165.5深、170高的折边/支撑关系", "solidContours": ["165.5深侧板", "底折边"], "holes": ["侧向减重口"], "excludedLines": ["165.5/170尺寸线", "尺寸界线"]},
+        {"name": "正视图", "direction": "垂直235×185主板观察", "region": "原格右侧", "projectionRelation": "235高、185宽异形板及三角减重口和安装孔", "solidContours": ["235×185异形主板"], "holes": ["三角减重口", "多个安装孔"], "excludedLines": ["235/185尺寸线", "尺寸界线"]}
+      ],
+      "topology": "异形主板与165.5深侧板/底折边组成薄壁支撑板总成，具有三角减重口和安装孔",
+      "dimensions": {"explicit": ["235×185×165.5", "总高170"], "derived": [], "estimated": ["板厚", "孔槽尺寸", "折边局部尺寸"], "unknown": ["材料牌号", "焊接方式"]},
+      "material": {"value": "喷漆薄壁金属总成", "basis": "正侧视板件关系"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p49-premodel-overlay.png"], "readiness": "ready"
+    },
+    {
+      "recordKey": "jwf1206-p49-item-013", "partNumber": "JWF1206-5207", "name": "撑杆", "page": 49,
+      "sourceCrop": "assets/manuals/jwf1206/crops/jwf1206-p49-item-013.png", "identification": {"partNumberVerified": true, "nameVerified": true, "quantity": 4, "quantityMeaning": "单台设备用量"},
+      "views": [
+        {"name": "轴向局部剖视图", "direction": "垂直杆轴观察", "region": "原格上部", "projectionRelation": "总长156、中段实心杆和两端M8同轴", "solidContours": ["实心六角中段", "两端M8外螺纹杆"], "holes": [], "excludedLines": ["156/M8尺寸线", "中心线", "剖面填充", "螺纹示意线"]},
+        {"name": "六角端视图", "direction": "沿杆轴观察", "region": "原格下部", "projectionRelation": "对边16六角端面约束中段截面", "solidContours": ["对边16六角形"], "holes": [], "excludedLines": ["中心十字", "16尺寸线"]}
+      ],
+      "topology": "实心对边16六角撑杆，两端同轴M8外螺纹段，不是空心圆管",
+      "dimensions": {"explicit": ["总长156", "六角对边16", "两端M8"], "derived": [], "estimated": ["两端螺纹段长18"], "unknown": ["材料牌号", "螺纹牙型"]},
+      "material": {"value": "厂家未标的中性金属", "basis": "剖视和六角端视"}, "ambiguities": [], "preModelOverlays": ["tmp/jwf1206-p49-premodel-overlay.png"], "readiness": "ready"
+    }
+  ]
+}
