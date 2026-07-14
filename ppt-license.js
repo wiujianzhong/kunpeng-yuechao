@@ -334,7 +334,10 @@
         importLegacyWindowName();
         updateMachineCode();
         const code = await readPersistentValue(ACTIVATION_KEY);
-        if (code && await hasGrace()) hideOverlay();
+        if (code && await hasGrace()) {
+            licenseMode = 'paid';
+            hideOverlay();
+        }
         const paidResult = code ? await restorePaidLicense(code) : { valid: false, message: '' };
         if (paidResult.valid) return;
         if (await restoreTrial()) return;
