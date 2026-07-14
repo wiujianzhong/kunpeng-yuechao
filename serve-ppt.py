@@ -20,6 +20,10 @@ LEGACY_SECRET = "xiaowu1994"
 LEGACY_MIGRATION_DEADLINE = 1814716800000
 ADMIN_PASSWORD_HASH = "157421c681bfde5495f18aea96b37ae84921aab31c4098439e0cf409fe459008"
 ADMIN_LINK_TOKEN_HASH = "39980af83b36f0c0aaeeec7984928d15e3162f1ee8a76f29dcadcd481815170e"
+ADMIN_LINK_TOKEN_HASHES = {
+    ADMIN_LINK_TOKEN_HASH,
+    "36e2d5935cbac113c7e2cf1ddc812d52bbd8c1daba0b34295f17beefb3f571e2",
+}
 PERMANENT_EXPIRY = 4102444799000
 ADMIN_PLANS = {
     "month": (30, "1个月"),
@@ -330,8 +334,9 @@ class Handler(SimpleHTTPRequestHandler):
                 password_valid = hmac.compare_digest(
                     password_hash, ADMIN_PASSWORD_HASH
                 )
-                link_token_valid = hmac.compare_digest(
-                    link_token_hash, ADMIN_LINK_TOKEN_HASH
+                link_token_valid = any(
+                    hmac.compare_digest(link_token_hash, allowed_hash)
+                    for allowed_hash in ADMIN_LINK_TOKEN_HASHES
                 )
                 if not password_valid and not link_token_valid:
                     self.send_json(403, {"ok": False, "message": "管理员链接无效"})
