@@ -3,72 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>嘉新集团纺织机械3D零件库</title>
-  <link rel="stylesheet" href="catalog.css?v=20260713-10">
-  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"}}</script>
+  <title>嘉新集团纺织机械高清零件图册</title>
+  <link rel="stylesheet" href="catalog.css?v=20260714-public">
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><img src="assets/caresun-logo.png" alt="嘉新国际集团"><strong>纺织机械3D零件库</strong></div>
-    <div class="build-state"><span></span>资料整理与逐件核图中</div>
+    <div class="brand"><img src="assets/caresun-logo.png" alt="嘉新国际集团"><strong>纺织机械高清零件图册</strong></div>
+    <div class="build-state"><span></span>厂家原图模式</div>
+    <button id="cart-button" class="cart-button" type="button">申报清单 <b id="cart-count">0</b></button>
   </header>
-
   <main>
     <section class="workbench">
-      <div class="selector-block">
-        <label for="manual-select">选择厂家资料</label>
-        <select id="manual-select"></select>
-      </div>
-      <div class="search-block">
-        <label for="part-search">搜索当前资料</label>
-        <div class="search-input"><span>⌕</span><input id="part-search" type="search" placeholder="输入零件名称或件号"></div>
-      </div>
-      <div class="view-block">
-        <label>查看方式</label>
-        <div class="view-switch"><button class="active" data-view="3d">零件3D</button><button data-view="assemblies">总成3D</button><button data-view="pages">厂家原图</button></div>
-      </div>
+      <div class="selector-block"><label for="manual-select">选择厂家资料</label><select id="manual-select"></select></div>
+      <div class="search-block"><label for="part-search">搜索当前资料</label><div class="search-input"><span>⌕</span><input id="part-search" type="search" placeholder="输入名称、件号或物料编码"></div></div>
+      <div class="view-block"><label>查看方式</label><div class="view-switch"><button class="active" data-view="parts" type="button">零件高清图</button><button data-view="pages" type="button">厂家高清整页</button></div></div>
     </section>
-
-    <section class="result-head">
-      <div><p id="manual-kicker"></p><h1 id="result-title">零件3D预览</h1></div>
-      <div class="result-stats"><strong id="result-count">0</strong><span id="result-unit">条零件预览</span></div>
-    </section>
-
+    <section class="result-head"><div><p id="manual-kicker"></p><h1 id="result-title">零件高清图</h1></div><div class="result-stats"><strong id="result-count">0</strong><span id="result-unit">条零件</span></div></section>
     <section id="content" class="part-grid" aria-live="polite"></section>
     <nav id="pagination" class="pagination" aria-label="分页"></nav>
   </main>
 
   <dialog id="detail-dialog" class="detail-dialog">
-    <button class="close-detail" aria-label="关闭">×</button>
-    <div class="detail-stage">
-      <canvas id="detail-canvas"></canvas>
-      <img id="detail-fallback" class="detail-fallback" alt="3D静态预览">
-      <div class="stage-code" id="stage-code"></div>
-      <div class="stage-help" id="stage-help">拖动旋转 · 滚轮/双指缩放</div>
-    </div>
+    <button class="close-detail" aria-label="关闭" type="button">×</button>
+    <div class="detail-stage pdf-detail-stage"><img id="detail-image" alt="厂家零件高清原格"><div class="stage-code" id="stage-code"></div></div>
     <aside class="detail-info">
-      <p class="detail-assembly" id="detail-assembly"></p>
-      <h2 id="detail-name"></h2>
-      <p class="detail-name-en" id="detail-name-en"></p>
+      <p class="detail-assembly" id="detail-assembly"></p><h2 id="detail-name"></h2><p class="detail-name-en" id="detail-name-en"></p>
       <div class="identity">
-        <div><span id="detail-code-label">零件件号</span><div class="copy-value"><strong id="detail-code"></strong><button id="copy-code" type="button">复制</button></div></div>
-        <div><span id="detail-page-label">原手册位置</span><strong id="detail-page"></strong></div>
-        <div><span id="detail-status-label">模型状态</span><strong id="detail-status"></strong></div>
-        <div><span id="detail-dims-label">图纸尺寸</span><strong id="detail-dims"></strong></div>
-        <div><span id="detail-sheet-label">原图页眉/总成</span><strong id="detail-sheet"></strong></div>
-        <div><span id="detail-quantity-label">单台用量</span><strong id="detail-quantity"></strong></div>
+        <div><span>零件件号</span><div class="copy-value"><strong id="detail-code"></strong><button id="copy-code" type="button">复制件号</button></div></div>
+        <div><span>原手册位置</span><strong id="detail-page"></strong></div><div><span>图纸状态</span><strong id="detail-status"></strong></div>
+        <div><span>图纸尺寸</span><strong id="detail-dims"></strong></div><div><span>原图页眉/总成</span><strong id="detail-sheet"></strong></div><div><span>单台用量</span><strong id="detail-quantity"></strong></div>
       </div>
       <p class="accuracy" id="accuracy"></p>
-      <div class="explode-control" id="explode-control" hidden>
-        <div class="explode-label"><strong>爆炸程度</strong><span>拖动查看装配层级</span></div>
-        <div class="explode-range"><span>合拢</span><input id="explode-range" type="range" min="0" max="100" value="76" aria-label="爆炸程度"><span>爆炸</span></div>
-        <div class="assembly-legend" id="assembly-legend"></div>
-      </div>
-      <div class="detail-actions"><button id="show-origin">查看厂家原图</button><a id="open-vector" target="_blank" hidden>打开高清矢量原格</a><a id="open-page" target="_blank">打开原始PDF页</a></div>
-      <div class="origin-preview" id="origin-preview"><img id="origin-image" alt="厂家原图"><span id="origin-caption"></span></div>
+      <section class="purchase-panel" id="purchase-panel">
+        <div class="purchase-panel-head"><strong>历史采购对照</strong><span id="purchase-match"></span></div>
+        <div class="purchase-grid">
+          <div><span>内部物料编码</span><strong id="purchase-material-code"></strong></div>
+          <div><span>最近含税单价</span><strong id="purchase-price"></strong></div>
+          <div class="wide"><span>历史采购描述</span><strong id="purchase-description"></strong></div>
+          <div><span>最近采购日期</span><strong id="purchase-date"></strong></div>
+          <div><span>最近供应商</span><strong id="purchase-supplier"></strong></div>
+          <div><span>历史价格范围</span><strong id="purchase-range"></strong></div>
+          <div><span>采购记录</span><strong id="purchase-count"></strong></div>
+        </div>
+      </section>
+      <div class="detail-add-row"><label>添加数量<input id="detail-add-quantity" type="number" min="1" value="1"></label><button id="detail-add" type="button">添加到申报清单</button></div>
+      <div class="detail-actions"><button id="show-origin" type="button">隐藏整页原图</button><a id="open-vector" target="_blank" rel="noopener">打开高清原格</a><a id="open-page" target="_blank" rel="noopener">打开原始PDF页</a></div>
+      <div class="origin-preview show" id="origin-preview"><img id="origin-image" alt="厂家整页高清原图"><span id="origin-caption"></span></div>
     </aside>
   </dialog>
 
-  <script type="module" src="catalog.js?v=20260714-03"></script>
+  <dialog id="cart-dialog" class="cart-dialog">
+    <button id="close-cart" class="close-detail" type="button" aria-label="关闭">×</button><h2>申报清单</h2><p class="cart-tip">跨手册汇总厂家件号、历史物料编码和最近采购价格；无历史价格的项目会明确留空。</p>
+    <div id="cart-empty" class="empty"><strong>还没有添加零件</strong><span>在零件卡片上点击“添加”即可汇总。</span></div>
+    <div id="cart-table-wrap"><div id="cart-summary" class="cart-summary"></div><div class="cart-table-scroll"><table><thead><tr><th>手册</th><th>厂家件号</th><th>厂家名称</th><th>物料编码</th><th>历史采购描述</th><th>最近含税单价</th><th>数量</th><th>单位</th><th>估算金额</th><th>原页</th><th></th></tr></thead><tbody id="cart-body"></tbody></table></div><div class="cart-actions"><button id="export-excel" type="button">生成美化Excel</button><button id="copy-table" type="button">复制表格</button><button id="download-table" type="button">下载CSV备份</button><button id="clear-cart" class="danger" type="button">清空</button></div></div>
+  </dialog>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js" integrity="sha384-Pqp51FUN2/qzfxZxBCtF0stpc9ONI6MYZpVqmo8m20SoaQCzf+arZvACkLkirlPz" crossorigin="anonymous"></script>
+  <script type="module" src="catalog.js?v=20260714-public"></script>
 </body>
 </html>

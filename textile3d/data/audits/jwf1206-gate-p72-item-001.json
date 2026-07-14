@@ -1,8 +1,0 @@
-{
-  "recordKey":"jwf1206-p72-item-001","page":72,"partNumber":"FA225-8600-1","name":"吸风罩结合件","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p72-001.png","topology":"连续空心C形风罩：左下φ96入口水平接入环罩，气道沿环形转向后从右上切向出口引出；外周为连续法兰边，不是实心圆盘。",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"SUCTION COVER SUB-ASS","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"FA225-8600"},
-  "views":[{"name":"正视轮廓图","direction":"沿风罩轴向观看正面","region":"原格表头下方唯一几何视图","projectionRelation":"厂家仅提供单一正视；440和φ96只约束正视长度与左接口，轴向深度不可由此推导","solidContours":["C形内外壁","左下水平入口","右上切向出口","6个法兰孔"],"holes":["环罩中央开口","6个法兰孔"],"excludedLines":["440尺寸线与界线","φ96尺寸线","表格线","文字"]}],
-  "dimensions":{"explicit":["总长440","左接口φ96"],"derived":[],"estimated":["C形环罩内外径","出口高度","法兰孔径与孔位"],"unknown":["轴向深度","壁厚"]},
-  "material":{"value":"未标材质，展示暂用涂装金属","basis":"厂家只给名称和轮廓，未提供材质标注；展示材质不作加工依据"},
-  "ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p72-premodel-overlay-final.png#item-001"],"readiness":"ready"
-}

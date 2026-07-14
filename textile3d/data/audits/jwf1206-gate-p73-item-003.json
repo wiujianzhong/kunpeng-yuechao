@@ -1,7 +1,0 @@
-{
-  "recordKey":"jwf1206-p73-item-003","page":73,"partNumber":"FA225-8300-4","name":"门锁结合件","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p73-003.png","topology":"多零件同轴门锁装配：中空锁套贯穿左侧门板/拨片，左端螺母锁紧中心杆，右端由台阶套、压圈、螺母和方形驱动头组成；下伸梯形拨片与锁套连接，剖面白区为孔腔。",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"DOOR LOCK SUB-ASS","singleMachineQuantity":2,"quantityMeaning":"单机用量","assembly":"JWF1206-8700"},
-  "views":[{"name":"轴向全剖视图","direction":"垂直水平锁轴观看","region":"表头下方唯一剖视","projectionRelation":"沿中心线的剖视给出同轴套、中心杆和右端台阶；非回转拨片以完整外廓表达","solidContours":["中空锁套","中心杆","左端锁紧螺母","右端台阶压圈和方头","下伸梯形拨片"],"holes":["锁套轴向内孔"],"excludedLines":["水平中心线","52尺寸线与界线","剖面线","表格线","文字"]}],
-  "dimensions":{"explicit":["门板/拨片基准面至右端总长52"],"derived":[],"estimated":["各级直径与轴向分段","拨片高度、斜度和厚度","螺母尺寸"],"unknown":["材料牌号"]},
-  "material":{"value":"未标牌号，按深色金属与涂装拨片展示","basis":"剖面线说明锁套、杆和拨片均为实体材料，具体牌号未给"},"ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p73-premodel-overlay-final.png#item-003-section"],"readiness":"ready"
-}

@@ -1,8 +1,0 @@
-{
-  "recordKey":"jwf1206-p72-item-006","page":72,"partNumber":"ZFA177-0906","name":"垫片","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p72-006.png","topology":"厚1.5的薄板垫片：外廓来自φ140圆的左右对称切平，切平后安装宽120；中央大孔贯通，周围四个小孔对角分布。",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"GASKET","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"FA225-8600"},
-  "views":[{"name":"正视图","direction":"沿垫片厚度方向观看","region":"原格表头下方唯一几何视图","projectionRelation":"正视给出φ140圆弧、左右切平、120安装宽和五孔布局；δ1.5明确给出厚度","solidContours":["φ140上下圆弧","左右竖直切平边"],"holes":["中央大孔","四个对角小孔"],"excludedLines":["φ140引出线","δ1.5引出线","120尺寸线和界线","水平与竖直中心线","斜径尺寸线","表格线","文字"]}],
-  "dimensions":{"explicit":["原始外圆φ140","安装宽120","厚度1.5"],"derived":["切平半宽120/2=60","圆弧半径70"],"estimated":["中央孔径","小孔径和孔位"],"unknown":[]},
-  "material":{"value":"未标材质，展示暂用金属","basis":"厂家仅标注垫片几何，未给材质"},
-  "ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p72-premodel-overlay-final.png#item-006"],"readiness":"ready"
-}

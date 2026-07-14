@@ -1,8 +1,0 @@
-{
-  "recordKey":"jwf1206-p06-item-003","partNumber":"JWF1202-0100-12","name":"后左门结合件","page":6,"sourceCrop":"assets/manuals/jwf1206/crops/JWF1202-0100-12.png",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"quantity":1,"quantityMeaning":"单机用量"},
-  "topology":"912×830薄壁左门总成，左侧为双轨铰链框，右下为三条水平百叶开口及一小圆孔，顶部为左斜右长的宽扁把手/折边；不是右门的无差别复制。",
-  "views":[{"name":"正视图","direction":"沿门板厚度Z观察","region":"原格唯一厂家视图","projectionRelation":"单视图控制正面外廓；与右门镜向关系仅作核对，右下孔为本件独有。","solidContours":["门板外框","左双轨铰链框","顶部梯形把手"],"holes":["三条百叶开口","右下小圆孔"],"excludedLines":["912/830尺寸线","铰链中心十字","引出线"]}],
-  "dimensions":{"explicit":["门体宽912","门体高830"],"derived":[],"estimated":["铰链框约占总宽27%","把手宽高","百叶长度与间距","小孔直径","门厚"],"unknown":["背面结构","铰链轴径","百叶折边深度"]},
-  "material":{"value":"喷漆钣金门总成","basis":"门板及铰链框均以薄板/窄框正视轮廓表达"},"ambiguities":[],"preModelOverlays":["tmp/jwf1206-p06-gate-003-final.png"],"readiness":"ready"
-}

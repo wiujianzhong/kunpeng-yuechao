@@ -1,582 +1,262 @@
-import * as THREE from 'three';
-import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {manuals,parts as coreParts} from './data/parts.js?v=20260713-9';
-import {jwf1206Parts09to30} from './data/jwf1206-pages-09-30.js?v=20260713-9';
-import {jwf1206_pages_09_16_verified} from './data/jwf1206-pages-09-16-verified.js?v=20260714-03';
-import {jwf1206P17P26Verified} from './data/jwf1206-p17-p26-verified.js?v=20260713-29';
-import {jwf1206P27P37Verified} from './data/jwf1206-p27-p37-verified.js?v=20260713-29';
-import {jwf1206P38P49Verified} from './data/jwf1206-p38-p49-verified.js?v=20260714-03';
-import {jwf1206P50P61Verified} from './data/jwf1206-p50-p61-verified.js?v=20260713-29';
-import {jwf1206P62P73Verified} from './data/jwf1206-p62-p73-verified.js?v=20260713-29';
-import {jwf1206Parts31to50} from './data/jwf1206-pages-31-50.js?v=20260713-9';
-import {jwf1206Parts51to73} from './data/jwf1206-pages-51-73.js?v=20260713-9';
-import {zfa051aParts} from './data/zfa051a-parts.js?v=20260713-9';
-import {zfa051aP03P06Verified} from './data/zfa051a-p03-p06-verified.js?v=20260713-29';
-import {zfa051aP07P12Verified} from './data/zfa051a-p07-p12-verified.js?v=20260713-29';
-import {jwf1026Parts} from './data/jwf1026-parts.js?v=20260713-9';
-import {jwf1026P03P10Verified} from './data/jwf1026-p03-p10-verified.js?v=20260713-29';
-import {jwf1026P11P18Verified} from './data/jwf1026-p11-p18-verified.js?v=20260713-29';
-import {jwf1026P19P25Verified} from './data/jwf1026-p19-p25-verified.js?v=20260713-29';
-import {jwf1124cParts} from './data/jwf1124c-parts.js?v=20260713-9';
-import {jwf1124cP04Verified} from './data/jwf1124c-p04-verified.js?v=20260713-29';
-import {jwf1124cP06Verified} from './data/jwf1124c-p06-verified.js?v=20260713-29';
-import {jwf1124cP08Verified} from './data/jwf1124c-p08-verified.js?v=20260713-29';
-import {jwf1124cP09Verified} from './data/jwf1124c-p09-verified.js?v=20260713-29';
-import {jwf1124cP12Verified} from './data/jwf1124c-p12-verified.js?v=20260713-29';
-import {jwf1124cP13P14Verified} from './data/jwf1124c-p13-p14-verified.js?v=20260713-29';
-import {jwf1124cP16Verified} from './data/jwf1124c-p16-verified.js?v=20260713-29';
-import {jwf1124cP18Verified} from './data/jwf1124c-p18-verified.js?v=20260713-29';
-import {jwf1124cP20Verified} from './data/jwf1124c-p20-verified.js?v=20260713-29';
-import {jwf1124cP22Verified} from './data/jwf1124c-p22-verified.js?v=20260713-29';
-import {jwf1012Parts} from './data/jwf1012-parts.js?v=20260713-9';
-import {jwf1012P04P15Verified} from './data/jwf1012-p04-p15-verified.js?v=20260713-29';
-import {jwf1012P16P25Verified} from './data/jwf1012-p16-p25-verified.js?v=20260713-29';
-import {jwf1012P26P33Verified} from './data/jwf1012-p26-p33-verified.js?v=20260713-29';
-import {tf2513Parts} from './data/tf2513-parts.js?v=20260713-9';
-import {tf2513P03P12Verified} from './data/tf2513-p03-p12-verified.js?v=20260713-31';
-import {tf2513P14P23Verified} from './data/tf2513-p14-p23-verified.js?v=20260713-31';
-import {tf2513P25P37Verified} from './data/tf2513-p25-p37-verified.js?v=20260713-31';
-import {fa103bParts} from './data/fa103b-parts.js?v=20260713-9';
-import {fa103bP04Verified} from './data/fa103b-p04-verified.js?v=20260713-29';
-import {fa103bP06P07Verified} from './data/fa103b-p06-p07-verified.js?v=20260713-29';
-import {fa103bP09Verified} from './data/fa103b-p09-verified.js?v=20260713-29';
-import {fa103bP11Verified} from './data/fa103b-p11-verified.js?v=20260713-29';
-import {jwf1102Parts} from './data/jwf1102-parts.js?v=20260713-9';
-import {jwf1102P05Verified} from './data/jwf1102-p05-verified.js?v=20260713-29';
-import {jwf1102P08P09Verified} from './data/jwf1102-p08-p09-verified.js?v=20260713-29';
-import {jwf1102P11P12Verified} from './data/jwf1102-p11-p12-verified.js?v=20260713-29';
-import {jwf1102P14Verified} from './data/jwf1102-p14-verified.js?v=20260713-29';
-import {assemblies} from './data/assemblies.js?v=20260713-36';
-import {jwf1206_0100_verified} from './data/jwf1206-0100-verified.js?v=20260713-9';
-import {getPartModelSpec} from './data/model-specs/index.js?v=20260714-03';
-import {createPartModel} from './models/part-models.js?v=20260714-03';
-import {createAssemblyModel} from './models/assembly-models.js?v=20260713-36';
+import {manuals,parts} from './data/catalog-data.js?v=20260714-public';
 
-function inferType(part){
-  if(part.type!=='unknown')return part.type;
-  const text=(part.name||'')+(part.nameEn||'');
-  if(/气弹簧|弹簧|SPRING/i.test(text))return 'spring';
-  if(/同步带|平皮带|覆盖带|链条|BELT|CHAIN/i.test(text))return 'belt';
-  if(/减速电机|电动机|电机|GEARED MOTOR|MOTOR/i.test(text))return 'motor';
-  if(/轴承|垫圈|挡圈|密封圈|卡箍|BEARING|WASHER|COLLAR|RING|CLAMP/i.test(text))return 'ring';
-  if(/毛毡|FELT/i.test(text))return 'seal';
-  if(/气管|风管|钢管|软管|导带|拉绳|钢丝绳|TUBE|PIPE|HOSE|TAPE|ROPE|WIRE STRING/i.test(text))return 'tube';
-  if(/螺钉|拉杆|轴|销|螺栓|探测头|SCREW|ROD|SHAFT|PIN|BOLT|EXPLORER/i.test(text))return 'shaft';
-  if(/油塞|闷头|堵头|端帽|PLUG|CAP/i.test(text))return 'plug';
-  if(/带轮|PULLEY/i.test(text))return 'pulley';
-  if(/齿轮|GEAR/i.test(text))return 'gear';
-  if(/速度控制阀|消音器|接头|检测盘|套筒|轴套|轴衬|套|螺母|垫铁|VALVE|SILENCER|COUPLING|DISK|SLEEVE|BUSH|NUT|PAD IRON/i.test(text))return 'cylinder';
-  if(/定位片|帘|键|板|LATTICE|PLATE|FLAT|KEY/i.test(text))return 'panel';
-  if(/断头装置|换筒装置|接近开关|气动装置|机架|箱|壳|盖|罩|DEVICE|PROXIMITY SWITCH|PNEUMATIC DEVICE|FRAME|BODY|COVER|CASING/i.test(text))return 'casing';
-  if(/喂条嘴|喇叭口|NOZZLE|TRUMPET/i.test(text))return 'hood';
-  if(/导条|护栏|扶梯|GUIDE BAR|RAILING|LADDER/i.test(text))return 'beam';
-  if(/托垫|定位块|专用扳手|平衡块|配重|碰块|减震块|臂|指针|座|支架|WRENCH|BLOCK|ARM|POINTER|SEAT|BRACKET/i.test(text))return 'bracket';
-  return 'unknown';
-}
-
-const verified09to16Count=jwf1206_pages_09_16_verified.length;
-if(verified09to16Count!==93||jwf1206_pages_09_16_verified.some((part,index)=>part.page!==jwf1206Parts09to30[index]?.page)){
-  throw new Error('JWF1206第9—16页审计数据与原索引顺序不一致');
-}
-const verifiedJwf1206Parts09to30=[
-  ...jwf1206Parts09to30.slice(0,verified09to16Count).map((part,index)=>({...part,...jwf1206_pages_09_16_verified[index],type:part.type})),
-  ...jwf1206Parts09to30.slice(verified09to16Count)
-];
-function mergeVerifiedPage(source,page,verified,label){
-  const pageParts=source.filter(part=>part.page===page);
-  if(pageParts.length!==verified.length)throw new Error(`${label}核对数据与原索引数量不一致`);
-  let index=0;
-  return source.map(part=>part.page===page?{...part,...verified[index++],type:part.type}:part);
-}
-const verifiedJwf1206Parts09to30With17to26=[17,18,19,20,21,22,23,24,25,26].reduce((result,page)=>mergeVerifiedPage(
-  result,page,jwf1206P17P26Verified.filter(part=>part.page===page),`JWF1206第${page}页`
-),verifiedJwf1206Parts09to30);
-const verifiedJwf1206Parts09to30Through30=[27,28,29,30].reduce((result,page)=>mergeVerifiedPage(
-  result,page,jwf1206P27P37Verified.filter(part=>part.page===page),`JWF1206第${page}页`
-),verifiedJwf1206Parts09to30With17to26);
-const verifiedJwf1206Parts31to50Through37=[31,32,33,34,35,36,37].reduce((result,page)=>mergeVerifiedPage(
-  result,page,jwf1206P27P37Verified.filter(part=>part.page===page),`JWF1206第${page}页`
-),jwf1206Parts31to50);
-const verifiedJwf1206Parts31to50Through49=[38,39,40,41,42,43,44,45,46,47,48,49].reduce((result,page)=>mergeVerifiedPage(
-  result,page,jwf1206P38P49Verified.filter(part=>part.page===page),`JWF1206第${page}页`
-),verifiedJwf1206Parts31to50Through37);
-const verifiedJwf1206Parts31to50Through50=mergeVerifiedPage(
-  verifiedJwf1206Parts31to50Through49,50,jwf1206P50P61Verified.filter(part=>part.page===50),'JWF1206第50页'
-);
-const verifiedJwf1206Parts51to73Through61=[51,52,53,54,55,56,57,58,59,60,61].reduce((result,page)=>mergeVerifiedPage(
-  result,page,jwf1206P50P61Verified.filter(part=>part.page===page),`JWF1206第${page}页`
-),jwf1206Parts51to73);
-const verifiedJwf1206Parts51to73Through73=[62,63,64,65,66,67,68,69,70,71,72,73].reduce((result,page)=>mergeVerifiedPage(
-  result,page,jwf1206P62P73Verified.filter(part=>part.page===page),`JWF1206第${page}页`
-),verifiedJwf1206Parts51to73Through61);
-const verifiedJwf1124cParts=[
-  [4,jwf1124cP04Verified,'JWF1124C第4页'],
-  [6,jwf1124cP06Verified,'JWF1124C第6页'],
-  [8,jwf1124cP08Verified,'JWF1124C第8页'],
-  [9,jwf1124cP09Verified,'JWF1124C第9页'],
-  [12,jwf1124cP12Verified,'JWF1124C第12页'],
-  [13,jwf1124cP13P14Verified.filter(part=>part.page===13),'JWF1124C第13页'],
-  [14,jwf1124cP13P14Verified.filter(part=>part.page===14),'JWF1124C第14页'],
-  [16,jwf1124cP16Verified,'JWF1124C第16页'],
-  [18,jwf1124cP18Verified,'JWF1124C第18页'],
-  [20,jwf1124cP20Verified,'JWF1124C第20页'],
-  [22,jwf1124cP22Verified,'JWF1124C第22页']
-].reduce((result,[page,verified,label])=>mergeVerifiedPage(result,page,verified,label),jwf1124cParts);
-const verifiedJwf1102Parts=[
-  [5,jwf1102P05Verified,'JWF1102第5页'],
-  [8,jwf1102P08P09Verified.filter(part=>part.page===8),'JWF1102第8页'],
-  [9,jwf1102P08P09Verified.filter(part=>part.page===9),'JWF1102第9页'],
-  [11,jwf1102P11P12Verified.filter(part=>part.page===11),'JWF1102第11页'],
-  [12,jwf1102P11P12Verified.filter(part=>part.page===12),'JWF1102第12页'],
-  [14,jwf1102P14Verified,'JWF1102第14页']
-].reduce((result,[page,verified,label])=>mergeVerifiedPage(result,page,verified,label),jwf1102Parts);
-const verifiedFa103bParts=[
-  [4,fa103bP04Verified,'FA103B第4页'],
-  [6,fa103bP06P07Verified.filter(part=>part.page===6),'FA103B第6页'],
-  [7,fa103bP06P07Verified.filter(part=>part.page===7),'FA103B第7页'],
-  [9,fa103bP09Verified,'FA103B第9页'],
-  [11,fa103bP11Verified,'FA103B第11页']
-].reduce((result,[page,verified,label])=>mergeVerifiedPage(result,page,verified,label),fa103bParts);
-const verifiedZfa051aParts=[3,4,5,6,7,8,9,10,11,12].reduce((result,page)=>{
-  const source=page<=6?zfa051aP03P06Verified:zfa051aP07P12Verified;
-  return mergeVerifiedPage(result,page,source.filter(part=>part.page===page),`ZFA051A第${page}页`);
-},zfa051aParts);
-const verifiedJwf1026Parts=[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25].reduce((result,page)=>{
-  const source=page<=10?jwf1026P03P10Verified:page<=18?jwf1026P11P18Verified:jwf1026P19P25Verified;
-  return mergeVerifiedPage(result,page,source.filter(part=>part.page===page),`JWF1026第${page}页`);
-},jwf1026Parts);
-const verifiedJwf1012Parts=[4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33].reduce((result,page)=>{
-  const source=page<=15?jwf1012P04P15Verified:page<=25?jwf1012P16P25Verified:jwf1012P26P33Verified;
-  return mergeVerifiedPage(result,page,source.filter(part=>part.page===page),`JWF1012第${page}页`);
-},jwf1012Parts);
-const verifiedTf2513PartsEarly=[3,5,6,8,9,11,12].reduce((result,page)=>mergeVerifiedPage(
-  result,page,tf2513P03P12Verified.filter(part=>part.page===page),`TF2513第${page}页`
-),tf2513Parts);
-const verifiedTf2513PartsThroughLate=[25,26,28,30,31,32,34,35,37].reduce((result,page)=>mergeVerifiedPage(
-  result,page,tf2513P25P37Verified.filter(part=>part.page===page),`TF2513第${page}页`
-),verifiedTf2513PartsEarly);
-const verifiedTf2513PartsFull=[14,15,16,18,19,20,22,23].reduce((result,page)=>mergeVerifiedPage(
-  result,page,tf2513P14P23Verified.filter(part=>part.page===page),`TF2513第${page}页`
-),verifiedTf2513PartsThroughLate);
-const indexedParts=[
-  ...verifiedJwf1206Parts09to30Through30,...verifiedJwf1206Parts31to50Through50,...verifiedJwf1206Parts51to73Through73,
-  ...verifiedZfa051aParts,...verifiedJwf1026Parts,...verifiedJwf1124cParts,...verifiedJwf1012Parts,
-  ...verifiedTf2513PartsFull,...verifiedFa103bParts,...verifiedJwf1102Parts
-].map(part=>{
-  const inferred=inferType(part);
-  const verified=part.dataStatus==='厂家资料已核';
-  return {...part,type:inferred==='unknown'?'casing':inferred,status:verified?part.status:'资料与3D待核',dataStatus:verified?'厂家资料已核':'待核',modelStatus:verified?(part.modelStatus||'待核'):'待核'};
-});
-if(jwf1206_0100_verified.length!==coreParts.length)throw new Error('JWF1206-0100审计数据与模型基线数量不一致');
-const verifiedCoreParts=coreParts.map((part,index)=>({...part,...jwf1206_0100_verified[index]}));
-const parts=[...verifiedCoreParts,...indexedParts].map(part=>{
-  const modelSpec=getPartModelSpec(part.manual,part.code,part.recordKey,part.page);
-  if(!modelSpec)return part;
-  const modelStatus=`${modelSpec.level}3D已核`;
-  return {...part,modelSpec,modelStatus,status:`${part.dataStatus==='厂家资料已核'?'资料已核':'资料待核'}·${modelStatus}`};
-});
+let purchaseHistory={};
+try{purchaseHistory=(await import('./data/purchase-history.local.js?v=20260714-public')).purchaseHistory||{}}catch(error){}
+const hasPurchaseHistory=Object.keys(purchaseHistory).length>0;
 
 const manualSelect=document.querySelector('#manual-select');
 const search=document.querySelector('#part-search');
 const content=document.querySelector('#content');
 const pagination=document.querySelector('#pagination');
 const dialog=document.querySelector('#detail-dialog');
+const cartDialog=document.querySelector('#cart-dialog');
 const pageSize=6;
 const urlParams=new URLSearchParams(location.search);
-let currentManual=urlParams.get('manual')||'jwf1206';
-let currentView=urlParams.get('view')||'3d';
+const CART_KEY='jiaxin-pdf-parts-cart-v2';
+let currentManual=urlParams.get('manual')||manuals[0].id;
+let currentView=urlParams.get('view')||'parts';
 let currentPage=1;
 let query=urlParams.get('q')||'';
-let previewEngine=null;
-let detailEngine=null;
+let currentPart=null;
 let currentCopyCode='';
 let copyResetTimer=null;
-const previewCache=new Map();
+let cart=loadCart();
 
 if(!manuals.some(item=>item.id===currentManual))currentManual=manuals[0].id;
-if(!['3d','assemblies','pages'].includes(currentView))currentView='3d';
+if(!['parts','pages'].includes(currentView))currentView='parts';
 manuals.forEach(manual=>{
   const count=parts.filter(part=>part.manual===manual.id).length;
-  manualSelect.insertAdjacentHTML('beforeend',`<option value="${manual.id}">${manual.name}（${count}条零件）</option>`);
+  manualSelect.insertAdjacentHTML('beforeend',`<option value="${escapeHtml(manual.id)}">${escapeHtml(manual.name)}（${count}条零件）</option>`);
 });
 manualSelect.value=currentManual;
 search.value=query;
+if(!hasPurchaseHistory)document.querySelector('.build-state').innerHTML='<span></span>公网安全版 · 内部价格未公开';
 
+function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}
+function normalizeCode(value){return String(value||'').normalize('NFKC').toUpperCase().replace(/[—–－﹣−]/g,'-').replace(/[～〜]/g,'~').replace(/\s+/g,'')}
 function pagePath(manual,page){return `assets/manuals/${manual}/pages/page-${String(page).padStart(2,'0')}.jpg`}
 function hdPagePath(manual,page){return `assets/manuals/${manual}/pages-hd/page-${String(page).padStart(2,'0')}.jpg`}
 function pdfPagePath(manual,page){return `assets/manuals/${manual}/original.pdf#page=${page}`}
-function formatDims(part){
-  if(!Array.isArray(part.dims)||!part.dims.length)return '图纸未标明确尺寸';
-  return part.dims.join(' × ')+(part.dims.every(Number.isFinite)?' mm':'');
-}
 function formatCode(part){return part.code?.trim()||'厂家未提供件号'}
-function formatUsage(part){return part.quantity==null?'待逐格核对':`${part.quantity} ${part.quantityUnit||'件'}/台`}
-function isVerified(part){return part.dataStatus==='厂家资料已核'||part.status?.startsWith('已核图')||part.status?.startsWith('资料已核')}
-function isModelVerified(part){return part.modelStatus?.includes('已核')||part.status?.includes('3D已核')}
-function modelBadge(part){return isModelVerified(part)?part.modelSpec?.level==='尺寸级'?'尺寸3D':'轮廓3D':'3D待核'}
-
-function setCopyCode(code){
-  currentCopyCode=code?.trim?.()||'';
-  const button=document.querySelector('#copy-code');
-  clearTimeout(copyResetTimer);
-  button.disabled=!currentCopyCode;
-  button.textContent=currentCopyCode?'复制':'无件号';
+function formatDims(part){if(!Array.isArray(part.dims)||!part.dims.length)return '图纸未标明确尺寸';return part.dims.join(' × ')+(part.dims.every(Number.isFinite)?' mm':'')}
+function formatUsage(part){return part.quantity==null?'待确认':`${part.quantity} ${part.quantityUnit||'件'}/台`}
+function isVerified(part){return part.dataStatus==='厂家资料已核'||part.sourceCrop||part.sourceVector||part.status?.startsWith('资料已核')}
+function partImage(part){return part.sourceCrop||hdPagePath(part.manual,part.page)}
+function fullPageImage(part){return hdPagePath(part.manual,part.page)}
+function purchaseForPart(part){return purchaseHistory[normalizeCode(part.code)]||null}
+function formatMoney(value){return Number.isFinite(value)?`¥${new Intl.NumberFormat('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}).format(value)}`:'暂无历史价'}
+function formatUnit(value){return /^(pcs?|件)$/i.test(String(value||''))?'个':String(value||'个')}
+function priceRange(history){if(!history||!Number.isFinite(history.minTaxPrice))return '—';if(history.minTaxPrice===history.maxTaxPrice)return formatMoney(history.minTaxPrice);return `${formatMoney(history.minTaxPrice)} ～ ${formatMoney(history.maxTaxPrice)}`}
+function loadCart(){try{return JSON.parse(localStorage.getItem(CART_KEY)||'{}')}catch(error){return {}}}
+function saveCart(){localStorage.setItem(CART_KEY,JSON.stringify(cart));updateCartBadge()}
+function cartKey(part){return `${part.manual}:${part.recordKey||part.code}:${part.page}`}
+function rowForPart(part,quantity){
+  const history=purchaseForPart(part);
+  const latest=history?.latest;
+  return {
+    key:cartKey(part),manual:part.manual,manualName:manuals.find(item=>item.id===part.manual)?.name||part.manual,
+    code:formatCode(part),name:part.name||'未命名零件',nameEn:part.nameEn||'',page:part.page,assembly:part.assembly||'',
+    image:partImage(part),quantity,materialCode:latest?.materialCode||'',purchaseDescription:latest?.description||latest?.materialName||'',
+    unit:formatUnit(latest?.unit),taxPrice:latest?.taxPrice??null,netPrice:latest?.netPrice??null,latestDate:latest?.date||'',
+    supplier:latest?.supplier||'',minTaxPrice:history?.minTaxPrice??null,maxTaxPrice:history?.maxTaxPrice??null,
+    purchaseRecordCount:history?.recordCount||0,purchaseDocumentCount:history?.documentCount||0,matchType:history?.matchType||(hasPurchaseHistory?'暂无历史采购价':'内部价格未公开')
+  };
 }
-
-async function copyCurrentCode(){
-  if(!currentCopyCode)return;
-  const button=document.querySelector('#copy-code');
+function cartRows(){return Object.values(cart)}
+function updateCartBadge(){const count=cartRows().reduce((sum,row)=>sum+row.quantity,0);document.querySelector('#cart-count').textContent=count;document.querySelector('#cart-button').classList.toggle('has-items',count>0)}
+function addToCart(part,quantity=1){
+  const n=Math.max(1,Number.parseInt(quantity,10)||1);
+  const key=cartKey(part);
+  const total=(cart[key]?.quantity||0)+n;
+  cart[key]=rowForPart(part,total);
+  saveCart();
+  return n;
+}
+function removeFromCart(key){delete cart[key];saveCart()}
+function setCopyCode(code){currentCopyCode=code?.trim?.()||'';const button=document.querySelector('#copy-code');button.disabled=!currentCopyCode;button.textContent=currentCopyCode?'复制件号':'无件号'}
+async function copyText(text,button,label='已复制',resetLabel='复制件号'){
   let copied=false;
-  try{
-    if(!navigator.clipboard?.writeText)throw new Error('当前环境不支持剪贴板接口');
-    await navigator.clipboard.writeText(currentCopyCode);
-    copied=true;
-  }catch(error){}
-  if(!copied){
-    const textarea=document.createElement('textarea');
-    textarea.value=currentCopyCode;
-    textarea.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
-    textarea.setAttribute('readonly','');
-    document.body.append(textarea);
-    textarea.select();
-    textarea.setSelectionRange(0,textarea.value.length);
-    try{copied=document.execCommand('copy')}catch(error){copied=false}
-    textarea.remove();
+  try{await navigator.clipboard.writeText(text);copied=true}catch(error){
+    const textarea=document.createElement('textarea');textarea.value=text;textarea.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';document.body.append(textarea);textarea.select();try{copied=document.execCommand('copy')}catch(error2){}textarea.remove();
   }
-  button.textContent=copied?'已复制':'复制失败';
-  clearTimeout(copyResetTimer);
-  copyResetTimer=setTimeout(()=>{button.textContent='复制'},1200);
-}
-
-function createLitScene(){
-  const scene=new THREE.Scene();
-  scene.add(new THREE.HemisphereLight(0xeafff8,0x526b68,1.35));
-  scene.add(new THREE.AmbientLight(0xffffff,.28));
-  const key=new THREE.DirectionalLight(0xffffff,2.15);key.position.set(4,7,5);scene.add(key);
-  const rim=new THREE.DirectionalLight(0x6fffd5,.72);rim.position.set(-5,2,-4);scene.add(rim);
-  const lowerFill=new THREE.DirectionalLight(0xd9fff5,.55);lowerFill.position.set(1,-6,4);scene.add(lowerFill);
-  const frontFill=new THREE.DirectionalLight(0xffffff,.42);frontFill.position.set(0,1,7);scene.add(frontFill);
-  return scene;
-}
-
-function disposeModel(model){
-  if(!model)return;
-  model.traverse(object=>{
-    object.geometry?.dispose?.();
-    if(Array.isArray(object.material))object.material.forEach(item=>item.dispose?.());
-    else object.material?.dispose?.();
-  });
-}
-
-function getPreviewEngine(){
-  if(previewEngine)return previewEngine;
-  try{
-    const canvas=document.createElement('canvas');
-    const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:true});
-    renderer.setPixelRatio(1);renderer.setSize(640,400,false);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.92;
-    const scene=createLitScene();
-    const camera=new THREE.PerspectiveCamera(35,640/400,.1,100);camera.position.set(4.8,3.3,5.4);camera.lookAt(0,0,0);
-    previewEngine={canvas,renderer,scene,camera};
-  }catch(error){
-    previewEngine={failed:true};
-  }
-  return previewEngine;
-}
-
-function modelPreview(key,createModel,fallback){
-  if(previewCache.has(key))return previewCache.get(key);
-  const engine=getPreviewEngine();
-  if(engine.failed)return fallback;
-  let model;
-  try{
-    model=createModel();model.rotation.set(-.08,.52,0);engine.scene.add(model);
-    engine.renderer.render(engine.scene,engine.camera);
-    const image=engine.canvas.toDataURL('image/webp',.84);
-    previewCache.set(key,image);
-    if(previewCache.size>24)previewCache.delete(previewCache.keys().next().value);
-    return image;
-  }catch(error){
-    return fallback;
-  }finally{
-    if(model){engine.scene.remove(model);disposeModel(model)}
-  }
-}
-
-function previewImage(part){return modelPreview(`part:${part.manual}:${part.recordKey||part.code||formatCode(part)}`,()=>createPartModel(part),part.sourceCrop||hdPagePath(part.manual,part.page))}
-function assemblyPreview(assembly){return modelPreview(`assembly:${assembly.manual}:${assembly.code}`,()=>createAssemblyModel(assembly),assembly.sourceImage)}
-
-function getDetailEngine(){
-  if(detailEngine)return detailEngine;
-  const canvas=document.querySelector('#detail-canvas');
-  const stage=canvas.parentElement;
-  try{
-    const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
-    renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.92;
-    const scene=createLitScene();
-    const camera=new THREE.PerspectiveCamera(35,1,.1,100);camera.position.set(4.8,3.3,5.4);camera.lookAt(0,0,0);
-    const controls=new OrbitControls(camera,canvas);controls.enableDamping=true;controls.minDistance=2.8;controls.maxDistance=11;
-    let model=null;
-    const resize=()=>{const w=Math.max(stage.clientWidth,1),h=Math.max(stage.clientHeight,1);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()};
-    const observer=new ResizeObserver(resize);observer.observe(stage);
-    const showModel=(nextModel,cameraPosition)=>{
-      stage.classList.remove('viewer-failed');
-      if(model){scene.remove(model);disposeModel(model);model=null}
-      try{
-        model=nextModel;scene.add(model);
-        camera.position.fromArray(cameraPosition);controls.target.set(0,0,0);controls.update();resize();
-        renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});
-        return true;
-      }catch(error){
-        renderer.setAnimationLoop(null);model=null;return false;
-      }
-    };
-    detailEngine={
-      show(part){try{return showModel(createPartModel(part),[4.8,3.3,5.4])}catch(error){return false}},
-      showAssembly(assembly){try{return showModel(createAssemblyModel(assembly),[7.4,5.4,8.2])}catch(error){return false}},
-      setExplode(value){model?.userData.setExplode?.(value)},
-      pause(){renderer.setAnimationLoop(null)},
-      dispose(){
-        renderer.setAnimationLoop(null);observer.disconnect();controls.dispose();
-        if(model){scene.remove(model);disposeModel(model)}
-        renderer.dispose();renderer.forceContextLoss();
-      }
-    };
-  }catch(error){
-    detailEngine={failed:true,show:()=>false,pause:()=>{},dispose:()=>{}};
-  }
-  return detailEngine;
+  if(button){button.textContent=copied?label:'复制失败';clearTimeout(copyResetTimer);copyResetTimer=setTimeout(()=>{button.textContent=resetLabel},1200)}
+  return copied;
 }
 
 function filteredParts(){
   const pool=parts.filter(part=>part.manual===currentManual);
-  const q=query.toLowerCase();
+  const q=query.trim().toLowerCase();
   if(!q)return pool;
-  const exact=pool.filter(part=>part.code?.toLowerCase()===q);
+  const exact=pool.filter(part=>formatCode(part).toLowerCase()===q||purchaseForPart(part)?.latest?.materialCode===q);
   if(exact.length)return exact;
-  return pool.filter(part=>`${part.name||''}${part.nameEn||''}${part.code||''}${part.assembly||''}`.toLowerCase().includes(q));
+  return pool.filter(part=>{
+    const purchase=purchaseForPart(part)?.latest;
+    return `${part.name||''}${part.nameEn||''}${formatCode(part)}${part.assembly||''}${purchase?.materialCode||''}${purchase?.materialName||''}${purchase?.description||''}${purchase?.supplier||''}`.toLowerCase().includes(q);
+  });
 }
-
-function filteredAssemblies(){
-  const pool=assemblies.filter(assembly=>assembly.manual===currentManual);
-  const q=query.toLowerCase();
-  if(!q)return pool;
-  return pool.filter(assembly=>`${assembly.code}${assembly.name}${assembly.nameEn}`.toLowerCase().includes(q));
-}
-
 function updateHeading(count,unit){
   const manual=manuals.find(item=>item.id===currentManual);
   const manualParts=parts.filter(part=>part.manual===currentManual);
   const verified=manualParts.filter(isVerified).length;
-  const modeled=manualParts.filter(isModelVerified).length;
-  document.querySelector('#manual-kicker').textContent=`${manual.name} · 已收录 ${manualParts.length} 条 · 已核资料 ${verified} 条 · 已建3D ${modeled} 件`;
-  document.querySelector('#result-title').textContent={
-    '3d':'零件3D预览',
-    assemblies:'爆炸总成3D视觉',
-    pages:'厂家高清原图页'
-  }[currentView]||'零件3D预览';
+  const purchased=manualParts.filter(purchaseForPart).length;
+  const priceState=hasPurchaseHistory?`历史已购 ${purchased} 条`:'内部采购价格未公开';
+  document.querySelector('#manual-kicker').textContent=`${manual.name} · 收录 ${manualParts.length} 条 · 高清原图 ${verified} 条 · ${priceState}`;
+  document.querySelector('#result-title').textContent=currentView==='pages'?'厂家高清整页':(hasPurchaseHistory?'零件高清图与历史采购价':'零件高清图（公网安全版）');
   document.querySelector('#result-count').textContent=count;
   document.querySelector('#result-unit').textContent=unit;
 }
 
-function renderAssemblies(){
-  const found=filteredAssemblies();
-  const pages=Math.max(1,Math.ceil(found.length/pageSize));
-  currentPage=Math.min(currentPage,pages);
-  const shown=found.slice((currentPage-1)*pageSize,currentPage*pageSize);
-  content.className='assembly-grid';content.innerHTML='';updateHeading(found.length,'个爆炸总成视觉');
-  if(!shown.length){
-    content.innerHTML='<div class="empty"><strong>这本资料的总成3D正在按爆炸图逐页制作</strong><span>厂家高清原图已经保留；只有核对过爆炸图层级的总成才会出现在这里。</span></div>';
-    pagination.innerHTML='';return;
-  }
-  shown.forEach(assembly=>{
-    const card=document.createElement('article');
-    card.className='part-card assembly-card';
-    const markerLabel=assembly.markerLabel||`1–${assembly.itemCount}`;
-    card.innerHTML=`<div class="thumb-stage assembly-stage"><img class="model-preview" alt="${assembly.name} 爆炸总成3D预览"><span class="thumb-code">${assembly.code}</span><span class="model-pill verified">视觉级总成</span><span class="explode-mark">可合拢 / 可爆炸</span></div><div class="card-info"><div class="card-name-row"><h2>${assembly.name}</h2><span class="page">爆炸图第${assembly.drawingPage}页</span></div><div class="card-meta"><div><span>厂家英文</span><strong>${assembly.nameEn}</strong></div><div><span>图中标号</span><strong>${markerLabel}</strong></div></div></div>`;
-    card.addEventListener('click',()=>openAssemblyDetail(assembly));
-    content.append(card);card.querySelector('.model-preview').src=assemblyPreview(assembly);
-  });
-  renderPagination(pages);
-}
-
 function renderParts(){
   const found=filteredParts();
-  const pages=Math.max(1,Math.ceil(found.length/pageSize));
-  currentPage=Math.min(currentPage,pages);
+  const total=Math.max(1,Math.ceil(found.length/pageSize));
+  currentPage=Math.min(currentPage,total);
   const shown=found.slice((currentPage-1)*pageSize,currentPage*pageSize);
-  content.className='part-grid';content.innerHTML='';updateHeading(found.length,'条零件预览');
-  if(!shown.length){
-    content.innerHTML='<div class="empty"><strong>当前资料没有匹配零件</strong><span>请更换零件名称或件号关键词，也可切换“厂家原图”逐页查看。</span></div>';
-    pagination.innerHTML='';return;
-  }
+  content.className='part-grid';content.innerHTML='';updateHeading(found.length,'条零件');
+  if(!shown.length){content.innerHTML='<div class="empty"><strong>当前资料没有匹配零件</strong><span>可搜索厂家名称、件号或内部物料编码。</span></div>';pagination.innerHTML='';return}
   shown.forEach(part=>{
+    const history=purchaseForPart(part);
+    const latest=history?.latest;
+    const key=cartKey(part);
+    const queued=cart[key]?.quantity||0;
     const card=document.createElement('article');
-    const verified=isVerified(part);
-    const modelVerified=isModelVerified(part);
-    const hasVerifiedDims=verified&&Array.isArray(part.dims)&&part.dims.length>0;
-    card.className='part-card';
-    card.innerHTML=`<div class="thumb-stage"><img class="model-preview" alt="${part.name} 3D静态预览"><span class="thumb-code">${formatCode(part)}</span><span class="model-pill ${verified?'verified':''}">${verified?'资料已核':'资料待核'}</span><span class="model-state ${modelVerified?'verified':''}">${modelBadge(part)}</span></div><div class="card-info"><div class="card-name-row"><h2>${part.name}</h2><span class="page">原第${part.page}页</span></div><div class="card-meta"><div><span>所属总成</span><strong>${part.assembly}</strong></div><div><span>${hasVerifiedDims?'厂家明确尺寸':verified?'厂家未标尺寸':'录入尺寸（待核）'}</span><strong>${formatDims(part)}</strong></div><div class="usage"><span>单台用量</span><strong>${formatUsage(part)}</strong></div></div></div>`;
-    card.addEventListener('click',()=>openDetail(part));
+    card.className='part-card pdf-part-card';
+    const missingLabel=hasPurchaseHistory?'暂无历史价':'内部价格未公开';
+    const missingCode=hasPurchaseHistory?'未找到':'未公开';
+    const missingDescription=hasPurchaseHistory?'历史订单中未按件号找到，价格留空':'公网安全版不加载内部采购价格和供应商';
+    card.innerHTML=`<div class="thumb-stage pdf-thumb"><img class="part-image" alt="${escapeHtml(part.name)}高清原格" loading="lazy"><span class="thumb-code">${escapeHtml(formatCode(part))}</span><span class="pdf-badge">高清原图</span><span class="purchase-badge ${history?'matched':'missing'}">${history?'历史已购':missingLabel}</span></div><div class="card-info"><div class="card-name-row"><h2>${escapeHtml(part.name||'未命名零件')}</h2><span class="page">原第${part.page}页</span></div><div class="purchase-summary ${history?'matched':'missing'}"><div><span>内部物料编码</span><strong>${escapeHtml(latest?.materialCode||missingCode)}</strong></div><div><span>最近含税单价</span><strong>${history?`${escapeHtml(formatMoney(latest?.taxPrice))}${latest?.unit?` / ${escapeHtml(formatUnit(latest.unit))}`:''}`:missingLabel}</strong></div><p>${escapeHtml(latest?.description||latest?.materialName||missingDescription)}</p></div><div class="card-meta"><div><span>所属总成/页眉</span><strong>${escapeHtml(part.assembly||'厂家未提供')}</strong></div><div><span>单台用量</span><strong>${escapeHtml(formatUsage(part))}</strong></div></div><div class="card-actions"><button class="copy-card-code" type="button" ${part.code?'':'disabled'}>复制件号</button><label>添加数量<input class="add-quantity" type="number" min="1" value="1"></label><button class="add-part ${queued?'added':''}" type="button">${queued?`已添加 ${queued} 个`:'添加'}</button></div></div>`;
     content.append(card);
-    card.querySelector('.model-preview').src=previewImage(part);
+    const image=card.querySelector('.part-image');image.src=partImage(part);image.onerror=()=>{if(!image.dataset.fallback){image.dataset.fallback='1';image.src=hdPagePath(part.manual,part.page)}};
+    card.querySelector('.copy-card-code').addEventListener('click',event=>{event.stopPropagation();copyText(formatCode(part),event.currentTarget)});
+    card.querySelector('.add-part').addEventListener('click',event=>{event.stopPropagation();const amount=addToCart(part,card.querySelector('.add-quantity').value);event.currentTarget.textContent=`已添加 ${cart[key].quantity} 个`;event.currentTarget.classList.add('added');showToast(`已添加 ${amount} 个：${formatCode(part)}`)});
+    card.addEventListener('click',event=>{if(event.target.closest('button,input,label'))return;openDetail(part)});
   });
-  renderPagination(pages);
+  renderPagination(total);
 }
 
 function renderPages(){
   const manual=manuals.find(item=>item.id===currentManual);
-  const start=manual.contentStart||4;
+  const start=manual.contentStart||1;
   const pages=Array.from({length:Math.max(0,manual.pages-start+1)},(_,i)=>i+start);
-  const pageCount=Math.max(1,Math.ceil(pages.length/pageSize));
-  currentPage=Math.min(currentPage,pageCount);
+  const total=Math.max(1,Math.ceil(pages.length/pageSize));currentPage=Math.min(currentPage,total);
   const shown=pages.slice((currentPage-1)*pageSize,currentPage*pageSize);
-  content.className='page-grid';content.innerHTML='';updateHeading(pages.length,'页厂家原图');
-  shown.forEach(page=>content.insertAdjacentHTML('beforeend',`<a class="page-card" href="${pdfPagePath(currentManual,page)}" target="_blank"><img src="${hdPagePath(currentManual,page)}" loading="lazy" alt="第${page}页"><span>第 ${page} 页 · 300dpi高清页 · 点击打开原始PDF</span></a>`));
-  renderPagination(pageCount);
+  content.className='page-grid';content.innerHTML='';updateHeading(pages.length,'页高清整页');
+  shown.forEach(page=>{const link=document.createElement('a');link.className='page-card';link.href=pdfPagePath(currentManual,page);link.target='_blank';link.rel='noopener';link.innerHTML=`<img src="${hdPagePath(currentManual,page)}" loading="lazy" alt="${escapeHtml(manual.name)}第${page}页高清原图"><span>第 ${page} 页 · 高清原页 · 点击打开 PDF</span>`;content.append(link)});
+  renderPagination(total);
 }
 
-function goToPage(value,total){
-  const target=Math.max(1,Math.min(total,Number.parseInt(value,10)||currentPage));
-  if(target===currentPage)return;
-  currentPage=target;render();window.scrollTo({top:150,behavior:'smooth'});
-}
-
+function goToPage(value,total){const target=Math.max(1,Math.min(total,Number.parseInt(value,10)||currentPage));if(target===currentPage)return;currentPage=target;render();window.scrollTo({top:150,behavior:'smooth'})}
 function renderPagination(total){
   pagination.innerHTML='';
-  const previousButton=document.createElement('button');previousButton.textContent='上一页';previousButton.className='page-step';previousButton.disabled=currentPage===1;previousButton.addEventListener('click',()=>goToPage(currentPage-1,total));pagination.append(previousButton);
-  const wanted=new Set([1,total,currentPage-2,currentPage-1,currentPage,currentPage+1,currentPage+2]);
-  const pageNumbers=[...wanted].filter(i=>i>=1&&i<=total).sort((a,b)=>a-b);
-  let previous=0;
-  for(const i of pageNumbers){
-    if(previous&&i-previous>1){const gap=document.createElement('span');gap.textContent='…';gap.className='page-gap';pagination.append(gap)}
-    const button=document.createElement('button');button.textContent=i;button.classList.toggle('active',i===currentPage);button.setAttribute('aria-label',`第${i}页`);button.addEventListener('click',()=>goToPage(i,total));pagination.append(button);previous=i;
-  }
-  const nextButton=document.createElement('button');nextButton.textContent='下一页';nextButton.className='page-step';nextButton.disabled=currentPage===total;nextButton.addEventListener('click',()=>goToPage(currentPage+1,total));pagination.append(nextButton);
-  const jump=document.createElement('form');jump.className='page-jump';jump.innerHTML=`<span>到</span><input type="number" inputmode="numeric" min="1" max="${total}" value="${currentPage}" aria-label="输入页码"><span>页</span><button type="submit">跳转</button>`;
-  jump.addEventListener('submit',event=>{event.preventDefault();goToPage(jump.querySelector('input').value,total)});
-  pagination.append(jump);
+  const prev=document.createElement('button');prev.textContent='上一页';prev.className='page-step';prev.disabled=currentPage===1;prev.onclick=()=>goToPage(currentPage-1,total);pagination.append(prev);
+  const wanted=new Set([1,total,currentPage-2,currentPage-1,currentPage,currentPage+1,currentPage+2]);const nums=[...wanted].filter(i=>i>=1&&i<=total).sort((a,b)=>a-b);let previous=0;
+  for(const i of nums){if(previous&&i-previous>1){const gap=document.createElement('span');gap.textContent='…';gap.className='page-gap';pagination.append(gap)}const button=document.createElement('button');button.textContent=i;button.classList.toggle('active',i===currentPage);button.onclick=()=>goToPage(i,total);pagination.append(button);previous=i}
+  const next=document.createElement('button');next.textContent='下一页';next.className='page-step';next.disabled=currentPage===total;next.onclick=()=>goToPage(currentPage+1,total);pagination.append(next);
+  const jump=document.createElement('form');jump.className='page-jump';jump.innerHTML=`<span>到</span><input type="number" min="1" max="${total}" value="${currentPage}" aria-label="输入页码"><span>页</span><button type="submit">跳转</button>`;jump.onsubmit=event=>{event.preventDefault();goToPage(jump.querySelector('input').value,total)};pagination.append(jump);
 }
 
-function render(){
-  if(currentView==='assemblies')renderAssemblies();
-  else if(currentView==='pages')renderPages();
-  else renderParts();
+function fillPurchaseDetail(part){
+  const history=purchaseForPart(part);
+  const latest=history?.latest;
+  const panel=document.querySelector('#purchase-panel');
+  panel.classList.toggle('missing',!history);
+  document.querySelector('#purchase-match').textContent=history?'件号精确匹配':(hasPurchaseHistory?'暂无历史采购价':'公网安全版未加载');
+  document.querySelector('#purchase-material-code').textContent=latest?.materialCode||'—';
+  document.querySelector('#purchase-price').textContent=history?`${formatMoney(latest?.taxPrice)} / ${formatUnit(latest?.unit)}`:'—';
+  document.querySelector('#purchase-description').textContent=latest?.description||latest?.materialName||(hasPurchaseHistory?'历史订单中未按厂家件号找到对应记录':'内部采购价格和供应商未在公网发布');
+  document.querySelector('#purchase-date').textContent=latest?.date||'—';
+  document.querySelector('#purchase-supplier').textContent=latest?.supplier||'—';
+  document.querySelector('#purchase-range').textContent=priceRange(history);
+  document.querySelector('#purchase-count').textContent=history?`${history.recordCount} 条明细 / ${history.documentCount} 张订单`:'0 条';
 }
-
 function openDetail(part){
+  currentPart=part;
   const manualName=manuals.find(item=>item.id===part.manual)?.name||part.manual;
-  const verified=isVerified(part);
-  const modelVerified=isModelVerified(part);
   document.querySelector('.detail-info').scrollTop=0;
-  document.querySelector('#detail-code-label').textContent='零件件号';
-  document.querySelector('#detail-page-label').textContent='原手册位置';
-  document.querySelector('#detail-status-label').textContent='核对状态';
-  document.querySelector('#detail-sheet-label').textContent='原图页眉/总成';
-  document.querySelector('#detail-quantity-label').textContent='单台用量';
-  document.querySelector('#stage-help').textContent='拖动旋转 · 滚轮/双指缩放';
-  document.querySelector('#explode-control').hidden=true;
   document.querySelector('#stage-code').textContent=formatCode(part);
-  document.querySelector('#detail-assembly').textContent=`${part.assembly}${part.sheetPage?` · ${part.sheetPage}`:''} · ${manualName}`;
-  document.querySelector('#detail-name').textContent=part.name;
+  document.querySelector('#detail-assembly').textContent=`${part.assembly||'厂家未提供页眉'} · ${manualName}`;
+  document.querySelector('#detail-name').textContent=part.name||'未命名零件';
   document.querySelector('#detail-name-en').textContent=part.nameEn||'厂家原格未提供英文描述';
-  document.querySelector('#detail-code').textContent=formatCode(part);
-  setCopyCode(part.code);
+  document.querySelector('#detail-code').textContent=formatCode(part);setCopyCode(part.code);
   document.querySelector('#detail-page').textContent=`第 ${part.page} 页`;
-  document.querySelector('#detail-status').textContent=`${part.dataStatus||'待核'} · ${part.modelStatus||'待核'}`;
+  document.querySelector('#detail-status').textContent=isVerified(part)?'厂家高清原图已收录':'高清原图待补充';
   document.querySelector('#detail-dims').textContent=formatDims(part);
-  document.querySelector('#detail-dims-label').textContent=verified&&part.dims?.length?'厂家明确尺寸':verified?'厂家未标尺寸':'录入尺寸（待核）';
   document.querySelector('#detail-sheet').textContent=part.assembly||'厂家未提供';
   document.querySelector('#detail-quantity').textContent=formatUsage(part);
-  const assumptions=part.modelSpec?.source?.assumptions?.join('；');
-  document.querySelector('#accuracy').textContent=verified
-    ?modelVerified
-      ?`厂家资料和主要3D轮廓均已逐项核对。${part.dimensionNote||'图纸未标注尺寸仍不得推测'}${assumptions?`；未标部分：${assumptions}`:'；未标注的高度、深度、板厚和背面结构不作为准确数据'}。`
-      :`件号、名称、英文描述、页码和厂家明确尺寸已按原格核对；当前3D仍是待核预览，不可作为加工、采购或装配依据。`
-    :'当前录入的件号、名称、尺寸和3D均尚未逐件与厂家原图核对，不可作为申报、采购、加工或装配依据；下方厂家原页已默认展开，请以原图为准。';
-  const source=part.sourceCrop||hdPagePath(part.manual,part.page);
-  const originPreview=document.querySelector('#origin-preview');
-  const showOrigin=document.querySelector('#show-origin');
-  document.querySelector('#origin-image').src=source;
-  document.querySelector('#origin-caption').textContent=part.sourceCrop
-    ?`厂家原手册第${part.page}页 · 600dpi零件原格（非AI重画）`
-    :`厂家原手册第${part.page}页 · 300dpi高清整页（非AI重画）`;
-  const pageLink=document.querySelector('#open-page');
-  pageLink.href=pdfPagePath(part.manual,part.page);pageLink.textContent='打开原始PDF页';
-  const vectorLink=document.querySelector('#open-vector');
-  vectorLink.hidden=!part.sourceVector;vectorLink.href=part.sourceVector||'#';vectorLink.textContent='打开矢量原格';
-  originPreview.classList.add('show');
-  showOrigin.textContent=part.sourceCrop?'隐藏厂家原格':'隐藏厂家原页';
+  document.querySelector('#accuracy').textContent='厂家图册负责确认件号和外形；历史采购价来自订单明细，仅供本次申报参考，最终价格以采购询价为准。';
+  fillPurchaseDetail(part);
+  const detailImage=document.querySelector('#detail-image');detailImage.src=partImage(part);detailImage.onerror=()=>{detailImage.src=hdPagePath(part.manual,part.page)};
+  document.querySelector('#origin-image').src=fullPageImage(part);
+  document.querySelector('#origin-caption').textContent=`厂家原手册第${part.page}页 · 高清整页原图（非AI重画）`;
+  document.querySelector('#origin-preview').classList.add('show');document.querySelector('#show-origin').textContent='隐藏整页原图';
+  document.querySelector('#open-page').href=pdfPagePath(part.manual,part.page);
+  document.querySelector('#open-vector').hidden=!part.sourceVector;document.querySelector('#open-vector').href=part.sourceVector||'#';
+  document.querySelector('#detail-add-quantity').value=1;
   if(!dialog.open)dialog.showModal();
-  const active=getDetailEngine().show(part);
-  const fallback=document.querySelector('#detail-fallback');
-  fallback.classList.toggle('show',!active);fallback.src=previewImage(part);
-  document.querySelector('.detail-stage').classList.toggle('viewer-failed',!active);
 }
 
-function openAssemblyDetail(assembly){
-  const manualName=manuals.find(item=>item.id===assembly.manual)?.name||assembly.manual;
-  document.querySelector('.detail-info').scrollTop=0;
-  document.querySelector('#detail-code-label').textContent='总成号';
-  document.querySelector('#detail-page-label').textContent='厂家爆炸图';
-  document.querySelector('#detail-status-label').textContent='模型级别';
-  document.querySelector('#detail-dims-label').textContent='爆炸图标号';
-  document.querySelector('#detail-sheet-label').textContent='配套明细表';
-  document.querySelector('#detail-quantity-label').textContent='总成构件';
-  document.querySelector('#stage-help').textContent='拖动旋转 · 双指缩放 · 下方调节爆炸程度';
-  document.querySelector('#stage-code').textContent=assembly.code;
-  document.querySelector('#detail-assembly').textContent=`${assembly.code} · ${manualName}`;
-  document.querySelector('#detail-name').textContent=assembly.name;
-  document.querySelector('#detail-name-en').textContent=assembly.nameEn;
-  document.querySelector('#detail-code').textContent=assembly.code;
-  setCopyCode(assembly.code);
-  document.querySelector('#detail-page').textContent=`第 ${assembly.drawingPage} 页`;
-  document.querySelector('#detail-status').textContent=assembly.status;
-  document.querySelector('#detail-dims').textContent=assembly.markerLabel||`1–${assembly.itemCount}`;
-  document.querySelector('#detail-sheet').textContent=assembly.bomPages.map(page=>`第${page}页`).join('、');
-  document.querySelector('#detail-quantity').textContent=`${assembly.itemCount} 项`;
-  document.querySelector('#accuracy').textContent=`${assembly.accuracy} 该模型用于理解结构和装配顺序，不可作为加工、配合或维修尺寸依据。`;
-  const control=document.querySelector('#explode-control');control.hidden=false;
-  const range=document.querySelector('#explode-range');range.value=76;
-  document.querySelector('#assembly-legend').innerHTML=assembly.keyParts.map(item=>`<span>${item}</span>`).join('');
-  document.querySelector('#origin-image').src=assembly.sourceImage;
-  document.querySelector('#origin-caption').textContent=`厂家原手册第${assembly.drawingPage}页 · ${assembly.sourceDpi||300}dpi高清爆炸图（非AI重画）`;
-  document.querySelector('#origin-preview').classList.add('show');
-  document.querySelector('#show-origin').textContent='隐藏厂家爆炸图';
-  const vectorLink=document.querySelector('#open-vector');vectorLink.hidden=false;vectorLink.href=assembly.sourceVector;vectorLink.textContent='打开原始PDF页';
-  const pageLink=document.querySelector('#open-page');pageLink.href=assembly.sourceImage;pageLink.textContent='打开高清整页';
-  if(!dialog.open)dialog.showModal();
-  const active=getDetailEngine().showAssembly(assembly);getDetailEngine().setExplode(.76);
-  const fallback=document.querySelector('#detail-fallback');fallback.classList.toggle('show',!active);fallback.src=assemblyPreview(assembly);
-  document.querySelector('.detail-stage').classList.toggle('viewer-failed',!active);
+function openCart(){renderCart();if(!cartDialog.open)cartDialog.showModal()}
+function renderCart(){
+  const body=document.querySelector('#cart-body');const rows=cartRows();
+  document.querySelector('#cart-empty').hidden=rows.length>0;document.querySelector('#cart-table-wrap').hidden=!rows.length;
+  const known=rows.filter(row=>Number.isFinite(row.taxPrice));const totalQty=rows.reduce((sum,row)=>sum+row.quantity,0);const totalMoney=known.reduce((sum,row)=>sum+row.quantity*row.taxPrice,0);
+  document.querySelector('#cart-summary').innerHTML=`<span>共 <b>${rows.length}</b> 种 / <b>${totalQty}</b> 个</span><span>有历史价 <b>${known.length}</b> 种</span><span>待询价 <b>${rows.length-known.length}</b> 种</span><span>已知价格估算 <b>${escapeHtml(formatMoney(totalMoney))}</b></span>`;
+  body.innerHTML=rows.map(row=>{const estimated=Number.isFinite(row.taxPrice)?row.quantity*row.taxPrice:null;return `<tr><td>${escapeHtml(row.manualName)}</td><td class="code-cell">${escapeHtml(row.code)}</td><td>${escapeHtml(row.name)}</td><td>${escapeHtml(row.materialCode||'—')}</td><td class="description-cell">${escapeHtml(row.purchaseDescription||'暂无历史采购记录')}</td><td class="money-cell ${Number.isFinite(row.taxPrice)?'':'unknown'}">${escapeHtml(formatMoney(row.taxPrice))}</td><td><input class="cart-quantity" data-key="${escapeHtml(row.key)}" type="number" min="1" value="${row.quantity}"></td><td>${escapeHtml(formatUnit(row.unit))}</td><td class="money-cell">${escapeHtml(formatMoney(estimated))}</td><td>第${row.page}页</td><td><button class="remove-cart" data-key="${escapeHtml(row.key)}" type="button">移除</button></td></tr>`}).join('');
+  body.querySelectorAll('.cart-quantity').forEach(input=>input.onchange=()=>{const row=cart[input.dataset.key];if(row){row.quantity=Math.max(1,Number.parseInt(input.value,10)||1);saveCart();renderCart()}});
+  body.querySelectorAll('.remove-cart').forEach(button=>button.onclick=()=>{removeFromCart(button.dataset.key);renderCart();render()});
 }
+function tableText(){return ['手册\t厂家件号\t厂家名称\t物料编码\t历史采购描述\t申报数量\t单位\t最近含税单价\t估算含税金额\t最近采购日期\t供应商\t原页'].concat(cartRows().map(row=>[row.manualName,row.code,row.name,row.materialCode,row.purchaseDescription,row.quantity,formatUnit(row.unit),row.taxPrice??'',Number.isFinite(row.taxPrice)?row.quantity*row.taxPrice:'',row.latestDate,row.supplier,`第${row.page}页`].join('\t'))).join('\n')}
+function downloadCsv(){
+  const rows=[['手册','厂家件号','厂家名称','物料编码','历史采购描述','申报数量','单位','最近含税单价','估算含税金额','最近采购日期','供应商','原页','历史价格范围','价格依据'],...cartRows().map(row=>[row.manualName,row.code,row.name,row.materialCode,row.purchaseDescription,row.quantity,formatUnit(row.unit),row.taxPrice??'',Number.isFinite(row.taxPrice)?row.quantity*row.taxPrice:'',row.latestDate,row.supplier,`第${row.page}页`,Number.isFinite(row.minTaxPrice)?`${row.minTaxPrice}-${row.maxTaxPrice}`:'',row.matchType])];
+  const csv='\ufeff'+rows.map(row=>row.map(value=>`"${String(value??'').replaceAll('"','""')}"`).join(',')).join('\n');
+  downloadBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),`嘉新纺织零件申报清单-${localDate()}.csv`);
+}
+function localDate(){const date=new Date();return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`}
+function downloadBlob(blob,filename){const link=document.createElement('a');const url=URL.createObjectURL(blob);link.href=url;link.download=filename;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+async function exportExcel(button){
+  const rows=cartRows();
+  if(!rows.length)return;
+  if(!globalThis.ExcelJS){showToast('Excel组件未加载，请联网刷新后重试');return}
+  const oldLabel=button.textContent;button.disabled=true;button.textContent='正在生成Excel…';
+  try{
+    const workbook=new ExcelJS.Workbook();workbook.creator='嘉新纺织机械高清零件图册';workbook.created=new Date();
+    const sheet=workbook.addWorksheet('采购申报单',{views:[{state:'frozen',xSplit:2,ySplit:5,showGridLines:false}],pageSetup:{orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,paperSize:9,margins:{left:.25,right:.25,top:.5,bottom:.5,header:.2,footer:.2}}});
+    const known=rows.filter(row=>Number.isFinite(row.taxPrice));const totalQty=rows.reduce((sum,row)=>sum+row.quantity,0);const knownTotal=known.reduce((sum,row)=>sum+row.quantity*row.taxPrice,0);
+    sheet.mergeCells('A1:O1');sheet.getCell('A1').value='嘉新纺织机械零件采购申报单';sheet.getCell('A1').font={name:'Microsoft YaHei',size:20,bold:true,color:{argb:'FFFFFFFF'}};sheet.getCell('A1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF12363B'}};sheet.getCell('A1').alignment={horizontal:'center',vertical:'middle'};sheet.getRow(1).height=34;
+    sheet.mergeCells('A2:O2');sheet.getCell('A2').value=`生成日期：${localDate()}　数据来源：厂家高清图册 + 历史采购订单（件号精确匹配）`;sheet.getCell('A2').font={name:'Microsoft YaHei',size:10,color:{argb:'FF53645F'}};sheet.getCell('A2').alignment={horizontal:'center'};sheet.getRow(2).height=22;
+    sheet.mergeCells('A3:O3');sheet.getCell('A3').value=`共 ${rows.length} 种 / ${totalQty} 个　有历史价 ${known.length} 种　待询价 ${rows.length-known.length} 种　已知价格估算 ${formatMoney(knownTotal)}`;sheet.getCell('A3').font={name:'Microsoft YaHei',size:11,bold:true,color:{argb:'FF2F6B3D'}};sheet.getCell('A3').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEAF3E5'}};sheet.getCell('A3').alignment={horizontal:'center'};sheet.getRow(3).height=24;
+    const headers=['序号','资料手册','厂家件号','厂家名称','物料编码','历史采购描述','申报数量','单位','最近含税单价','估算含税金额','最近采购日期','最近供应商','原手册页','历史价格范围','价格依据'];
+    sheet.getRow(5).values=headers;sheet.getRow(5).height=30;
+    sheet.getRow(5).eachCell(cell=>{cell.font={name:'Microsoft YaHei',size:10,bold:true,color:{argb:'FFFFFFFF'}};cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2F6B3D'}};cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};cell.border={bottom:{style:'medium',color:{argb:'FF9CBD8D'}}}});
+    sheet.columns=[{width:7},{width:24},{width:20},{width:22},{width:18},{width:34},{width:11},{width:9},{width:15},{width:16},{width:14},{width:28},{width:12},{width:22},{width:16}];
+    for(let index=0;index<rows.length;index++){
+      const item=rows[index];const excelRow=index+6;const estimated=Number.isFinite(item.taxPrice)?item.quantity*item.taxPrice:null;
+      const row=sheet.getRow(excelRow);row.values=[index+1,item.manualName,item.code,item.name,item.materialCode||'—',item.purchaseDescription||'暂无历史采购记录',item.quantity,formatUnit(item.unit),item.taxPrice??null,estimated,item.latestDate||'—',item.supplier||'—',`第${item.page}页`,Number.isFinite(item.minTaxPrice)?priceRange({minTaxPrice:item.minTaxPrice,maxTaxPrice:item.maxTaxPrice}):'—',item.matchType];row.height=46;
+      row.eachCell({includeEmpty:true},cell=>{cell.font={name:'Microsoft YaHei',size:9,color:{argb:'FF20302D'}};cell.alignment={vertical:'middle',wrapText:true};cell.border={bottom:{style:'thin',color:{argb:'FFD8DFD9'}}};if(index%2)cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF5F8F3'}}});
+      for(const col of [1,7,8,9,10,11,13,15])row.getCell(col).alignment={horizontal:'center',vertical:'middle',wrapText:true};
+      row.getCell(3).numFmt='@';row.getCell(5).numFmt='@';row.getCell(9).numFmt='¥#,##0.00';row.getCell(10).numFmt='¥#,##0.00';
+      row.getCell(13).value={text:`第${item.page}页`,hyperlink:new URL(pdfPagePath(item.manual,item.page),location.href).href};row.getCell(13).font={name:'Microsoft YaHei',size:9,color:{argb:'FF2F6B3D'},underline:true};
+      if(!Number.isFinite(item.taxPrice)){for(const col of [5,6,9,10,11,12,14,15])row.getCell(col).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF2CC'}}}
+    }
+    const totalRow=rows.length+7;sheet.mergeCells(`A${totalRow}:F${totalRow}`);sheet.getCell(`A${totalRow}`).value='合计（无历史价格的项目不计入估算金额）';sheet.getCell(`G${totalRow}`).value={formula:`SUM(G6:G${rows.length+5})`,result:totalQty};sheet.mergeCells(`H${totalRow}:I${totalRow}`);sheet.getCell(`H${totalRow}`).value='已知价格估算合计';sheet.getCell(`J${totalRow}`).value={formula:`SUM(J6:J${rows.length+5})`,result:knownTotal};sheet.getCell(`J${totalRow}`).numFmt='¥#,##0.00';sheet.mergeCells(`K${totalRow}:O${totalRow}`);sheet.getCell(`K${totalRow}`).value=`待询价 ${rows.length-known.length} 种`;
+    sheet.getRow(totalRow).height=28;sheet.getRow(totalRow).eachCell({includeEmpty:true},cell=>{cell.font={name:'Microsoft YaHei',size:10,bold:true,color:{argb:'FFFFFFFF'}};cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF12363B'}};cell.alignment={horizontal:'center',vertical:'middle'}});
+    sheet.autoFilter={from:'A5',to:'O5'};sheet.properties.defaultRowHeight=20;sheet.pageSetup.printArea=`A1:O${totalRow}`;
+    const buffer=await workbook.xlsx.writeBuffer();downloadBlob(new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),`嘉新纺织零件采购申报单-${localDate()}.xlsx`);showToast('美化Excel已生成');
+  }catch(error){console.error(error);showToast('Excel生成失败，请先下载CSV备份')}
+  finally{button.disabled=false;button.textContent=oldLabel}
+}
+function showToast(message){let toast=document.querySelector('.toast');if(!toast){toast=document.createElement('div');toast.className='toast';document.body.append(toast)}toast.textContent=message;toast.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>toast.classList.remove('show'),2200)}
+function render(){if(currentView==='pages')renderPages();else renderParts();updateCartBadge()}
 
-manualSelect.addEventListener('change',()=>{currentManual=manualSelect.value;currentPage=1;search.value='';query='';render()});
-let searchTimer;
-search.addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{query=search.value.trim();currentPage=1;render()},160)});
-document.querySelectorAll('.view-switch button').forEach(button=>button.addEventListener('click',()=>{
-  document.querySelectorAll('.view-switch button').forEach(item=>item.classList.remove('active'));
-  button.classList.add('active');currentView=button.dataset.view;currentPage=1;render();
-}));
-document.querySelector('.close-detail').addEventListener('click',()=>dialog.close());
-document.querySelector('#copy-code').addEventListener('click',copyCurrentCode);
-dialog.addEventListener('close',()=>{
-  detailEngine?.pause();
-  if(detailEngine?.failed)detailEngine=null;
-  document.querySelector('.detail-stage').classList.remove('viewer-failed');
-});
-document.querySelector('#show-origin').addEventListener('click',event=>{
-  const shown=document.querySelector('#origin-preview').classList.toggle('show');
-  event.currentTarget.textContent=shown?'隐藏厂家原图':'查看厂家原图';
-});
-document.querySelector('#explode-range').addEventListener('input',event=>detailEngine?.setExplode(Number(event.currentTarget.value)/100));
-window.addEventListener('beforeunload',()=>{
-  detailEngine?.dispose();
-  if(previewEngine?.renderer){previewEngine.renderer.dispose();previewEngine.renderer.forceContextLoss()}
-});
-
+manualSelect.onchange=()=>{currentManual=manualSelect.value;currentPage=1;search.value='';query='';render()};
+let searchTimer;search.oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{query=search.value.trim();currentPage=1;render()},160)};
+document.querySelectorAll('.view-switch button').forEach(button=>button.onclick=()=>{document.querySelectorAll('.view-switch button').forEach(item=>item.classList.remove('active'));button.classList.add('active');currentView=button.dataset.view;currentPage=1;render()});
+document.querySelector('.close-detail').onclick=()=>dialog.close();
+document.querySelector('#copy-code').onclick=()=>copyText(currentCopyCode,document.querySelector('#copy-code'));
+document.querySelector('#detail-add').onclick=()=>{if(currentPart){addToCart(currentPart,document.querySelector('#detail-add-quantity').value);showToast(`已添加：${formatCode(currentPart)}`);render()}};
+document.querySelector('#show-origin').onclick=event=>{const shown=document.querySelector('#origin-preview').classList.toggle('show');event.currentTarget.textContent=shown?'隐藏整页原图':'查看整页原图'};
+document.querySelector('#cart-button').onclick=openCart;document.querySelector('#close-cart').onclick=()=>cartDialog.close();
+document.querySelector('#copy-table').onclick=event=>copyText(tableText(),event.currentTarget,'已复制表格','复制表格');
+document.querySelector('#download-table').onclick=downloadCsv;document.querySelector('#export-excel').onclick=event=>exportExcel(event.currentTarget);
+document.querySelector('#clear-cart').onclick=()=>{cart={};saveCart();renderCart();render()};
 document.querySelectorAll('.view-switch button').forEach(button=>button.classList.toggle('active',button.dataset.view===currentView));
 render();
-const directPart=urlParams.get('part');
-if(directPart){const target=parts.find(part=>part.recordKey===directPart)||parts.find(part=>part.code===directPart);if(target)openDetail(target)}
-const directAssembly=urlParams.get('assembly');
-if(directAssembly){const target=assemblies.find(assembly=>assembly.code===directAssembly);if(target)openAssemblyDetail(target)}

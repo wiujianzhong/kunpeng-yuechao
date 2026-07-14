@@ -1,6 +1,0 @@
-{
-  "recordKey":"jwf1206-p06-item-014","partNumber":"JWF1206-0106","name":"左线槽盖（三）","page":6,"sourceCrop":"assets/manuals/jwf1206/crops/JWF1206-0106.png",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"quantity":1,"quantityMeaning":"单机用量"},"topology":"974×95矩形单片展开薄板，孔位线上五个安装孔；所有十字均为孔中心定位辅助线。",
-  "views":[{"name":"展开平面图","direction":"沿板厚Z观察","region":"原格唯一视图","projectionRelation":"单视图直接定义矩形外廓和孔位。","solidContours":["974×95矩形板"],"holes":["五安装孔"],"excludedLines":["尺寸线","孔位中心线","中心十字"]}],
-  "dimensions":{"explicit":["长974","宽95"],"derived":[],"estimated":["孔径与孔距","板厚"],"unknown":["折弯状态"]},"material":{"value":"喷漆薄钢板","basis":"名称为线槽盖且以展开平面图表达"},"ambiguities":[],"preModelOverlays":["tmp/jwf1206-p06-gate-014-final.png"],"readiness":"ready"
-}

@@ -1,8 +1,0 @@
-{
-  "recordKey":"jwf1206-p72-item-007","page":72,"partNumber":"ZFA177-0907","name":"垫片","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p72-007.png","topology":"厚0.5的薄圆环垫片：φ25外圆完整闭合，中心圆孔在12点方向有矩形键槽扩孔，轮廓与0905同类但厚度独立核对。",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"GASKET","singleMachineQuantity":3,"quantityMeaning":"单机用量","assembly":"FA225-8600"},
-  "views":[{"name":"正视图","direction":"沿垫片厚度方向观看","region":"原格表头下方唯一几何视图","projectionRelation":"正视给出闭合外圆和带键槽内孔；δ0.5明确给出厚度，不直接复用1mm件的厚度","solidContours":["φ25闭合外圆","内孔上方键槽轮廓"],"holes":["带键槽的中心贯通孔"],"excludedLines":["φ25引出线","δ0.5引出线","水平和竖直中心线","表格线","文字"]}],
-  "dimensions":{"explicit":["外径φ25","厚度0.5"],"derived":[],"estimated":["内孔径","键槽宽高"],"unknown":[]},
-  "material":{"value":"未标材质，展示暂用金属","basis":"垫片未标具体材料牌号"},
-  "ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p72-premodel-overlay-final.png#item-007"],"readiness":"ready"
-}

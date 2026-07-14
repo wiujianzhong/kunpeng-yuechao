@@ -1,7 +1,0 @@
-{
-  "recordKey":"jwf1206-p64-item-004","page":64,"partNumber":"JWF1202-8003","name":"管接头","sourceCrop":"tmp/pdfs/jwf1206-p56-p64-review/tiles/p64-004.png","topology":"同轴薄壁管接头：左端φ98外缘，外壁向右轻微收锥；左半部有外凸台阶和中部小环肩，内部为贯通孔，剖面白区不是实心。",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"PIPE COUNECTOR","singleMachineQuantity":2,"quantityMeaning":"单机用量","assembly":"JWF1206-8000"},
-  "views":[{"name":"轴向全剖视图","direction":"垂直水平回转轴观看","region":"表头下方唯一剖视","projectionRelation":"上下剖面关于中心线对称，可绕水平轴回转为同一薄壁接头","solidContours":["φ98左端外缘","左部外凸台阶","中部小环肩","向右收锥外壁","内壁"],"holes":["轴向贯通内孔"],"excludedLines":["水平中心线","剖面线","φ98和100尺寸线与界线"]}],
-  "dimensions":{"explicit":["左端外径φ98","轴向总长100"],"derived":[],"estimated":["右端外径","内径","壁厚","台阶长度和高度"],"unknown":[]},
-  "material":{"value":"未标牌号，按金属接头展示","basis":"剖视为连续薄壁回转件，厂家未给具体材料"},"ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p56-p64-review/p64-premodel-overlay-final.png#item-004-section"],"readiness":"ready"
-}

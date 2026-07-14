@@ -1,6 +1,0 @@
-{
-  "recordKey":"jwf1206-p06-item-011","partNumber":"JWF1206-0103","name":"右线槽盖（三）","page":6,"sourceCrop":"assets/manuals/jwf1206/crops/JWF1206-0103.png",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"quantity":1,"quantityMeaning":"单机用量"},"topology":"1212×160单片展开薄板，右上有两处连续避让缺口，孔位线上六个安装孔。",
-  "views":[{"name":"展开平面图","direction":"沿板厚Z观察","region":"原格唯一视图","projectionRelation":"单视图直接定义展开外廓、缺口和孔位。","solidContours":["1212×160板外廓","右上双缺口"],"holes":["六安装孔"],"excludedLines":["尺寸线","孔位中心线","中心十字"]}],
-  "dimensions":{"explicit":["长1212","宽160"],"derived":[],"estimated":["缺口尺寸","孔径与孔距","板厚"],"unknown":["折弯状态"]},"material":{"value":"喷漆薄钢板","basis":"名称为线槽盖且以展开平面图表达"},"ambiguities":[],"preModelOverlays":["tmp/jwf1206-p06-gate-011-final.png"],"readiness":"ready"
-}

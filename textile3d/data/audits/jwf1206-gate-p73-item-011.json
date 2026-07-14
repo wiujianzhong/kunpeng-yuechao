@@ -1,7 +1,0 @@
-{
-  "recordKey":"jwf1206-p73-item-011","page":73,"partNumber":"TZH1075","name":"密封条","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p73-011.png","topology":"沿长度方向连续挤出的橡胶密封条：上部为中空泡形管，下部为开口向下的U形夹持槽，槽内左右交错布置倒齿；截面外包络9×21。",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"SEALING STRIP","singleMachineQuantity":132,"quantityUnit":"dm","quantityMeaning":"单机用量","assembly":"JWF1206-8700"},
-  "views":[{"name":"截面剖视图","direction":"沿密封条长度方向观看截面","region":"表头下方唯一剖面","projectionRelation":"截面沿长度方向保持不变；132dm是单机长度用量，不是截面数量","solidContours":["上部中空泡形外壁","下部U形夹持槽外壁","内部左右交错倒齿"],"holes":["上部封闭泡孔","下部向外敞开的夹持槽"],"excludedLines":["点状与交叉剖面填充","9和21尺寸线与界线","表格线","文字"]}],
-  "dimensions":{"explicit":["截面宽9","截面高21","单机长度用量132dm"],"derived":[],"estimated":["泡壁厚","U槽壁厚","倒齿角度和厚度"],"unknown":["单段交付长度"]},
-  "material":{"value":"橡胶密封条","basis":"名称、泡形中空截面、U形夹持槽和非金属剖面填充共同证明为橡胶/弹性体，不渲染为金属"},"ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p73-premodel-overlay-final.png#item-011-section"],"readiness":"ready"
-}

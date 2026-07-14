@@ -1,8 +1,0 @@
-{
-  "recordKey":"jwf1206-p72-item-002","page":72,"partNumber":"ZFA177-0902","name":"吹气风机蜗壳","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p72-002.png","topology":"单体偏心蜗壳：蜗旋外壳与右下切向矩形出口连续，中央为圆形进风法兰，法兰上4孔环布；不是圆环加悬空方管。",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"BLOWING FAN VOLUTE","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"FA225-8600"},
-  "views":[{"name":"正视图","direction":"沿蜗壳轴向观看进风面","region":"原格表头下方唯一几何视图","projectionRelation":"单一正视明示蜗壳偏心外廓、中央法兰与右下切向出口；205从轴线至右端，轴向深度未约束","solidContours":["偏心蜗旋外廓","右下切向出口","中央进风法兰"],"holes":["中央进风孔","法兰4个螺栓孔"],"excludedLines":["205尺寸线与界线","水平和竖直中心线","表格线","文字"]}],
-  "dimensions":{"explicit":["轴线至右端205"],"derived":[],"estimated":["蜗壳外径","中央法兰内外径","出口宽高","孔径与孔位"],"unknown":["轴向深度","壁厚"]},
-  "material":{"value":"未标材质，展示暂用涂装金属","basis":"蜗壳零件图未给材质标注，仅作中性展示假设"},
-  "ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p72-premodel-overlay-final.png#item-002"],"readiness":"ready"
-}

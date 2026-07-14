@@ -1,7 +1,0 @@
-{
-  "recordKey":"jwf1206-p73-item-006","page":73,"partNumber":"FA225-8701","name":"拉手","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p73-006.png","topology":"绕竖直中心线回转的中空杯形拉手：外径φ32、高35，底部大孔敞开，顶部缩为较小贯通孔；剖面线表示橡胶/非金属壁，不是U形直线挤出件。",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"HANDLE","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"JWF1206-8700"},
-  "views":[{"name":"轴向全剖视图","direction":"垂直竖直回转轴观看","region":"表头下方唯一剖视","projectionRelation":"φ符号与竖直中心线证明是回转截面；左右剖面关于轴对称","solidContours":["φ32外圆柱壁","圆角顶肩","顶部小孔边界","底部大开口内壁"],"holes":["底部大盲腔/开口","顶部小贯通孔"],"excludedLines":["竖直中心线","剖面线","φ32和35尺寸线与界线"]}],
-  "dimensions":{"explicit":["外径φ32","总高35"],"derived":[],"estimated":["底部内孔径","顶部小孔径","壁厚和圆角"],"unknown":[]},
-  "material":{"value":"橡胶/弹性非金属","basis":"厂家剖面采用非金属交叉剖面表达，形态为套装拉手"},"ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p73-premodel-overlay-final.png#item-006-section"],"readiness":"ready"
-}

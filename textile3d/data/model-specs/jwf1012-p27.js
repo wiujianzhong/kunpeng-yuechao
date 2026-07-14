@@ -1,2 +1,0 @@
-import {jwf1012P26P33Verified as verified} from '../jwf1012-p26-p33-verified.js';import {createJwf1012P26P33Spec} from './jwf1012-p26-p33-factory.js';
-const parts=verified.filter(p=>p.page===27).map(p=>({pdfPage:p.page,item:p.item,recordKey:p.recordKey,code:p.code,nameZh:p.name,quantity:{value:p.quantity,unit:p.quantityUnit,meaning:p.quantityMeaning},dimensions:p.dims}));export const jwf1012P27ModelSpecs=Object.fromEntries(parts.map(p=>[p.code||p.recordKey,createJwf1012P26P33Spec(p)]));

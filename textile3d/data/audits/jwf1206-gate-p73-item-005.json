@@ -1,7 +1,0 @@
-{
-  "recordKey":"jwf1206-p73-item-005","page":73,"partNumber":"ZFA211-0116","name":"挂钩螺钉","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p73-005.png","topology":"同轴阶梯螺钉：左端φ14薄圆头，随后为较粗圆柱肩部，右端为带螺纹简化线和倒角的较细螺杆；名称中的挂钩不代表图中存在弯钩。",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"HANGER SCREW","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"JWF1206-8700"},
-  "views":[{"name":"轴向主视图","direction":"垂直水平螺钉轴线观看","region":"表头下方唯一视图","projectionRelation":"中心线和各阶梯上下对称说明同轴回转；18控制左端面至右端总长","solidContours":["φ14薄圆头","中段圆柱肩部","右端螺杆和端部倒角"],"holes":[],"excludedLines":["水平中心线","螺纹简化细线","φ14和18尺寸线","尺寸界线"]}],
-  "dimensions":{"explicit":["头部直径φ14","总长18"],"derived":[],"estimated":["头厚","肩部直径与长度","螺杆直径","倒角"],"unknown":[]},
-  "material":{"value":"未标牌号，按金属展示","basis":"螺钉为典型金属紧固件，厂家未给材料牌号"},"ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p73-premodel-overlay-final.png#item-005-main"],"readiness":"ready"
-}

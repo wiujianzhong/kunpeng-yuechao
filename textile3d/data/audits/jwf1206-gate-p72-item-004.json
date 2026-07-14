@@ -1,8 +1,0 @@
-{
-  "recordKey":"jwf1206-p72-item-004","page":72,"partNumber":"ZFA177-0904","name":"挡圈","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p72-004.png","topology":"同轴阶梯回转体：φ36主圆盘总宽9，左侧有小轮毂，中央为贯通孔并从右侧扩为沉孔台阶；全部轮廓共轴。",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"COLLAR","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"FA225-8600"},
-  "views":[{"name":"轴向全剖视图","direction":"观看方向垂直回转轴线，水平为轴向","region":"原格表头下方唯一剖视图","projectionRelation":"单一轴向剖视完整给出回转母线，可绕中心轴旋转得到同一实体","solidContours":["φ36主圆盘","左侧小轮毂","右侧沉孔台阶"],"holes":["中央贯通孔","右侧沉孔"],"excludedLines":["φ36尺寸线", "9尺寸线","水平中心线","剖面线","表格线","文字"]}],
-  "dimensions":{"explicit":["外径φ36","总轴向宽9"],"derived":[],"estimated":["小轮毂外径","贯通孔径","沉孔径与深度"],"unknown":[]},
-  "material":{"value":"未标材质，展示暂用金属","basis":"挡圈剖视为连续实体，厂家未给具体材料牌号"},
-  "ambiguities":[],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p72-premodel-overlay-final.png#item-004"],"readiness":"ready"
-}

@@ -1,7 +1,0 @@
-{
-  "recordKey":"jwf1206-p73-item-007","page":73,"partNumber":"FA225-8702","name":"拉绳","sourceCrop":"tmp/pdfs/jwf1206-p65-p73-review/tiles/p73-007.png","topology":"可确认上部为连续编织绳、下部连接加宽拉头；绳中段用断裂符号省略，拉头上下轮廓也存在断开，无法从本格唯一恢复完整长度和拉头闭合轮廓。",
-  "identification":{"partNumberVerified":true,"nameVerified":true,"englishName":"PULL ROPE","singleMachineQuantity":1,"quantityMeaning":"单机用量","assembly":"JWF1206-8700"},
-  "views":[{"name":"厂家主视简化图","direction":"垂直拉绳正面观看","region":"表头下方唯一视图","projectionRelation":"单视图含两处断裂/省略，不能把断裂符号当真实断口，也不能推出总长和拉头深度","solidContours":["上下两段可见绳体","拉头可见斜边"],"holes":[],"excludedLines":["绳中段断裂符号","拉头轮廓省略间隙","绳体斜向材料示意线","表格线","文字"]}],
-  "dimensions":{"explicit":[],"derived":[],"estimated":["绳径"],"unknown":["绳总长","拉头完整闭合轮廓","拉头深度与连接结构"]},
-  "material":{"value":"编织绳与非金属拉头","basis":"斜向纹理只表示绳材，不建为螺纹实体；拉头材料未标"},"ambiguities":["拉头两处轮廓断开究竟是第二处断裂省略还是扫描缺线，无法唯一闭合","总长、拉头深度及绳头连接方式均无视图或尺寸约束"],"preModelOverlays":["tmp/pdfs/jwf1206-p65-p73-review/p73-premodel-overlay-final.png#item-007-blocked"],"readiness":"blocked"
-}
