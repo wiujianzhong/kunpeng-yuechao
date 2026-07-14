@@ -376,7 +376,7 @@ body > .container > .text-center:first-child h1::before {
     font-weight: 600; cursor: pointer; transition: background 0.2s;
 }
 #activation-btn:hover { background: #15803d; }
-#trial-section { display: none; margin-bottom: 14px; }
+#trial-section { margin-bottom: 14px; }
 #trial-btn {
     width: 100%; padding: 12px; background: #eff6ff; color: #1d4ed8;
     border: 1px solid #bfdbfe; border-radius: 10px; font-size: 1rem;
@@ -391,6 +391,7 @@ body > .container > .text-center:first-child h1::before {
 </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+<button type="button" id="language-toggle" class="language-toggle" aria-label="切换为维吾尔文">ئۇيغۇرچە</button>
 <noscript>
     <style>
         .javascript-disabled-tip { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 24px; background: #fff; color: #1e293b; text-align: center; font: 16px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
@@ -406,7 +407,7 @@ body > .container > .text-center:first-child h1::before {
         <h2>嘉新内部工具授权</h2>
         <p class="subtitle">由小伍工作室提供技术支持</p>
         <p class="activation-trust-note">本工具用于嘉新内部问题整改材料排版，不是嘉新集团官网，不提供在线支付。上传的图片、文字和PPT仅在当前浏览器本地处理，不上传业务资料。</p>
-        <div id="trial-section">
+        <div id="trial-section" style="display: none;">
             <button id="trial-btn" onclick="startFreeTrial()">🎉 免费体验7天</button>
         </div>
         <div class="machine-code-box">
@@ -3901,6 +3902,185 @@ body > .container > .text-center:first-child h1::before {
         }
 
     </script>
+  <style>
+    .language-toggle {
+        position: fixed; top: 14px; right: 14px; z-index: 100001;
+        min-width: 88px; min-height: 40px; padding: 8px 14px;
+        border: 1px solid rgba(22, 163, 74, 0.38); border-radius: 999px;
+        background: rgba(255, 255, 255, 0.96); color: #15803d;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
+        font: 700 14px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft Uighur", sans-serif;
+        cursor: pointer; backdrop-filter: blur(8px);
+    }
+    .language-toggle:focus-visible { outline: 3px solid rgba(34, 197, 94, 0.35); outline-offset: 2px; }
+    html[lang="ug"] body { direction: rtl; }
+    html[lang="ug"] input,
+    html[lang="ug"] textarea,
+    html[lang="ug"] select { direction: auto; text-align: start; }
+    html[lang="ug"] .language-toggle { right: auto; left: 14px; }
+    @media (max-width: 640px) {
+        .language-toggle { top: 10px; right: 10px; min-width: 78px; min-height: 36px; padding: 7px 11px; font-size: 13px; }
+        html[lang="ug"] .language-toggle { right: auto; left: 10px; }
+    }
+  </style>
+  <script>
+    (() => {
+        const LANGUAGE_KEY = 'jx_ppt_ui_language';
+        const translations = {
+            '嘉新集团问题整改PPT生成工具': 'جياشىن گۇرۇھى مەسىلە تۈزىتىش PPT ھاسىل قىلىش قورالى',
+            '嘉新内部工具授权': 'جياشىن ئىچكى قورال ئىجازىتى',
+            '由小伍工作室提供技术支持': 'شياۋۇ ستۇدىيەسى تېخنىكىلىق قوللايدۇ',
+            '本工具用于嘉新内部问题整改材料排版，不是嘉新集团官网，不提供在线支付。上传的图片、文字和PPT仅在当前浏览器本地处理，不上传业务资料。': 'بۇ قورال جياشىننىڭ ئىچكى مەسىلە تۈزىتىش ماتېرىياللىرىنى رەتلەشكە ئىشلىتىلىدۇ، جياشىن گۇرۇھىنىڭ رەسمىي تور بېكىتى ئەمەس ۋە توردا پۇل تۆلەش مۇلازىمىتى بىلەن تەمىنلىمەيدۇ. يۈكلەنگەن رەسىم، تېكىست ۋە PPT پەقەت نۆۋەتتىكى توركۆرگۈچتە بىر تەرەپ قىلىنىدۇ، خىزمەت ماتېرىياللىرى يوللانمايدۇ.',
+            '🎉 免费体验7天': '🎉 7 كۈن ھەقسىز سىناش',
+            '📱 您的设备机器码': '📱 ئۈسكۈنىڭىزنىڭ كودى',
+            '📋 复制': '📋 كۆچۈرۈش',
+            '验证并进入工具': 'دەلىللەپ قورالغا كىرىش',
+            '已有管理员授权码，请在上方输入并验证': 'باشقۇرغۇچى ئىجازەت كودى بولسا، ئۈستىگە كىرگۈزۈپ دەلىللەڭ',
+            '隐私说明': 'مەخپىيەتلىك چۈشەندۈرۈشى',
+            '使用说明': 'ئىشلىتىش قوللانمىسى',
+            '再次点击即可返回': 'قايتىش ئۈچۈن يەنە بىر قېتىم چېكىڭ',
+            '编辑照片': 'رەسىمنى تەھرىرلەش',
+            '选好工具后在大图上拖动；点已有的箭头、圆圈、方框或放大镜，可直接拖动位置。': 'قورالنى تاللىغاندىن كېيىن چوڭ رەسىم ئۈستىدە سۆرەڭ؛ بار بولغان ئوق، چەمبەر، تۆت بۇلۇڭ ياكى چوڭايتقۇچنى چېكىپ ئورنىنى بىۋاسىتە سۆرىگىلى بولىدۇ.',
+            '− 缩小': '− كىچىكلىتىش',
+            '＋ 放大': '＋ چوڭايتىش',
+            '重置': 'ئەسلىگە قايتۇرۇش',
+            '↗ 箭头': '↗ ئوق',
+            '◯ 圆圈': '◯ چەمبەر',
+            '□ 方框': '□ تۆت بۇلۇڭ',
+            '🔍 放大镜': '🔍 چوڭايتقۇچ',
+            '↶ 撤销': '↶ بىكار قىلىش',
+            '清除本次编辑': 'بۇ قېتىمقى تەھرىرنى تازىلاش',
+            '线条粗细': 'سىزىق قېلىنلىقى',
+            '取消': 'بىكار قىلىش',
+            '确认编辑': 'تەھرىرنى جەزملەش',
+            '纯前端本地处理 | 批量上传 | 自动排版 | 手机电脑通用': 'يەرلىك بىر تەرەپ قىلىش | تۈركۈملەپ يۈكلەش | ئاپتوماتىك رەتلەش | تېلېفون ۋە كومپيۇتېرغا ماس',
+            '嘉新内部定制工具 · 小伍工作室提供技术支持': 'جياشىن ئىچكى مەخسۇس قورالى · شياۋۇ ستۇدىيەسى تېخنىكىلىق قوللايدۇ',
+            '本工具不是嘉新集团官网，不提供在线支付；上传资料仅在当前设备本地处理。': 'بۇ قورال جياشىن گۇرۇھىنىڭ رەسمىي تور بېكىتى ئەمەس، توردا پۇل تۆلەش مۇلازىمىتى يوق؛ يۈكلەنگەن ماتېرىياللار پەقەت نۆۋەتتىكى ئۈسكۈنىدە بىر تەرەپ قىلىنىدۇ.',
+            '推荐使用：电脑 Chrome/Edge、苹果 Safari、安卓 Chrome 或较新的系统浏览器。微信、QQ 内置浏览器可能无法下载PPT，请点右上角“在浏览器打开”。': 'تەۋسىيە: كومپيۇتېردا Chrome/Edge، ئايفوندا Safari، ئاندىرويىدتا Chrome ياكى يېڭى سىستېما توركۆرگۈچىنى ئىشلىتىڭ. ئۈندىدار ياكى QQ ئىچكى توركۆرگۈچى PPT نى چۈشۈرەلمەسلىكى مۇمكىن، ئوڭ ئۈستىدىكى «توركۆرگۈچتە ئېچىش»نى چېكىڭ.',
+            '清空全部内容': 'بارلىق مەزمۇننى تازىلاش',
+            '模板选择': 'قېلىپ تاللاش',
+            '生成时会弹出命名窗口，支持的浏览器会优先保存到桌面': 'ھاسىل قىلغاندا نام بېرىش كۆزنىكى چىقىدۇ، قوللايدىغان توركۆرگۈچ ئالدى بىلەن ئۈستەل يۈزىگە ساقلايدۇ',
+            '公司模板': 'شىركەت قېلىپى',
+            '嵌入嘉新模板视觉': 'جياشىن قېلىپ ئۇسلۇبى',
+            '默认模板': 'كۆڭۈلدىكى قېلىپ',
+            '新版清爽对比版式': 'يېڭى، پاكىز سېلىشتۇرما لايىھە',
+            '资料导入': 'ماتېرىيال كىرگۈزۈش',
+            '上传照片': 'رەسىم يۈكلەش',
+            '拖拽、粘贴或点击批量导入': 'سۆرەش، چاپلاش ياكى چېكىپ تۈركۈملەپ كىرگۈزۈش',
+            '从相册批量选择': 'ئالبومدىن تۈركۈملەپ تاللاش',
+            '已上传': 'يۈكلەندى',
+            '张': 'پارچە',
+            '导入PPT': 'PPT كىرگۈزۈش',
+            '拆解已有PPT继续整改': 'بار PPT نى پارچىلاپ تۈزىتىشنى داۋاملاشتۇرۇش',
+            '提取文字': 'تېكىستنى چىقىرىش',
+            '只提取问题描述': 'پەقەت مەسىلە چۈشەندۈرۈشىنى چىقىرىش',
+            'PPT文字提取结果': 'PPT تېكىست چىقىرىش نەتىجىسى',
+            '复制文字': 'تېكىستنى كۆچۈرۈش',
+            '下载Excel': 'Excel چۈشۈرۈش',
+            '序号': 'تەرتىپ نومۇرى',
+            '页码': 'بەت نومۇرى',
+            '位置': 'ئورنى',
+            '问题描述': 'مەسىلە چۈشەندۈرۈشى',
+            '💾 正在开启本机自动草稿保存…': '💾 يەرلىك ئاپتوماتىك دەسلەپكى نۇسخا ساقلاش ئېچىلىۋاتىدۇ…',
+            '添加整改页': 'تۈزىتىش بېتى قوشۇش',
+            '一键生成PPT': 'بىر چېكىشتە PPT ھاسىل قىلىش',
+            '↑ 回到顶部': '↑ ئۈستىگە قايتىش',
+            '命名PPT': 'PPT غا نام بېرىش',
+            '文件名称': 'ھۆججەت نامى',
+            '封面文字会同步这里填写的文件名称': 'مۇقاۋا تېكىستى بۇ يەردىكى ھۆججەت نامى بىلەن ماسلىشىدۇ',
+            '照片呈现（仅影响这次导出）': 'رەسىم كۆرسىتىش (پەقەت بۇ قېتىمقى چىقىرىشقا تەسىر قىلىدۇ)',
+            '完整不变形': 'تولۇق، شەكلى ئۆزگەرمەيدۇ',
+            '适中调整': 'ئوتتۇراھال تەڭشەش',
+            '变形量': 'شەكىل ئۆزگىرىش دەرىجىسى',
+            '视频保持原样；工具内的图片预览和原图不会改变。': 'سىن ئەسلى ھالىتىدە قالىدۇ؛ قورالدىكى رەسىم ئالدىن كۆرۈش ۋە ئەسلى رەسىم ئۆزگەرمەيدۇ.',
+            '保存到桌面': 'ئۈستەل يۈزىگە ساقلاش',
+            '请输入管理员给的激活码': 'باشقۇرغۇچى بەرگەن ئىجازەت كودىنى كىرگۈزۈڭ',
+            '查看完整照片': 'تولۇق رەسىمنى كۆرۈش',
+            '关闭完整照片': 'تولۇق رەسىمنى تاقاش',
+            '标记颜色': 'بەلگە رەڭگى',
+            '红色': 'قىزىل',
+            '黄色': 'سېرىق',
+            '蓝色': 'كۆك',
+            '绿色': 'يېشىل'
+        };
+        const textOriginals = new WeakMap();
+        const attributeOriginals = new WeakMap();
+        let language = localStorage.getItem(LANGUAGE_KEY) === 'ug' ? 'ug' : 'zh';
+        let applying = false;
+
+        function translatedText(value) {
+            const leading = value.match(/^\s*/)?.[0] || '';
+            const trailing = value.match(/\s*$/)?.[0] || '';
+            const core = value.trim();
+            return translations[core] ? `${leading}${translations[core]}${trailing}` : value;
+        }
+
+        function applyTextNode(node) {
+            if (!node.nodeValue || !node.nodeValue.trim()) return;
+            if (language === 'ug') {
+                if (!textOriginals.has(node) && translations[node.nodeValue.trim()]) textOriginals.set(node, node.nodeValue);
+                const original = textOriginals.get(node);
+                if (original) node.nodeValue = translatedText(original);
+            } else if (textOriginals.has(node)) {
+                node.nodeValue = textOriginals.get(node);
+            }
+        }
+
+        function applyElement(element) {
+            if (!(element instanceof Element) || element.id === 'language-toggle') return;
+            const attributes = ['placeholder', 'title', 'aria-label'];
+            let originals = attributeOriginals.get(element);
+            attributes.forEach(name => {
+                const current = element.getAttribute(name);
+                if (!current) return;
+                if (language === 'ug' && translations[current.trim()]) {
+                    if (!originals) {
+                        originals = {};
+                        attributeOriginals.set(element, originals);
+                    }
+                    if (!originals[name]) originals[name] = current;
+                    element.setAttribute(name, translations[current.trim()]);
+                } else if (language === 'zh' && originals?.[name]) {
+                    element.setAttribute(name, originals[name]);
+                }
+            });
+        }
+
+        function applyTree(root = document.body) {
+            applying = true;
+            if (root.nodeType === Node.TEXT_NODE) applyTextNode(root);
+            if (root.nodeType === Node.ELEMENT_NODE) applyElement(root);
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+            let node;
+            while ((node = walker.nextNode())) {
+                if (node.nodeType === Node.TEXT_NODE) applyTextNode(node);
+                else applyElement(node);
+            }
+            document.documentElement.lang = language === 'ug' ? 'ug' : 'zh-CN';
+            document.documentElement.dir = language === 'ug' ? 'rtl' : 'ltr';
+            document.title = language === 'ug' ? translations['嘉新集团问题整改PPT生成工具'] : '嘉新集团问题整改PPT生成工具';
+            const toggle = document.getElementById('language-toggle');
+            if (toggle) {
+                toggle.textContent = language === 'ug' ? '中文' : 'ئۇيغۇرچە';
+                toggle.setAttribute('aria-label', language === 'ug' ? '切换为中文' : '切换为维吾尔文');
+            }
+            applying = false;
+        }
+
+        document.getElementById('language-toggle')?.addEventListener('click', () => {
+            language = language === 'zh' ? 'ug' : 'zh';
+            localStorage.setItem(LANGUAGE_KEY, language);
+            applyTree();
+        });
+
+        const observer = new MutationObserver(records => {
+            if (applying) return;
+            records.forEach(record => record.addedNodes.forEach(node => applyTree(node)));
+        });
+        applyTree();
+        observer.observe(document.body, { childList: true, subtree: true });
+    })();
+  </script>
   <script defer src="https://xiaowustudio.cn/assets/analytics.js?v=20260710"></script>
 </body>
 </html>
