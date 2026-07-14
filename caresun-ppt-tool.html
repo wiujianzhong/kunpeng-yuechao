@@ -4061,7 +4061,8 @@ body > .container > .text-center:first-child h1::before {
             document.title = language === 'ug' ? translations['嘉新集团问题整改PPT生成工具'] : '嘉新集团问题整改PPT生成工具';
             const toggle = document.getElementById('language-toggle');
             if (toggle) {
-                toggle.textContent = language === 'ug' ? '中文' : 'ئۇيغۇرچە';
+                const toggleText = language === 'ug' ? '中文' : 'ئۇيغۇرچە';
+                if (toggle.textContent !== toggleText) toggle.textContent = toggleText;
                 toggle.setAttribute('aria-label', language === 'ug' ? '切换为中文' : '切换为维吾尔文');
             }
             applying = false;
