@@ -3958,23 +3958,21 @@ body > .container > .text-center:first-child h1::before {
     </script>
   <style>
     .language-toggle {
-        position: fixed; top: 14px; right: 14px; z-index: 100001;
+        position: fixed; top: calc(env(safe-area-inset-top, 0px) + 14px); right: calc(env(safe-area-inset-right, 0px) + 14px); z-index: 100001;
         min-width: 88px; min-height: 40px; padding: 8px 14px;
         border: 1px solid rgba(22, 163, 74, 0.38); border-radius: 999px;
         background: rgba(255, 255, 255, 0.96); color: #15803d;
         box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
         font: 700 14px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft Uighur", sans-serif;
-        cursor: pointer; backdrop-filter: blur(8px);
+        cursor: pointer; backdrop-filter: blur(8px); direction: ltr;
     }
     .language-toggle:focus-visible { outline: 3px solid rgba(34, 197, 94, 0.35); outline-offset: 2px; }
     html[lang="ug"] body { direction: rtl; }
     html[lang="ug"] input,
     html[lang="ug"] textarea,
     html[lang="ug"] select { direction: auto; text-align: start; }
-    html[lang="ug"] .language-toggle { right: auto; left: 14px; }
     @media (max-width: 640px) {
-        .language-toggle { top: 10px; right: 10px; min-width: 78px; min-height: 36px; padding: 7px 11px; font-size: 13px; }
-        html[lang="ug"] .language-toggle { right: auto; left: 10px; }
+        .language-toggle { top: calc(env(safe-area-inset-top, 0px) + 10px); right: calc(env(safe-area-inset-right, 0px) + 10px); min-width: 78px; min-height: 36px; padding: 7px 11px; font-size: 13px; }
     }
   </style>
   <script>
