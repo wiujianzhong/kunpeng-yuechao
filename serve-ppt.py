@@ -8,6 +8,8 @@ import sys
 import time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 
 ROOT = Path(__file__).resolve().parent
@@ -31,6 +33,26 @@ ALLOWED_ORIGINS = {
     "https://texhong-ppt.xiaowustudio.cn",
     "https://wiujianzhong.github.io",
 }
+TRANSLATION_ORIGINS = {
+    "https://jx.xiaowustudio.cn",
+    "https://jiaxin-ppt.xiaowustudio.cn",
+    "https://wiujianzhong.github.io",
+}
+TOKENHUB_URL = "https://tokenhub.tencentmaas.com/v1/api/translations"
+GLOSSARY_PATH = ROOT / "ppt-glossary.json"
+
+
+def load_env_file():
+    env_path = ROOT / ".env"
+    if not env_path.exists():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        key, separator, value = line.partition("=")
+        if separator and key.strip() and key.strip() not in os.environ:
+            os.environ[key.strip()] = value.strip()
+
+
+load_env_file()
 
 
 def now_ms():
@@ -167,11 +189,56 @@ def register_or_check(code, installation_id, current_machine):
     return expiry, ""
 
 
+def matching_glossary(text):
+    try:
+        entries = json.loads(GLOSSARY_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    return [item for item in entries if item.get("zh") in text and item.get("ug")][:30]
+
+
+def translate_to_uyghur(text):
+    api_key = os.environ.get("TOKENHUB_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("翻译服务尚未配置")
+    terms = matching_glossary(text)
+    context = ""
+    if terms:
+        context = "纺织行业术语必须采用以下译法：" + "；".join(
+            f'{item["zh"]}={item["ug"]}' for item in terms
+        )
+    payload = {
+        "model": "hy-mt2-pro",
+        "text": text,
+        "source": "zh",
+        "target": "ug",
+        "stream": False,
+    }
+    if context:
+        payload["context"] = context
+    request = Request(
+        TOKENHUB_URL,
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urlopen(request, timeout=30) as response:
+            result = json.loads(response.read().decode("utf-8"))
+        return result["choices"][0]["message"]["content"].strip()
+    except (HTTPError, URLError, KeyError, IndexError, json.JSONDecodeError) as error:
+        raise RuntimeError("翻译服务暂时不可用") from error
+
+
 class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
-        if self.path.startswith("/api/license/"):
+        if self.path.startswith("/api/license/") or self.path == "/api/translate":
             origin = self.headers.get("Origin", "")
-            if origin in ALLOWED_ORIGINS:
+            allowed_origins = TRANSLATION_ORIGINS if self.path == "/api/translate" else ALLOWED_ORIGINS
+            if origin in allowed_origins:
                 self.send_header("Access-Control-Allow-Origin", origin)
                 self.send_header("Vary", "Origin")
             self.send_header("Access-Control-Allow-Headers", "Content-Type")
@@ -180,7 +247,7 @@ class Handler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_OPTIONS(self):
-        if self.path.startswith("/api/license/"):
+        if self.path.startswith("/api/license/") or self.path == "/api/translate":
             self.send_response(204)
             self.end_headers()
             return
@@ -207,6 +274,34 @@ class Handler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_POST(self):
+        if self.path == "/api/translate":
+            if self.headers.get("Origin", "") not in TRANSLATION_ORIGINS:
+                self.send_json(403, {"ok": False, "message": "此入口不支持双语翻译"})
+                return
+            try:
+                payload = self.read_json()
+                expiry, message = register_or_check(
+                    str(payload.get("code", "")).strip(),
+                    str(payload.get("installationId", "")).strip(),
+                    str(payload.get("machineCode", "")).strip(),
+                )
+                if not expiry:
+                    self.send_json(403, {"ok": False, "message": message or "仅正式付费客户可使用双语翻译"})
+                    return
+                texts = payload.get("texts", [])
+                if not isinstance(texts, list) or len(texts) > 60:
+                    raise ValueError("翻译内容无效")
+                clean_texts = [str(text).strip() for text in texts]
+                if any(len(text) > 2000 for text in clean_texts):
+                    raise ValueError("单段文字过长")
+                translations = [translate_to_uyghur(text) if text else "" for text in clean_texts]
+                self.send_json(200, {"ok": True, "translations": translations})
+            except (ValueError, json.JSONDecodeError):
+                self.send_json(400, {"ok": False, "message": "翻译内容无效"})
+            except RuntimeError as error:
+                self.send_json(502, {"ok": False, "message": str(error)})
+            return
+
         if self.path == "/api/license/check":
             try:
                 payload = self.read_json()

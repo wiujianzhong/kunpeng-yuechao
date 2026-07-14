@@ -16,6 +16,7 @@
         || (hostname === 'wiujianzhong.github.io' && window.location.pathname.includes('texhong'))
         ? 'th'
         : 'jx';
+    let licenseMode = 'locked';
 
     function scopedCookieName(key) {
         return `${key}_${PRODUCT_SCOPE}`;
@@ -313,6 +314,7 @@
         try {
             const result = await checkServer(code);
             if (result.valid) {
+                licenseMode = 'paid';
                 await writePersistentValue(ACTIVATION_KEY, code);
                 await saveGrace(result.expiry);
                 hideOverlay();
@@ -347,6 +349,7 @@
             try {
                 const trial = JSON.parse(trialData);
                 if (Date.now() < trial.expiry) {
+                    licenseMode = 'trial';
                     hideOverlay();
                     return true;
                 }
@@ -357,6 +360,7 @@
             const trial = await getActivationDBValue('trial');
             const fingerprintRecord = await getActivationDBValue(getTrialFingerprintKey());
             if (trial && Date.now() < trial.expiry) {
+                licenseMode = 'trial';
                 storageSet(TRIAL_KEY, JSON.stringify(trial), 7 * 24 * 60 * 60);
                 hideOverlay();
                 return true;
@@ -389,6 +393,7 @@
                 return;
             }
             await writePersistentValue(ACTIVATION_KEY, code);
+            licenseMode = 'paid';
             await saveGrace(result.expiry);
             document.getElementById('activation-error')?.classList.remove('visible');
             hideOverlay();
@@ -433,6 +438,7 @@
                 fingerprint
             };
             storageSet(TRIAL_KEY, JSON.stringify(trial), 7 * 24 * 60 * 60);
+            licenseMode = 'trial';
             document.getElementById('activation-error')?.classList.remove('visible');
             hideOverlay();
             Promise.all([
@@ -500,4 +506,15 @@
     }
 
     window.__pptLicenseVersion = VERSION;
+    window.__pptLicense = {
+        isPaid: () => PRODUCT_SCOPE === 'jx' && licenseMode === 'paid',
+        getTranslationAuth: async () => {
+            if (PRODUCT_SCOPE !== 'jx' || licenseMode !== 'paid') return null;
+            return {
+                code: await readPersistentValue(ACTIVATION_KEY),
+                machineCode: getMachineCode(),
+                installationId: await installationId()
+            };
+        }
+    };
 })();
