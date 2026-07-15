@@ -3365,6 +3365,7 @@ body > .container > .text-center:first-child h1::before {
                     renderCompanyCoverSlide(pptx, coverSlide, cleanBaseName);
                 }
                 let pageNum = 0;
+                let photoSequence = 0;
                 
                 for (const issue of issues) {
                     pageNum++;
@@ -3378,6 +3379,8 @@ body > .container > .text-center:first-child h1::before {
                     const rightVideo = window[`rightVideo-${issueId}`];
                     const leftVideoName = window[`leftVideoName-${issueId}`];
                     const rightVideoName = window[`rightVideoName-${issueId}`];
+                    const leftPhotoNumber = leftImg ? ++photoSequence : null;
+                    const rightPhotoNumber = rightImg ? ++photoSequence : null;
                     const [leftPptImage, rightPptImage] = await Promise.all([
                         preparePPTImage(leftImg, imageFrameRatio, exportOptions, preparedImageCache),
                         preparePPTImage(rightImg, imageFrameRatio, exportOptions, preparedImageCache)
@@ -3385,9 +3388,9 @@ body > .container > .text-center:first-child h1::before {
                     
                     const slide = pptx.addSlide();
                     if (templateMode === 'company') {
-                        renderCompanySlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
+                        renderCompanySlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, leftPhotoNumber, rightPhotoNumber, pageNum, total: issues.length });
                     } else {
-                        renderDefaultSlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
+                        renderDefaultSlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, leftPhotoNumber, rightPhotoNumber, pageNum, total: issues.length });
                     }
                 }
                 
@@ -3543,6 +3546,7 @@ body > .container > .text-center:first-child h1::before {
                 color: '64748B',
                 fill: 'F8FAFC',
                 labelStyle: 'outline',
+                sequence: data.leftPhotoNumber,
                 hideLabel: sharedDesc,
                 reserveLabelSpace: sharedDesc
             });
@@ -3556,6 +3560,7 @@ body > .container > .text-center:first-child h1::before {
                 color: '64748B',
                 fill: 'F8FAFC',
                 labelStyle: 'outline',
+                sequence: data.rightPhotoNumber,
                 hideLabel: sharedDesc,
                 reserveLabelSpace: sharedDesc
             });
@@ -3604,6 +3609,7 @@ body > .container > .text-center:first-child h1::before {
                 color: '64748B',
                 fill: 'F8FAFC',
                 labelStyle: 'outline',
+                sequence: data.leftPhotoNumber,
                 hideLabel: sharedDesc,
                 reserveLabelSpace: sharedDesc
             });
@@ -3617,6 +3623,7 @@ body > .container > .text-center:first-child h1::before {
                 color: '64748B',
                 fill: 'F8FAFC',
                 labelStyle: 'outline',
+                sequence: data.rightPhotoNumber,
                 hideLabel: sharedDesc,
                 reserveLabelSpace: sharedDesc
             });
@@ -3773,6 +3780,18 @@ body > .container > .text-center:first-child h1::before {
                 slide.addText(opt.placeholder, {
                     x: imgX, y: imgY + imgH / 2 - 0.18, w: imgW, h: 0.36,
                     fontSize: 15, color: opt.color, align: 'center'
+                });
+            }
+            if (opt.img && opt.sequence) {
+                slide.addShape(pptx.ShapeType.ellipse, {
+                    x: imgX + 0.12, y: imgY + 0.12, w: 0.38, h: 0.38,
+                    fill: { color: '16A34A', transparency: 4 },
+                    line: { color: 'FFFFFF', width: 1.2 }
+                });
+                slide.addText(String(opt.sequence), {
+                    x: imgX + 0.12, y: imgY + 0.12, w: 0.38, h: 0.38,
+                    fontSize: 12, color: 'FFFFFF', bold: true,
+                    align: 'center', valign: 'middle', margin: 0
                 });
             }
         }
@@ -3967,7 +3986,6 @@ body > .container > .text-center:first-child h1::before {
         cursor: pointer; backdrop-filter: blur(8px); direction: ltr;
     }
     .language-toggle:focus-visible { outline: 3px solid rgba(34, 197, 94, 0.35); outline-offset: 2px; }
-    html[lang="ug"] body { direction: rtl; }
     html[lang="ug"] input,
     html[lang="ug"] textarea,
     html[lang="ug"] select { direction: auto; text-align: start; }
@@ -4109,7 +4127,7 @@ body > .container > .text-center:first-child h1::before {
                 else applyElement(node);
             }
             document.documentElement.lang = language === 'ug' ? 'ug' : 'zh-CN';
-            document.documentElement.dir = language === 'ug' ? 'rtl' : 'ltr';
+            document.documentElement.dir = 'ltr';
             document.title = language === 'ug' ? translations['嘉新集团问题整改PPT生成工具'] : '嘉新集团问题整改PPT生成工具';
             const toggle = document.getElementById('language-toggle');
             if (toggle) {
