@@ -17,6 +17,10 @@
         ? 'th'
         : 'jx';
     let licenseMode = 'locked';
+    let resolveLicenseReady;
+    const licenseReady = new Promise(resolve => {
+        resolveLicenseReady = resolve;
+    });
 
     function scopedCookieName(key) {
         return `${key}_${PRODUCT_SCOPE}`;
@@ -331,19 +335,23 @@
     }
 
     async function init() {
-        importLegacyWindowName();
-        updateMachineCode();
-        const code = await readPersistentValue(ACTIVATION_KEY);
-        if (code && await hasGrace()) {
-            licenseMode = 'paid';
-            hideOverlay();
+        try {
+            importLegacyWindowName();
+            updateMachineCode();
+            const code = await readPersistentValue(ACTIVATION_KEY);
+            if (code && await hasGrace()) {
+                licenseMode = 'paid';
+                hideOverlay();
+            }
+            const paidResult = code ? await restorePaidLicense(code) : { valid: false, message: '' };
+            if (paidResult.valid) return;
+            if (await restoreTrial()) return;
+            showTrialSection();
+            showOverlay();
+            if (paidResult.message) showError(paidResult.message);
+        } finally {
+            resolveLicenseReady();
         }
-        const paidResult = code ? await restorePaidLicense(code) : { valid: false, message: '' };
-        if (paidResult.valid) return;
-        if (await restoreTrial()) return;
-        showTrialSection();
-        showOverlay();
-        if (paidResult.message) showError(paidResult.message);
     }
 
     async function restoreTrial() {
@@ -511,6 +519,7 @@
     window.__pptLicenseVersion = VERSION;
     window.__pptLicense = {
         isPaid: () => PRODUCT_SCOPE === 'jx' && licenseMode === 'paid',
+        whenReady: () => licenseReady,
         getTranslationAuth: async () => {
             if (PRODUCT_SCOPE !== 'jx' || licenseMode !== 'paid') return null;
             return {

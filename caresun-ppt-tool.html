@@ -45,7 +45,7 @@
             }
         })();
     </script>
-    <script src="./ppt-license.js?v=20260714-bilingual-paid-fix" defer></script>
+    <script src="./ppt-license.js?v=20260717-bilingual-ready-fix" defer></script>
     <script src="./vendor/tailwindcss-cdn.js" defer></script>
     <script src="./vendor/pptxgen.bundle.js" defer></script>
     <script src="./vendor/jszip.min.js" defer></script>
@@ -3849,7 +3849,8 @@ body > .container > .text-center:first-child h1::before {
             return message || '未知错误，请刷新页面后再试';
         }
 
-        function openFileNameDialog(defaultName) {
+        async function openFileNameDialog(defaultName) {
+            await window.__pptLicense?.whenReady?.();
             return new Promise(resolve => {
                 pendingFileNameResolve = resolve;
                 const modal = document.getElementById('file-name-modal');
