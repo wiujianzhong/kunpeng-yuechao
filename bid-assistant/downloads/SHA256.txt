@@ -1,0 +1,2 @@
+d9df2e00c2245c2975d35a581e9aa02a0b9f7230fd935b6f1b6a9b7bab610721  BidLibraryAssistant_Setup.exe
+d3e6c9464a949c440dc7706ae08e520b2e0dec1a9e33df49ec7be1a6cde81886  BidLibraryAssistant_Windows_x64_v0.1.0.zip
