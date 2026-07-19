@@ -45,6 +45,7 @@
             }
         })();
     </script>
+    <script src="./vendor/pinyin-pro.js?v=3.18.6"></script>
     <script src="./ppt-license.js?v=20260717-bilingual-ready-fix" defer></script>
     <script src="./vendor/tailwindcss-cdn.js" defer></script>
     <script src="./vendor/pptxgen.bundle.js" defer></script>
@@ -391,7 +392,7 @@ body > .container > .text-center:first-child h1::before {
 </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-<button type="button" id="language-toggle" class="language-toggle" aria-label="切换为维吾尔文">ئۇيغۇرچە</button>
+<button type="button" id="language-toggle" class="language-toggle" aria-label="切换为拼音">拼音</button>
 <noscript>
     <style>
         .javascript-disabled-tip { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 24px; background: #fff; color: #1e293b; text-align: center; font: 16px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
@@ -620,7 +621,7 @@ body > .container > .text-center:first-child h1::before {
                     <label class="flex items-start gap-3 text-sm text-emerald-900">
                         <input id="ppt-bilingual-mode" type="checkbox" class="mt-0.5 h-4 w-4 accent-emerald-600">
                         <span>
-                            <strong>生成中文＋维吾尔语双语PPT</strong>
+                            <strong>生成中文＋拼音双语PPT</strong>
                             <small id="ppt-bilingual-tip" class="mt-1 block text-xs text-emerald-700">仅嘉新正式付费客户可用</small>
                         </span>
                     </label>
@@ -3290,7 +3291,8 @@ body > .container > .text-center:first-child h1::before {
         // 生成PPT
         async function translatePPTTexts(issues) {
             const auth = await window.__pptLicense?.getTranslationAuth?.();
-            if (!auth) throw new Error('双语翻译仅限嘉新正式付费客户使用');
+            if (!auth) throw new Error('中文＋拼音双语功能仅限嘉新正式付费客户使用');
+            if (!window.pinyinPro?.pinyin) throw new Error('拼音组件加载失败，请刷新页面后重试');
             const texts = [];
             issues.forEach(issue => {
                 const issueId = issue.id.replace('issue-', '');
@@ -3304,20 +3306,16 @@ body > .container > .text-center:first-child h1::before {
                 });
             });
             if (!texts.length) return new Map();
-            const response = await fetch('https://pptsq.xiaowustudio.cn/api/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...auth, texts })
-            });
-            const result = await response.json();
-            if (!response.ok || !result.ok) throw new Error(result.message || '翻译失败，请稍后重试');
-            return new Map(texts.map((text, index) => [text, result.translations[index] || '']));
+            return new Map(texts.map(text => [
+                text,
+                window.pinyinPro.pinyin(text, { toneType: 'symbol' })
+            ]));
         }
 
         function bilingualPPTText(text, translations) {
             const chinese = String(text || '').trim();
-            const uyghur = translations.get(chinese) || '';
-            return chinese && uyghur ? `${chinese}\n${uyghur}` : chinese;
+            const pinyinText = translations.get(chinese) || '';
+            return chinese && pinyinText ? `${chinese}\n${pinyinText}` : chinese;
         }
 
         async function generatePPT() {
@@ -3865,7 +3863,7 @@ body > .container > .text-center:first-child h1::before {
                 bilingual.checked = false;
                 bilingual.disabled = !paid;
                 bilingualTip.textContent = paid
-                    ? '启用后，小标题和问题描述将同时保留中文与维吾尔语'
+                    ? '启用后，小标题和问题描述将同时保留中文与拼音'
                     : '7天免费体验不可用，仅嘉新正式付费客户可用';
                 syncPPTImageFitControls();
                 panel.style.transform = '';
@@ -3987,9 +3985,9 @@ body > .container > .text-center:first-child h1::before {
         cursor: pointer; backdrop-filter: blur(8px); direction: ltr;
     }
     .language-toggle:focus-visible { outline: 3px solid rgba(34, 197, 94, 0.35); outline-offset: 2px; }
-    html[lang="ug"] input,
-    html[lang="ug"] textarea,
-    html[lang="ug"] select { direction: auto; text-align: start; }
+    html[lang="zh-Latn"] input,
+    html[lang="zh-Latn"] textarea,
+    html[lang="zh-Latn"] select { direction: auto; text-align: start; }
     @media (max-width: 640px) {
         .language-toggle { top: calc(env(safe-area-inset-top, 0px) + 10px); right: calc(env(safe-area-inset-right, 0px) + 10px); min-width: 78px; min-height: 36px; padding: 7px 11px; font-size: 13px; }
     }
@@ -3997,6 +3995,9 @@ body > .container > .text-center:first-child h1::before {
   <script>
     (() => {
         const LANGUAGE_KEY = 'jx_ppt_ui_language';
+        window.pinyinPro?.customPinyin?.({
+            '得培训': 'děi péi xùn'
+        });
         const translations = {
             '嘉新集团问题整改PPT生成工具': 'جياشىن گۇرۇھى مەسىلە تۈزىتىش PPT ھاسىل قىلىش قورالى',
             '嘉新内部工具授权': 'جياشىن ئىچكى قورال ئىجازىتى',
@@ -4076,20 +4077,18 @@ body > .container > .text-center:first-child h1::before {
         };
         const textOriginals = new WeakMap();
         const attributeOriginals = new WeakMap();
-        let language = localStorage.getItem(LANGUAGE_KEY) === 'ug' ? 'ug' : 'zh';
+        let language = ['ug', 'py'].includes(localStorage.getItem(LANGUAGE_KEY)) ? 'py' : 'zh';
         let applying = false;
 
         function translatedText(value) {
-            const leading = value.match(/^\s*/)?.[0] || '';
-            const trailing = value.match(/\s*$/)?.[0] || '';
-            const core = value.trim();
-            return translations[core] ? `${leading}${translations[core]}${trailing}` : value;
+            if (!/[\u3400-\u9fff]/.test(value) || !window.pinyinPro?.pinyin) return value;
+            return window.pinyinPro.pinyin(value, { toneType: 'symbol' });
         }
 
         function applyTextNode(node) {
             if (!node.nodeValue || !node.nodeValue.trim()) return;
-            if (language === 'ug') {
-                if (!textOriginals.has(node) && translations[node.nodeValue.trim()]) textOriginals.set(node, node.nodeValue);
+            if (language === 'py') {
+                if (!textOriginals.has(node) && /[\u3400-\u9fff]/.test(node.nodeValue)) textOriginals.set(node, node.nodeValue);
                 const original = textOriginals.get(node);
                 if (original) node.nodeValue = translatedText(original);
             } else if (textOriginals.has(node)) {
@@ -4104,13 +4103,13 @@ body > .container > .text-center:first-child h1::before {
             attributes.forEach(name => {
                 const current = element.getAttribute(name);
                 if (!current) return;
-                if (language === 'ug' && translations[current.trim()]) {
+                if (language === 'py' && /[\u3400-\u9fff]/.test(current)) {
                     if (!originals) {
                         originals = {};
                         attributeOriginals.set(element, originals);
                     }
                     if (!originals[name]) originals[name] = current;
-                    element.setAttribute(name, translations[current.trim()]);
+                    element.setAttribute(name, translatedText(current));
                 } else if (language === 'zh' && originals?.[name]) {
                     element.setAttribute(name, originals[name]);
                 }
@@ -4127,20 +4126,20 @@ body > .container > .text-center:first-child h1::before {
                 if (node.nodeType === Node.TEXT_NODE) applyTextNode(node);
                 else applyElement(node);
             }
-            document.documentElement.lang = language === 'ug' ? 'ug' : 'zh-CN';
+            document.documentElement.lang = language === 'py' ? 'zh-Latn' : 'zh-CN';
             document.documentElement.dir = 'ltr';
-            document.title = language === 'ug' ? translations['嘉新集团问题整改PPT生成工具'] : '嘉新集团问题整改PPT生成工具';
+            document.title = language === 'py' ? translatedText('嘉新集团问题整改PPT生成工具') : '嘉新集团问题整改PPT生成工具';
             const toggle = document.getElementById('language-toggle');
             if (toggle) {
-                const toggleText = language === 'ug' ? '中文' : 'ئۇيغۇرچە';
+                const toggleText = language === 'py' ? '中文' : '拼音';
                 if (toggle.textContent !== toggleText) toggle.textContent = toggleText;
-                toggle.setAttribute('aria-label', language === 'ug' ? '切换为中文' : '切换为维吾尔文');
+                toggle.setAttribute('aria-label', language === 'py' ? '切换为中文' : '切换为拼音');
             }
             applying = false;
         }
 
         document.getElementById('language-toggle')?.addEventListener('click', () => {
-            language = language === 'zh' ? 'ug' : 'zh';
+            language = language === 'zh' ? 'py' : 'zh';
             localStorage.setItem(LANGUAGE_KEY, language);
             applyTree();
         });
