@@ -513,23 +513,35 @@ const calibrationMaterials = {
   channelGlass: new THREE.MeshPhysicalMaterial({
     color: 0x76d7e8,
     transparent: true,
-    opacity: 0.34,
+    opacity: 0.28,
     roughness: 0.08,
-    transmission: 0.48,
+    transmission: 0.56,
     depthWrite: false,
     side: THREE.DoubleSide
   }),
-  channelShell: new THREE.MeshStandardMaterial({ color: 0xd8dfe1, roughness: 0.32, metalness: 0.72 }),
-  channelFrame: new THREE.MeshStandardMaterial({ color: 0xc7d0d3, roughness: 0.28, metalness: 0.78 }),
+  channelShell: new THREE.MeshStandardMaterial({ color: 0xf1f2ef, roughness: 0.32, metalness: 0.58 }),
+  channelFrame: new THREE.MeshStandardMaterial({ color: 0xe5e8e6, roughness: 0.28, metalness: 0.64 }),
   channelWindowGlass: new THREE.MeshPhysicalMaterial({
-    color: 0xb9eff8,
+    color: 0xe8fbff,
     transparent: true,
-    opacity: 0.30,
+    opacity: 0.16,
     roughness: 0.04,
     metalness: 0.04,
-    transmission: 0.72,
+    transmission: 0.88,
     thickness: 0.01,
     ior: 1.46,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  }),
+  channelPlaybackWindow: new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.52,
+    roughness: 0.30,
+    metalness: 0.02,
+    transmission: 0.36,
+    thickness: 0.01,
+    ior: 1.42,
     depthWrite: false,
     side: THREE.DoubleSide
   }),
@@ -685,6 +697,8 @@ function clearCalibrationChildren(group) {
 function flowChannelPathPoints(dimensions) {
   const height = dimensions.height;
   const offset = dimensions.offset;
+  // 主通道组整体比例为0.85；局部延伸0.15/0.85后，当前整机中的实际前伸量为150毫米。
+  const outletExtension = 0.15 / 0.85;
   return [
     new THREE.Vector3(0, -height * 0.50, -offset * 0.50),
     new THREE.Vector3(0, -height * 0.30, -offset * 0.34),
@@ -693,7 +707,7 @@ function flowChannelPathPoints(dimensions) {
     new THREE.Vector3(0, height * 0.38, 0),
     new THREE.Vector3(0, height * 0.47, offset * 0.10),
     new THREE.Vector3(0, height * 0.50, offset * 0.28),
-    new THREE.Vector3(0, height * 0.50, offset * 0.50)
+    new THREE.Vector3(0, height * 0.50, offset * 0.50 + outletExtension)
   ];
 }
 
@@ -844,7 +858,7 @@ function buildParametricCalibrationPart(group) {
     leftRail.userData.name = '主通道左侧铁质边框';
     rightRail.userData.name = '主通道右侧铁质边框';
     channelSurfaces.push(leftRail, rightRail);
-    channelSurfaces.forEach((part) => { part.userData.detail = '主通道主体为铁质风道；前后相机对射处设置上下各70毫米的透明玻璃检测窗。'; });
+    channelSurfaces.forEach((part) => { part.userData.detail = '主通道主体为白色铁质风道，上方出口向前延伸150毫米；前后相机对射处设置上下各70毫米的透明玻璃检测窗。'; });
   }
   if (config.kind === 'reject-volute') {
     const length = dimensions.length;
@@ -941,7 +955,7 @@ function createCalibrationPart(config) {
     id: 'flow-channel-1', label: '连续棉流主通道（1600×70）', count: 1, kind: 'flow-channel',
     dimensions: { length: 2.33, height: 2.05, depth: 0.27, thickness: 0.012, offset: 0.72 },
     position: [-0.04408803968526252, 2.5782623922476064, -0.38111494470446605], rotation: [0, 0, 0], scale: [0.85, 0.85, 0.85],
-    note: '连续空心铁质主通道：下方斜入、贯穿检测区、上部平滑转向；前后相机对射位置分别设置上下各70毫米的透明玻璃检测窗。'
+    note: '连续空心白色铁质主通道：下方斜入、贯穿检测区，上方出口向前延伸150毫米；前后相机对射位置分别设置上下各70毫米的透明玻璃检测窗。'
   },
   {
     id: 'reject-volute-1', label: '排杂漩涡风道＋风机接口', count: 1, kind: 'reject-volute',
@@ -1086,6 +1100,22 @@ function setFlowChannelGhosted(ghosted) {
     if (!object.isMesh) return;
     object.material = ghosted ? calibrationMaterials.channelGlass : object.userData.baseMaterial;
     object.renderOrder = ghosted ? 10 : 0;
+  });
+}
+
+function setFlowChannelPlaybackAppearance(active) {
+  const channel = calibrationParts.get('flow-channel-1');
+  if (!channel) return;
+  channel.traverse((object) => {
+    if (!object.isMesh) return;
+    if (active) {
+      object.material = /透明检测窗/.test(object.userData.name || '')
+        ? calibrationMaterials.channelPlaybackWindow
+        : calibrationMaterials.channelGlass;
+    } else {
+      object.material = object.userData.baseMaterial;
+    }
+    object.renderOrder = active ? 10 : 0;
   });
 }
 
@@ -2201,13 +2231,13 @@ function setProcessDemo(enabled) {
     applyMode('xray');
     updateCalibrationPartVisibility('process');
     setValveRowActive(true);
-    setFlowChannelGhosted(false);
+    setFlowChannelPlaybackAppearance(true);
     setExternalModulesGhosted(true);
     setOpticalPathState('process', 0);
     setLayerVisible('hunyuan', importedModelReady);
     setLayerVisible('shell', !importedModelReady);
     partTitle.textContent = '异纤机工作原理动画';
-    partDetail.textContent = '主通道为铁质风道，只在前后相机对射位置设置上下各70毫米的透明玻璃检测窗。播放会依次讲解进棉、扫描、识别、喷射和风机吸杂；前后视16台主相机持续扫描，发现异纤时蓝色光幕闪白。';
+    partDetail.textContent = '实体展示时主通道为白色铁质风道，前后相机对射位置是透明玻璃窗；播放时整条通道切换为淡蓝透明，玻璃窗发白，便于观察内部棉流。';
   } else {
     stopProcessVoice();
     valvePulse.visible = false;
@@ -2219,7 +2249,7 @@ function setProcessDemo(enabled) {
     setValveRowActive(false);
     updateCalibrationPartVisibility('external');
     applyMode('solid');
-    setFlowChannelGhosted(false);
+    setFlowChannelPlaybackAppearance(false);
     setExternalModulesGhosted(false);
     setOpticalPathState('off');
   }
