@@ -208,13 +208,13 @@ function invertedRightTrianglePrismGeometry(width, height, depth) {
   return geometry;
 }
 
-function sweptWideDuctGeometry(points, width, thickness, segments = 40, normalOffset = 0) {
+function sweptWideDuctGeometry(points, width, thickness, segments = 40, normalOffset = 0, startProgress = 0, endProgress = 1) {
   const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
   const vertices = [];
   const indices = [];
   const widthAxis = new THREE.Vector3(1, 0, 0);
   for (let i = 0; i <= segments; i += 1) {
-    const t = i / segments;
+    const t = THREE.MathUtils.lerp(startProgress, endProgress, i / segments);
     const point = curve.getPoint(t);
     const tangent = curve.getTangent(t).normalize();
     const normal = new THREE.Vector3(0, -tangent.z, tangent.y).normalize();
@@ -519,8 +519,20 @@ const calibrationMaterials = {
     depthWrite: false,
     side: THREE.DoubleSide
   }),
-  channelShell: new THREE.MeshStandardMaterial({ color: 0xe8eceb, roughness: 0.42, metalness: 0.20 }),
-  channelFrame: new THREE.MeshStandardMaterial({ color: 0xe8eceb, roughness: 0.42, metalness: 0.20 }),
+  channelShell: new THREE.MeshStandardMaterial({ color: 0xd8dfe1, roughness: 0.32, metalness: 0.72 }),
+  channelFrame: new THREE.MeshStandardMaterial({ color: 0xc7d0d3, roughness: 0.28, metalness: 0.78 }),
+  channelWindowGlass: new THREE.MeshPhysicalMaterial({
+    color: 0xb9eff8,
+    transparent: true,
+    opacity: 0.30,
+    roughness: 0.04,
+    metalness: 0.04,
+    transmission: 0.72,
+    thickness: 0.01,
+    ior: 1.46,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  }),
   rejectVolute: new THREE.MeshPhysicalMaterial({
     color: 0x76d7e8,
     transparent: true,
@@ -780,22 +792,41 @@ function buildParametricCalibrationPart(group) {
   }
   if (config.kind === 'flow-channel') {
     const width = dimensions.length;
-    const height = dimensions.height;
     const depth = dimensions.depth;
     const wall = Math.min(dimensions.thickness, depth / 3, width / 20);
     const points = flowChannelPathPoints(dimensions);
-    const frontWall = addCalibrationMesh(
-      group,
-      sweptWideDuctGeometry(points, width, wall, 44, (depth - wall) / 2),
-      calibrationMaterials.channelShell,
-      config.id
-    );
-    const rearWall = addCalibrationMesh(
-      group,
-      sweptWideDuctGeometry(points, width, wall, 44, -(depth - wall) / 2),
-      calibrationMaterials.channelShell,
-      config.id
-    );
+    const curveLength = new THREE.CatmullRomCurve3(points, false, 'centripetal').getLength();
+    const windowCenter = 0.30;
+    const halfWindowProgress = Math.min(0.07 / Math.max(curveLength, 0.01), 0.08);
+    const windowStart = windowCenter - halfWindowProgress;
+    const windowEnd = windowCenter + halfWindowProgress;
+    const wallRanges = [[0, windowStart], [windowEnd, 1]];
+    const wallOffsets = [
+      { offset: (depth - wall) / 2, side: '前壁' },
+      { offset: -(depth - wall) / 2, side: '后壁' }
+    ];
+    const channelSurfaces = [];
+    wallOffsets.forEach(({ offset, side }) => {
+      wallRanges.forEach(([start, end]) => {
+        const metalWall = addCalibrationMesh(
+          group,
+          sweptWideDuctGeometry(points, width, wall, Math.max(8, Math.round(44 * (end - start))), offset, start, end),
+          calibrationMaterials.channelShell,
+          config.id
+        );
+        metalWall.userData.name = `主通道铁质${side}`;
+        channelSurfaces.push(metalWall);
+      });
+      const glassWindow = addCalibrationMesh(
+        group,
+        sweptWideDuctGeometry(points, width, wall, 10, offset, windowStart, windowEnd),
+        calibrationMaterials.channelWindowGlass,
+        config.id
+      );
+      glassWindow.userData.name = `${side}透明检测窗（上下各70毫米）`;
+      glassWindow.renderOrder = 9;
+      channelSurfaces.push(glassWindow);
+    });
     const leftRail = addCalibrationMesh(
       group,
       sweptWideDuctGeometry(points, wall, depth, 44),
@@ -810,7 +841,10 @@ function buildParametricCalibrationPart(group) {
     );
     leftRail.position.x = -width / 2 + wall / 2;
     rightRail.position.x = width / 2 - wall / 2;
-    [frontWall, rearWall, leftRail, rightRail].forEach((part) => { part.userData.name = config.label; });
+    leftRail.userData.name = '主通道左侧铁质边框';
+    rightRail.userData.name = '主通道右侧铁质边框';
+    channelSurfaces.push(leftRail, rightRail);
+    channelSurfaces.forEach((part) => { part.userData.detail = '主通道主体为铁质风道；前后相机对射处设置上下各70毫米的透明玻璃检测窗。'; });
   }
   if (config.kind === 'reject-volute') {
     const length = dimensions.length;
@@ -907,7 +941,7 @@ function createCalibrationPart(config) {
     id: 'flow-channel-1', label: '连续棉流主通道（1600×70）', count: 1, kind: 'flow-channel',
     dimensions: { length: 2.33, height: 2.05, depth: 0.27, thickness: 0.012, offset: 0.72 },
     position: [-0.04408803968526252, 2.5782623922476064, -0.38111494470446605], rotation: [0, 0, 0], scale: [0.85, 0.85, 0.85],
-    note: '依据JWF0019A说明书和乌斯特同类原理建立的连续空心草模：下方斜入、贯穿检测区、上部平滑转向；截面宽1600毫米、厚70毫米。'
+    note: '连续空心铁质主通道：下方斜入、贯穿检测区、上部平滑转向；前后相机对射位置分别设置上下各70毫米的透明玻璃检测窗。'
   },
   {
     id: 'reject-volute-1', label: '排杂漩涡风道＋风机接口', count: 1, kind: 'reject-volute',
@@ -1467,33 +1501,53 @@ let processPlaybackRate = 1;
 let processTimelineMs = 0;
 
 const processVoice = {
-  start: new Audio('./assets/audio/process-start.mp3'),
-  alert: new Audio('./assets/audio/impurity-alert.mp3')
+  intake: new Audio('./assets/audio/step-intake.mp3'),
+  scan: new Audio('./assets/audio/step-scan.mp3'),
+  detect: new Audio('./assets/audio/step-detect.mp3'),
+  eject: new Audio('./assets/audio/step-eject.mp3'),
+  suction: new Audio('./assets/audio/step-suction.mp3')
 };
 Object.values(processVoice).forEach((audio) => { audio.preload = 'auto'; });
 let activeProcessVoice = null;
-let lastProcessVoiceCue = '';
+const processVoiceQueue = [];
+const playedProcessVoiceCues = new Set();
 
-function stopProcessVoice() {
-  if (activeProcessVoice) {
-    activeProcessVoice.pause();
-    activeProcessVoice.currentTime = 0;
+function playNextProcessVoice() {
+  if (activeProcessVoice || !processVoiceQueue.length || !processDemoPlaying) return;
+  const clipName = processVoiceQueue.shift();
+  const audio = processVoice[clipName];
+  if (!audio) {
+    playNextProcessVoice();
+    return;
   }
-  activeProcessVoice = null;
-  lastProcessVoiceCue = '';
+  activeProcessVoice = audio;
+  audio.currentTime = 0;
+  audio.onended = () => {
+    activeProcessVoice = null;
+    playNextProcessVoice();
+  };
+  audio.play().catch(() => {
+    activeProcessVoice = null;
+    playNextProcessVoice();
+  });
 }
 
-function playProcessVoiceCue(cue, clipName) {
-  if (lastProcessVoiceCue === cue) return;
-  lastProcessVoiceCue = cue;
-  if (activeProcessVoice) {
-    activeProcessVoice.pause();
-    activeProcessVoice.currentTime = 0;
-  }
-  activeProcessVoice = processVoice[clipName];
-  if (!activeProcessVoice) return;
-  activeProcessVoice.currentTime = 0;
-  activeProcessVoice.play().catch(() => {});
+function stopProcessVoice() {
+  Object.values(processVoice).forEach((audio) => {
+    audio.pause();
+    audio.currentTime = 0;
+    audio.onended = null;
+  });
+  activeProcessVoice = null;
+  processVoiceQueue.length = 0;
+  playedProcessVoiceCues.clear();
+}
+
+function queueProcessVoiceCue(cue, clipName) {
+  if (playedProcessVoiceCues.has(cue)) return;
+  playedProcessVoiceCues.add(cue);
+  processVoiceQueue.push(clipName);
+  playNextProcessVoice();
 }
 
 const cottonLobeGeometry = new THREE.SphereGeometry(0.034, 8, 6);
@@ -1823,9 +1877,9 @@ function updateCottonProcess(time) {
   const impurityDuration = 4.6;
   const cycleSeconds = (time / 1000) % cycleDuration;
   let cameraTriggerStrength = 0;
-  let processVoiceCue = '';
+  if (processDemoPlaying && time >= 2500) queueProcessVoiceCue('扫描透明检测窗', 'scan');
 
-  impurityEvents.forEach((event) => {
+  impurityEvents.forEach((event, eventIndex) => {
     const elapsed = (cycleSeconds - event.start + cycleDuration) % cycleDuration;
     const active = elapsed < impurityDuration;
     event.tuft.visible = active;
@@ -1850,12 +1904,13 @@ function updateCottonProcess(time) {
       cameraTriggerStrength = Math.max(cameraTriggerStrength, eventTrigger);
       if (progress > 0.12) {
         activeStatus = `相机光幕闪白：通道30%位置识别到${event.label}，预先锁定第${valve.index + 1}号电磁阀`;
-        processVoiceCue = `${event.label}-提示`;
+        if (eventIndex === 0) queueProcessVoiceCue('识别第一处异纤', 'detect');
       }
       return;
     }
 
     if (progress < 0.70) {
+      if (eventIndex === 0) queueProcessVoiceCue('第一次喷射排杂', 'eject');
       const ejectProgress = (progress - 0.38) / 0.32;
       const control = ejectPoint.clone().lerp(route.inlet, 0.5).add(new THREE.Vector3(0, 0.10, 0));
       event.tuft.position.copy(quadraticPoint(ejectPoint, control, route.inlet, ejectProgress));
@@ -1885,6 +1940,7 @@ function updateCottonProcess(time) {
       return;
     }
 
+    if (eventIndex === 0) queueProcessVoiceCue('第一次风机吸杂', 'suction');
     const suctionProgress = (progress - 0.70) / 0.30;
     if (suctionProgress < 0.55) event.tuft.position.lerpVectors(route.inlet, route.center, suctionProgress / 0.55);
     else event.tuft.position.lerpVectors(route.center, route.fan, (suctionProgress - 0.55) / 0.45);
@@ -1905,7 +1961,6 @@ function updateCottonProcess(time) {
     if (triggerNow && !opticalTriggerLatched) opticalWhiteFlashStartedAt = lastAnimationTime;
     opticalTriggerLatched = triggerNow;
     setOpticalPathState('process', cameraTriggerStrength);
-    if (processVoiceCue) playProcessVoiceCue(processVoiceCue, 'alert');
   }
 
   updateProcessStatus(activeStatus);
@@ -2140,19 +2195,19 @@ function setProcessDemo(enabled) {
   if (enabled) {
     processTimelineMs = 0;
     stopProcessVoice();
-    playProcessVoiceCue('播放开始', 'start');
+    queueProcessVoiceCue('棉流进入主通道', 'intake');
     stopTour();
     if (calibrationEnabled) setCalibrationEnabled(false);
     applyMode('xray');
     updateCalibrationPartVisibility('process');
     setValveRowActive(true);
-    setFlowChannelGhosted(true);
+    setFlowChannelGhosted(false);
     setExternalModulesGhosted(true);
     setOpticalPathState('process', 0);
     setLayerVisible('hunyuan', importedModelReady);
     setLayerVisible('shell', !importedModelReady);
     partTitle.textContent = '异纤机工作原理动画';
-    partDetail.textContent = '前后视16台主相机持续扫描；前视8台直射，后视8台经反光镜折射。每台相机形成约300毫米宽、10毫米厚的蓝色检测光幕；发现异物时光幕闪白，随后对应电磁阀提前喷射。播放期间隐藏精灵眼相机。';
+    partDetail.textContent = '主通道为铁质风道，只在前后相机对射位置设置上下各70毫米的透明玻璃检测窗。播放会依次讲解进棉、扫描、识别、喷射和风机吸杂；前后视16台主相机持续扫描，发现异纤时蓝色光幕闪白。';
   } else {
     stopProcessVoice();
     valvePulse.visible = false;
