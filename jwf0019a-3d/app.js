@@ -522,12 +522,14 @@ const calibrationMaterials = {
   channelShell: materials.paint,
   channelFrame: materials.paint,
   channelWindowGlass: new THREE.MeshPhysicalMaterial({
-    color: 0xe8fbff,
+    color: 0xffffff,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.18,
     transparent: true,
-    opacity: 0.16,
-    roughness: 0.04,
+    opacity: 0.38,
+    roughness: 0.12,
     metalness: 0.04,
-    transmission: 0.88,
+    transmission: 0.58,
     thickness: 0.01,
     ior: 1.46,
     depthWrite: false,
@@ -535,8 +537,10 @@ const calibrationMaterials = {
   }),
   channelPlaybackWindow: new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.24,
     transparent: true,
-    opacity: 0.52,
+    opacity: 0.62,
     roughness: 0.30,
     metalness: 0.02,
     transmission: 0.36,
@@ -1541,6 +1545,7 @@ Object.values(processVoice).forEach((audio) => { audio.preload = 'auto'; });
 let activeProcessVoice = null;
 const processVoiceQueue = [];
 const playedProcessVoiceCues = new Set();
+let processVoiceCycleIndex = 0;
 
 function playNextProcessVoice() {
   if (activeProcessVoice || !processVoiceQueue.length || !processDemoPlaying) return;
@@ -1816,7 +1821,7 @@ function updateOpticalPathAnimation(time) {
   if (!opticalPathLayer.visible) return;
   opticalCameraMaterials.forEach(({ material }) => {
     material.color.copy(opticalBlue);
-    material.opacity = 0.16;
+    material.opacity = 0.11;
   });
   calibrationMaterials.cameraGlass.emissive.copy(opticalBlue);
   calibrationMaterials.cameraGlass.emissiveIntensity = 0.82;
@@ -1836,8 +1841,14 @@ function rejectRoutePoints(source) {
   const inlet = partLocalPoint(part, new THREE.Vector3(localX, -dimensions.height / 2 - dimensions.drop + dimensions.thickness, 0));
   const center = partLocalPoint(part, new THREE.Vector3(localX * 0.30, 0, 0));
   const fan = partLocalPoint(part, new THREE.Vector3(dimensions.length / 2 + Math.max(0.18, dimensions.depth * 0.55), dimensions.height * 0.04, 0));
-  const funnel = new THREE.Vector3(1.69, 2.245, 0.015);
-  const drop = new THREE.Vector3(1.69, 1.68, 0.015);
+  const outletDisk = completeModel.getObjectByName('第10轮_出口圆盘_连续低模');
+  const funnel = new THREE.Vector3(0.897, 2.347, 0.749);
+  if (outletDisk) {
+    const diskBounds = new THREE.Box3().setFromObject(outletDisk);
+    diskBounds.getCenter(funnel);
+    funnel.y = diskBounds.min.y - 0.02;
+  }
+  const drop = funnel.clone().add(new THREE.Vector3(0, -0.62, 0));
   return { inlet, center, fan, funnel, drop };
 }
 
@@ -1895,6 +1906,12 @@ function updateCottonProcess(time) {
   let activeStatus = '白色棉絮正常通过：下方进入，顶部出口消失';
   const cycleDuration = 36;
   const impurityDuration = 4.6;
+  const voiceCycleIndex = Math.floor(time / (cycleDuration * 1000));
+  if (processDemoPlaying && voiceCycleIndex !== processVoiceCycleIndex) {
+    processVoiceCycleIndex = voiceCycleIndex;
+    playedProcessVoiceCues.clear();
+    queueProcessVoiceCue(`第${voiceCycleIndex + 1}轮棉流进入主通道`, 'intake');
+  }
   const cycleSeconds = (time / 1000) % cycleDuration;
   let cameraTriggerStrength = 0;
   if (processDemoPlaying && time >= 2500) queueProcessVoiceCue('扫描透明检测窗', 'scan');
@@ -2216,6 +2233,7 @@ function setProcessDemo(enabled) {
   processStatus.hidden = !enabled;
   if (enabled) {
     processTimelineMs = 0;
+    processVoiceCycleIndex = 0;
     stopProcessVoice();
     queueProcessVoiceCue('棉流进入主通道', 'intake');
     stopTour();
