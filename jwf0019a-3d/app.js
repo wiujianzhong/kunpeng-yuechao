@@ -519,8 +519,8 @@ const calibrationMaterials = {
     depthWrite: false,
     side: THREE.DoubleSide
   }),
-  channelShell: new THREE.MeshStandardMaterial({ color: 0xf1f2ef, roughness: 0.32, metalness: 0.58 }),
-  channelFrame: new THREE.MeshStandardMaterial({ color: 0xe5e8e6, roughness: 0.28, metalness: 0.64 }),
+  channelShell: materials.paint,
+  channelFrame: materials.paint,
   channelWindowGlass: new THREE.MeshPhysicalMaterial({
     color: 0xe8fbff,
     transparent: true,
@@ -1661,11 +1661,8 @@ opticalPathLayer.visible = false;
 machine.add(opticalPathLayer);
 const opticalCameraMaterials = [];
 const opticalBlue = new THREE.Color(0x38a9ff);
-const opticalWhite = new THREE.Color(0xffffff);
 let opticalPathMode = 'off';
 let opticalTriggerStrength = 0;
-let opticalWhiteFlashStartedAt = -Infinity;
-let opticalTriggerLatched = false;
 
 function clearOpticalPaths() {
   opticalPathLayer.children.forEach((child) => child.geometry?.dispose());
@@ -1806,8 +1803,6 @@ function setOpticalPathState(mode = 'off', triggerStrength = 0) {
   if (mode === 'off') {
     opticalPathMode = 'off';
     opticalPathLayer.visible = false;
-    opticalTriggerLatched = false;
-    opticalWhiteFlashStartedAt = -Infinity;
     calibrationMaterials.cameraGlass.emissive.setHex(0x000000);
     calibrationMaterials.cameraGlass.emissiveIntensity = 0;
     return;
@@ -1819,19 +1814,12 @@ function setOpticalPathState(mode = 'off', triggerStrength = 0) {
 
 function updateOpticalPathAnimation(time) {
   if (!opticalPathLayer.visible) return;
-  const sweep = (time * 0.00048) % 1;
-  const trigger = opticalPathMode === 'scan' ? 0.58 : opticalTriggerStrength;
-  const whiteFlash = THREE.MathUtils.clamp(1 - (time - opticalWhiteFlashStartedAt) / 260, 0, 1);
-  opticalCameraMaterials.forEach(({ material, index, count }) => {
-    const phase = count <= 1 ? 0 : index / (count - 1);
-    const distance = Math.min(Math.abs(sweep - phase), 1 - Math.abs(sweep - phase));
-    const scanPulse = Math.exp(-distance * distance * 95);
-    material.color.copy(opticalBlue).lerp(opticalWhite, whiteFlash);
-    material.opacity = Math.min(0.72, 0.055 + scanPulse * 0.055 + trigger * (0.18 + scanPulse * 0.18) + whiteFlash * 0.48);
+  opticalCameraMaterials.forEach(({ material }) => {
+    material.color.copy(opticalBlue);
+    material.opacity = 0.16;
   });
-  const lensPulse = 0.65 + Math.sin(time * 0.012) * 0.35;
-  calibrationMaterials.cameraGlass.emissive.copy(opticalBlue).lerp(opticalWhite, whiteFlash);
-  calibrationMaterials.cameraGlass.emissiveIntensity = 0.20 + trigger * (1.4 + lensPulse * 1.1) + whiteFlash * 3.2;
+  calibrationMaterials.cameraGlass.emissive.copy(opticalBlue);
+  calibrationMaterials.cameraGlass.emissiveIntensity = 0.82;
 }
 
 function quadraticPoint(start, control, end, progress) {
@@ -1848,7 +1836,9 @@ function rejectRoutePoints(source) {
   const inlet = partLocalPoint(part, new THREE.Vector3(localX, -dimensions.height / 2 - dimensions.drop + dimensions.thickness, 0));
   const center = partLocalPoint(part, new THREE.Vector3(localX * 0.30, 0, 0));
   const fan = partLocalPoint(part, new THREE.Vector3(dimensions.length / 2 + Math.max(0.18, dimensions.depth * 0.55), dimensions.height * 0.04, 0));
-  return { inlet, center, fan };
+  const funnel = new THREE.Vector3(1.69, 2.245, 0.015);
+  const drop = new THREE.Vector3(1.69, 1.68, 0.015);
+  return { inlet, center, fan, funnel, drop };
 }
 
 function valvePosition(lane) {
@@ -1933,7 +1923,7 @@ function updateCottonProcess(time) {
       const eventTrigger = triggerIn * triggerOut;
       cameraTriggerStrength = Math.max(cameraTriggerStrength, eventTrigger);
       if (progress > 0.12) {
-        activeStatus = `相机光幕闪白：通道30%位置识别到${event.label}，预先锁定第${valve.index + 1}号电磁阀`;
+        activeStatus = `相机淡蓝光幕识别到${event.label}：通道30%位置预先锁定第${valve.index + 1}号电磁阀`;
         if (eventIndex === 0) queueProcessVoiceCue('识别第一处异纤', 'detect');
       }
       return;
@@ -1972,24 +1962,26 @@ function updateCottonProcess(time) {
 
     if (eventIndex === 0) queueProcessVoiceCue('第一次风机吸杂', 'suction');
     const suctionProgress = (progress - 0.70) / 0.30;
-    if (suctionProgress < 0.55) event.tuft.position.lerpVectors(route.inlet, route.center, suctionProgress / 0.55);
-    else event.tuft.position.lerpVectors(route.center, route.fan, (suctionProgress - 0.55) / 0.45);
-    event.tuft.scale.setScalar(Math.max(0.04, 1.08 * (1 - suctionProgress)));
+    const dropProgress = THREE.MathUtils.clamp((suctionProgress - 0.42) / 0.58, 0, 1);
+    if (suctionProgress < 0.25) event.tuft.position.lerpVectors(route.inlet, route.center, suctionProgress / 0.25);
+    else if (suctionProgress < 0.42) event.tuft.position.lerpVectors(route.center, route.funnel, (suctionProgress - 0.25) / 0.17);
+    else event.tuft.position.lerpVectors(route.funnel, route.drop, dropProgress);
+    event.tuft.scale.setScalar(Math.max(0.02, 1.08 * (1 - dropProgress)));
     event.sprayCotton.forEach((tuft, index) => {
-      const offset = new THREE.Vector3(tuft.userData.sprayOffset * (1 - suctionProgress), 0, 0);
-      if (suctionProgress < 0.55) tuft.position.lerpVectors(route.inlet, route.center, suctionProgress / 0.55).add(offset);
-      else tuft.position.lerpVectors(route.center, route.fan, (suctionProgress - 0.55) / 0.45).add(offset);
+      const offset = new THREE.Vector3(tuft.userData.sprayOffset * (1 - dropProgress), 0, 0);
+      if (suctionProgress < 0.25) tuft.position.lerpVectors(route.inlet, route.center, suctionProgress / 0.25).add(offset);
+      else if (suctionProgress < 0.42) tuft.position.lerpVectors(route.center, route.funnel, (suctionProgress - 0.25) / 0.17).add(offset);
+      else tuft.position.lerpVectors(route.funnel, route.drop, dropProgress).add(offset);
       tuft.visible = true;
-      tuft.scale.setScalar(Math.max(0.03, tuft.userData.baseScale * (1 - suctionProgress)));
+      tuft.scale.setScalar(Math.max(0.02, tuft.userData.baseScale * (1 - dropProgress)));
       tuft.rotation.y += 0.032;
     });
-    activeStatus = `排杂风机吸走${event.label}和伴随白棉，其余白棉继续通过`;
+    activeStatus = suctionProgress < 0.42
+      ? `排杂风机将${event.label}和伴随白棉送向圆盘漏斗`
+      : `${event.label}和伴随白棉从圆盘漏斗落下并消失，其余白棉继续通过`;
   });
 
   if (processDemoPlaying) {
-    const triggerNow = cameraTriggerStrength > 0.05;
-    if (triggerNow && !opticalTriggerLatched) opticalWhiteFlashStartedAt = lastAnimationTime;
-    opticalTriggerLatched = triggerNow;
     setOpticalPathState('process', cameraTriggerStrength);
   }
 
