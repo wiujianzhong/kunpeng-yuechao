@@ -52,6 +52,10 @@ h2 { margin: 0 0 12px; font-size: 14px; color: #e4e9ea; }
 .modes { grid-template-columns: repeat(4, 1fr); }
 .tour { grid-template-columns: repeat(5, 1fr); }
 .tour + .calibration-toggle { margin-top: 8px; }
+.process-speed { display: flex; align-items: center; gap: 9px; margin-top: 8px; color: #8f9ca1; font-size: 12px; }
+.process-speed > span { flex: 0 0 auto; }
+.speed-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; flex: 1; }
+.speed-options button { padding: 6px 4px; font-size: 12px; }
 button {
   padding: 8px 6px;
   border: 1px solid #303a3f;

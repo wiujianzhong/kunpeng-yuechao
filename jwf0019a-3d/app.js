@@ -1026,7 +1026,7 @@ function updateCalibrationPartVisibility(mode = 'external') {
     const kind = part.userData.config.kind;
     const external = kind === 'cover' || kind === 'heatsink' || id === 'flow-channel-1';
     const processDuct = id === 'flow-channel-1' || id === 'reject-volute-1';
-    const detectionPart = kind === 'camera-row' || kind === 'mirror-single';
+    const detectionPart = id === 'front-cameras' || id === 'rear-cameras' || id === 'mirrors';
     part.visible = mode === 'all'
       || external
       || ((mode === 'process' || mode === 'detect') && (processDuct || detectionPart));
@@ -1463,6 +1463,38 @@ machine.add(cottonFlow);
 const processStatus = document.querySelector('#process-status');
 const processPlay = document.querySelector('#process-play');
 let processDemoPlaying = false;
+let processPlaybackRate = 1;
+let processTimelineMs = 0;
+
+const processVoice = {
+  start: new Audio('./assets/audio/process-start.mp3'),
+  alert: new Audio('./assets/audio/impurity-alert.mp3')
+};
+Object.values(processVoice).forEach((audio) => { audio.preload = 'auto'; });
+let activeProcessVoice = null;
+let lastProcessVoiceCue = '';
+
+function stopProcessVoice() {
+  if (activeProcessVoice) {
+    activeProcessVoice.pause();
+    activeProcessVoice.currentTime = 0;
+  }
+  activeProcessVoice = null;
+  lastProcessVoiceCue = '';
+}
+
+function playProcessVoiceCue(cue, clipName) {
+  if (lastProcessVoiceCue === cue) return;
+  lastProcessVoiceCue = cue;
+  if (activeProcessVoice) {
+    activeProcessVoice.pause();
+    activeProcessVoice.currentTime = 0;
+  }
+  activeProcessVoice = processVoice[clipName];
+  if (!activeProcessVoice) return;
+  activeProcessVoice.currentTime = 0;
+  activeProcessVoice.play().catch(() => {});
+}
 
 const cottonLobeGeometry = new THREE.SphereGeometry(0.034, 8, 6);
 const impurityLobeGeometry = new THREE.DodecahedronGeometry(0.038, 0);
@@ -1504,11 +1536,11 @@ const whiteCottonTufts = Array.from({ length: 42 }, (_, index) => {
 });
 
 const impurityEvents = [
-  { label: '红色异物', start: 1.0, lane: -0.42, tuft: makeFluffyTuft(101, redImpurityMaterial, true) },
-  { label: '黑色异物', start: 7.0, lane: 0.47, tuft: makeFluffyTuft(202, blackImpurityMaterial, true) },
-  { label: '蓝色异物', start: 13.0, lane: -0.10, tuft: makeFluffyTuft(303, blueImpurityMaterial, true) },
-  { label: '黄色异物', start: 19.0, lane: 0.22, tuft: makeFluffyTuft(404, yellowImpurityMaterial, true) },
-  { label: '绿色异物', start: 25.0, lane: -0.67, tuft: makeFluffyTuft(505, greenImpurityMaterial, true) }
+  { label: '红色异物', start: 6.0, lane: -0.42, tuft: makeFluffyTuft(101, redImpurityMaterial, true) },
+  { label: '黑色异物', start: 12.0, lane: 0.47, tuft: makeFluffyTuft(202, blackImpurityMaterial, true) },
+  { label: '蓝色异物', start: 18.0, lane: -0.10, tuft: makeFluffyTuft(303, blueImpurityMaterial, true) },
+  { label: '黄色异物', start: 24.0, lane: 0.22, tuft: makeFluffyTuft(404, yellowImpurityMaterial, true) },
+  { label: '绿色异物', start: 30.0, lane: -0.67, tuft: makeFluffyTuft(505, greenImpurityMaterial, true) }
 ];
 impurityEvents.forEach((event, eventIndex) => {
   event.tuft.visible = false;
@@ -1544,8 +1576,12 @@ opticalPathLayer.name = '相机动态检测光路';
 opticalPathLayer.visible = false;
 machine.add(opticalPathLayer);
 const opticalCameraMaterials = [];
+const opticalBlue = new THREE.Color(0x38a9ff);
+const opticalWhite = new THREE.Color(0xffffff);
 let opticalPathMode = 'off';
 let opticalTriggerStrength = 0;
+let opticalWhiteFlashStartedAt = -Infinity;
+let opticalTriggerLatched = false;
 
 function clearOpticalPaths() {
   opticalPathLayer.children.forEach((child) => child.geometry?.dispose());
@@ -1554,24 +1590,58 @@ function clearOpticalPaths() {
   opticalCameraMaterials.length = 0;
 }
 
-function makeOpticalLine(points, material) {
-  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), material);
-  line.frustumCulled = false;
-  line.renderOrder = 30;
-  opticalPathLayer.add(line);
-}
-
-function makeOpticalCameraMaterial(color, index, count, type) {
-  const material = new THREE.LineBasicMaterial({
-    color,
+function makeOpticalCameraMaterial(index, count, type) {
+  const material = new THREE.MeshBasicMaterial({
+    color: opticalBlue,
     transparent: true,
-    opacity: 0.16,
+    opacity: 0.10,
     depthWrite: false,
     depthTest: false,
+    side: THREE.DoubleSide,
     blending: THREE.AdditiveBlending
   });
   opticalCameraMaterials.push({ material, index, count, type });
   return material;
+}
+
+function opticalWedgeGeometry(start, end, startWidth, endWidth, thickness = 0.01) {
+  const direction = end.clone().sub(start).normalize();
+  const widthAxis = new THREE.Vector3(1, 0, 0);
+  const thicknessAxis = new THREE.Vector3().crossVectors(widthAxis, direction).normalize();
+  if (thicknessAxis.lengthSq() < 0.001) thicknessAxis.set(0, 0, 1);
+  const startHalfWidth = widthAxis.clone().multiplyScalar(startWidth / 2);
+  const endHalfWidth = widthAxis.clone().multiplyScalar(endWidth / 2);
+  const halfThickness = thicknessAxis.multiplyScalar(thickness / 2);
+  const vertices = [
+    start.clone().sub(startHalfWidth).sub(halfThickness),
+    start.clone().add(startHalfWidth).sub(halfThickness),
+    start.clone().add(startHalfWidth).add(halfThickness),
+    start.clone().sub(startHalfWidth).add(halfThickness),
+    end.clone().sub(endHalfWidth).sub(halfThickness),
+    end.clone().add(endHalfWidth).sub(halfThickness),
+    end.clone().add(endHalfWidth).add(halfThickness),
+    end.clone().sub(endHalfWidth).add(halfThickness)
+  ];
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices.flatMap((point) => point.toArray()), 3));
+  geometry.setIndex([
+    0, 2, 1, 0, 3, 2,
+    4, 5, 6, 4, 6, 7,
+    0, 1, 5, 0, 5, 4,
+    3, 7, 6, 3, 6, 2,
+    0, 4, 7, 0, 7, 3,
+    1, 2, 6, 1, 6, 5
+  ]);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function makeOpticalWedge(start, end, startWidth, endWidth, material) {
+  if (start.distanceToSquared(end) < 0.000001) return;
+  const wedge = new THREE.Mesh(opticalWedgeGeometry(start, end, startWidth, endWidth, 0.01), material);
+  wedge.frustumCulled = false;
+  wedge.renderOrder = 30;
+  opticalPathLayer.add(wedge);
 }
 
 function partLocalPoint(part, point) {
@@ -1609,7 +1679,7 @@ function mirrorHitPoint(mirror, targetX) {
   return partLocalPoint(mirror, new THREE.Vector3(localX, 0, 0));
 }
 
-function addCameraCoveragePath({ rowId, count, direction, mirrorForIndex, progress, color, type }) {
+function addCameraCoveragePath({ rowId, count, direction, mirrorForIndex, progress, type }) {
   const row = calibrationParts.get(rowId);
   const channel = calibrationParts.get('flow-channel-1');
   if (!row || !channel) return;
@@ -1621,25 +1691,17 @@ function addCameraCoveragePath({ rowId, count, direction, mirrorForIndex, progre
   for (let index = 0; index < count; index += 1) {
     const target = curve.getPoint(progress);
     target.x += count === 1 ? 0 : (index / (count - 1) - 0.5) * span;
-    const targetLeft = target.clone().add(new THREE.Vector3(-coverageWidth / 2, 0, 0));
-    const targetRight = target.clone().add(new THREE.Vector3(coverageWidth / 2, 0, 0));
     const source = cameraLensPoint(row, index, count, direction);
-    const material = makeOpticalCameraMaterial(color, index, count, type);
+    const material = makeOpticalCameraMaterial(index, count, type);
     const mirror = mirrorForIndex ? calibrationParts.get(mirrorForIndex(index)) : null;
 
     if (mirror) {
       const hit = mirrorHitPoint(mirror, target.x);
-      const hitLeft = hit.clone().add(new THREE.Vector3(-0.035, 0, 0));
-      const hitRight = hit.clone().add(new THREE.Vector3(0.035, 0, 0));
-      makeOpticalLine([source, hit, target], material);
-      makeOpticalLine([source, hitLeft, targetLeft], material);
-      makeOpticalLine([source, hitRight, targetRight], material);
+      makeOpticalWedge(source, hit, 0.025, 0.075, material);
+      makeOpticalWedge(hit, target, 0.075, coverageWidth, material);
     } else {
-      makeOpticalLine([source, target], material);
-      makeOpticalLine([source, targetLeft], material);
-      makeOpticalLine([source, targetRight], material);
+      makeOpticalWedge(source, target, 0.025, coverageWidth, material);
     }
-    makeOpticalLine([targetLeft, targetRight], material);
   }
 }
 
@@ -1647,16 +1709,11 @@ function rebuildOpticalPaths() {
   clearOpticalPaths();
   addCameraCoveragePath({
     rowId: 'front-cameras', count: 8, direction: 'rear', progress: 0.30,
-    color: 0x61dcff, type: 'front'
+    type: 'front'
   });
   addCameraCoveragePath({
     rowId: 'rear-cameras', count: 8, direction: 'down', progress: 0.30,
-    mirrorForIndex: () => 'mirrors', color: 0xa88cff, type: 'rear'
-  });
-  addCameraCoveragePath({
-    rowId: 'magic-cameras', count: 4, direction: 'down', progress: 0.22,
-    mirrorForIndex: (index) => index < 2 ? 'mirror-single-1784558446608' : 'mirror-single-1784558638431',
-    color: 0xffb45e, type: 'magic'
+    mirrorForIndex: () => 'mirrors', type: 'rear'
   });
 }
 
@@ -1665,6 +1722,8 @@ function setOpticalPathState(mode = 'off', triggerStrength = 0) {
   if (mode === 'off') {
     opticalPathMode = 'off';
     opticalPathLayer.visible = false;
+    opticalTriggerLatched = false;
+    opticalWhiteFlashStartedAt = -Infinity;
     calibrationMaterials.cameraGlass.emissive.setHex(0x000000);
     calibrationMaterials.cameraGlass.emissiveIntensity = 0;
     return;
@@ -1678,15 +1737,17 @@ function updateOpticalPathAnimation(time) {
   if (!opticalPathLayer.visible) return;
   const sweep = (time * 0.00048) % 1;
   const trigger = opticalPathMode === 'scan' ? 0.58 : opticalTriggerStrength;
+  const whiteFlash = THREE.MathUtils.clamp(1 - (time - opticalWhiteFlashStartedAt) / 260, 0, 1);
   opticalCameraMaterials.forEach(({ material, index, count }) => {
     const phase = count <= 1 ? 0 : index / (count - 1);
     const distance = Math.min(Math.abs(sweep - phase), 1 - Math.abs(sweep - phase));
     const scanPulse = Math.exp(-distance * distance * 95);
-    material.opacity = Math.min(0.92, 0.10 + trigger * (0.28 + scanPulse * 0.58));
+    material.color.copy(opticalBlue).lerp(opticalWhite, whiteFlash);
+    material.opacity = Math.min(0.72, 0.055 + scanPulse * 0.055 + trigger * (0.18 + scanPulse * 0.18) + whiteFlash * 0.48);
   });
   const lensPulse = 0.65 + Math.sin(time * 0.012) * 0.35;
-  calibrationMaterials.cameraGlass.emissive.setHex(0x48d8ff);
-  calibrationMaterials.cameraGlass.emissiveIntensity = 0.22 + trigger * (1.6 + lensPulse * 1.3);
+  calibrationMaterials.cameraGlass.emissive.copy(opticalBlue).lerp(opticalWhite, whiteFlash);
+  calibrationMaterials.cameraGlass.emissiveIntensity = 0.20 + trigger * (1.4 + lensPulse * 1.1) + whiteFlash * 3.2;
 }
 
 function quadraticPoint(start, control, end, progress) {
@@ -1754,14 +1815,15 @@ function updateCottonProcess(time) {
       event.sprayCotton.forEach((tuft) => { tuft.visible = false; });
     });
     setOpticalPathState('scan', 0.58);
-    updateProcessStatus('20台相机持续扫描：前视直射，后视与精灵眼经反光镜折射覆盖通道');
+    updateProcessStatus('16台主相机持续扫描：前视直射，后视经反光镜折射覆盖通道');
     return;
   }
   let activeStatus = '白色棉絮正常通过：下方进入，顶部出口消失';
-  const cycleDuration = 30;
+  const cycleDuration = 36;
   const impurityDuration = 4.6;
   const cycleSeconds = (time / 1000) % cycleDuration;
   let cameraTriggerStrength = 0;
+  let processVoiceCue = '';
 
   impurityEvents.forEach((event) => {
     const elapsed = (cycleSeconds - event.start + cycleDuration) % cycleDuration;
@@ -1786,7 +1848,10 @@ function updateCottonProcess(time) {
       const triggerOut = 1 - THREE.MathUtils.smoothstep(progress, 0.32, 0.38);
       const eventTrigger = triggerIn * triggerOut;
       cameraTriggerStrength = Math.max(cameraTriggerStrength, eventTrigger);
-      if (progress > 0.12) activeStatus = `相机光路触发：通道30%位置识别到${event.label}，预先锁定第${valve.index + 1}号电磁阀`;
+      if (progress > 0.12) {
+        activeStatus = `相机光幕闪白：通道30%位置识别到${event.label}，预先锁定第${valve.index + 1}号电磁阀`;
+        processVoiceCue = `${event.label}-提示`;
+      }
       return;
     }
 
@@ -1835,7 +1900,13 @@ function updateCottonProcess(time) {
     activeStatus = `排杂风机吸走${event.label}和伴随白棉，其余白棉继续通过`;
   });
 
-  if (processDemoPlaying) setOpticalPathState('process', cameraTriggerStrength);
+  if (processDemoPlaying) {
+    const triggerNow = cameraTriggerStrength > 0.05;
+    if (triggerNow && !opticalTriggerLatched) opticalWhiteFlashStartedAt = lastAnimationTime;
+    opticalTriggerLatched = triggerNow;
+    setOpticalPathState('process', cameraTriggerStrength);
+    if (processVoiceCue) playProcessVoiceCue(processVoiceCue, 'alert');
+  }
 
   updateProcessStatus(activeStatus);
 }
@@ -2067,6 +2138,9 @@ function setProcessDemo(enabled) {
   cottonFlow.visible = enabled;
   processStatus.hidden = !enabled;
   if (enabled) {
+    processTimelineMs = 0;
+    stopProcessVoice();
+    playProcessVoiceCue('播放开始', 'start');
     stopTour();
     if (calibrationEnabled) setCalibrationEnabled(false);
     applyMode('xray');
@@ -2078,8 +2152,9 @@ function setProcessDemo(enabled) {
     setLayerVisible('hunyuan', importedModelReady);
     setLayerVisible('shell', !importedModelReady);
     partTitle.textContent = '异纤机工作原理动画';
-    partDetail.textContent = '20台相机持续扫描；检测到异物时镜头与光路同步增强。前视8台直射，后视8台和4台精灵眼经反光镜折射，每台在通道上形成约300毫米覆盖区；随后对应电磁阀提前喷射。';
+    partDetail.textContent = '前后视16台主相机持续扫描；前视8台直射，后视8台经反光镜折射。每台相机形成约300毫米宽、10毫米厚的蓝色检测光幕；发现异物时光幕闪白，随后对应电磁阀提前喷射。播放期间隐藏精灵眼相机。';
   } else {
+    stopProcessVoice();
     valvePulse.visible = false;
     airJet.visible = false;
     impurityEvents.forEach((event) => {
@@ -2096,6 +2171,14 @@ function setProcessDemo(enabled) {
 }
 
 processPlay.addEventListener('click', () => setProcessDemo(!processDemoPlaying));
+document.querySelectorAll('[data-process-speed]').forEach((button) => {
+  button.addEventListener('click', () => {
+    processPlaybackRate = Number(button.dataset.processSpeed) || 1;
+    document.querySelectorAll('[data-process-speed]').forEach((item) => {
+      item.classList.toggle('active', item === button);
+    });
+  });
+});
 
 const explodeSlider = document.querySelector('#explode');
 const explodeValue = document.querySelector('#explode-value');
@@ -2176,7 +2259,8 @@ function animate(time = 0) {
     if (percent >= 100) stopDismantle();
   }
   if (cottonFlow.visible) {
-    updateCottonProcess(time);
+    if (processDemoPlaying) processTimelineMs += deltaSeconds * 1000 * processPlaybackRate;
+    updateCottonProcess(processDemoPlaying ? processTimelineMs : time);
   }
   updateOpticalPathAnimation(time);
   controls.update();
