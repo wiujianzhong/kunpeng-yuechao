@@ -404,27 +404,33 @@ function importedPartInfo(name) {
   return [name || 'JWF0019A整机', '依据官方外形、现场拆板照片和已确认结构重新绘制的低面数可拆模型。'];
 }
 
-// 第13轮恢复：回退到第11轮完整外形母体，保留已校准内部布局。
+// 第14轮：只清除右侧穿出机身的旧白色排风管，保留原外形与已校准内部布局。
 const completeModel = makeLayer('hunyuan');
 const modelLoadStatus = document.querySelector('#model-load-status');
 const modelStatusValue = document.querySelector('#model-status-value');
 const importedModelLoader = new GLTFLoader();
 importedModelLoader.setMeshoptDecoder(MeshoptDecoder);
 importedModelLoader.load(
-  './assets/models/JWF0019A-第11轮精灵眼管道梯形罩.glb?v=13restore-shell',
+  './assets/models/JWF0019A-第14轮清除穿出白色排风管.glb?v=14-remove-protruding-pipe',
   (gltf) => {
     const importedRoot = gltf.scene;
-    importedRoot.name = 'JWF0019A第13轮完整外形恢复';
+    importedRoot.name = 'JWF0019A第14轮清除穿出白色排风管';
     completeModel.add(importedRoot);
     importedRoot.updateMatrixWorld(true);
 
-    const sourceBounds = new THREE.Box3().setFromObject(importedRoot);
-    const sourceSize = sourceBounds.getSize(new THREE.Vector3());
-    const scale = 3.62 / sourceSize.y;
+    // 固定沿用第11轮母体的原始包围盒，避免清除外伸管道后因自动重居中导致整机和已校准内部件错位。
+    const referenceBounds = new THREE.Box3(
+      new THREE.Vector3(-1.6000000238, 0.0049999952, -1.3600000143),
+      new THREE.Vector3(1.6000000238, 4.4489998817, 1.4329999685)
+    );
+    const referenceSize = referenceBounds.getSize(new THREE.Vector3());
+    const scale = 3.62 / referenceSize.y;
     importedRoot.scale.setScalar(scale);
     importedRoot.updateMatrixWorld(true);
 
-    const scaledBounds = new THREE.Box3().setFromObject(importedRoot);
+    const scaledBounds = referenceBounds.clone();
+    scaledBounds.min.multiplyScalar(scale);
+    scaledBounds.max.multiplyScalar(scale);
     const scaledCenter = scaledBounds.getCenter(new THREE.Vector3());
     importedRoot.position.x -= scaledCenter.x;
     importedRoot.position.y -= scaledBounds.min.y;
@@ -459,8 +465,8 @@ importedModelLoader.load(
     }
 
     importedModelReady = true;
-    modelLoadStatus.innerHTML = '<span class="dot ready"></span>第13轮完整外形恢复版已加载 · 31970三角面';
-    modelStatusValue.textContent = '精灵眼承载外形已恢复 · 内部布局位置保留';
+    modelLoadStatus.innerHTML = '<span class="dot ready"></span>第14轮旧穿出管道已清除 · 30455三角面';
+    modelStatusValue.textContent = '旧穿出管道已清除 · 原外形与内部布局保留';
     updateExplode();
     applyMode(currentMode);
   },
@@ -470,7 +476,7 @@ importedModelLoader.load(
     modelStatusValue.textContent = `真实外观加载 ${progress}%`;
   },
   (error) => {
-    console.error('第13轮完整外形恢复版加载失败', error);
+    console.error('第14轮清除穿出白色排风管版加载失败', error);
     completeModel.visible = false;
     if (layers.shell) layers.shell.visible = true;
     const hunyuanToggle = document.querySelector('[data-layer="hunyuan"]');
