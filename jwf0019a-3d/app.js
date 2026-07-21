@@ -333,15 +333,37 @@ function addLogo(parent, position) {
   return logo;
 }
 
-function addMachineIdentityDetails(parent) {
+function frontSurfaceZ(parent, target, x, y, fallbackZ) {
+  parent.updateMatrixWorld(true);
+  target.updateMatrixWorld(true);
+  const origin = parent.localToWorld(new THREE.Vector3(x, y, 4));
+  const raycaster = new THREE.Raycaster(origin, new THREE.Vector3(0, 0, -1), 0, 8);
+  const hit = raycaster.intersectObject(target, true)[0];
+  if (!hit) return fallbackZ;
+  return parent.worldToLocal(hit.point.clone()).z;
+}
+
+function addMachineIdentityDetails(parent, importedRoot) {
   const details = new THREE.Group();
   details.name = 'JWF0019A机身标识与立柱操作件';
   parent.add(details);
 
-  // 正面罩板：保留完整型号和蓝色圆形Logo，稍微浮于原网格表面避免闪烁。
-  textPlate(details, 'JWF0019A', 0.66, 0.13, [-0.10, 2.35, 0.82], 68, '#596468');
-  const logo = addLogo(details, [1.12, 2.31, 0.822]);
+  // 正面罩板：通过光线探测原网格的真实表面，仅外浮几毫米，旋转视角时不再悬空。
+  const labelSurfaceZ = frontSurfaceZ(parent, importedRoot, -0.10, 2.35, 0.31);
+  const logoSurfaceZ = frontSurfaceZ(parent, importedRoot, 1.12, 2.31, 0.31);
+  const modelLabel = textPlate(details, 'JWF0019A', 0.66, 0.13, [-0.10, 2.35, labelSurfaceZ + 0.008], 68, '#596468');
+  modelLabel.material.depthTest = false;
+  modelLabel.renderOrder = 20;
+  const logo = addLogo(details, [1.12, 2.31, logoSurfaceZ + 0.016]);
   logo.scale.setScalar(0.82);
+  logo.traverse((object) => {
+    if (!object.isMesh) return;
+    object.material = object.material.clone();
+    object.material.depthTest = false;
+    object.material.depthWrite = false;
+    object.userData.baseMaterial = object.material;
+    object.renderOrder = 20;
+  });
 
   // 信号灯侧立柱内面：独立触摸屏，不改动立柱本体。
   const screenMaterial = new THREE.MeshStandardMaterial({
@@ -498,7 +520,7 @@ importedModelLoader.load(
     importedRoot.position.z -= scaledCenter.z;
     importedRoot.updateMatrixWorld(true);
 
-    addMachineIdentityDetails(completeModel);
+    addMachineIdentityDetails(completeModel, importedRoot);
 
     importedRoot.traverse((object) => {
       if (!object.isMesh) return;
