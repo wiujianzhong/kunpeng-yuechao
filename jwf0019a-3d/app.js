@@ -330,6 +330,73 @@ function addLogo(parent, position) {
     logo.add(stripe);
   }
   parent.add(logo);
+  return logo;
+}
+
+function addMachineIdentityDetails(parent) {
+  const details = new THREE.Group();
+  details.name = 'JWF0019A机身标识与立柱操作件';
+  parent.add(details);
+
+  // 正面罩板：保留完整型号和蓝色圆形Logo，稍微浮于原网格表面避免闪烁。
+  textPlate(details, 'JWF0019A', 0.66, 0.13, [-0.10, 2.35, 0.82], 68, '#596468');
+  const logo = addLogo(details, [1.12, 2.31, 0.822]);
+  logo.scale.setScalar(0.82);
+
+  // 信号灯侧立柱内面：独立触摸屏，不改动立柱本体。
+  const screenMaterial = new THREE.MeshStandardMaterial({
+    color: 0x10191d,
+    emissive: 0x0b3b4a,
+    emissiveIntensity: 0.62,
+    roughness: 0.22,
+    metalness: 0.28
+  });
+  roundedBox(
+    details,
+    [0.032, 0.32, 0.45],
+    [-0.895, 1.665, 0],
+    materials.recess,
+    '左立柱内侧触摸屏外框',
+    '信号灯侧立柱内面的独立屏幕外框。',
+    0.012
+  );
+  roundedBox(
+    details,
+    [0.018, 0.255, 0.37],
+    [-0.874, 1.665, 0],
+    screenMaterial,
+    '左立柱内侧触摸屏',
+    '用于查看异纤检测参数、相机状态和排杂统计。',
+    0.008
+  );
+
+  // 风机侧立柱内面：平整电气柜门与独立旋转按钮。
+  roundedBox(
+    details,
+    [0.032, 0.54, 0.59],
+    [0.892, 1.645, 0],
+    materials.paintDark,
+    '右立柱内侧电气柜门',
+    '风机侧立柱内面的平整电气柜门。',
+    0.014
+  );
+  roundedBox(details, [0.018, 0.47, 0.52], [0.872, 1.645, 0], materials.paint, '', '', 0.01);
+  roundedBox(details, [0.018, 0.105, 0.105], [0.855, 1.75, 0.145], materials.yellow, '', '', 0.008);
+  cylinder(
+    details,
+    0.035,
+    0.052,
+    [0.825, 1.75, 0.145],
+    [0, 0, Math.PI / 2],
+    materials.red,
+    '电柜门旋转按钮',
+    '电气柜门上的红色旋转按钮，带黄色安全底座。',
+    'shell',
+    28
+  );
+  roundedBox(details, [0.058, 0.022, 0.018], [0.797, 1.75, 0.145], materials.dark, '', '', 0.006);
+
+  return details;
 }
 
 function addBoltRow(parent, y, z, count = 10) {
@@ -430,6 +497,8 @@ importedModelLoader.load(
     importedRoot.position.y -= scaledBounds.min.y;
     importedRoot.position.z -= scaledCenter.z;
     importedRoot.updateMatrixWorld(true);
+
+    addMachineIdentityDetails(completeModel);
 
     importedRoot.traverse((object) => {
       if (!object.isMesh) return;
@@ -1366,7 +1435,7 @@ const frontCover = new THREE.Group();
 frontCover.position.z = 0.388;
 shell.add(frontCover);
 roundedBox(frontCover, [2.67, 0.48, 0.045], [-0.035, 2.31, 0], materials.paint, '主机正面白色罩板', '整张白色罩板的左右边缘与两根支撑腿外边对齐。', 0.018);
-textPlate(frontCover, 'JWF0019', 0.55, 0.13, [0.43, 2.34, 0.024], 72);
+textPlate(frontCover, 'JWF0019A', 0.66, 0.13, [0.38, 2.34, 0.024], 68);
 addLogo(frontCover, [0.94, 2.31, 0.027]);
 addBoltRow(frontCover, 2.08, 0.029, 11);
 trackExplode(frontCover, [0, 0, 1], 0.95);
@@ -1451,7 +1520,8 @@ const electricCabinet = new THREE.Group();
 shell.add(electricCabinet);
 roundedBox(electricCabinet, [0.055, 0.78, 0.47], [0.855, 1.48, 0], materials.paintDark, '电柜门', '风机侧立柱内面的一体式电气柜门。', 0.018);
 roundedBox(electricCabinet, [0.022, 0.68, 0.39], [0.821, 1.48, 0], materials.paint, '电柜内侧面板', '电柜完全收在右侧落地立柱内，不占用中间悬空区域。', 0.01);
-cylinder(electricCabinet, 0.032, 0.03, [0.801, 1.69, 0.13], [0, 0, Math.PI / 2], materials.red, '急停按钮', '风机侧电柜内面急停按钮。');
+roundedBox(electricCabinet, [0.016, 0.10, 0.10], [0.798, 1.69, 0.13], materials.yellow, '', '', 0.008);
+cylinder(electricCabinet, 0.032, 0.045, [0.775, 1.69, 0.13], [0, 0, Math.PI / 2], materials.red, '电柜门旋转按钮', '风机侧电柜门上的红色旋转按钮，带黄色安全底座。');
 
 // 正面是1600×70 mm的全机幅水平入口；背面同一位置背有精灵眼三角立体罩。
 const intakeDuct = new THREE.Group();
