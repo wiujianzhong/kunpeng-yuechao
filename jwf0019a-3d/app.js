@@ -404,17 +404,17 @@ function importedPartInfo(name) {
   return [name || 'JWF0019A整机', '依据官方外形、现场拆板照片和已确认结构重新绘制的低面数可拆模型。'];
 }
 
-// 第15轮：清除用户红圈指定的顶部旧白色弯管，保留滚筒、风机、机身与已校准内部布局。
+// 第14轮：只清除右侧穿出机身的旧白色排风管，保留原外形与已校准内部布局。
 const completeModel = makeLayer('hunyuan');
 const modelLoadStatus = document.querySelector('#model-load-status');
 const modelStatusValue = document.querySelector('#model-status-value');
 const importedModelLoader = new GLTFLoader();
 importedModelLoader.setMeshoptDecoder(MeshoptDecoder);
 importedModelLoader.load(
-  './assets/models/JWF0019A-第15轮清除顶部旧白色管道.glb?v=15-remove-top-old-pipe',
+  './assets/models/JWF0019A-第14轮清除穿出白色排风管.glb?v=14-remove-protruding-pipe',
   (gltf) => {
     const importedRoot = gltf.scene;
-    importedRoot.name = 'JWF0019A第15轮清除顶部旧白色管道';
+    importedRoot.name = 'JWF0019A第14轮清除穿出白色排风管';
     completeModel.add(importedRoot);
     importedRoot.updateMatrixWorld(true);
 
@@ -465,8 +465,8 @@ importedModelLoader.load(
     }
 
     importedModelReady = true;
-    modelLoadStatus.innerHTML = '<span class="dot ready"></span>第15轮顶部旧白色管道已清除 · 26419三角面';
-    modelStatusValue.textContent = '顶部红圈旧白色管道已清除 · 其他结构保留';
+    modelLoadStatus.innerHTML = '<span class="dot ready"></span>第14轮旧穿出管道已清除 · 30455三角面';
+    modelStatusValue.textContent = '旧穿出管道已清除 · 原外形与内部布局保留';
     updateExplode();
     applyMode(currentMode);
   },
@@ -476,7 +476,7 @@ importedModelLoader.load(
     modelStatusValue.textContent = `真实外观加载 ${progress}%`;
   },
   (error) => {
-    console.error('第15轮清除顶部旧白色管道版加载失败', error);
+    console.error('第14轮清除穿出白色排风管版加载失败', error);
     completeModel.visible = false;
     if (layers.shell) layers.shell.visible = true;
     const hunyuanToggle = document.querySelector('[data-layer="hunyuan"]');
@@ -696,7 +696,10 @@ function flowChannelPathPoints(dimensions) {
     new THREE.Vector3(0, -height * 0.30, -offset * 0.34),
     new THREE.Vector3(0, -height * 0.06, -offset * 0.13),
     new THREE.Vector3(0, height * 0.22, 0),
-    new THREE.Vector3(0, height * 0.38, 0)
+    new THREE.Vector3(0, height * 0.38, 0),
+    new THREE.Vector3(0, height * 0.47, offset * 0.10),
+    new THREE.Vector3(0, height * 0.50, offset * 0.28),
+    new THREE.Vector3(0, height * 0.50, offset * 0.50)
   ];
 }
 

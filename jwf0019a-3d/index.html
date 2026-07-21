@@ -18,7 +18,7 @@
   <main>
     <section class="stage" aria-label="JWF0019A三维模型">
       <canvas id="scene"></canvas>
-      <div id="model-load-status" class="status"><span class="dot warning"></span>第15轮顶部旧白色管道清除版加载中</div>
+      <div id="model-load-status" class="status"><span class="dot warning"></span>第14轮旧穿出管道清除版加载中</div>
       <div id="process-status" class="process-status" hidden>白色棉絮正常通过</div>
       <div class="hint">拖动旋转 · 滚轮缩放 · 点击内部部件查看</div>
     </section>
@@ -27,7 +27,7 @@
       <div>
         <p class="eyebrow">JWF0019A</p>
         <h1>异纤机数字讲解平台</h1>
-        <p class="intro">当前加载第15轮：已清除用户红圈指定的顶部旧白色弯管，滚筒、风机、机身与已校准内部布局保持不变。</p>
+        <p class="intro">当前加载第14轮：只清除右侧穿出机身的旧白色管道，原外形、精灵眼组件与已校准内部布局保持不变。</p>
       </div>
 
       <section>
@@ -80,8 +80,8 @@
 
       <section>
         <h2>模型层</h2>
-        <label><input type="checkbox" data-layer="hunyuan" checked> 第15轮顶部旧白色管道清除版</label>
-        <p class="annotation-help">当前显示26419三角面的第15轮母体；只移除顶部红圈旧白色管道，散热片、后视罩板及内部布局继续沿用已校准位置。</p>
+        <label><input type="checkbox" data-layer="hunyuan" checked> 第14轮旧穿出管道清除版</label>
+        <p class="annotation-help">当前显示30455三角面的完整母体；只移除右侧穿出机身的旧管道，散热片、后视罩板及内部布局继续沿用已校准位置。</p>
       </section>
 
       <section class="calibration-section">
@@ -143,6 +143,6 @@
       </section>
     </aside>
   </main>
-  <script type="module" src="./app.js?v=17-remove-top-old-pipe"></script>
+  <script type="module" src="./app.js?v=16-remove-protruding-pipe"></script>
 </body>
 </html>
