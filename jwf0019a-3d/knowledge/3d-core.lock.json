@@ -1,0 +1,7 @@
+{
+  "lockedAt": "2026-07-22",
+  "rule": "知识平台迭代只增不减，未经伍建忠明确确认不得修改3D核心、模型文件或工作原理动画。",
+  "appJsSha256": "f56daad421733499fcc287e3c8538acd0848b22b1fdac4a5778de9ffca4ac6aa",
+  "publishedBranch": "main",
+  "publishedCommitBeforeKnowledgePlatform": "9f20868"
+}

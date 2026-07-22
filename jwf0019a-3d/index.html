@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JWF0019A 3D结构模型</title>
-  <link rel="stylesheet" href="./styles.css">
+  <title>JWF0019A 设备超级知识平台</title>
+  <meta name="description" content="JWF0019A异纤机3D结构、工作原理、操作保养、故障诊断、参数质量与设备知识库。">
+  <link rel="stylesheet" href="./styles.css?v=2-knowledge-lock">
   <script type="importmap">
     {
       "imports": {
@@ -20,6 +21,10 @@
       <canvas id="scene"></canvas>
       <div id="model-load-status" class="status"><span class="dot warning"></span>第13轮完整外形恢复版加载中</div>
       <div id="process-status" class="process-status" hidden>白色棉絮正常通过</div>
+      <a class="knowledge-jump" href="#knowledge-platform">
+        <span>新增</span>
+        进入设备超级知识库
+      </a>
       <div class="hint">拖动旋转 · 滚轮缩放 · 点击内部部件查看</div>
     </section>
 
@@ -28,6 +33,10 @@
         <p class="eyebrow">JWF0019A</p>
         <h1>异纤机数字讲解平台</h1>
         <p class="intro">当前加载第13轮：恢复通道后方承载精灵眼的完整外形，并保留已校准的内部布局与连续棉流主通道。</p>
+        <div class="platform-switch" aria-label="平台区域导航">
+          <a href="#scene" class="active">3D工作台</a>
+          <a href="#knowledge-platform">超级知识库</a>
+        </div>
       </div>
 
       <section>
@@ -84,7 +93,14 @@
         <p class="annotation-help">当前显示31970三角面的完整母体；散热片、后视罩板及内部布局继续沿用已校准位置。</p>
       </section>
 
-      <section class="calibration-section">
+      <section id="calibration-private-section" class="calibration-section calibration-private-section">
+        <div id="calibration-lock-row" class="calibration-lock-row">
+          <strong>内部布局校准</strong>
+          <input id="calibration-password" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="内部布局校准密码" placeholder="输入密码">
+          <button id="calibration-unlock" type="button">解锁</button>
+          <output id="calibration-lock-status" aria-live="polite"></output>
+        </div>
+        <div id="calibration-private-content" hidden>
         <div class="range-head"><h2>内部布局校准</h2><output id="calibration-status">基准v3已锁定</output></div>
         <button id="calibration-mode" class="calibration-toggle">开启内部校准模式</button>
         <p class="annotation-help">外壳会变半透明。先选部件，再拖动红、绿、蓝轴；X=左右，Y=上下，Z=前后。主通道和排杂漩涡风道均可调整尺寸与接口位置；反光镜、罩壳和散热片可复制。</p>
@@ -123,6 +139,7 @@
           <button id="calibration-reset" disabled>复位当前部件</button>
           <button id="calibration-delete" disabled>删除当前副本</button>
         </div>
+        </div>
       </section>
 
       <details class="reference">
@@ -143,6 +160,79 @@
       </section>
     </aside>
   </main>
+
+  <section id="knowledge-platform" class="knowledge-platform" aria-labelledby="knowledge-title">
+    <header class="knowledge-hero">
+      <div class="knowledge-hero-copy">
+        <div class="knowledge-live"><span></span>JWF0019A正式知识层已接入</div>
+        <p class="knowledge-kicker">设备超级知识库 · 从认识到维修</p>
+        <h2 id="knowledge-title">先看懂机器，再解决问题</h2>
+        <p>3D模型继续承担“看见结构”，知识平台负责把说明书、现场经验、参数截图和真实故障组织成可查、可学、可执行的设备知识。</p>
+      </div>
+      <div class="knowledge-metrics" aria-label="知识库规模">
+        <div><strong id="knowledge-module-count">7</strong><span>学习模块</span></div>
+        <div><strong id="knowledge-article-count">14</strong><span>正式知识卡</span></div>
+        <div><strong id="knowledge-fault-count">8</strong><span>故障入口</span></div>
+      </div>
+    </header>
+
+    <nav id="knowledge-module-tabs" class="knowledge-flow" aria-label="知识模块"></nav>
+
+    <div class="knowledge-workbench">
+      <aside class="knowledge-quick-panel">
+        <span class="knowledge-panel-label">快速进入</span>
+        <h3>你现在想做什么？</h3>
+        <div id="knowledge-quick-actions" class="knowledge-quick-actions">
+          <button type="button" data-quick-module="principle"><span>看</span>理解工作原理</button>
+          <button type="button" data-quick-module="operation"><span>学</span>查看操作保养</button>
+          <button type="button" data-quick-module="fault"><span>查</span>按现象查故障</button>
+          <button type="button" data-quick-module="quality"><span>调</span>核对参数质量</button>
+        </div>
+        <div class="knowledge-safety-note">
+          <strong>知识分层</strong>
+          <p>绿色为已确认事实；琥珀色内容包含待验证实验，不会冒充现有功能。</p>
+        </div>
+      </aside>
+
+      <div id="knowledge-content" class="knowledge-content">
+        <div class="knowledge-search-row">
+          <label class="knowledge-search">
+            <span>搜索设备知识</span>
+            <input id="knowledge-search" type="search" placeholder="例如：相机不刷新、电磁阀、高温、玻璃清洁" autocomplete="off">
+          </label>
+          <button id="knowledge-search-clear" type="button">清除</button>
+        </div>
+
+        <div class="knowledge-module-head">
+          <div>
+            <span id="knowledge-module-evidence">已脱敏正式知识</span>
+            <h3 id="knowledge-module-title">认识设备</h3>
+            <p id="knowledge-module-description"></p>
+          </div>
+          <output id="knowledge-result-count">0项结果</output>
+        </div>
+
+        <div id="knowledge-card-grid" class="knowledge-card-grid" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <dialog id="knowledge-dialog" class="knowledge-dialog" aria-labelledby="knowledge-dialog-title">
+    <div class="knowledge-dialog-frame">
+      <header>
+        <div>
+          <p>JWF0019A · 设备知识卡</p>
+          <h2 id="knowledge-dialog-title"></h2>
+          <div id="knowledge-dialog-meta" class="knowledge-dialog-meta"></div>
+        </div>
+        <button id="knowledge-dialog-close" type="button" aria-label="关闭知识卡">关闭</button>
+      </header>
+      <div id="knowledge-dialog-body" class="knowledge-dialog-body"></div>
+    </div>
+  </dialog>
+
   <script type="module" src="./app.js?v=20-surface-attached-identity"></script>
+  <script type="module" src="./knowledge-app.js?v=2-knowledge-search"></script>
+  <script src="./ui-access.js?v=1-calibration-lock"></script>
 </body>
 </html>
