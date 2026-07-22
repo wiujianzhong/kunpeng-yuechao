@@ -712,25 +712,30 @@
     let currentSymptom = "camera";
 
     const principleVoice = [
-      new Audio("./assets/audio/step-intake.mp3"),
-      new Audio("./assets/audio/step-scan.mp3"),
-      new Audio("./assets/audio/step-detect.mp3"),
-      new Audio("./assets/audio/step-eject.mp3"),
-      new Audio("./assets/audio/step-suction.mp3")
+      "./assets/audio/step-intake.mp3",
+      "./assets/audio/step-scan.mp3",
+      "./assets/audio/step-detect.mp3",
+      "./assets/audio/step-eject.mp3",
+      "./assets/audio/step-suction.mp3"
     ];
     const structureVoice = [
-      new Audio("./assets/audio/structure-overview.mp3"),
-      new Audio("./assets/audio/structure-controls.mp3"),
-      new Audio("./assets/audio/structure-cameras.mp3"),
-      new Audio("./assets/audio/structure-elfeye.mp3"),
-      new Audio("./assets/audio/structure-ejection.mp3")
+      "./assets/audio/structure-overview.mp3",
+      "./assets/audio/structure-controls.mp3",
+      "./assets/audio/structure-cameras.mp3",
+      "./assets/audio/structure-elfeye.mp3",
+      "./assets/audio/structure-ejection.mp3"
     ];
     const voiceTracks = {
       "认识结构": structureVoice,
       "工作原理": principleVoice
     };
-    Object.values(voiceTracks).flat().forEach(audio => { audio.preload = "auto"; });
+    Object.values(voiceTracks).flat().forEach(src => {
+      fetch(src, { cache: "force-cache" }).catch(() => {});
+    });
+    const voicePlayer = new Audio();
+    voicePlayer.preload = "auto";
     let activeVoice = null;
+    let activeVoiceToken = 0;
 
     function getSteps() {
       const module = modules[currentModule];
@@ -745,23 +750,37 @@
     }
 
     function stopVoice() {
-      Object.values(voiceTracks).flat().forEach(audio => {
-        audio.pause();
-        audio.currentTime = 0;
-      });
+      activeVoiceToken += 1;
+      voicePlayer.pause();
+      voicePlayer.onended = null;
+      voicePlayer.onerror = null;
+      if (Number.isFinite(voicePlayer.duration)) voicePlayer.currentTime = 0;
       activeVoice = null;
     }
 
     function playStepVoice(index) {
       stopVoice();
       if (!voiceEnabled) return;
-      const audio = voiceTracks[currentModule]?.[index];
-      if (!audio) return;
-      activeVoice = audio;
-      audio.playbackRate = speed;
-      audio.play().catch(() => {
+      const src = voiceTracks[currentModule]?.[index];
+      if (!src) return;
+      const token = activeVoiceToken;
+      let failed = false;
+      const useFallback = () => {
+        if (failed || token !== activeVoiceToken) return;
+        failed = true;
         activeVoice = null;
-      });
+        scheduleNext(true);
+      };
+      activeVoice = voicePlayer;
+      voicePlayer.src = src;
+      voicePlayer.playbackRate = speed;
+      voicePlayer.onended = () => {
+        if (token !== activeVoiceToken || paused) return;
+        activeVoice = null;
+        advanceStep();
+      };
+      voicePlayer.onerror = useFallback;
+      voicePlayer.play().catch(useFallback);
     }
 
     function updateVoiceControl() {
@@ -793,22 +812,27 @@
       if (announce) playStepVoice(currentStep);
     }
 
-    function scheduleNext() {
+    function advanceStep() {
       clearTimeout(stepTimer);
       if (paused) return;
-      stepTimer = setTimeout(() => {
-        const finalStep = getSteps().length - 1;
-        if (currentStep >= finalStep) {
-          paused = true;
-          hero.classList.remove("playing");
-          pauseButton.textContent = "重新播放";
-          statusText.textContent = `${currentModule}讲解完成`;
-          return;
-        }
-        currentStep += 1;
-        renderStep(true);
-        scheduleNext();
-      }, Math.max(4200 / speed, activeVoice ? ((activeVoice.duration || 0) / speed + .45) * 1000 : 0));
+      const finalStep = getSteps().length - 1;
+      if (currentStep >= finalStep) {
+        paused = true;
+        hero.classList.remove("playing");
+        pauseButton.textContent = "重新播放";
+        statusText.textContent = `${currentModule}讲解完成`;
+        return;
+      }
+      currentStep += 1;
+      renderStep(true);
+      scheduleNext();
+    }
+
+    function scheduleNext(forceTimer = false) {
+      clearTimeout(stepTimer);
+      if (paused) return;
+      if (!forceTimer && voiceEnabled && voiceTracks[currentModule]) return;
+      stepTimer = setTimeout(advanceStep, 4200 / speed);
     }
 
     function playFromCurrent() {
@@ -940,15 +964,19 @@
       if (!voiceTracks[currentModule]) return;
       voiceEnabled = !voiceEnabled;
       updateVoiceControl();
-      if (voiceEnabled && currentMode === "guided" && !paused) playStepVoice(currentStep);
-      else stopVoice();
+      if (voiceEnabled && currentMode === "guided" && !paused) {
+        playStepVoice(currentStep);
+      } else {
+        stopVoice();
+        if (currentMode === "guided" && !paused) scheduleNext(true);
+      }
     });
     document.querySelectorAll("[data-speed]").forEach(button => button.addEventListener("click", () => {
       speed = Number(button.dataset.speed);
       document.querySelectorAll("[data-speed]").forEach(item => item.classList.toggle("active", item === button));
       if (!paused) {
-        playStepVoice(currentStep);
-        scheduleNext();
+        if (activeVoice) activeVoice.playbackRate = speed;
+        else scheduleNext();
       }
     }));
     document.querySelector("#exit-guided").addEventListener("click", () => setMode("free"));
