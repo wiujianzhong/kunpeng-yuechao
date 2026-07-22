@@ -718,7 +718,18 @@
       new Audio("./assets/audio/step-eject.mp3"),
       new Audio("./assets/audio/step-suction.mp3")
     ];
-    principleVoice.forEach(audio => { audio.preload = "auto"; });
+    const structureVoice = [
+      new Audio("./assets/audio/structure-overview.mp3"),
+      new Audio("./assets/audio/structure-controls.mp3"),
+      new Audio("./assets/audio/structure-cameras.mp3"),
+      new Audio("./assets/audio/structure-elfeye.mp3"),
+      new Audio("./assets/audio/structure-ejection.mp3")
+    ];
+    const voiceTracks = {
+      "认识结构": structureVoice,
+      "工作原理": principleVoice
+    };
+    Object.values(voiceTracks).flat().forEach(audio => { audio.preload = "auto"; });
     let activeVoice = null;
 
     function getSteps() {
@@ -734,7 +745,7 @@
     }
 
     function stopVoice() {
-      principleVoice.forEach(audio => {
+      Object.values(voiceTracks).flat().forEach(audio => {
         audio.pause();
         audio.currentTime = 0;
       });
@@ -743,8 +754,8 @@
 
     function playStepVoice(index) {
       stopVoice();
-      if (!voiceEnabled || currentModule !== "工作原理") return;
-      const audio = principleVoice[index];
+      if (!voiceEnabled) return;
+      const audio = voiceTracks[currentModule]?.[index];
       if (!audio) return;
       activeVoice = audio;
       audio.playbackRate = speed;
@@ -754,10 +765,10 @@
     }
 
     function updateVoiceControl() {
-      const hasOriginalVoice = currentModule === "工作原理";
-      voiceButton.disabled = !hasOriginalVoice;
-      voiceButton.hidden = !hasOriginalVoice;
-      voiceButton.classList.toggle("active", hasOriginalVoice && voiceEnabled);
+      const hasVoice = Boolean(voiceTracks[currentModule]);
+      voiceButton.disabled = !hasVoice;
+      voiceButton.hidden = !hasVoice;
+      voiceButton.classList.toggle("active", hasVoice && voiceEnabled);
       voiceButton.textContent = voiceEnabled ? "原声开" : "原声关";
     }
 
@@ -826,8 +837,8 @@
         currentStep = 0;
         paused = true;
         pauseButton.textContent = "开始";
-        modeHint.textContent = currentModule === "工作原理"
-          ? "已使用原3D讲解的五段真人原声，点击带我学习后自动播放。"
+        modeHint.textContent = voiceTracks[currentModule]
+          ? "已接入五段讲解语音，点击带我学习后自动播放。"
           : "该模块先播放画面与字幕；等你确认内容并补充真人录音后再接入语音。";
         renderStep(false);
         if (autoPlay) {
@@ -872,8 +883,8 @@
       pauseButton.textContent = currentMode === "guided" ? "开始" : "暂停";
       updateVoiceControl();
       if (currentMode === "guided") {
-        modeHint.textContent = name === "工作原理"
-          ? "已使用原3D讲解的五段真人原声，当前会自动播放。"
+        modeHint.textContent = voiceTracks[name]
+          ? "已接入五段讲解语音，当前会自动播放。"
           : "该模块先播放画面与字幕；等你确认内容并补充真人录音后再接入语音。";
         playFromCurrent();
         revealPlaybackControls();
@@ -926,7 +937,7 @@
       }
     });
     voiceButton.addEventListener("click", () => {
-      if (currentModule !== "工作原理") return;
+      if (!voiceTracks[currentModule]) return;
       voiceEnabled = !voiceEnabled;
       updateVoiceControl();
       if (voiceEnabled && currentMode === "guided" && !paused) playStepVoice(currentStep);
