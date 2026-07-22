@@ -459,10 +459,10 @@
           <button type="button" data-mode="guided"><strong>带我学习</strong><small>点击自动讲解</small></button>
         </div>
         <div class="actions">
-          <button class="primary" id="module-action" type="button">开始结构讲解 <span>→</span></button>
-          <a class="secondary" href="./3d.html?review=simplified">打开真实3D</a>
+          <a class="primary" href="./3d.html?review=simplified">打开真实3D <span>→</span></a>
+          <button class="secondary" id="module-action" type="button">讲解试听</button>
         </div>
-        <p class="microcopy" id="mode-hint">当前为自由查看，点击模块即可切换内容。</p>
+        <p class="microcopy" id="mode-hint">真实3D可完整旋转查看；自动讲解仍在继续完善。</p>
       </section>
 
       <section class="machine-stage" aria-label="JWF0019A设备展示">
@@ -517,7 +517,7 @@
         kicker: "认识结构 · 从外到内",
         title: "从外到内，<em>看懂每个部件</em>",
         lead: "先建立整机方位，再逐层认识相机、算力盒子、电磁阀与排杂风道。",
-        action: "开始结构讲解",
+        action: "预览结构讲解",
         status: "整机结构认识",
         steps: [
           "先从正面观察两侧支撑腿与检测通道。",
@@ -564,7 +564,7 @@
         kicker: "操作保养 · 每天做对",
         title: "规范操作，<em>保持检测稳定</em>",
         lead: "把开停机、画面检查和玻璃清洁整理成可跟随的现场步骤。",
-        action: "开始操作讲解",
+        action: "预览操作讲解",
         status: "开停机与日常清洁",
         steps: [
           "确认屏幕旁的小急停按钮已经旋转弹出。",
@@ -591,7 +591,7 @@
         kicker: "故障诊断 · 先看现象",
         title: "先判断范围，<em>再处理故障</em>",
         lead: "先选一个现场症状，再按照屏幕信息和设备状态逐步排查。",
-        action: "开始诊断讲解",
+        action: "预览诊断讲解",
         status: "按现象定位故障",
         symptoms: {
           camera: {
@@ -657,7 +657,7 @@
         kicker: "参数资料 · 读懂作用",
         title: "参数不是数字，<em>而是动作时机</em>",
         lead: "把流速、延时、吹气时间、模型与抽测记录放回实际工艺场景中理解。",
-        action: "开始参数讲解",
+        action: "预览参数讲解",
         status: "模型、延时与质量记录",
         steps: [
           "先匹配原料与检测模型：模型过敏会增加乱喷，过松则可能漏检。",
@@ -756,10 +756,9 @@
     function updateVoiceControl() {
       const hasOriginalVoice = currentModule === "工作原理";
       voiceButton.disabled = !hasOriginalVoice;
+      voiceButton.hidden = !hasOriginalVoice;
       voiceButton.classList.toggle("active", hasOriginalVoice && voiceEnabled);
-      voiceButton.textContent = hasOriginalVoice
-        ? (voiceEnabled ? "原声开" : "原声关")
-        : "待补原声";
+      voiceButton.textContent = voiceEnabled ? "原声开" : "原声关";
     }
 
     function updateFocus(module, index) {

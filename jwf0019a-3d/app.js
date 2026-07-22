@@ -448,7 +448,7 @@ function addMachineIdentityDetails(parent, importedRoot) {
   // 真实外观母版没有着色信号灯，在原机左上方补齐可辨识的红、黄、绿三色灯。
   const signal = new THREE.Group();
   signal.name = '三色信号灯总成';
-  signal.position.set(-0.62, 3.11, 0.05);
+  signal.position.set(-1.15, 2.97, -0.062);
   details.add(signal);
   cylinder(signal, 0.035, 0.16, [0, -0.10, 0], [0, 0, 0], materials.dark, '三色信号灯安装柱', '连接信号灯与机身上盖的黑色安装柱。', 'indicator', 20);
   cylinder(signal, 0.056, 0.062, [0, 0, 0], [0, 0, 0], materials.dark, '三色信号灯底座', '设备运行状态三色灯底座。', 'indicator', 24);
@@ -539,10 +539,10 @@ const modelStatusValue = document.querySelector('#model-status-value');
 const importedModelLoader = new GLTFLoader();
 importedModelLoader.setMeshoptDecoder(MeshoptDecoder);
 importedModelLoader.load(
-  './assets/models/JWF0019A-第11轮精灵眼管道梯形罩.glb?v=13restore-shell',
+  './assets/models/JWF0019A-第12轮清除旧灯疙瘩并校正圆盘.glb?v=12-clean-shell-align-disk',
   (gltf) => {
     const importedRoot = gltf.scene;
-    importedRoot.name = 'JWF0019A第13轮完整外形恢复';
+    importedRoot.name = 'JWF0019A外形清理校正版';
     completeModel.add(importedRoot);
     importedRoot.updateMatrixWorld(true);
 
@@ -558,14 +558,6 @@ importedModelLoader.load(
     importedRoot.position.y -= scaledBounds.min.y;
     importedRoot.position.z -= scaledCenter.z;
     importedRoot.updateMatrixWorld(true);
-
-    // 让右侧落管正对圆盘中心：仅移动独立圆盘节点，不修改母模型其他外形。
-    const outletDisk = importedRoot.getObjectByName('第10轮_出口圆盘_连续低模');
-    if (outletDisk) {
-      outletDisk.position.x += 0.02 / scale;
-      outletDisk.position.z -= 0.18 / scale;
-      outletDisk.updateMatrixWorld(true);
-    }
 
     addMachineIdentityDetails(completeModel, importedRoot);
 
@@ -597,8 +589,8 @@ importedModelLoader.load(
     }
 
     importedModelReady = true;
-    modelLoadStatus.innerHTML = '<span class="dot ready"></span>第13轮完整外形恢复版已加载 · 31970三角面';
-    modelStatusValue.textContent = '精灵眼承载外形已恢复 · 内部布局位置保留';
+    modelLoadStatus.innerHTML = '<span class="dot ready"></span>外形清理校正版已加载 · 31252三角面';
+    modelStatusValue.textContent = '旧灯与疙瘩已清除 · 圆盘管口已对中';
     updateExplode();
     applyMode(currentMode);
   },
@@ -608,7 +600,7 @@ importedModelLoader.load(
     modelStatusValue.textContent = `真实外观加载 ${progress}%`;
   },
   (error) => {
-    console.error('第13轮完整外形恢复版加载失败', error);
+    console.error('外形清理校正版加载失败', error);
     completeModel.visible = false;
     if (layers.shell) layers.shell.visible = true;
     const hunyuanToggle = document.querySelector('[data-layer="hunyuan"]');
