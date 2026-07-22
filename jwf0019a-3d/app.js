@@ -389,16 +389,24 @@ function addMachineIdentityDetails(parent, importedRoot) {
   details.name = 'JWF0019A机身标识与立柱操作件';
   parent.add(details);
 
-  // 母版里原有的屏幕和电柜门会从新件边缘露出，直接移除旧独立节点，避免重叠穿帮。
-  ['左立柱_内侧触摸屏', '右立柱_内侧电柜门'].forEach((name) => {
-    importedRoot.getObjectByName(name)?.removeFromParent();
-  });
+  // 先读取母版原件中心，再移除旧件；新屏幕和电柜门贴回原立柱内面，避免悬空。
+  const leftScreenOriginal = importedRoot.getObjectByName('左立柱_内侧触摸屏');
+  const rightCabinetOriginal = importedRoot.getObjectByName('右立柱_内侧电柜门');
+  const anchorCenter = (object, fallback) => {
+    if (!object) return fallback;
+    const center = new THREE.Box3().setFromObject(object).getCenter(new THREE.Vector3());
+    return parent.worldToLocal(center);
+  };
+  const leftScreenAnchor = anchorCenter(leftScreenOriginal, new THREE.Vector3(-0.895, 1.665, 0));
+  const rightCabinetAnchor = anchorCenter(rightCabinetOriginal, new THREE.Vector3(0.892, 1.55, -0.055));
+  leftScreenOriginal?.removeFromParent();
+  rightCabinetOriginal?.removeFromParent();
 
   // 信号灯侧立柱内面：独立触摸屏，不改动立柱本体。
   roundedBox(
     details,
     [0.032, 0.32, 0.45],
-    [-0.895, 1.665, 0],
+    [leftScreenAnchor.x, 1.665, 0],
     materials.recess,
     '左立柱内侧触摸屏外框',
     '信号灯侧立柱内面的独立屏幕外框。',
@@ -407,14 +415,14 @@ function addMachineIdentityDetails(parent, importedRoot) {
   roundedBox(
     details,
     [0.018, 0.255, 0.37],
-    [-0.874, 1.665, 0],
+    [leftScreenAnchor.x + 0.021, 1.665, 0],
     materials.dark,
     '左立柱内侧触摸屏',
     '用于查看异纤检测参数、相机状态和排杂统计。',
     0.008
   );
   const operatingScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.355, 0.225), makeScreenImageMaterial());
-  operatingScreen.position.set(-0.862, 1.665, 0);
+  operatingScreen.position.set(leftScreenAnchor.x + 0.034, 1.665, 0);
   operatingScreen.rotation.y = Math.PI / 2;
   registerMesh(operatingScreen, '触摸屏运行主画面', '通道状态与32位喷阀统计的正常运行画面。', 'decal');
   details.add(operatingScreen);
@@ -423,19 +431,19 @@ function addMachineIdentityDetails(parent, importedRoot) {
   roundedBox(
     details,
     [0.032, 0.54, 0.59],
-    [0.892, 1.55, -0.055],
+    [rightCabinetAnchor.x, 1.55, -0.055],
     materials.paint,
     '右立柱内侧电气柜门',
     '风机侧立柱内面的平整电气柜门。',
     0.014
   );
-  roundedBox(details, [0.018, 0.47, 0.52], [0.872, 1.55, -0.055], materials.paint, '', '', 0.01);
-  roundedBox(details, [0.018, 0.105, 0.105], [0.855, 1.55, -0.19], materials.yellow, '', '', 0.008);
+  roundedBox(details, [0.018, 0.47, 0.52], [rightCabinetAnchor.x - 0.020, 1.55, -0.055], materials.paint, '', '', 0.01);
+  roundedBox(details, [0.018, 0.105, 0.105], [rightCabinetAnchor.x - 0.037, 1.55, -0.19], materials.yellow, '', '', 0.008);
   cylinder(
     details,
     0.035,
     0.052,
-    [0.825, 1.55, -0.19],
+    [rightCabinetAnchor.x - 0.067, 1.55, -0.19],
     [0, 0, Math.PI / 2],
     materials.red,
     '电柜门旋转按钮',
@@ -443,7 +451,7 @@ function addMachineIdentityDetails(parent, importedRoot) {
     'shell',
     28
   );
-  roundedBox(details, [0.058, 0.022, 0.018], [0.797, 1.55, -0.19], materials.dark, '', '', 0.006);
+  roundedBox(details, [0.058, 0.022, 0.018], [rightCabinetAnchor.x - 0.095, 1.55, -0.19], materials.dark, '', '', 0.006);
 
   // 真实外观母版没有着色信号灯，在原机左上方补齐可辨识的红、黄、绿三色灯。
   const signal = new THREE.Group();
@@ -558,6 +566,20 @@ importedModelLoader.load(
     importedRoot.position.y -= scaledBounds.min.y;
     importedRoot.position.z -= scaledCenter.z;
     importedRoot.updateMatrixWorld(true);
+
+    // 圆盘保持与管口同轴，并按现场校对结果整体上提100毫米，消除悬空缝隙。
+    const outletDisk = importedRoot.getObjectByName('第10轮_出口圆盘_连续低模');
+    if (outletDisk) outletDisk.position.y += 0.10 / scale;
+
+    // 外加罩板和电柜门沿用母版机身白漆，避免前罩板比主机明显更白。
+    const shellReference = importedRoot.getObjectByName('第10轮_母版保形上部外观_锁定');
+    const shellMaterial = Array.isArray(shellReference?.material)
+      ? shellReference.material[0]
+      : shellReference?.material;
+    if (shellMaterial?.color) {
+      materials.paint.color.copy(shellMaterial.color);
+      calibrationMaterials.cover.color.copy(shellMaterial.color);
+    }
 
     addMachineIdentityDetails(completeModel, importedRoot);
 
@@ -1337,6 +1359,17 @@ function setExternalModulesGhosted(ghosted) {
       object.material = ghosted ? calibrationMaterials.coverGhost : object.userData.baseMaterial;
       object.renderOrder = ghosted ? 12 : 0;
     });
+  });
+}
+
+function setSignalTowerGhosted(ghosted) {
+  const signalTower = completeModel.getObjectByName('三色信号灯总成');
+  if (!signalTower) return;
+  signalTower.traverse((object) => {
+    if (!object.isMesh || !object.userData.baseMaterial) return;
+    object.material = ghosted ? modeMaterials.xrayShell : object.userData.baseMaterial;
+    object.renderOrder = ghosted ? 13 : 0;
+    object.castShadow = !ghosted;
   });
 }
 
@@ -2554,6 +2587,7 @@ function setProcessDemo(enabled) {
     setValveRowActive(true);
     setFlowChannelPlaybackAppearance(true);
     setExternalModulesGhosted(true);
+    setSignalTowerGhosted(true);
     setOpticalPathState('process', 0);
     setLayerVisible('hunyuan', importedModelReady);
     setLayerVisible('shell', !importedModelReady);
@@ -2572,6 +2606,7 @@ function setProcessDemo(enabled) {
     applyMode('solid');
     setFlowChannelPlaybackAppearance(false);
     setExternalModulesGhosted(false);
+    setSignalTowerGhosted(false);
     setOpticalPathState('off');
   }
 }
