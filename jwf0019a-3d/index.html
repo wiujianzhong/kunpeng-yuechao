@@ -378,7 +378,7 @@
       .topbar { border-radius: 18px; gap: 12px; }
       .brand { min-width: 0; }
       .brand-copy span, .topnav, .knowledge-link { display: none; }
-      .hero { min-height: 820px; grid-template-columns: 1fr; border-radius: 28px; }
+      .hero { min-height: 820px; grid-template-columns: minmax(0, 1fr); border-radius: 28px; }
       .hero-copy { padding: 48px 26px 20px; align-self: start; }
       h1 { font-size: 46px; }
       .lead { font-size: 15px; }
@@ -398,11 +398,17 @@
     }
 
     @media (max-width: 560px) {
+      html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+      .shell { width: 100%; max-width: 100%; padding: 8px; overflow: hidden; }
+      .topbar, .hero, .below, .learning-console, .demo-note { width: 100%; max-width: 100%; }
       .hero { min-height: 880px; }
+      .hero-copy, .machine-stage { width: 100%; min-width: 0; }
       .hero-copy { padding: 38px 20px 18px; }
-      h1 { font-size: 39px; }
+      h1, h1 em { max-width: 100%; white-space: normal; overflow-wrap: anywhere; word-break: break-all; }
+      h1 { font-size: clamp(32px, 10vw, 39px); }
+      .lead { max-width: 100%; overflow-wrap: anywhere; }
       .actions { margin-top: 18px; }
-      .primary, .secondary { flex: 1 1 150px; padding: 0 15px; }
+      .primary, .secondary { flex: 1 1 140px; min-width: 0; padding: 0 12px; }
       .machine-stage { min-height: 385px; }
       .status-card { top: 2px; right: 8px; }
       .module-rail { overflow-x: auto; grid-template-columns: repeat(5, minmax(92px, 1fr)); }
