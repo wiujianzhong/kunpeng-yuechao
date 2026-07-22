@@ -71,6 +71,8 @@ const materials = {
   light: new THREE.MeshStandardMaterial({ color: 0xf2fcff, emissive: 0xbcecff, emissiveIntensity: 1.7 }),
   red: new THREE.MeshStandardMaterial({ color: 0xc82727, roughness: 0.34 }),
   yellow: new THREE.MeshStandardMaterial({ color: 0xf2b62b, roughness: 0.34 }),
+  signalRed: new THREE.MeshStandardMaterial({ color: 0xef3d42, emissive: 0x8b1018, emissiveIntensity: 0.82, roughness: 0.22 }),
+  signalAmber: new THREE.MeshStandardMaterial({ color: 0xffb51e, emissive: 0x9a5400, emissiveIntensity: 0.78, roughness: 0.22 }),
   signalGreen: new THREE.MeshStandardMaterial({ color: 0x35b95c, emissive: 0x176c31, emissiveIntensity: 0.7 }),
   blue: new THREE.MeshStandardMaterial({ color: 0x2f7daf, roughness: 0.42 }),
   orange: new THREE.MeshStandardMaterial({ color: 0xf07d32, emissive: 0x7c2f09, emissiveIntensity: 0.55 }),
@@ -89,7 +91,27 @@ const modeMaterials = {
     depthWrite: false,
     side: THREE.DoubleSide
   }),
-  xrayInternal: new THREE.MeshStandardMaterial({ color: 0x49c7e6, roughness: 0.35, metalness: 0.25 })
+  xrayInternal: new THREE.MeshStandardMaterial({ color: 0x49c7e6, roughness: 0.35, metalness: 0.25 }),
+  xrayCalibrationShell: new THREE.MeshPhysicalMaterial({
+    color: 0x9fcbd3,
+    transparent: true,
+    opacity: 0.15,
+    roughness: 0.16,
+    transmission: 0.42,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  }),
+  xrayWindow: new THREE.MeshPhysicalMaterial({
+    color: 0xf7ffff,
+    emissive: 0xd8fbff,
+    emissiveIntensity: 1.05,
+    transparent: true,
+    opacity: 0.72,
+    roughness: 0.08,
+    transmission: 0.28,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  })
 };
 
 const layers = {};
@@ -105,7 +127,10 @@ let modelAnimationMixer = null;
 let modelAnimationActions = [];
 let modelAnimationDuration = 0;
 let dismantlePlaying = false;
+let dismantleProgress = 0;
 let lastAnimationTime = 0;
+let explodePresentationActive = false;
+let modeBeforeExplode = 'solid';
 
 function makeLayer(name) {
   const value = new THREE.Group();
@@ -154,13 +179,20 @@ function cylinder(parent, radius, depth, position, rotation, material, name, det
   return mesh;
 }
 
-function trackExplode(object, direction, distance = 1) {
+function trackExplode(object, direction, distance = 1, start = 0, end = 1) {
   explodeItems.push({
     object,
     base: object.position.clone(),
     direction: new THREE.Vector3(...direction).normalize(),
-    distance
+    distance,
+    start,
+    end
   });
+}
+
+function syncExplodeBase(object) {
+  const item = explodeItems.find((entry) => entry.object === object);
+  if (item) item.base.copy(object.position);
 }
 
 function wedgeGeometry(width, height, depth, topFrontInset = 0.13) {
@@ -333,6 +365,15 @@ function addLogo(parent, position) {
   return logo;
 }
 
+const screenTexture = new THREE.TextureLoader().load('./assets/JWF0019A-运行主屏.png');
+screenTexture.colorSpace = THREE.SRGBColorSpace;
+screenTexture.minFilter = THREE.LinearFilter;
+screenTexture.magFilter = THREE.LinearFilter;
+
+function makeScreenImageMaterial() {
+  return new THREE.MeshBasicMaterial({ map: screenTexture, toneMapped: false, side: THREE.DoubleSide });
+}
+
 function frontSurfaceZ(parent, target, x, y, fallbackZ) {
   parent.updateMatrixWorld(true);
   target.updateMatrixWorld(true);
@@ -348,31 +389,12 @@ function addMachineIdentityDetails(parent, importedRoot) {
   details.name = 'JWF0019A机身标识与立柱操作件';
   parent.add(details);
 
-  // 正面罩板：通过光线探测原网格的真实表面，仅外浮几毫米，旋转视角时不再悬空。
-  const labelSurfaceZ = frontSurfaceZ(parent, importedRoot, -0.10, 2.35, 0.31);
-  const logoSurfaceZ = frontSurfaceZ(parent, importedRoot, 1.12, 2.31, 0.31);
-  const modelLabel = textPlate(details, 'JWF0019A', 0.66, 0.13, [-0.10, 2.35, labelSurfaceZ + 0.008], 68, '#596468');
-  modelLabel.material.depthTest = false;
-  modelLabel.renderOrder = 20;
-  const logo = addLogo(details, [1.12, 2.31, logoSurfaceZ + 0.016]);
-  logo.scale.setScalar(0.82);
-  logo.traverse((object) => {
-    if (!object.isMesh) return;
-    object.material = object.material.clone();
-    object.material.depthTest = false;
-    object.material.depthWrite = false;
-    object.userData.baseMaterial = object.material;
-    object.renderOrder = 20;
+  // 母版里原有的屏幕和电柜门会从新件边缘露出，直接移除旧独立节点，避免重叠穿帮。
+  ['左立柱_内侧触摸屏', '右立柱_内侧电柜门'].forEach((name) => {
+    importedRoot.getObjectByName(name)?.removeFromParent();
   });
 
   // 信号灯侧立柱内面：独立触摸屏，不改动立柱本体。
-  const screenMaterial = new THREE.MeshStandardMaterial({
-    color: 0x10191d,
-    emissive: 0x0b3b4a,
-    emissiveIntensity: 0.62,
-    roughness: 0.22,
-    metalness: 0.28
-  });
   roundedBox(
     details,
     [0.032, 0.32, 0.45],
@@ -386,29 +408,34 @@ function addMachineIdentityDetails(parent, importedRoot) {
     details,
     [0.018, 0.255, 0.37],
     [-0.874, 1.665, 0],
-    screenMaterial,
+    materials.dark,
     '左立柱内侧触摸屏',
     '用于查看异纤检测参数、相机状态和排杂统计。',
     0.008
   );
+  const operatingScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.355, 0.225), makeScreenImageMaterial());
+  operatingScreen.position.set(-0.862, 1.665, 0);
+  operatingScreen.rotation.y = Math.PI / 2;
+  registerMesh(operatingScreen, '触摸屏运行主画面', '通道状态与32位喷阀统计的正常运行画面。', 'decal');
+  details.add(operatingScreen);
 
   // 风机侧立柱内面：平整电气柜门与独立旋转按钮。
   roundedBox(
     details,
     [0.032, 0.54, 0.59],
-    [0.892, 1.645, 0],
-    materials.paintDark,
+    [0.892, 1.55, -0.055],
+    materials.paint,
     '右立柱内侧电气柜门',
     '风机侧立柱内面的平整电气柜门。',
     0.014
   );
-  roundedBox(details, [0.018, 0.47, 0.52], [0.872, 1.645, 0], materials.paint, '', '', 0.01);
-  roundedBox(details, [0.018, 0.105, 0.105], [0.855, 1.75, 0.145], materials.yellow, '', '', 0.008);
+  roundedBox(details, [0.018, 0.47, 0.52], [0.872, 1.55, -0.055], materials.paint, '', '', 0.01);
+  roundedBox(details, [0.018, 0.105, 0.105], [0.855, 1.55, -0.19], materials.yellow, '', '', 0.008);
   cylinder(
     details,
     0.035,
     0.052,
-    [0.825, 1.75, 0.145],
+    [0.825, 1.55, -0.19],
     [0, 0, Math.PI / 2],
     materials.red,
     '电柜门旋转按钮',
@@ -416,7 +443,19 @@ function addMachineIdentityDetails(parent, importedRoot) {
     'shell',
     28
   );
-  roundedBox(details, [0.058, 0.022, 0.018], [0.797, 1.75, 0.145], materials.dark, '', '', 0.006);
+  roundedBox(details, [0.058, 0.022, 0.018], [0.797, 1.55, -0.19], materials.dark, '', '', 0.006);
+
+  // 真实外观母版没有着色信号灯，在原机左上方补齐可辨识的红、黄、绿三色灯。
+  const signal = new THREE.Group();
+  signal.name = '三色信号灯总成';
+  signal.position.set(-0.62, 3.11, 0.05);
+  details.add(signal);
+  cylinder(signal, 0.035, 0.16, [0, -0.10, 0], [0, 0, 0], materials.dark, '三色信号灯安装柱', '连接信号灯与机身上盖的黑色安装柱。', 'indicator', 20);
+  cylinder(signal, 0.056, 0.062, [0, 0, 0], [0, 0, 0], materials.dark, '三色信号灯底座', '设备运行状态三色灯底座。', 'indicator', 24);
+  cylinder(signal, 0.047, 0.068, [0, 0.065, 0], [0, 0, 0], materials.signalRed, '三色信号灯红灯', '红灯用于设备报警或停止状态提示。', 'indicator', 24);
+  cylinder(signal, 0.047, 0.068, [0, 0.136, 0], [0, 0, 0], materials.signalAmber, '三色信号灯黄灯', '黄灯用于设备待机或提示状态。', 'indicator', 24);
+  cylinder(signal, 0.047, 0.068, [0, 0.207, 0], [0, 0, 0], materials.signalGreen, '三色信号灯绿灯', '绿灯用于设备正常运行状态提示。', 'indicator', 24);
+  cylinder(signal, 0.054, 0.025, [0, 0.253, 0], [0, 0, 0], materials.dark, '三色信号灯顶盖', '三色信号灯顶部保护盖。', 'indicator', 24);
 
   return details;
 }
@@ -520,6 +559,14 @@ importedModelLoader.load(
     importedRoot.position.z -= scaledCenter.z;
     importedRoot.updateMatrixWorld(true);
 
+    // 让右侧落管正对圆盘中心：仅移动独立圆盘节点，不修改母模型其他外形。
+    const outletDisk = importedRoot.getObjectByName('第10轮_出口圆盘_连续低模');
+    if (outletDisk) {
+      outletDisk.position.x += 0.02 / scale;
+      outletDisk.position.z -= 0.18 / scale;
+      outletDisk.updateMatrixWorld(true);
+    }
+
     addMachineIdentityDetails(completeModel, importedRoot);
 
     importedRoot.traverse((object) => {
@@ -590,7 +637,7 @@ const calibrationMaterials = {
     depthWrite: false,
     side: THREE.DoubleSide
   }),
-  heatsink: new THREE.MeshStandardMaterial({ color: 0x8f9ca1, roughness: 0.30, metalness: 0.74 }),
+  heatsink: new THREE.MeshStandardMaterial({ color: 0xf0f3f4, roughness: 0.18, metalness: 0.88 }),
   cameraBody: new THREE.MeshStandardMaterial({ color: 0x9da8ad, roughness: 0.26, metalness: 0.72 }),
   cameraDark: new THREE.MeshStandardMaterial({ color: 0x1b2226, roughness: 0.40, metalness: 0.50 }),
   cameraGlass: new THREE.MeshPhysicalMaterial({ color: 0x5db4d2, roughness: 0.08, metalness: 0.15, transmission: 0.38 }),
@@ -598,9 +645,27 @@ const calibrationMaterials = {
   computeFin: new THREE.MeshStandardMaterial({ color: 0x8d9ba1, roughness: 0.24, metalness: 0.78 }),
   connector: new THREE.MeshStandardMaterial({ color: 0x22292d, roughness: 0.48, metalness: 0.32 }),
   statusLed: new THREE.MeshStandardMaterial({ color: 0x77f082, emissive: 0x28b94c, emissiveIntensity: 1.5 }),
-  valveCoil: new THREE.MeshStandardMaterial({ color: 0xc94b43, roughness: 0.38, metalness: 0.42, emissive: 0x5a120e, emissiveIntensity: 0.45 }),
+  valveBody: new THREE.MeshStandardMaterial({ color: 0x2f6f9f, roughness: 0.34, metalness: 0.54 }),
+  valveBodyActive: new THREE.MeshStandardMaterial({ color: 0x297fbd, emissive: 0x0f4d77, emissiveIntensity: 0.62, roughness: 0.24, metalness: 0.46 }),
+  valveCoil: new THREE.MeshStandardMaterial({ color: 0x20272b, roughness: 0.42, metalness: 0.34 }),
+  valveCoilActive: new THREE.MeshStandardMaterial({ color: 0x192126, emissive: 0x22333d, emissiveIntensity: 0.34, roughness: 0.28, metalness: 0.38 }),
   valveMetal: new THREE.MeshStandardMaterial({ color: 0xb8c1c4, roughness: 0.22, metalness: 0.82 }),
-  valveNozzle: new THREE.MeshStandardMaterial({ color: 0xc8963f, roughness: 0.30, metalness: 0.72 }),
+  valveMetalActive: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xd9f7ff, emissiveIntensity: 0.48, roughness: 0.12, metalness: 0.76 }),
+  valveNozzle: new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.38,
+    roughness: 0.18,
+    metalness: 0.10
+  }),
+  valveNozzleActive: new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    emissive: 0xffffff,
+    emissiveIntensity: 1.1,
+    roughness: 0.08,
+    transparent: false
+  }),
+  valveOverrideActive: new THREE.MeshStandardMaterial({ color: 0xf53f46, emissive: 0xb60f1d, emissiveIntensity: 0.78 }),
   channelGlass: new THREE.MeshPhysicalMaterial({
     color: 0x76d7e8,
     transparent: true,
@@ -760,18 +825,67 @@ function addComputeRow(group, calibrationId, count) {
 }
 
 function addValveRow(group, calibrationId, count) {
+  const spacing = 0.072;
+  const manifoldLength = (count - 1) * spacing + 0.105;
+  const manifold = addCalibrationMesh(
+    group,
+    new RoundedBoxGeometry(manifoldLength, 0.040, 0.120, 2, 0.010),
+    calibrationMaterials.valveMetal,
+    calibrationId
+  );
+  // 阀板位于32个阀体前方，靠近前视相机侧；正面可直接看清128个喷孔。
+  manifold.position.y = 0.150;
+  manifold.userData.name = `32位MAC52A电磁阀板（${count * 4}孔）`;
+  manifold.userData.detail = `整块阀板安装${count}个MAC52A风格电磁阀，每阀对应4个喷孔，共${count * 4}个喷孔。`;
+
   for (let index = 0; index < count; index += 1) {
     const unit = new THREE.Group();
-    unit.position.x = (index - (count - 1) / 2) * 0.072;
-    const coil = addCalibrationMesh(unit, new THREE.CylinderGeometry(0.027, 0.027, 0.062, 14), calibrationMaterials.valveCoil, calibrationId);
-    const core = addCalibrationMesh(unit, new THREE.CylinderGeometry(0.014, 0.014, 0.102, 14), calibrationMaterials.valveMetal, calibrationId);
-    const collar = addCalibrationMesh(unit, new THREE.CylinderGeometry(0.024, 0.024, 0.018, 14), calibrationMaterials.valveMetal, calibrationId);
-    const nozzle = addCalibrationMesh(unit, new THREE.CylinderGeometry(0.008, 0.012, 0.044, 12), calibrationMaterials.valveNozzle, calibrationId);
-    coil.position.y = 0.012;
-    core.position.y = -0.018;
-    collar.position.y = -0.060;
-    nozzle.position.y = -0.090;
-    [coil, core, collar, nozzle].forEach((part) => { part.userData.name = `电磁阀${index + 1}号`; });
+    unit.position.x = (index - (count - 1) / 2) * spacing;
+
+    const body = addCalibrationMesh(
+      unit,
+      new RoundedBoxGeometry(0.057, 0.065, 0.080, 2, 0.008),
+      calibrationMaterials.valveBody,
+      calibrationId
+    );
+    body.position.y = 0.013;
+    const coil = addCalibrationMesh(
+      unit,
+      new RoundedBoxGeometry(0.047, 0.068, 0.054, 2, 0.007),
+      calibrationMaterials.valveCoil,
+      calibrationId
+    );
+    coil.position.y = 0.078;
+    const metalCap = addCalibrationMesh(
+      unit,
+      new THREE.CylinderGeometry(0.017, 0.017, 0.012, 12),
+      calibrationMaterials.valveMetal,
+      calibrationId
+    );
+    metalCap.position.y = 0.119;
+    const manualOverride = addCalibrationMesh(
+      unit,
+      new THREE.CylinderGeometry(0.007, 0.007, 0.008, 10),
+      materials.red,
+      calibrationId
+    );
+    manualOverride.position.y = 0.130;
+    [body, coil, metalCap, manualOverride].forEach((part) => {
+      part.userData.name = `MAC52A电磁阀${index + 1}号`;
+      part.userData.detail = '蓝色阀体、黑色电磁线圈安装在银色阀板上；每个阀位控制4个喷孔。';
+    });
+
+    for (let portIndex = 0; portIndex < 4; portIndex += 1) {
+      const port = addCalibrationMesh(
+        unit,
+        new THREE.CylinderGeometry(0.0044, 0.0044, 0.012, 10),
+        calibrationMaterials.valveNozzle,
+        calibrationId
+      );
+      port.position.set(-0.024 + portIndex * 0.016, 0.178, 0.042);
+      port.userData.name = `电磁阀${index + 1}号·喷孔${portIndex + 1}`;
+      port.userData.detail = `第${index + 1}个电磁阀对应的第${portIndex + 1}个喷孔；整排共${count * 4}孔。`;
+    }
     group.add(unit);
   }
 }
@@ -878,6 +992,10 @@ function buildParametricCalibrationPart(group) {
       slot.position.set(screw.position.x, screw.position.y, depth / 2 + 0.008);
       slot.userData.name = screw.userData.name;
     });
+    if (config.id === 'cover-1') {
+      const modelLabel = textPlate(group, 'JWF0019', 0.62, 0.10, [0, 0, depth / 2 + 0.012], 62, '#505b60');
+      modelLabel.userData.calibrationId = config.id;
+    }
   }
   if (config.kind === 'heatsink') {
     const length = dimensions.length;
@@ -887,7 +1005,7 @@ function buildParametricCalibrationPart(group) {
     const base = addCalibrationMesh(group, new THREE.BoxGeometry(length, thickness, depth), calibrationMaterials.heatsink, config.id);
     base.position.y = -height / 2 + thickness / 2;
     base.userData.name = config.label;
-    const finCount = 16;
+    const finCount = 32;
     for (let index = 0; index < finCount; index += 1) {
       const fin = addCalibrationMesh(
         group,
@@ -1061,12 +1179,12 @@ function createCalibrationPart(config) {
   {
     id: 'cover-1', label: '罩壳1', count: 1, kind: 'cover',
     dimensions: { length: 1.64, height: 0.24, depth: 0.02, thickness: 0.015 },
-    position: [-0.019831424666720946, 2.348879635895407, 0.30033862543684176], rotation: [0, 0, 0], scale: [1, 1, 1], note: '开放背面的薄壁罩壳，可调整长宽高、板厚、位置和旋转，也可复制。'
+    position: [-0.019831424666720946, 2.388879635895407, 0.30033862543684176], rotation: [0, 0, 0], scale: [1, 1, 1], note: '带10颗螺丝和JWF0019型号字样的正面薄壁罩壳，可调整尺寸、位置和旋转。'
   },
   {
     id: 'heatsink-1', label: '散热片1', count: 1, kind: 'heatsink',
     dimensions: { length: 1.34, height: 0.17, depth: 0.08, thickness: 0.018 },
-    position: [0.005711318451512161, 2.04222648449484, -1.2115566226616268], rotation: [0, 0, 0], scale: [1, 1, 1], note: '带底板和12条散热鳍片的校准件，可复制、位移、旋转和缩放。'
+    position: [0.005711318451512161, 2.04222648449484, -1.18], rotation: [0, 0, 0], scale: [1, 1, 1], note: '银白色密集散热片，带底板和32条散热鳍片；正常模式下贴紧精灵眼外侧。'
   },
   {
     id: 'mirror-single-1784558446608', label: '反光镜2', count: 1, kind: 'mirror-single', isDuplicate: true,
@@ -1162,6 +1280,46 @@ function restoreCalibrationLayout() {
   }
 }
 restoreCalibrationLayout();
+const heatsinkPositionMigrationKey = 'jwf0019a-heatsink-tight-v1';
+if (!localStorage.getItem(heatsinkPositionMigrationKey)) {
+  const heatsinkPart = calibrationParts.get('heatsink-1');
+  if (heatsinkPart) heatsinkPart.position.z = -1.18;
+  localStorage.setItem(heatsinkPositionMigrationKey, '1');
+  persistCalibrationLayout();
+}
+const frontCoverPositionMigrationKey = 'jwf0019a-front-cover-up-v1';
+if (!localStorage.getItem(frontCoverPositionMigrationKey)) {
+  const frontCoverPart = calibrationParts.get('cover-1');
+  if (frontCoverPart) frontCoverPart.position.y = 2.388879635895407;
+  localStorage.setItem(frontCoverPositionMigrationKey, '1');
+  persistCalibrationLayout();
+}
+
+function trackCalibrationExplode(part, id) {
+  if (!part || explodeItems.some((entry) => entry.object === part)) return;
+  const kind = part.userData.config.kind;
+  if (kind === 'cover') {
+    trackExplode(part, [0, 0, part.position.z >= 0 ? 1 : -1], 0.68, 0.00, 0.18);
+    return;
+  }
+  if (kind === 'heatsink') {
+    trackExplode(part, [0, 0.10, -1], 1.42, 0.18, 0.48);
+    return;
+  }
+  const plans = {
+    'front-cameras': [[0, 0, 1], 0.70, 0.20, 0.46],
+    'rear-cameras': [[0, 0.12, -1], 0.80, 0.25, 0.52],
+    'magic-cameras': [[0, -0.10, -1], 0.95, 0.34, 0.60],
+    'compute-boxes': [[0, -0.06, -1], 0.88, 0.38, 0.68],
+    valves: [[0, 1, -0.20], 0.55, 0.58, 0.82],
+    'reject-volute-1': [[1, 0.05, 0.15], 0.75, 0.64, 0.88],
+    'flow-channel-1': [[0, -1, 0], 0.28, 0.78, 1.00]
+  };
+  const plan = plans[id] || (kind === 'mirror-single' ? [[0, 0.22, -1], 0.82, 0.48, 0.74] : null);
+  if (plan) trackExplode(part, plan[0], plan[1], plan[2], plan[3]);
+}
+
+calibrationParts.forEach(trackCalibrationExplode);
 
 function updateCalibrationPartVisibility(mode = 'external') {
   calibrationLayer.visible = true;
@@ -1170,9 +1328,11 @@ function updateCalibrationPartVisibility(mode = 'external') {
     const external = kind === 'cover' || kind === 'heatsink' || id === 'flow-channel-1';
     const processDuct = id === 'flow-channel-1' || id === 'reject-volute-1';
     const detectionPart = id === 'front-cameras' || id === 'rear-cameras' || id === 'mirrors';
+    const processPart = processDuct || detectionPart || id === 'valves';
     part.visible = mode === 'all'
       || external
-      || ((mode === 'process' || mode === 'detect') && (processDuct || detectionPart));
+      || (mode === 'process' && processPart)
+      || (mode === 'detect' && detectionPart);
   });
 }
 
@@ -1302,6 +1462,7 @@ calibrationInputs.forEach((input) => {
     if (axis === 'scale') selectedCalibrationPart.scale.setScalar(Math.max(0.1, value));
     else if (axis.startsWith('position.')) selectedCalibrationPart.position[axis.split('.')[1]] = value;
     else selectedCalibrationPart.rotation[axis.split('.')[1]] = THREE.MathUtils.degToRad(value);
+    syncExplodeBase(selectedCalibrationPart);
     calibrationHelper?.update();
     persistCalibrationLayout();
     updateCalibrationFields();
@@ -1321,6 +1482,7 @@ calibrationDimensionInputs.forEach((input) => {
   });
 });
 transformControls.addEventListener('objectChange', () => {
+  if (selectedCalibrationPart) syncExplodeBase(selectedCalibrationPart);
   calibrationHelper?.update();
   updateCalibrationFields();
   persistCalibrationLayout();
@@ -1357,6 +1519,7 @@ calibrationDuplicate.addEventListener('click', () => {
   ];
   config.scale = [selectedCalibrationPart.scale.x, selectedCalibrationPart.scale.y, selectedCalibrationPart.scale.z];
   const duplicate = createCalibrationPart(config);
+  trackCalibrationExplode(duplicate, config.id);
   addCalibrationOption(duplicate, config.id);
   selectCalibrationPart(config.id);
   persistCalibrationLayout();
@@ -1374,6 +1537,8 @@ calibrationDelete.addEventListener('click', () => {
   clearCalibrationChildren(part);
   calibrationLayer.remove(part);
   calibrationParts.delete(id);
+  const explodeIndex = explodeItems.findIndex((entry) => entry.object === part);
+  if (explodeIndex >= 0) explodeItems.splice(explodeIndex, 1);
   calibrationPartSelect.querySelector(`option[value="${id}"]`)?.remove();
   selectedCalibrationPart = null;
   calibrationPartSelect.value = '';
@@ -1387,6 +1552,7 @@ calibrationReset.addEventListener('click', () => {
   selectedCalibrationPart.position.set(...defaults.position);
   selectedCalibrationPart.rotation.set(...defaults.rotation.map(THREE.MathUtils.degToRad));
   selectedCalibrationPart.scale.set(...defaults.scale);
+  syncExplodeBase(selectedCalibrationPart);
   if (selectedCalibrationPart.userData.defaultDimensions) {
     selectedCalibrationPart.userData.config.dimensions = { ...selectedCalibrationPart.userData.defaultDimensions };
     buildParametricCalibrationPart(selectedCalibrationPart);
@@ -1457,8 +1623,7 @@ const frontCover = new THREE.Group();
 frontCover.position.z = 0.388;
 shell.add(frontCover);
 roundedBox(frontCover, [2.67, 0.48, 0.045], [-0.035, 2.31, 0], materials.paint, '主机正面白色罩板', '整张白色罩板的左右边缘与两根支撑腿外边对齐。', 0.018);
-textPlate(frontCover, 'JWF0019A', 0.66, 0.13, [0.38, 2.34, 0.024], 68);
-addLogo(frontCover, [0.94, 2.31, 0.027]);
+textPlate(frontCover, 'JWF0019', 0.66, 0.13, [0.38, 2.34, 0.024], 68);
 addBoltRow(frontCover, 2.08, 0.029, 11);
 trackExplode(frontCover, [0, 0, 1], 0.95);
 
@@ -1536,14 +1701,22 @@ const screenGroup = new THREE.Group();
 shell.add(screenGroup);
 roundedBox(screenGroup, [0.055, 0.40, 0.38], [-0.925, 1.66, 0.02], materials.paintDark, '操作屏箱体', '信号灯侧立柱的内侧操作屏箱体。', 0.018);
 roundedBox(screenGroup, [0.022, 0.30, 0.28], [-0.891, 1.66, 0.02], materials.dark, '操作屏', '信号灯侧立柱内面屏幕，用于参数、统计与相机状态查看。', 0.008);
-box(screenGroup, [0.008, 0.24, 0.22], [-0.876, 1.66, 0.02], materials.light, '', '', 'decal');
+const screenImage = new THREE.Mesh(
+  new THREE.PlaneGeometry(0.265, 0.169),
+  makeScreenImageMaterial()
+);
+screenImage.position.set(-0.878, 1.66, 0.02);
+screenImage.rotation.y = Math.PI / 2;
+registerMesh(screenImage, '操作屏运行画面', 'JWF0019A正常运行时的通道状态与喷阀统计主画面。', 'decal');
+screenGroup.add(screenImage);
 
 const electricCabinet = new THREE.Group();
 shell.add(electricCabinet);
+electricCabinet.position.set(-0.015, -0.09, -0.055);
 roundedBox(electricCabinet, [0.055, 0.78, 0.47], [0.855, 1.48, 0], materials.paintDark, '电柜门', '风机侧立柱内面的一体式电气柜门。', 0.018);
 roundedBox(electricCabinet, [0.022, 0.68, 0.39], [0.821, 1.48, 0], materials.paint, '电柜内侧面板', '电柜完全收在右侧落地立柱内，不占用中间悬空区域。', 0.01);
-roundedBox(electricCabinet, [0.016, 0.10, 0.10], [0.798, 1.69, 0.13], materials.yellow, '', '', 0.008);
-cylinder(electricCabinet, 0.032, 0.045, [0.775, 1.69, 0.13], [0, 0, Math.PI / 2], materials.red, '电柜门旋转按钮', '风机侧电柜门上的红色旋转按钮，带黄色安全底座。');
+roundedBox(electricCabinet, [0.016, 0.10, 0.10], [0.798, 1.48, -0.13], materials.yellow, '', '', 0.008);
+cylinder(electricCabinet, 0.032, 0.045, [0.775, 1.48, -0.13], [0, 0, Math.PI / 2], materials.red, '电柜门旋转按钮', '风机侧电柜门靠左侧边框中部的红色旋转按钮，带黄色安全底座。');
 
 // 正面是1600×70 mm的全机幅水平入口；背面同一位置背有精灵眼三角立体罩。
 const intakeDuct = new THREE.Group();
@@ -1601,21 +1774,12 @@ box(channel, [1.78, 0.035, 0.14], [-0.02, 2.49, 0], materials.light, '上照明�
 box(channel, [1.78, 0.035, 0.14], [-0.02, 1.99, 0], materials.light, '下照明板', '主检测通道照明组件，当前只标位置。', 'internal');
 
 const ejection = makeLayer('ejection');
-for (let i = 0; i < 32; i += 1) {
-  const x = -0.82 + i * (1.64 / 31);
-  cylinder(
-    ejection,
-    0.015,
-    0.105,
-    [x, 3.01, -0.22],
-    [Math.PI / 2, 0, 0],
-    materials.orange,
-    `喷射阀${i + 1}`,
-    `第${i + 1}个电磁喷射阀；位于后视相机上方约500 mm并靠后布置，不附加长底板。`,
-    'internal',
-    14
-  );
-}
+const fallbackValveRow = new THREE.Group();
+fallbackValveRow.position.set(-0.031286, 2.878776, -0.515353);
+fallbackValveRow.rotation.set(THREE.MathUtils.degToRad(90.81208), THREE.MathUtils.degToRad(-0.171593), THREE.MathUtils.degToRad(0.285773));
+fallbackValveRow.scale.set(0.827251, 0.577727, 0.577727);
+ejection.add(fallbackValveRow);
+addValveRow(fallbackValveRow, 'fallback-valves', 32);
 
 const cottonFlow = new THREE.Group();
 cottonFlow.visible = false;
@@ -1718,10 +1882,10 @@ const whiteCottonTufts = Array.from({ length: 42 }, (_, index) => {
 
 const impurityEvents = [
   { label: '红色异物', start: 6.0, lane: -0.42, tuft: makeFluffyTuft(101, redImpurityMaterial, true) },
-  { label: '黑色异物', start: 12.0, lane: 0.47, tuft: makeFluffyTuft(202, blackImpurityMaterial, true) },
-  { label: '蓝色异物', start: 18.0, lane: -0.10, tuft: makeFluffyTuft(303, blueImpurityMaterial, true) },
-  { label: '黄色异物', start: 24.0, lane: 0.22, tuft: makeFluffyTuft(404, yellowImpurityMaterial, true) },
-  { label: '绿色异物', start: 30.0, lane: -0.67, tuft: makeFluffyTuft(505, greenImpurityMaterial, true) }
+  { label: '黑色异物', start: 15.0, lane: 0.47, tuft: makeFluffyTuft(202, blackImpurityMaterial, true) },
+  { label: '蓝色异物', start: 24.0, lane: -0.10, tuft: makeFluffyTuft(303, blueImpurityMaterial, true) },
+  { label: '黄色异物', start: 33.0, lane: 0.22, tuft: makeFluffyTuft(404, yellowImpurityMaterial, true) },
+  { label: '绿色异物', start: 42.0, lane: -0.67, tuft: makeFluffyTuft(505, greenImpurityMaterial, true) }
 ];
 impurityEvents.forEach((event, eventIndex) => {
   event.tuft.visible = false;
@@ -1734,18 +1898,26 @@ impurityEvents.forEach((event, eventIndex) => {
   });
 });
 
-const valvePulse = new THREE.Mesh(
-  new THREE.SphereGeometry(0.065, 14, 10),
-  new THREE.MeshStandardMaterial({ color: 0xffb23b, emissive: 0xff5a12, emissiveIntensity: 2.4, transparent: true, opacity: 0.92 })
-);
-registerMesh(valvePulse, '', '', 'flow', false);
+const valvePulse = new THREE.Group();
+const valvePulseMaterial = new THREE.MeshStandardMaterial({
+  color: 0xffffff,
+  emissive: 0xffffff,
+  emissiveIntensity: 2.1,
+  transparent: true,
+  opacity: 0.92
+});
+for (let index = 0; index < 4; index += 1) {
+  const pulsePoint = new THREE.Mesh(new THREE.SphereGeometry(0.013, 10, 8), valvePulseMaterial);
+  registerMesh(pulsePoint, '', '', 'flow', false);
+  valvePulse.add(pulsePoint);
+}
 valvePulse.visible = false;
 cottonFlow.add(valvePulse);
 
 const airJet = new THREE.Group();
-const airJetMaterial = new THREE.MeshBasicMaterial({ color: 0x9feeff, transparent: true, opacity: 0.72, depthWrite: false });
-for (let index = 0; index < 11; index += 1) {
-  const particle = new THREE.Mesh(new THREE.SphereGeometry(0.014 + (index % 3) * 0.004, 8, 6), airJetMaterial);
+const airJetMaterial = new THREE.MeshBasicMaterial({ color: 0xf5fbff, transparent: true, opacity: 0.78, depthWrite: false });
+for (let index = 0; index < 16; index += 1) {
+  const particle = new THREE.Mesh(new THREE.SphereGeometry(0.010 + (index % 3) * 0.0025, 8, 6), airJetMaterial);
   registerMesh(particle, '', '', 'flow', false);
   airJet.add(particle);
 }
@@ -1931,8 +2103,8 @@ function rejectRoutePoints(source) {
   const dimensions = part.userData.config.dimensions;
   const localX = THREE.MathUtils.clamp((source.x - part.position.x) / Math.max(part.scale.x, 0.01), -dimensions.length * 0.45, dimensions.length * 0.45);
   const inlet = partLocalPoint(part, new THREE.Vector3(localX, -dimensions.height / 2 - dimensions.drop + dimensions.thickness, 0));
-  const center = partLocalPoint(part, new THREE.Vector3(localX * 0.30, 0, 0));
-  const fan = partLocalPoint(part, new THREE.Vector3(dimensions.length / 2 + Math.max(0.18, dimensions.depth * 0.55), dimensions.height * 0.04, 0));
+  const center = partLocalPoint(part, new THREE.Vector3(0, 0, 0));
+  const ductEnd = partLocalPoint(part, new THREE.Vector3(dimensions.length / 2 + Math.max(0.18, dimensions.depth * 0.55), dimensions.height * 0.04, 0));
   const outletDisk = completeModel.getObjectByName('第10轮_出口圆盘_连续低模');
   const funnel = new THREE.Vector3(0.897, 2.347, 0.749);
   if (outletDisk) {
@@ -1940,15 +2112,39 @@ function rejectRoutePoints(source) {
     diskBounds.getCenter(funnel);
     funnel.y = diskBounds.min.y - 0.02;
   }
+  const turn = new THREE.Vector3(ductEnd.x, funnel.y + 0.16, funnel.z);
   const drop = funnel.clone().add(new THREE.Vector3(0, -0.62, 0));
-  return { inlet, center, fan, funnel, drop };
+  return { inlet, center, ductEnd, turn, funnel, drop };
+}
+
+function pointAlongRoute(points, progress) {
+  const clamped = THREE.MathUtils.clamp(progress, 0, 1);
+  const lengths = [];
+  let total = 0;
+  for (let index = 1; index < points.length; index += 1) {
+    const length = points[index - 1].distanceTo(points[index]);
+    lengths.push(length);
+    total += length;
+  }
+  let target = clamped * Math.max(total, 0.0001);
+  for (let index = 0; index < lengths.length; index += 1) {
+    if (target <= lengths[index] || index === lengths.length - 1) {
+      return points[index].clone().lerp(points[index + 1], target / Math.max(lengths[index], 0.0001));
+    }
+    target -= lengths[index];
+  }
+  return points[points.length - 1].clone();
 }
 
 function valvePosition(lane) {
   const row = calibrationParts.get('valves');
   const index = THREE.MathUtils.clamp(Math.round(((lane + 1) / 2) * 31), 0, 31);
-  const position = partLocalPoint(row, new THREE.Vector3((index - 15.5) * 0.072, 0, 0));
-  return { index, position };
+  const ports = Array.from({ length: 4 }, (_, portIndex) => partLocalPoint(
+    row,
+    new THREE.Vector3((index - 15.5) * 0.072 - 0.024 + portIndex * 0.016, 0.178, 0.042)
+  ));
+  const position = ports.reduce((center, port) => center.add(port), new THREE.Vector3()).multiplyScalar(0.25);
+  return { index, position, ports };
 }
 
 function setValveRowActive(active) {
@@ -1957,9 +2153,19 @@ function setValveRowActive(active) {
   row.visible = active || calibrationEnabled;
   row.traverse((object) => {
     if (!object.isMesh) return;
-    if (active && object.userData.baseMaterial) object.material = object.userData.baseMaterial;
-    object.renderOrder = active ? 15 : 0;
-    object.material.depthTest = !active;
+    if (active) object.visible = true;
+    if (active && object.userData.baseMaterial) {
+      if (object.userData.baseMaterial === calibrationMaterials.valveBody) object.material = calibrationMaterials.valveBodyActive;
+      else if (object.userData.baseMaterial === calibrationMaterials.valveMetal) object.material = calibrationMaterials.valveMetalActive;
+      else if (object.userData.baseMaterial === calibrationMaterials.valveCoil) object.material = calibrationMaterials.valveCoilActive;
+      else if (object.userData.baseMaterial === calibrationMaterials.valveNozzle) object.material = calibrationMaterials.valveNozzleActive;
+      else if (object.userData.baseMaterial === materials.red) object.material = calibrationMaterials.valveOverrideActive;
+      else object.material = object.userData.baseMaterial;
+    } else if (!active && object.userData.baseMaterial) {
+      object.material = object.userData.baseMaterial;
+    }
+    object.renderOrder = active ? 80 : 0;
+    object.frustumCulled = !active;
     object.material.needsUpdate = true;
   });
 }
@@ -1996,8 +2202,8 @@ function updateCottonProcess(time) {
     return;
   }
   let activeStatus = '白色棉絮正常通过：下方进入，顶部出口消失';
-  const cycleDuration = 36;
-  const impurityDuration = 4.6;
+  const cycleDuration = 50;
+  const impurityDuration = 7.4;
   const voiceCycleIndex = Math.floor(time / (cycleDuration * 1000));
   if (processDemoPlaying && voiceCycleIndex !== processVoiceCycleIndex) {
     processVoiceCycleIndex = voiceCycleIndex;
@@ -2024,11 +2230,11 @@ function updateCottonProcess(time) {
     event.tuft.rotation.z += 0.021;
     event.tuft.scale.setScalar(1.08);
 
-    if (progress < 0.38) {
-      const channelProgress = 0.04 + (progress / 0.38) * 0.26;
+    if (progress < 0.30) {
+      const channelProgress = 0.04 + (progress / 0.30) * 0.26;
       event.tuft.position.copy(lanePoint(curve, channelProgress, event.lane, width));
       const triggerIn = THREE.MathUtils.smoothstep(progress, 0.12, 0.22);
-      const triggerOut = 1 - THREE.MathUtils.smoothstep(progress, 0.32, 0.38);
+      const triggerOut = 1 - THREE.MathUtils.smoothstep(progress, 0.25, 0.30);
       const eventTrigger = triggerIn * triggerOut;
       cameraTriggerStrength = Math.max(cameraTriggerStrength, eventTrigger);
       if (progress > 0.12) {
@@ -2038,9 +2244,9 @@ function updateCottonProcess(time) {
       return;
     }
 
-    if (progress < 0.70) {
+    if (progress < 0.50) {
       if (eventIndex === 0) queueProcessVoiceCue('第一次喷射排杂', 'eject');
-      const ejectProgress = (progress - 0.38) / 0.32;
+      const ejectProgress = (progress - 0.30) / 0.20;
       const control = ejectPoint.clone().lerp(route.inlet, 0.5).add(new THREE.Vector3(0, 0.10, 0));
       event.tuft.position.copy(quadraticPoint(ejectPoint, control, route.inlet, ejectProgress));
       event.sprayCotton.forEach((tuft, index) => {
@@ -2057,12 +2263,16 @@ function updateCottonProcess(time) {
       });
       valvePulse.visible = true;
       setValveRowActive(true);
-      valvePulse.position.copy(valve.position);
-      valvePulse.scale.setScalar(0.72 + Math.sin(ejectProgress * Math.PI * 5) * 0.28);
+      valvePulse.children.forEach((pulsePoint, index) => {
+        pulsePoint.position.copy(valve.ports[index]);
+        pulsePoint.scale.setScalar(0.72 + Math.sin(ejectProgress * Math.PI * 5) * 0.28);
+      });
       airJet.visible = true;
       airJet.children.forEach((particle, index) => {
-        const jetProgress = (ejectProgress + index / airJet.children.length) % 1;
-        particle.position.lerpVectors(valve.position, route.inlet, jetProgress);
+        const portIndex = index % 4;
+        const streamIndex = Math.floor(index / 4);
+        const jetProgress = (ejectProgress * 1.12 + streamIndex / 4) % 1;
+        particle.position.lerpVectors(valve.ports[portIndex], route.inlet, jetProgress);
         particle.scale.setScalar(0.55 + (1 - jetProgress) * 0.65);
       });
       activeStatus = `第${valve.index + 1}号电磁阀“噗”地喷射：${event.label}连同周围白棉进入排杂风道`;
@@ -2070,23 +2280,25 @@ function updateCottonProcess(time) {
     }
 
     if (eventIndex === 0) queueProcessVoiceCue('第一次风机吸杂', 'suction');
-    const suctionProgress = (progress - 0.70) / 0.30;
-    const dropProgress = THREE.MathUtils.clamp((suctionProgress - 0.42) / 0.58, 0, 1);
-    if (suctionProgress < 0.25) event.tuft.position.lerpVectors(route.inlet, route.center, suctionProgress / 0.25);
-    else if (suctionProgress < 0.42) event.tuft.position.lerpVectors(route.center, route.funnel, (suctionProgress - 0.25) / 0.17);
-    else event.tuft.position.lerpVectors(route.funnel, route.drop, dropProgress);
+    const suctionProgress = (progress - 0.50) / 0.50;
+    const pathProgress = THREE.MathUtils.clamp(suctionProgress / 0.84, 0, 1);
+    const dropProgress = THREE.MathUtils.clamp((suctionProgress - 0.84) / 0.16, 0, 1);
+    const routePath = [route.inlet, route.center, route.ductEnd, route.turn, route.funnel];
+    event.tuft.position.copy(suctionProgress < 0.84
+      ? pointAlongRoute(routePath, pathProgress)
+      : route.funnel.clone().lerp(route.drop, dropProgress));
     event.tuft.scale.setScalar(Math.max(0.02, 1.08 * (1 - dropProgress)));
     event.sprayCotton.forEach((tuft, index) => {
       const offset = new THREE.Vector3(tuft.userData.sprayOffset * (1 - dropProgress), 0, 0);
-      if (suctionProgress < 0.25) tuft.position.lerpVectors(route.inlet, route.center, suctionProgress / 0.25).add(offset);
-      else if (suctionProgress < 0.42) tuft.position.lerpVectors(route.center, route.funnel, (suctionProgress - 0.25) / 0.17).add(offset);
-      else tuft.position.lerpVectors(route.funnel, route.drop, dropProgress).add(offset);
+      tuft.position.copy(suctionProgress < 0.84
+        ? pointAlongRoute(routePath, pathProgress)
+        : route.funnel.clone().lerp(route.drop, dropProgress)).add(offset);
       tuft.visible = true;
       tuft.scale.setScalar(Math.max(0.02, tuft.userData.baseScale * (1 - dropProgress)));
       tuft.rotation.y += 0.032;
     });
-    activeStatus = suctionProgress < 0.42
-      ? `排杂风机将${event.label}和伴随白棉送向圆盘漏斗`
+    activeStatus = suctionProgress < 0.84
+      ? `排杂风机将${event.label}和伴随白棉沿排杂管送到末端，再拐向圆盘漏斗`
       : `${event.label}和伴随白棉从圆盘漏斗落下并消失，其余白棉继续通过`;
   });
 
@@ -2198,10 +2410,23 @@ function applyMode(mode) {
   machine.traverse((object) => {
     if (!object.isMesh || !object.userData.baseMaterial) return;
     const role = object.userData.role;
-    if (role === 'calibration' || role === 'flow') {
+    if (role === 'calibration') {
+      const calibrationId = object.userData.calibrationId;
+      const calibrationKind = calibrationParts.get(calibrationId)?.userData.config.kind;
+      const isXrayShell = calibrationId === 'flow-channel-1' || calibrationKind === 'cover';
+      const isGlassWindow = /透明检测窗/.test(object.userData.name || '');
+      object.material = mode === 'xray' && isXrayShell
+        ? (isGlassWindow ? modeMaterials.xrayWindow : modeMaterials.xrayCalibrationShell)
+        : object.userData.baseMaterial;
+      object.visible = true;
+      object.castShadow = mode !== 'xray';
+      object.renderOrder = mode === 'xray' && isXrayShell ? (isGlassWindow ? 12 : 9) : 0;
+      return;
+    }
+    if (role === 'flow' || role === 'indicator') {
       object.material = object.userData.baseMaterial;
       object.visible = true;
-      object.castShadow = role === 'calibration';
+      object.castShadow = role === 'indicator' && mode !== 'xray';
       return;
     }
     if (role === 'decal') {
@@ -2216,6 +2441,7 @@ function applyMode(mode) {
     if (mode === 'xray') object.material = role === 'internal' ? modeMaterials.xrayInternal : modeMaterials.xrayShell;
     object.castShadow = mode === 'solid' || mode === 'clay';
   });
+  if (processDemoPlaying) setValveRowActive(true);
 }
 
 document.querySelectorAll('[data-mode]').forEach((button) => {
@@ -2235,8 +2461,8 @@ const tourCopy = {
   overview: ['整机结构', '先校对外形、双落地立柱、正面1600×70入口、右前风机和等径管路。'],
   intake: ['进棉阶段', '开棉后的棉流由下方进入，在气流作用下向上通过全机幅入口和检测通道。'],
   detect: ['视觉检测', '正面8台、背面8台主相机覆盖1.6米机幅；背面另有4台精灵眼相机。'],
-  compute: ['算力判别', '通道分配逻辑仍保留；内部校准模式中提供10个带散热鳍片、接口和状态灯的算力盒子，可直接调整位置。'],
-  eject: ['喷射排杂', '系统根据目标位置和流速计算毫秒时机，驱动32个喷射阀中的对应阀位完成排杂。']
+  compute: ['算力判别', '10个算力盒子位于精灵眼背部，最外侧是银白色密集散热片；拆解时按实际前后层级展开。'],
+  eject: ['喷射排杂', '32个MAC52A风格电磁阀安装在整块阀板上，每阀控制4个喷孔，共128个喷孔。']
 };
 let tourTimer = null;
 let currentTourIndex = 0;
@@ -2258,6 +2484,7 @@ function setTourStep(step) {
   setLayerVisible('hunyuan', importedModelReady);
   setLayerVisible('shell', !importedModelReady);
   updateCalibrationPartVisibility('external');
+  setValveRowActive(false);
 
   if (step === 'overview') applyMode('solid');
   if (step === 'intake') {
@@ -2320,7 +2547,7 @@ document.querySelector('#tour-play').addEventListener('click', () => {
 function setProcessDemo(enabled) {
   processDemoPlaying = enabled;
   processPlay.classList.toggle('active', enabled);
-  processPlay.textContent = enabled ? '暂停棉流与排杂' : '播放棉流与排杂';
+  processPlay.textContent = enabled ? '暂停工作原理' : '播放工作原理';
   cottonFlow.visible = enabled;
   processStatus.hidden = !enabled;
   if (enabled) {
@@ -2386,33 +2613,65 @@ function setModelAnimationTime(time) {
   modelAnimationMixer.setTime(time);
 }
 
+function setExplodePresentation(active) {
+  if (active === explodePresentationActive) return;
+  explodePresentationActive = active;
+  if (active) {
+    if (processDemoPlaying) setProcessDemo(false);
+    modeBeforeExplode = currentMode;
+    applyMode('xray');
+    updateCalibrationPartVisibility('all');
+    setFlowChannelPlaybackAppearance(true);
+  } else {
+    applyMode(modeBeforeExplode);
+    updateCalibrationPartVisibility('external');
+    setFlowChannelPlaybackAppearance(false);
+  }
+}
+
+function explodeStageLabel(amount) {
+  if (amount <= 0) return '整机';
+  if (amount < 0.20) return '拆开罩板';
+  if (amount < 0.38) return '外移银白散热片';
+  if (amount < 0.62) return '展开相机与10个算力盒';
+  if (amount < 0.82) return '展开阀组与排杂风道';
+  return '完整拆解';
+}
+
 function updateExplode() {
   const amount = Number(explodeSlider.value) / 100;
-  explodeValue.textContent = `${explodeSlider.value}%`;
+  explodeValue.textContent = `${explodeSlider.value}% · ${explodeStageLabel(amount)}`;
+  setExplodePresentation(amount > 0);
   if (modelAnimationMixer && modelAnimationDuration) {
     setModelAnimationTime(modelAnimationDuration * amount);
     completeModel.updateMatrixWorld(true);
   }
-  explodeItems.forEach(({ object, base, direction, distance }) => {
-    object.position.copy(base).addScaledVector(direction, amount * distance);
+  explodeItems.forEach(({ object, base, direction, distance, start = 0, end = 1 }) => {
+    const rawProgress = THREE.MathUtils.clamp((amount - start) / Math.max(0.001, end - start), 0, 1);
+    const progress = rawProgress * rawProgress * (3 - 2 * rawProgress);
+    object.position.copy(base).addScaledVector(direction, progress * distance);
   });
   updateViewZoom();
 }
 explodeSlider.addEventListener('input', () => {
   stopDismantle();
+  dismantleProgress = Number(explodeSlider.value);
   updateExplode();
 });
 dismantlePlay.addEventListener('click', () => {
-  if (!modelAnimationActions.length || !modelAnimationDuration) return;
   if (dismantlePlaying) {
     stopDismantle();
     return;
   }
   if (Number(explodeSlider.value) >= 100) {
     explodeSlider.value = 0;
-    setModelAnimationTime(0);
+    if (modelAnimationMixer && modelAnimationDuration) setModelAnimationTime(0);
+    updateExplode();
   }
-  setModelAnimationTime(modelAnimationDuration * (Number(explodeSlider.value) / 100));
+  dismantleProgress = Number(explodeSlider.value);
+  if (modelAnimationMixer && modelAnimationDuration) {
+    setModelAnimationTime(modelAnimationDuration * (Number(explodeSlider.value) / 100));
+  }
   dismantlePlaying = true;
   dismantlePlay.textContent = '暂停拆解';
 });
@@ -2438,12 +2697,16 @@ resize();
 function animate(time = 0) {
   const deltaSeconds = lastAnimationTime ? Math.min((time - lastAnimationTime) / 1000, 0.05) : 0;
   lastAnimationTime = time;
-  if (dismantlePlaying && modelAnimationMixer && modelAnimationActions.length) {
-    modelAnimationMixer.update(deltaSeconds);
-    const percent = Math.min(100, Math.round((modelAnimationMixer.time / modelAnimationDuration) * 100));
-    explodeSlider.value = percent;
-    explodeValue.textContent = `${percent}%`;
-    if (percent >= 100) stopDismantle();
+  if (dismantlePlaying) {
+    if (modelAnimationMixer && modelAnimationActions.length) {
+      modelAnimationMixer.update(deltaSeconds);
+      dismantleProgress = Math.min(100, (modelAnimationMixer.time / modelAnimationDuration) * 100);
+    } else {
+      dismantleProgress = Math.min(100, dismantleProgress + deltaSeconds * 12);
+    }
+    explodeSlider.value = Math.round(dismantleProgress);
+    updateExplode();
+    if (Number(explodeSlider.value) >= 100) stopDismantle();
   }
   if (cottonFlow.visible) {
     if (processDemoPlaying) processTimelineMs += deltaSeconds * 1000 * processPlaybackRate;

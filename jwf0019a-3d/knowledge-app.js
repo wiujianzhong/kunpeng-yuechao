@@ -330,7 +330,7 @@ searchClear.addEventListener('click', () => {
   renderContent();
 });
 
-quickActions.addEventListener('click', (event) => {
+quickActions?.addEventListener('click', (event) => {
   const button = event.target.closest('[data-quick-module]');
   if (!button) return;
   setModule(button.dataset.quickModule);
@@ -342,7 +342,7 @@ dialog.addEventListener('click', (event) => {
   if (event.target === dialog) dialog.close();
 });
 
-metricArticles.textContent = String(knowledgeData.articles.length);
-metricFaults.textContent = String(knowledgeData.faultCases.length);
-metricModules.textContent = String(knowledgeData.modules.length);
+if (metricArticles) metricArticles.textContent = String(knowledgeData.articles.length);
+if (metricFaults) metricFaults.textContent = String(knowledgeData.faultCases.length);
+if (metricModules) metricModules.textContent = String(knowledgeData.modules.length);
 renderContent();

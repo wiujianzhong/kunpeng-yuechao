@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JWF0019A 设备超级知识平台</title>
+  <meta name="description" content="JWF0019A异纤机3D结构、工作原理、操作保养、故障诊断、参数质量与设备知识库。">
+  <link rel="stylesheet" href="./styles.css?v=4-simplified-interface">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main>
+    <section class="stage" aria-label="JWF0019A三维模型">
+      <canvas id="scene"></canvas>
+      <div id="model-load-status" class="status" hidden aria-live="polite"><span class="dot warning"></span>模型加载中</div>
+      <div id="process-status" class="process-status" hidden>白色棉絮正常通过</div>
+      <div class="hint">拖动旋转 · 滚轮缩放 · 点击内部部件查看</div>
+    </section>
+
+    <aside class="panel">
+      <div>
+        <p class="eyebrow">JWF0019A</p>
+        <h1>异纤机数字讲解平台</h1>
+        <button id="process-play" class="primary-demo-button">播放工作原理</button>
+        <div class="platform-switch" aria-label="平台区域导航">
+          <a href="#scene" class="active">3D工作台</a>
+          <a href="#knowledge-platform">设备知识</a>
+        </div>
+      </div>
+
+      <section>
+        <h2>固定视角</h2>
+        <div class="views">
+          <button data-view="isoRight" class="active">右前45°</button>
+          <button data-view="isoLeft">左前45°</button>
+          <button data-view="front">正面</button>
+          <button data-view="rear">背面</button>
+          <button data-view="left">左侧</button>
+          <button data-view="right">右侧</button>
+          <button data-view="top">俯视</button>
+        </div>
+      </section>
+
+      <details class="panel-tools">
+        <summary>更多讲解控制</summary>
+        <section>
+          <h2>查看模式</h2>
+          <div class="modes">
+            <button data-mode="solid" class="active">实体</button>
+            <button data-mode="clay">素模</button>
+            <button data-mode="wireframe">网格</button>
+            <button data-mode="xray">X光</button>
+          </div>
+        </section>
+
+        <section>
+          <div class="range-head"><h2>分段讲解</h2><button id="tour-play" class="mini">自动演示</button></div>
+          <div class="tour">
+            <button data-tour="overview" class="active">整机</button>
+            <button data-tour="intake">进棉</button>
+            <button data-tour="detect">检测</button>
+            <button data-tour="compute">计算</button>
+            <button data-tour="eject">喷射</button>
+          </div>
+          <div class="process-speed" aria-label="动画播放速度">
+            <span>动画速度</span>
+            <div class="speed-options" role="group" aria-label="动画播放速度">
+              <button type="button" data-process-speed="0.5">慢速 0.5×</button>
+              <button type="button" data-process-speed="1" class="active">标准 1×</button>
+              <button type="button" data-process-speed="1.5">快速 1.5×</button>
+            </div>
+          </div>
+        </section>
+      </details>
+
+      <section>
+        <div class="range-head"><h2>分步拆解</h2><button id="dismantle-play" class="mini">播放拆解</button><output id="explode-value">0% · 整机</output></div>
+        <input id="explode" class="range" type="range" min="0" max="100" value="0">
+      </section>
+
+      <section hidden>
+        <h2>模型层</h2>
+        <label><input type="checkbox" data-layer="hunyuan" checked> 第13轮完整外形恢复版</label>
+        <p class="annotation-help">当前显示31970三角面的完整母体；散热片、后视罩板及内部布局继续沿用已校准位置。</p>
+      </section>
+
+      <section id="calibration-private-section" class="calibration-section calibration-private-section">
+        <div id="calibration-lock-row" class="calibration-lock-row">
+          <strong>内部布局校准</strong>
+          <input id="calibration-password" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="内部布局校准密码" placeholder="输入密码">
+          <button id="calibration-unlock" type="button">解锁</button>
+          <output id="calibration-lock-status" aria-live="polite"></output>
+        </div>
+        <div id="calibration-private-content" hidden>
+        <div class="range-head"><h2>内部布局校准</h2><output id="calibration-status">基准v3已锁定</output></div>
+        <button id="calibration-mode" class="calibration-toggle">开启内部校准模式</button>
+        <p class="annotation-help">外壳会变半透明。先选部件，再拖动红、绿、蓝轴；X=左右，Y=上下，Z=前后。主通道和排杂漩涡风道均可调整尺寸与接口位置；反光镜、罩壳和散热片可复制。</p>
+        <label class="field-label" for="calibration-part">当前部件</label>
+        <select id="calibration-part" disabled>
+          <option value="">请选择内部部件</option>
+        </select>
+        <div class="calibration-tools">
+          <button type="button" data-transform="translate" class="active" disabled>移动</button>
+          <button type="button" data-transform="rotate" disabled>旋转</button>
+          <button type="button" data-transform="scale" disabled>缩放</button>
+        </div>
+        <div class="calibration-values">
+          <label>X左右<input type="number" data-axis="position.x" step="0.01" disabled></label>
+          <label>Y上下<input type="number" data-axis="position.y" step="0.01" disabled></label>
+          <label>Z前后<input type="number" data-axis="position.z" step="0.01" disabled></label>
+          <label>绕X°<input type="number" data-axis="rotation.x" step="1" disabled></label>
+          <label>绕Y°<input type="number" data-axis="rotation.y" step="1" disabled></label>
+          <label>绕Z°<input type="number" data-axis="rotation.z" step="1" disabled></label>
+          <label>整体比例<input type="number" data-axis="scale" min="0.1" step="0.05" disabled></label>
+        </div>
+        <div class="calibration-dimensions">
+          <label>长度X<input type="number" data-dimension="length" min="0.01" step="0.01" disabled></label>
+          <label>高度Y<input type="number" data-dimension="height" min="0.01" step="0.01" disabled></label>
+          <label>深度Z<input type="number" data-dimension="depth" min="0.01" step="0.01" disabled></label>
+          <label>板厚<input type="number" data-dimension="thickness" min="0.005" step="0.005" disabled></label>
+          <label>转向跨度Z<input type="number" data-dimension="offset" min="0.05" step="0.01" disabled></label>
+          <label>接口下探Y<input type="number" data-dimension="drop" min="0.05" step="0.01" disabled></label>
+        </div>
+        <div class="calibration-actions">
+          <button id="calibration-save" disabled>保存本机位置</button>
+          <button id="calibration-export" disabled>导出布局JSON</button>
+        </div>
+        <div class="calibration-actions calibration-edit-actions">
+          <button id="calibration-duplicate" disabled>复制当前部件</button>
+          <button id="calibration-reset" disabled>复位当前部件</button>
+          <button id="calibration-delete" disabled>删除当前副本</button>
+        </div>
+        </div>
+      </section>
+
+      <details class="reference">
+        <summary>对照图实物</summary>
+        <img src="./assets/JWF0019A-对照实物-官方图.png" alt="JWF0019A官方整机实物对照图">
+      </details>
+
+      <section class="selection">
+        <h2 id="part-title">模型说明</h2>
+        <p id="part-detail">点击相机、电磁阀、反光镜、算力盒子、主通道或外壳查看结构说明。</p>
+      </section>
+
+      <section class="facts" hidden>
+        <div><span>模型状态</span><strong id="model-status-value">低模外形与拟真内部加载中</strong></div>
+        <div><span>检测通道</span><strong>1600×70 mm</strong></div>
+        <div><span>已确认相机</span><strong>8＋8＋4</strong></div>
+        <div><span>算力盒子</span><strong>10个拟真低模</strong></div>
+      </section>
+    </aside>
+  </main>
+
+  <section id="knowledge-platform" class="knowledge-platform knowledge-platform-compact" aria-labelledby="knowledge-title">
+    <header class="knowledge-simple-head">
+      <p>JWF0019A</p>
+      <h2 id="knowledge-title">设备知识库</h2>
+    </header>
+
+    <nav id="knowledge-module-tabs" class="knowledge-flow" aria-label="知识模块"></nav>
+
+    <div class="knowledge-workbench knowledge-workbench-simple">
+      <div id="knowledge-content" class="knowledge-content">
+        <div class="knowledge-search-row">
+          <label class="knowledge-search">
+            <span>搜索设备知识</span>
+            <input id="knowledge-search" type="search" placeholder="例如：相机不刷新、电磁阀、高温、玻璃清洁" autocomplete="off">
+          </label>
+          <button id="knowledge-search-clear" type="button">清除</button>
+        </div>
+
+        <div class="knowledge-module-head">
+          <div>
+            <span id="knowledge-module-evidence">已脱敏正式知识</span>
+            <h3 id="knowledge-module-title">认识设备</h3>
+            <p id="knowledge-module-description"></p>
+          </div>
+          <output id="knowledge-result-count">0项结果</output>
+        </div>
+
+        <div id="knowledge-card-grid" class="knowledge-card-grid" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <dialog id="knowledge-dialog" class="knowledge-dialog" aria-labelledby="knowledge-dialog-title">
+    <div class="knowledge-dialog-frame">
+      <header>
+        <div>
+          <p>JWF0019A · 设备知识卡</p>
+          <h2 id="knowledge-dialog-title"></h2>
+          <div id="knowledge-dialog-meta" class="knowledge-dialog-meta"></div>
+        </div>
+        <button id="knowledge-dialog-close" type="button" aria-label="关闭知识卡">关闭</button>
+      </header>
+      <div id="knowledge-dialog-body" class="knowledge-dialog-body"></div>
+    </div>
+  </dialog>
+
+  <script type="module" src="./app.js?v=22-staged-dismantle"></script>
+  <script type="module" src="./knowledge-app.js?v=3-compact-knowledge"></script>
+  <script src="./ui-access.js?v=1-calibration-lock"></script>
+</body>
+</html>

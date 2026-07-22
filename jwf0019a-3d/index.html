@@ -3,236 +3,941 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JWF0019A 设备超级知识平台</title>
-  <meta name="description" content="JWF0019A异纤机3D结构、工作原理、操作保养、故障诊断、参数质量与设备知识库。">
-  <link rel="stylesheet" href="./styles.css?v=2-knowledge-lock">
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
-      }
+  <title>JWF0019A 异纤机设备知识平台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --cotton: #fafbf8;
+      --porcelain: #f1f4ef;
+      --paper: #ffffff;
+      --ink: #1e2b25;
+      --muted: #68746e;
+      --line: #dbe2dc;
+      --leaf: #67b634;
+      --leaf-deep: #2f6539;
+      --leaf-soft: #e2efd8;
+      --glass: #a9d4d6;
+      --shadow: 0 24px 70px rgba(41, 64, 49, .10);
     }
-  </script>
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 88% 0%, rgba(169, 212, 214, .22), transparent 32%),
+        var(--cotton);
+      font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    }
+    button, a { font: inherit; }
+    button { color: inherit; }
+
+    .shell { min-height: 100vh; padding: 22px; }
+    .topbar {
+      position: relative;
+      z-index: 5;
+      width: min(1220px, 100%);
+      min-height: 66px;
+      margin: 0 auto;
+      padding: 10px 12px 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      border: 1px solid rgba(255, 255, 255, .9);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, .78);
+      box-shadow: 0 14px 42px rgba(49, 71, 57, .08);
+      backdrop-filter: blur(18px);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 205px; }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: white;
+      background: var(--leaf-deep);
+      box-shadow: inset 0 0 0 7px rgba(255,255,255,.15);
+      font: 700 13px/1 "DIN Alternate", sans-serif;
+    }
+    .brand-copy strong { display: block; font-size: 15px; letter-spacing: .02em; }
+    .brand-copy span { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .topnav { display: flex; align-items: center; gap: 4px; flex: 1; }
+    .topnav button {
+      padding: 9px 13px;
+      border: 0;
+      border-radius: 12px;
+      color: #66716b;
+      background: transparent;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+    .topnav button:hover, .topnav button.active { color: var(--ink); background: var(--porcelain); }
+    .knowledge-link {
+      padding: 10px 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--leaf-deep);
+      background: white;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .hero {
+      position: relative;
+      width: min(1220px, 100%);
+      min-height: 650px;
+      margin: 18px auto 0;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: .83fr 1.17fr;
+      border: 1px solid rgba(219, 226, 220, .9);
+      border-radius: 38px;
+      background: linear-gradient(120deg, #f4f6f1 0%, #fbfcf9 46%, #eef3ee 100%);
+      box-shadow: var(--shadow);
+    }
+    .hero-copy {
+      position: relative;
+      z-index: 3;
+      padding: 76px 20px 44px 64px;
+      align-self: center;
+    }
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 20px;
+      color: var(--leaf-deep);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+    .kicker::before { content: ""; width: 28px; height: 2px; background: var(--leaf); }
+    h1 {
+      max-width: 550px;
+      margin: 0;
+      font-size: clamp(42px, 5vw, 72px);
+      line-height: 1.06;
+      letter-spacing: -.045em;
+      font-weight: 720;
+    }
+    h1 em { color: var(--leaf-deep); font-style: normal; }
+    .lead {
+      max-width: 500px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.85;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .mode-choice {
+      width: min(430px, 100%);
+      margin-top: 28px;
+      padding: 5px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.7);
+    }
+    .mode-choice button {
+      min-height: 54px;
+      padding: 8px 12px;
+      border: 0;
+      border-radius: 13px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+    }
+    .mode-choice button strong, .mode-choice button small { display: block; }
+    .mode-choice button strong { font-size: 14px; }
+    .mode-choice button small { margin-top: 3px; color: #929c96; font-size: 10px; }
+    .mode-choice button.active {
+      color: var(--leaf-deep);
+      background: white;
+      box-shadow: 0 8px 22px rgba(47,101,57,.1);
+    }
+    .mode-choice button.active small { color: #6f8b76; }
+    .fault-symptoms {
+      width: min(500px, 100%);
+      margin-top: 20px;
+    }
+    .fault-symptoms > span { display: block; margin-bottom: 8px; color: var(--muted); font-size: 12px; }
+    .fault-symptom-list { display: flex; flex-wrap: wrap; gap: 7px; }
+    .fault-symptom-list button {
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: #65716a;
+      background: rgba(255,255,255,.78);
+      cursor: pointer;
+    }
+    .fault-symptom-list button.active { color: var(--leaf-deep); border-color: #a9c990; background: var(--leaf-soft); }
+    .primary, .secondary {
+      min-height: 50px;
+      padding: 0 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 15px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .primary { border: 1px solid var(--leaf-deep); color: white; background: var(--leaf-deep); box-shadow: 0 12px 26px rgba(47, 101, 57, .22); }
+    .secondary { border: 1px solid var(--line); color: var(--ink); background: rgba(255,255,255,.82); }
+    .primary:hover { transform: translateY(-1px); }
+    .microcopy { margin-top: 18px; color: #8a948e; font-size: 12px; }
+
+    .machine-stage { position: relative; min-height: 650px; }
+    .machine-stage::before {
+      content: "";
+      position: absolute;
+      inset: 9% 3% 6% 7%;
+      border-radius: 48% 52% 52% 48% / 43% 42% 58% 57%;
+      background: rgba(255, 255, 255, .78);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.9);
+    }
+    .machine {
+      position: absolute;
+      z-index: 2;
+      right: -2%;
+      bottom: -3%;
+      width: 98%;
+      height: 103%;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      filter: drop-shadow(0 26px 24px rgba(66, 82, 71, .13));
+    }
+    .airflow {
+      position: absolute;
+      z-index: 1;
+      inset: 8% 1% 2% 0;
+      width: 100%;
+      height: 88%;
+      overflow: visible;
+      opacity: .68;
+    }
+    .airflow path { fill: none; stroke: var(--glass); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 3 11; }
+    .airflow circle { fill: white; stroke: var(--glass); stroke-width: 2; }
+    .hero.playing .airflow path { animation: flow 1.2s linear infinite; }
+    .hero.module-principle .airflow { opacity: .72; }
+    .hero:not(.module-principle) .airflow { opacity: 0; }
+    .hero.module-principle.playing .machine { animation: breathe 2.8s ease-in-out infinite; }
+    @keyframes flow { to { stroke-dashoffset: -28; } }
+    @keyframes breathe { 50% { transform: translateY(-4px); } }
+
+    .focus-beacon {
+      --focus-x: 46%;
+      --focus-y: 32%;
+      --focus-w: 28%;
+      --focus-h: 18%;
+      position: absolute;
+      z-index: 3;
+      left: var(--focus-x);
+      top: var(--focus-y);
+      width: var(--focus-w);
+      height: var(--focus-h);
+      border: 2px solid rgba(103,182,52,.72);
+      border-radius: 22px;
+      background: rgba(226,239,216,.18);
+      box-shadow: 0 0 0 8px rgba(226,239,216,.32);
+      opacity: 0;
+      pointer-events: none;
+      transition: left .45s ease, top .45s ease, width .45s ease, height .45s ease, opacity .25s ease;
+    }
+    .focus-beacon span {
+      position: absolute;
+      left: 8px;
+      bottom: calc(100% + 8px);
+      max-width: 210px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      color: white;
+      background: rgba(47,101,57,.9);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .hero.guided:not(.module-principle) .focus-beacon { opacity: 1; }
+    .hero.guided.playing:not(.module-principle) .focus-beacon { animation: focusPulse 1.8s ease-in-out infinite; }
+    @keyframes focusPulse { 50% { box-shadow: 0 0 0 15px rgba(226,239,216,.10); } }
+
+    .status-card {
+      position: absolute;
+      z-index: 4;
+      right: 28px;
+      top: 34px;
+      width: 208px;
+      padding: 15px 16px;
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 18px;
+      background: rgba(255,255,255,.82);
+      box-shadow: 0 16px 36px rgba(49,71,57,.09);
+      backdrop-filter: blur(16px);
+    }
+    .status-card span { display: block; color: var(--muted); font-size: 11px; }
+    .status-card strong { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 14px; }
+    .status-card strong::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--leaf); box-shadow: 0 0 0 5px var(--leaf-soft); }
+
+    .module-rail {
+      position: absolute;
+      z-index: 5;
+      left: 42px;
+      right: 42px;
+      bottom: 26px;
+      min-height: 74px;
+      padding: 8px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 22px;
+      background: rgba(255,255,255,.82);
+      box-shadow: 0 18px 45px rgba(46,66,53,.10);
+      backdrop-filter: blur(18px);
+    }
+    .module-rail button {
+      position: relative;
+      padding: 12px 8px;
+      border: 0;
+      border-radius: 15px;
+      color: #6d7771;
+      background: transparent;
+      cursor: pointer;
+    }
+    .module-rail button span { display: block; margin-top: 5px; color: #9aa29d; font: 600 10px/1 "DIN Alternate", sans-serif; letter-spacing: .08em; }
+    .module-rail button.active { color: var(--leaf-deep); background: var(--leaf-soft); }
+    .hero.guided .module-rail { display: none; }
+
+    .below {
+      width: min(1220px, 100%);
+      margin: 26px auto 50px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+    .info-card {
+      min-height: 150px;
+      padding: 25px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255,255,255,.78);
+      transition: opacity .18s ease, transform .18s ease, background .2s ease;
+    }
+    .info-card:first-child { background: var(--leaf-deep); color: white; border-color: var(--leaf-deep); }
+    .info-card small { color: #8a958e; font-size: 11px; letter-spacing: .06em; }
+    .info-card:first-child small { color: rgba(255,255,255,.65); }
+    .info-card h2 { margin: 12px 0 8px; font-size: 21px; }
+    .info-card p { margin: 0; color: var(--muted); line-height: 1.65; font-size: 14px; }
+    .info-card:first-child p { color: rgba(255,255,255,.72); }
+    .info-card.updating { opacity: .45; transform: translateY(3px); }
+
+    .learning-console {
+      width: min(1220px, 100%);
+      margin: 14px auto 0;
+      padding: 15px 18px;
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) auto;
+      gap: 14px 24px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 16px 42px rgba(49,71,57,.08);
+    }
+    .learning-console[hidden] { display: none; }
+    .caption-line { min-width: 0; }
+    .caption-line small { color: var(--leaf-deep); font-weight: 700; letter-spacing: .06em; }
+    .caption-line p { margin: 6px 0 0; font-size: 15px; line-height: 1.55; }
+    .step-track { display: flex; gap: 6px; margin-top: 10px; }
+    .step-track i { width: 26px; height: 3px; border-radius: 2px; background: var(--line); transition: .2s ease; }
+    .step-track i.done { background: #a9c990; }
+    .step-track i.active { width: 42px; background: var(--leaf-deep); }
+    .playback-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+    .playback-controls button {
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: #53605a;
+      background: #f8faf7;
+      cursor: pointer;
+    }
+    .playback-controls button:hover, .playback-controls button.active { color: var(--leaf-deep); border-color: #a9c990; background: var(--leaf-soft); }
+    .playback-controls button:disabled { cursor: default; opacity: .5; color: #89918c; border-color: var(--line); background: #f4f5f2; }
+    .playback-controls .pause-control { min-width: 64px; color: white; border-color: var(--leaf-deep); background: var(--leaf-deep); }
+    .playback-controls .exit-control { color: #7b625d; }
+    .demo-note { width: min(1220px, 100%); margin: -25px auto 30px; color: #8a948e; font-size: 12px; text-align: center; }
+
+    @media (max-width: 900px) {
+      .shell { padding: 12px; }
+      .topbar { border-radius: 18px; gap: 12px; }
+      .brand { min-width: 0; }
+      .brand-copy span, .topnav, .knowledge-link { display: none; }
+      .hero { min-height: 820px; grid-template-columns: 1fr; border-radius: 28px; }
+      .hero-copy { padding: 48px 26px 20px; align-self: start; }
+      h1 { font-size: 46px; }
+      .lead { font-size: 15px; }
+      .machine-stage { min-height: 420px; }
+      .machine { right: -7%; width: 110%; height: 105%; }
+      .status-card { top: 10px; right: 14px; transform: scale(.9); transform-origin: top right; }
+      .module-rail { left: 12px; right: 12px; bottom: 12px; min-height: 66px; }
+      .module-rail button { padding: 10px 3px; font-size: 12px; }
+      .below { grid-template-columns: 1fr; }
+      .learning-console { grid-template-columns: 1fr; padding: 15px; border-radius: 20px; }
+      .playback-controls { justify-content: flex-start; }
+      .playback-controls button { flex: 1 1 auto; }
+    }
+
+    @media (min-width: 901px) {
+      .module-rail { display: none; }
+    }
+
+    @media (max-width: 560px) {
+      .hero { min-height: 880px; }
+      .hero-copy { padding: 38px 20px 18px; }
+      h1 { font-size: 39px; }
+      .actions { margin-top: 18px; }
+      .primary, .secondary { flex: 1 1 150px; padding: 0 15px; }
+      .machine-stage { min-height: 385px; }
+      .status-card { top: 2px; right: 8px; }
+      .module-rail { overflow-x: auto; grid-template-columns: repeat(5, minmax(92px, 1fr)); }
+      .focus-beacon span { max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+      .learning-console { margin-top: 10px; }
+      .caption-line p { font-size: 14px; }
+      .playback-controls button { min-width: 72px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+    }
+  </style>
 </head>
 <body>
-  <main>
-    <section class="stage" aria-label="JWF0019A三维模型">
-      <canvas id="scene"></canvas>
-      <div id="model-load-status" class="status"><span class="dot warning"></span>第13轮完整外形恢复版加载中</div>
-      <div id="process-status" class="process-status" hidden>白色棉絮正常通过</div>
-      <a class="knowledge-jump" href="#knowledge-platform">
-        <span>新增</span>
-        进入设备超级知识库
-      </a>
-      <div class="hint">拖动旋转 · 滚轮缩放 · 点击内部部件查看</div>
-    </section>
-
-    <aside class="panel">
-      <div>
-        <p class="eyebrow">JWF0019A</p>
-        <h1>异纤机数字讲解平台</h1>
-        <p class="intro">当前加载第13轮：恢复通道后方承载精灵眼的完整外形，并保留已校准的内部布局与连续棉流主通道。</p>
-        <div class="platform-switch" aria-label="平台区域导航">
-          <a href="#scene" class="active">3D工作台</a>
-          <a href="#knowledge-platform">超级知识库</a>
-        </div>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">JWF</div>
+        <div class="brand-copy"><strong>JWF0019A</strong><span>异纤机设备知识平台</span></div>
       </div>
-
-      <section>
-        <h2>固定视角</h2>
-        <div class="views">
-          <button data-view="isoRight" class="active">右前45°</button>
-          <button data-view="isoLeft">左前45°</button>
-          <button data-view="front">正面</button>
-          <button data-view="rear">背面</button>
-          <button data-view="left">左侧</button>
-          <button data-view="right">右侧</button>
-          <button data-view="top">俯视</button>
-        </div>
-      </section>
-
-      <section>
-        <h2>查看模式</h2>
-        <div class="modes">
-          <button data-mode="solid" class="active">实体</button>
-          <button data-mode="clay">素模</button>
-          <button data-mode="wireframe">网格</button>
-          <button data-mode="xray">X光</button>
-        </div>
-      </section>
-
-      <section>
-        <div class="range-head"><h2>讲解流程</h2><button id="tour-play" class="mini">自动演示</button></div>
-        <div class="tour">
-          <button data-tour="overview" class="active">整机</button>
-          <button data-tour="intake">进棉</button>
-          <button data-tour="detect">检测</button>
-          <button data-tour="compute">计算</button>
-          <button data-tour="eject">喷射</button>
-        </div>
-        <button id="process-play" class="calibration-toggle">播放棉流与排杂</button>
-        <div class="process-speed" aria-label="动画播放速度">
-          <span>动画速度</span>
-          <div class="speed-options" role="group" aria-label="动画播放速度">
-            <button type="button" data-process-speed="0.5">慢速 0.5×</button>
-            <button type="button" data-process-speed="1" class="active">标准 1×</button>
-            <button type="button" data-process-speed="1.5">快速 1.5×</button>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div class="range-head"><h2>分步拆解</h2><button id="dismantle-play" class="mini" disabled>内部重建后开放</button><output id="explode-value">0%</output></div>
-        <input id="explode" class="range" type="range" min="0" max="100" value="0" disabled>
-      </section>
-
-      <section>
-        <h2>模型层</h2>
-        <label><input type="checkbox" data-layer="hunyuan" checked> 第13轮完整外形恢复版</label>
-        <p class="annotation-help">当前显示31970三角面的完整母体；散热片、后视罩板及内部布局继续沿用已校准位置。</p>
-      </section>
-
-      <section id="calibration-private-section" class="calibration-section calibration-private-section">
-        <div id="calibration-lock-row" class="calibration-lock-row">
-          <strong>内部布局校准</strong>
-          <input id="calibration-password" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="内部布局校准密码" placeholder="输入密码">
-          <button id="calibration-unlock" type="button">解锁</button>
-          <output id="calibration-lock-status" aria-live="polite"></output>
-        </div>
-        <div id="calibration-private-content" hidden>
-        <div class="range-head"><h2>内部布局校准</h2><output id="calibration-status">基准v3已锁定</output></div>
-        <button id="calibration-mode" class="calibration-toggle">开启内部校准模式</button>
-        <p class="annotation-help">外壳会变半透明。先选部件，再拖动红、绿、蓝轴；X=左右，Y=上下，Z=前后。主通道和排杂漩涡风道均可调整尺寸与接口位置；反光镜、罩壳和散热片可复制。</p>
-        <label class="field-label" for="calibration-part">当前部件</label>
-        <select id="calibration-part" disabled>
-          <option value="">请选择内部部件</option>
-        </select>
-        <div class="calibration-tools">
-          <button type="button" data-transform="translate" class="active" disabled>移动</button>
-          <button type="button" data-transform="rotate" disabled>旋转</button>
-          <button type="button" data-transform="scale" disabled>缩放</button>
-        </div>
-        <div class="calibration-values">
-          <label>X左右<input type="number" data-axis="position.x" step="0.01" disabled></label>
-          <label>Y上下<input type="number" data-axis="position.y" step="0.01" disabled></label>
-          <label>Z前后<input type="number" data-axis="position.z" step="0.01" disabled></label>
-          <label>绕X°<input type="number" data-axis="rotation.x" step="1" disabled></label>
-          <label>绕Y°<input type="number" data-axis="rotation.y" step="1" disabled></label>
-          <label>绕Z°<input type="number" data-axis="rotation.z" step="1" disabled></label>
-          <label>整体比例<input type="number" data-axis="scale" min="0.1" step="0.05" disabled></label>
-        </div>
-        <div class="calibration-dimensions">
-          <label>长度X<input type="number" data-dimension="length" min="0.01" step="0.01" disabled></label>
-          <label>高度Y<input type="number" data-dimension="height" min="0.01" step="0.01" disabled></label>
-          <label>深度Z<input type="number" data-dimension="depth" min="0.01" step="0.01" disabled></label>
-          <label>板厚<input type="number" data-dimension="thickness" min="0.005" step="0.005" disabled></label>
-          <label>转向跨度Z<input type="number" data-dimension="offset" min="0.05" step="0.01" disabled></label>
-          <label>接口下探Y<input type="number" data-dimension="drop" min="0.05" step="0.01" disabled></label>
-        </div>
-        <div class="calibration-actions">
-          <button id="calibration-save" disabled>保存本机位置</button>
-          <button id="calibration-export" disabled>导出布局JSON</button>
-        </div>
-        <div class="calibration-actions calibration-edit-actions">
-          <button id="calibration-duplicate" disabled>复制当前部件</button>
-          <button id="calibration-reset" disabled>复位当前部件</button>
-          <button id="calibration-delete" disabled>删除当前副本</button>
-        </div>
-        </div>
-      </section>
-
-      <details class="reference">
-        <summary>对照图实物</summary>
-        <img src="./assets/JWF0019A-对照实物-官方图.png" alt="JWF0019A官方整机实物对照图">
-      </details>
-
-      <section class="selection">
-        <h2 id="part-title">模型说明</h2>
-        <p id="part-detail">点击相机、电磁阀、反光镜、算力盒子、主通道或外壳查看结构说明。</p>
-      </section>
-
-      <section class="facts">
-        <div><span>模型状态</span><strong id="model-status-value">低模外形与拟真内部加载中</strong></div>
-        <div><span>检测通道</span><strong>1600×70 mm</strong></div>
-        <div><span>已确认相机</span><strong>8＋8＋4</strong></div>
-        <div><span>算力盒子</span><strong>10个拟真低模</strong></div>
-      </section>
-    </aside>
-  </main>
-
-  <section id="knowledge-platform" class="knowledge-platform" aria-labelledby="knowledge-title">
-    <header class="knowledge-hero">
-      <div class="knowledge-hero-copy">
-        <div class="knowledge-live"><span></span>JWF0019A正式知识层已接入</div>
-        <p class="knowledge-kicker">设备超级知识库 · 从认识到维修</p>
-        <h2 id="knowledge-title">先看懂机器，再解决问题</h2>
-        <p>3D模型继续承担“看见结构”，知识平台负责把说明书、现场经验、参数截图和真实故障组织成可查、可学、可执行的设备知识。</p>
-      </div>
-      <div class="knowledge-metrics" aria-label="知识库规模">
-        <div><strong id="knowledge-module-count">7</strong><span>学习模块</span></div>
-        <div><strong id="knowledge-article-count">14</strong><span>正式知识卡</span></div>
-        <div><strong id="knowledge-fault-count">8</strong><span>故障入口</span></div>
-      </div>
+      <nav class="topnav" aria-label="主要模块">
+        <button class="active" data-module="认识结构">认识结构</button>
+        <button data-module="工作原理">工作原理</button>
+        <button data-module="操作保养">操作保养</button>
+        <button data-module="故障诊断">故障诊断</button>
+        <button data-module="参数资料">参数资料</button>
+      </nav>
+      <a class="knowledge-link" href="#modules">搜索知识</a>
     </header>
 
-    <nav id="knowledge-module-tabs" class="knowledge-flow" aria-label="知识模块"></nav>
-
-    <div class="knowledge-workbench">
-      <aside class="knowledge-quick-panel">
-        <span class="knowledge-panel-label">快速进入</span>
-        <h3>你现在想做什么？</h3>
-        <div id="knowledge-quick-actions" class="knowledge-quick-actions">
-          <button type="button" data-quick-module="principle"><span>看</span>理解工作原理</button>
-          <button type="button" data-quick-module="operation"><span>学</span>查看操作保养</button>
-          <button type="button" data-quick-module="fault"><span>查</span>按现象查故障</button>
-          <button type="button" data-quick-module="quality"><span>调</span>核对参数质量</button>
-        </div>
-        <div class="knowledge-safety-note">
-          <strong>知识分层</strong>
-          <p>绿色为已确认事实；琥珀色内容包含待验证实验，不会冒充现有功能。</p>
-        </div>
-      </aside>
-
-      <div id="knowledge-content" class="knowledge-content">
-        <div class="knowledge-search-row">
-          <label class="knowledge-search">
-            <span>搜索设备知识</span>
-            <input id="knowledge-search" type="search" placeholder="例如：相机不刷新、电磁阀、高温、玻璃清洁" autocomplete="off">
-          </label>
-          <button id="knowledge-search-clear" type="button">清除</button>
-        </div>
-
-        <div class="knowledge-module-head">
-          <div>
-            <span id="knowledge-module-evidence">已脱敏正式知识</span>
-            <h3 id="knowledge-module-title">认识设备</h3>
-            <p id="knowledge-module-description"></p>
+    <main class="hero" id="hero">
+      <section class="hero-copy">
+        <p class="kicker" id="module-kicker">认识结构 · 从外到内</p>
+        <h1 id="module-title">从外到内，<em>看懂每个部件</em></h1>
+        <p class="lead" id="module-lead">先建立整机方位，再逐层认识相机、算力盒子、电磁阀与排杂风道。</p>
+        <div class="fault-symptoms" id="fault-symptoms" hidden>
+          <span>先选择现场症状</span>
+          <div class="fault-symptom-list">
+            <button class="active" type="button" data-symptom="camera">相机画面不刷新</button>
+            <button type="button" data-symptom="channel">通道通讯故障</button>
+            <button type="button" data-symptom="temperature">高温报警</button>
+            <button type="button" data-symptom="flow">偏流报警</button>
           </div>
-          <output id="knowledge-result-count">0项结果</output>
         </div>
+        <div class="mode-choice" role="group" aria-label="学习方式">
+          <button class="active" type="button" data-mode="free"><strong>自由查看</strong><small>自己选择内容</small></button>
+          <button type="button" data-mode="guided"><strong>带我学习</strong><small>点击自动讲解</small></button>
+        </div>
+        <div class="actions">
+          <button class="primary" id="module-action" type="button">开始结构讲解 <span>→</span></button>
+          <a class="secondary" href="./3d.html?review=simplified">打开真实3D</a>
+        </div>
+        <p class="microcopy" id="mode-hint">当前为自由查看，点击模块即可切换内容。</p>
+      </section>
 
-        <div id="knowledge-card-grid" class="knowledge-card-grid" aria-live="polite"></div>
+      <section class="machine-stage" aria-label="JWF0019A设备展示">
+        <svg class="airflow" viewBox="0 0 720 520" aria-hidden="true">
+          <path d="M40,445 C88,390 92,298 190,282 C310,264 260,152 390,142 C505,133 560,82 681,54" />
+          <circle cx="92" cy="386" r="6"/><circle cx="184" cy="282" r="7"/><circle cx="368" cy="145" r="6"/><circle cx="560" cy="91" r="7"/>
+        </svg>
+        <img class="machine" src="./assets/JWF0019A-对照实物-官方图.png" alt="JWF0019A异纤机整机">
+        <div class="focus-beacon" id="focus-beacon" aria-hidden="true"><span id="focus-label">整机外形</span></div>
+        <div class="status-card"><span>当前讲解</span><strong id="status-text">整机结构认识</strong></div>
+      </section>
+
+      <nav class="module-rail" id="modules" aria-label="知识入口">
+        <button class="active" data-module="认识结构">认识结构<span>STRUCTURE</span></button>
+        <button data-module="工作原理">工作原理<span>PRINCIPLE</span></button>
+        <button data-module="操作保养">操作保养<span>OPERATION</span></button>
+        <button data-module="故障诊断">故障诊断<span>FAULT</span></button>
+        <button data-module="参数资料">参数资料<span>PARAMETER</span></button>
+      </nav>
+    </main>
+
+    <section class="learning-console" id="learning-console" aria-label="讲解播放控制" hidden>
+      <div class="caption-line" aria-live="polite">
+        <small id="step-count">步骤 1 / 5</small>
+        <p id="step-caption">先从正面观察两侧支撑腿与检测通道。</p>
+        <div class="step-track" id="step-track" aria-hidden="true"></div>
       </div>
-    </div>
-  </section>
+      <div class="playback-controls">
+        <button type="button" id="prev-step">上一步</button>
+        <button class="pause-control" type="button" id="pause-step">暂停</button>
+        <button type="button" id="next-step">下一步</button>
+        <button class="active" type="button" id="voice-toggle">原声开</button>
+        <button type="button" data-speed="0.5">0.5×</button>
+        <button class="active" type="button" data-speed="1">1×</button>
+        <button type="button" data-speed="1.5">1.5×</button>
+        <button class="exit-control" type="button" id="exit-guided">退出讲解</button>
+      </div>
+    </section>
 
-  <dialog id="knowledge-dialog" class="knowledge-dialog" aria-labelledby="knowledge-dialog-title">
-    <div class="knowledge-dialog-frame">
-      <header>
-        <div>
-          <p>JWF0019A · 设备知识卡</p>
-          <h2 id="knowledge-dialog-title"></h2>
-          <div id="knowledge-dialog-meta" class="knowledge-dialog-meta"></div>
-        </div>
-        <button id="knowledge-dialog-close" type="button" aria-label="关闭知识卡">关闭</button>
-      </header>
-      <div id="knowledge-dialog-body" class="knowledge-dialog-body"></div>
-    </div>
-  </dialog>
+    <section class="below" aria-label="知识内容预览">
+      <article class="info-card"><small>01 · 建立方位</small><h2>整机外部结构</h2><p>从正面、背面和两侧认识支撑腿、检测通道与排杂出口。</p></article>
+      <article class="info-card"><small>02 · 打开罩板</small><h2>主检测区域</h2><p>前后共16个相机覆盖1.6米机幅，并保留相邻检测区重叠。</p></article>
+      <article class="info-card"><small>03 · 继续深入</small><h2>精灵眼与算力</h2><p>认识4个精灵眼相机、10个算力通道及32个电磁阀的分工。</p></article>
+    </section>
+    <p class="demo-note">JWF0019A 异纤机设备知识平台 · 3D演示与知识内容</p>
+  </div>
 
-  <script type="module" src="./app.js?v=20-surface-attached-identity"></script>
-  <script type="module" src="./knowledge-app.js?v=2-knowledge-search"></script>
-  <script src="./ui-access.js?v=1-calibration-lock"></script>
+  <script>
+    const modules = {
+      "认识结构": {
+        slug: "structure",
+        kicker: "认识结构 · 从外到内",
+        title: "从外到内，<em>看懂每个部件</em>",
+        lead: "先建立整机方位，再逐层认识相机、算力盒子、电磁阀与排杂风道。",
+        action: "开始结构讲解",
+        status: "整机结构认识",
+        steps: [
+          "先从正面观察两侧支撑腿与检测通道。",
+          "定位左侧触摸屏和右侧电气柜。",
+          "打开前后罩板，认识16个主检测相机。",
+          "查看精灵眼、10个算力盒子与反光镜。",
+          "最后定位32个电磁阀和排杂风道。"
+        ],
+        focus: [
+          ["25%", "25%", "62%", "62%", "整机外形"],
+          ["37%", "61%", "45%", "24%", "两侧支撑腿"],
+          ["26%", "37%", "58%", "24%", "主检测区域"],
+          ["18%", "20%", "31%", "26%", "精灵眼与算力"],
+          ["55%", "31%", "37%", "27%", "喷射与排杂"]
+        ],
+        cards: [
+          ["01 · 建立方位", "整机外部结构", "从正面、背面和两侧认识支撑腿、检测通道与排杂出口。"],
+          ["02 · 打开罩板", "主检测区域", "前后共16个相机覆盖1.6米机幅，并保留相邻检测区重叠。"],
+          ["03 · 继续深入", "精灵眼与算力", "认识4个精灵眼相机、10个算力通道及32个电磁阀的分工。"]
+        ]
+      },
+      "工作原理": {
+        slug: "principle",
+        kicker: "工作原理 · 跟随棉流",
+        title: "五个动作，<em>看懂异纤分选</em>",
+        lead: "白色棉流正常通过；异纤到达喷射位置前，电磁阀提前动作并将其送入排杂风道。",
+        action: "播放工作原理",
+        status: "进棉 → 扫描 → 识别 → 喷射 → 排杂",
+        steps: [
+          "开棉后的棉絮从下方进入检测通道。",
+          "前后视相机持续扫描透明玻璃窗口。",
+          "算力盒子识别棉流中的彩色异纤。",
+          "异纤到位前，对应电磁阀提前喷射。",
+          "异纤和少量白棉进入漩涡风道，由风机吸走。"
+        ],
+        cards: [
+          ["01 · 正常棉流", "从入口进入通道", "松散白棉顺着连续主通道向上运动，正常棉流从出口离开。"],
+          ["02 · 检测计算", "相机扫描并定位", "前后视相机形成淡蓝光幕，检测数据交给对应算力通道。"],
+          ["03 · 精准排杂", "提前喷射并吸走", "对应电磁阀按流速延时动作，异纤经圆盘漏斗进入排杂风道。"]
+        ]
+      },
+      "操作保养": {
+        slug: "operation",
+        kicker: "操作保养 · 每天做对",
+        title: "规范操作，<em>保持检测稳定</em>",
+        lead: "把开停机、画面检查和玻璃清洁整理成可跟随的现场步骤。",
+        action: "开始操作讲解",
+        status: "开停机与日常清洁",
+        steps: [
+          "确认屏幕旁的小急停按钮已经旋转弹出。",
+          "在屏幕上点击开始检测，并观察系统进入运行状态。",
+          "确认20个相机画面每0.5至1秒持续刷新。",
+          "停机后，用湿布清洁4块检测通道玻璃。",
+          "内部镜面使用干布，最后检查灯板、散热片和风扇。"
+        ],
+        focus: [
+          ["39%", "53%", "20%", "22%", "急停与触摸屏"],
+          ["39%", "53%", "20%", "22%", "开始检测"],
+          ["28%", "38%", "55%", "23%", "相机刷新状态"],
+          ["29%", "39%", "53%", "18%", "4块检测玻璃"],
+          ["17%", "21%", "39%", "27%", "灯板与散热"]
+        ],
+        cards: [
+          ["01 · 开机前", "确认急停状态", "急停按钮弹出后再开始检测，异常时按下即可停止检测。"],
+          ["02 · 每日检查", "看画面是否刷新", "单个相机卡住和同通道双相机卡住，对应不同排查方向。"],
+          ["03 · 清洁标准", "湿布玻璃、干布内部", "通道玻璃需要去除棉蜡，内部镜面避免留下水印。"]
+        ]
+      },
+      "故障诊断": {
+        slug: "fault",
+        kicker: "故障诊断 · 先看现象",
+        title: "先判断范围，<em>再处理故障</em>",
+        lead: "先选一个现场症状，再按照屏幕信息和设备状态逐步排查。",
+        action: "开始诊断讲解",
+        status: "按现象定位故障",
+        symptoms: {
+          camera: {
+            lead: "单个相机画面停止刷新时，先确认报警编号，再复核对应相机。",
+            status: "相机画面不刷新",
+            steps: [
+              "观察20个相机画面，确认只有一个画面停止刷新。",
+              "读取主屏右侧报警信息，记录对应相机编号。",
+              "关闭整机电源，等待20秒后重新上电复核。",
+              "如果短期内反复出现，检查接线并准备对应相机。",
+              "确认故障持续后，更换对应相机并验证画面刷新。"
+            ]
+          },
+          channel: {
+            lead: "同一通道的前后两个相机同时不刷新，重点排查对应算力盒子。",
+            status: "通道通讯故障",
+            steps: [
+              "确认同一通道的两个相机画面都停止刷新。",
+              "读取报警信息，记录故障通道编号。",
+              "断电等待20秒后重新上电，观察通讯是否恢复。",
+              "若故障很快再次出现，检查该通道线缆与接口。",
+              "确认通讯仍异常后，更换对应算力盒子并复核。"
+            ]
+          },
+          temperature: {
+            lead: "高温报警先处理散热条件，再判断风扇或算力盒子是否受影响。",
+            status: "高温报警",
+            steps: [
+              "读取报警温度和对应通道，先停止高负荷运行。",
+              "检查散热风扇是否转动，周围是否被棉花堵塞。",
+              "检查散热片与风扇间距，清除影响风量的积花。",
+              "恢复运行后继续观察温度变化。",
+              "温度仍持续升高时，进一步检查风扇和算力盒子。"
+            ]
+          },
+          flow: {
+            lead: "偏流报警要先看通道是否堵花，再核对风口、玻璃和实际流速。",
+            status: "偏流报警",
+            steps: [
+              "观察棉流是否明显偏向通道一侧。",
+              "停机检查入口、出口和上部风口是否积花或漏风。",
+              "检查检测玻璃是否有棉蜡，必要时用湿布清洁。",
+              "恢复运行后观察流速是否回到基准范围。",
+              "偏流仍存在时，再检查前后工序风量与管道连接。"
+            ]
+          }
+        },
+        focus: [
+          ["39%", "53%", "20%", "22%", "读取报警信息"],
+          ["25%", "38%", "60%", "21%", "单个相机"],
+          ["18%", "25%", "37%", "28%", "算力通道"],
+          ["64%", "56%", "20%", "25%", "整机电源开关"],
+          ["20%", "27%", "61%", "35%", "确认更换范围"]
+        ],
+        cards: [
+          ["01 · 看报警", "先确认编号", "报警信息会指出异常相机或通道，先记录再断电处理。"],
+          ["02 · 看画面", "判断一个还是两个", "单画面卡住偏向相机；同通道双画面卡住偏向算力盒子。"],
+          ["03 · 看频率", "偶发重启，反复更换", "断电重启可用于复核；短期反复出现不能只靠重启。"]
+        ]
+      },
+      "参数资料": {
+        slug: "parameter",
+        kicker: "参数资料 · 读懂作用",
+        title: "参数不是数字，<em>而是动作时机</em>",
+        lead: "把流速、延时、吹气时间、模型与抽测记录放回实际工艺场景中理解。",
+        action: "开始参数讲解",
+        status: "模型、延时与质量记录",
+        steps: [
+          "先匹配原料与检测模型：模型过敏会增加乱喷，过松则可能漏检。",
+          "流速偏离基准会改变异纤到达喷阀的时间，导致喷射位置偏移。",
+          "吹阀延迟过小会喷早，延迟过大会喷晚，需要跟随实际流速校准。",
+          "吹气时间过长会带走更多白棉，过短又可能无法把异纤送入排杂口。",
+          "最后用分颜色投放结果、喷次和报警记录验证调整是否有效。"
+        ],
+        focus: [
+          ["39%", "53%", "20%", "22%", "当前检测方案"],
+          ["27%", "39%", "55%", "18%", "棉流与流速"],
+          ["50%", "35%", "37%", "22%", "电磁阀参数"],
+          ["28%", "38%", "55%", "22%", "投放验证"],
+          ["39%", "53%", "20%", "22%", "统计与记录"]
+        ],
+        cards: [
+          ["01 · 先看原料", "方案随原料确认", "新疆棉多数情况下可使用统一主模型，但仍要观察是否乱喷。"],
+          ["02 · 再看动作", "延时决定喷射位置", "参数需要结合实际流速观察，不能只看单个数值。"],
+          ["03 · 最后验证", "投放和长期记录", "单颜色检出偏低时单独调整，并结合喷次变化复核效果。"]
+        ]
+      }
+    };
+
+    const hero = document.querySelector("#hero");
+    const moduleButtons = [...document.querySelectorAll("[data-module]")];
+    const modeButtons = [...document.querySelectorAll("[data-mode]")];
+    const statusText = document.querySelector("#status-text");
+    const moduleKicker = document.querySelector("#module-kicker");
+    const moduleTitle = document.querySelector("#module-title");
+    const moduleLead = document.querySelector("#module-lead");
+    const moduleAction = document.querySelector("#module-action");
+    const modeHint = document.querySelector("#mode-hint");
+    const learningConsole = document.querySelector("#learning-console");
+    const stepCount = document.querySelector("#step-count");
+    const stepCaption = document.querySelector("#step-caption");
+    const stepTrack = document.querySelector("#step-track");
+    const pauseButton = document.querySelector("#pause-step");
+    const voiceButton = document.querySelector("#voice-toggle");
+    const faultSymptoms = document.querySelector("#fault-symptoms");
+    const symptomButtons = [...document.querySelectorAll("[data-symptom]")];
+    const focusBeacon = document.querySelector("#focus-beacon");
+    const focusLabel = document.querySelector("#focus-label");
+    const cards = [...document.querySelectorAll(".info-card")];
+
+    let currentModule = "认识结构";
+    let currentMode = "free";
+    let currentStep = 0;
+    let paused = true;
+    let voiceEnabled = true;
+    let speed = 1;
+    let stepTimer = null;
+    let currentSymptom = "camera";
+
+    const principleVoice = [
+      new Audio("./assets/audio/step-intake.mp3"),
+      new Audio("./assets/audio/step-scan.mp3"),
+      new Audio("./assets/audio/step-detect.mp3"),
+      new Audio("./assets/audio/step-eject.mp3"),
+      new Audio("./assets/audio/step-suction.mp3")
+    ];
+    principleVoice.forEach(audio => { audio.preload = "auto"; });
+    let activeVoice = null;
+
+    function getSteps() {
+      const module = modules[currentModule];
+      return module.symptoms?.[currentSymptom]?.steps || module.steps;
+    }
+
+    function stopPlayback() {
+      clearTimeout(stepTimer);
+      stepTimer = null;
+      stopVoice();
+      hero.classList.remove("playing");
+    }
+
+    function stopVoice() {
+      principleVoice.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+      activeVoice = null;
+    }
+
+    function playStepVoice(index) {
+      stopVoice();
+      if (!voiceEnabled || currentModule !== "工作原理") return;
+      const audio = principleVoice[index];
+      if (!audio) return;
+      activeVoice = audio;
+      audio.playbackRate = speed;
+      audio.play().catch(() => {
+        activeVoice = null;
+      });
+    }
+
+    function updateVoiceControl() {
+      const hasOriginalVoice = currentModule === "工作原理";
+      voiceButton.disabled = !hasOriginalVoice;
+      voiceButton.classList.toggle("active", hasOriginalVoice && voiceEnabled);
+      voiceButton.textContent = hasOriginalVoice
+        ? (voiceEnabled ? "原声开" : "原声关")
+        : "待补原声";
+    }
+
+    function updateFocus(module, index) {
+      const focus = module.focus?.[index];
+      if (!focus) return;
+      focusBeacon.style.setProperty("--focus-x", focus[0]);
+      focusBeacon.style.setProperty("--focus-y", focus[1]);
+      focusBeacon.style.setProperty("--focus-w", focus[2]);
+      focusBeacon.style.setProperty("--focus-h", focus[3]);
+      focusLabel.textContent = focus[4];
+    }
+
+    function renderStep(announce = false) {
+      const module = modules[currentModule];
+      const steps = getSteps();
+      stepCount.textContent = `步骤 ${currentStep + 1} / ${steps.length}`;
+      stepCaption.textContent = steps[currentStep];
+      statusText.textContent = steps[currentStep].replace(/[。；]/g, "");
+      stepTrack.innerHTML = steps.map((_, index) => `<i class="${index < currentStep ? "done" : index === currentStep ? "active" : ""}"></i>`).join("");
+      updateFocus(module, currentStep);
+      if (announce) playStepVoice(currentStep);
+    }
+
+    function scheduleNext() {
+      clearTimeout(stepTimer);
+      if (paused) return;
+      stepTimer = setTimeout(() => {
+        const finalStep = getSteps().length - 1;
+        if (currentStep >= finalStep) {
+          paused = true;
+          hero.classList.remove("playing");
+          pauseButton.textContent = "重新播放";
+          statusText.textContent = `${currentModule}讲解完成`;
+          return;
+        }
+        currentStep += 1;
+        renderStep(true);
+        scheduleNext();
+      }, Math.max(4200 / speed, activeVoice ? ((activeVoice.duration || 0) / speed + .45) * 1000 : 0));
+    }
+
+    function playFromCurrent() {
+      paused = false;
+      pauseButton.textContent = "暂停";
+      hero.classList.add("playing");
+      renderStep(true);
+      scheduleNext();
+    }
+
+    function revealPlaybackControls() {
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      requestAnimationFrame(() => learningConsole.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "nearest"
+      }));
+    }
+
+    function setMode(mode, autoPlay = false) {
+      stopPlayback();
+      currentMode = mode;
+      modeButtons.forEach(button => button.classList.toggle("active", button.dataset.mode === mode));
+      hero.classList.toggle("guided", mode === "guided");
+      learningConsole.hidden = mode !== "guided";
+      if (mode === "guided") {
+        currentStep = 0;
+        paused = true;
+        pauseButton.textContent = "开始";
+        modeHint.textContent = currentModule === "工作原理"
+          ? "已使用原3D讲解的五段真人原声，点击带我学习后自动播放。"
+          : "该模块先播放画面与字幕；等你确认内容并补充真人录音后再接入语音。";
+        renderStep(false);
+        if (autoPlay) {
+          playFromCurrent();
+          revealPlaybackControls();
+        }
+      } else {
+        paused = true;
+        pauseButton.textContent = "暂停";
+        statusText.textContent = modules[currentModule].status;
+        modeHint.textContent = "当前为自由查看，点击模块即可切换内容。";
+      }
+    }
+
+    function selectModule(name) {
+      stopPlayback();
+      currentModule = name;
+      currentStep = 0;
+      const module = modules[name];
+      moduleButtons.forEach(button => button.classList.toggle("active", button.dataset.module === name));
+      hero.className = `hero module-${module.slug}${currentMode === "guided" ? " guided" : ""}`;
+      moduleKicker.textContent = module.kicker;
+      moduleTitle.innerHTML = module.title;
+      moduleLead.textContent = module.lead;
+      moduleAction.innerHTML = `${module.action} <span>→</span>`;
+      statusText.textContent = module.status;
+      faultSymptoms.hidden = name !== "故障诊断";
+      if (name === "故障诊断") {
+        const symptom = module.symptoms[currentSymptom];
+        moduleLead.textContent = symptom.lead;
+        statusText.textContent = symptom.status;
+      }
+      cards.forEach((card, index) => {
+        card.classList.add("updating");
+        const data = module.cards[index];
+        card.querySelector("small").textContent = data[0];
+        card.querySelector("h2").textContent = data[1];
+        card.querySelector("p").textContent = data[2];
+        requestAnimationFrame(() => card.classList.remove("updating"));
+      });
+      paused = true;
+      pauseButton.textContent = currentMode === "guided" ? "开始" : "暂停";
+      updateVoiceControl();
+      if (currentMode === "guided") {
+        modeHint.textContent = name === "工作原理"
+          ? "已使用原3D讲解的五段真人原声，当前会自动播放。"
+          : "该模块先播放画面与字幕；等你确认内容并补充真人录音后再接入语音。";
+        playFromCurrent();
+        revealPlaybackControls();
+      }
+    }
+
+    moduleButtons.forEach(button => button.addEventListener("click", () => selectModule(button.dataset.module)));
+    modeButtons.forEach(button => button.addEventListener("click", () => setMode(button.dataset.mode, button.dataset.mode === "guided")));
+    moduleAction.addEventListener("click", () => {
+      if (currentMode !== "guided") {
+        setMode("guided", true);
+        return;
+      }
+      currentStep = 0;
+      playFromCurrent();
+      revealPlaybackControls();
+    });
+
+    symptomButtons.forEach(button => button.addEventListener("click", () => {
+      stopPlayback();
+      currentSymptom = button.dataset.symptom;
+      symptomButtons.forEach(item => item.classList.toggle("active", item === button));
+      const symptom = modules["故障诊断"].symptoms[currentSymptom];
+      moduleLead.textContent = symptom.lead;
+      statusText.textContent = symptom.status;
+      currentStep = 0;
+      paused = true;
+      pauseButton.textContent = currentMode === "guided" ? "开始" : "暂停";
+      if (currentMode === "guided") renderStep(false);
+    }));
+
+    document.querySelector("#prev-step").addEventListener("click", () => {
+      currentStep = Math.max(0, currentStep - 1);
+      renderStep(true);
+      scheduleNext();
+    });
+    document.querySelector("#next-step").addEventListener("click", () => {
+      currentStep = Math.min(getSteps().length - 1, currentStep + 1);
+      renderStep(true);
+      scheduleNext();
+    });
+    pauseButton.addEventListener("click", () => {
+      if (paused) {
+        if (currentStep === getSteps().length - 1) currentStep = 0;
+        playFromCurrent();
+      } else {
+        paused = true;
+        stopPlayback();
+        pauseButton.textContent = "继续";
+      }
+    });
+    voiceButton.addEventListener("click", () => {
+      if (currentModule !== "工作原理") return;
+      voiceEnabled = !voiceEnabled;
+      updateVoiceControl();
+      if (voiceEnabled && currentMode === "guided" && !paused) playStepVoice(currentStep);
+      else stopVoice();
+    });
+    document.querySelectorAll("[data-speed]").forEach(button => button.addEventListener("click", () => {
+      speed = Number(button.dataset.speed);
+      document.querySelectorAll("[data-speed]").forEach(item => item.classList.toggle("active", item === button));
+      if (!paused) {
+        playStepVoice(currentStep);
+        scheduleNext();
+      }
+    }));
+    document.querySelector("#exit-guided").addEventListener("click", () => setMode("free"));
+
+    selectModule(currentModule);
+  </script>
 </body>
 </html>
