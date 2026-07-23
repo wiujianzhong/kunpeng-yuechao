@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JWF0019A 设备超级知识平台</title>
   <meta name="description" content="JWF0019A异纤机3D结构、工作原理、操作保养、故障诊断、参数质量与设备知识库。">
-  <link rel="stylesheet" href="./styles.css?v=4-simplified-interface">
+  <link rel="stylesheet" href="./styles.css?v=5-glb-region-editor">
   <script type="importmap">
     {
       "imports": {
@@ -101,7 +101,7 @@
         <div id="calibration-private-content" hidden>
         <div class="range-head"><h2>内部布局校准</h2><output id="calibration-status">基准v3已锁定</output></div>
         <button id="calibration-mode" class="calibration-toggle">开启内部校准模式</button>
-        <p class="annotation-help">外壳会变半透明。先选部件，再拖动红、绿、蓝轴；X=左右，Y=上下，Z=前后。主通道和排杂漩涡风道均可调整尺寸与接口位置；反光镜、罩壳和散热片可复制。</p>
+        <p class="annotation-help">外壳会变半透明。先选部件，再拖动红、绿、蓝轴；X=左右，Y=上下，Z=前后。主通道可调整尺寸；反光镜、罩壳、散热片和灯板可复制。</p>
         <label class="field-label" for="calibration-part">当前部件</label>
         <select id="calibration-part" disabled>
           <option value="">请选择内部部件</option>
@@ -205,7 +205,7 @@
     </div>
   </dialog>
 
-  <script type="module" src="./app.js?v=23-loop-shell-align"></script>
+  <script type="module" src="./app.js?v=30-layout10-final"></script>
   <script type="module" src="./knowledge-app.js?v=3-compact-knowledge"></script>
   <script src="./ui-access.js?v=1-calibration-lock"></script>
 </body>

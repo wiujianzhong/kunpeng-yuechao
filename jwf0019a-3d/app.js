@@ -123,6 +123,12 @@ scene.add(machine);
 let currentMode = 'solid';
 let currentView = 'isoRight';
 let importedModelReady = false;
+let importedRootModel = null;
+let shellSurfacePaints = [];
+const shellSurfaceTopologyCache = new WeakMap();
+const fixedShellSurfacePaints = [
+  4877, 4875, 362, 364, 4375, 627, 4073, 1409, 4169, 3268, 4018, 4488
+].map((seedFaceIndex) => ({ meshId: '主体区域-0', seedFaceIndex, color: '#d9ddda' }));
 let modelAnimationMixer = null;
 let modelAnimationActions = [];
 let modelAnimationDuration = 0;
@@ -389,61 +395,62 @@ function addMachineIdentityDetails(parent, importedRoot) {
   details.name = 'JWF0019A机身标识与立柱操作件';
   parent.add(details);
 
-  // 先读取母版原件中心，再移除旧件；新屏幕和电柜门贴回原立柱内面，避免悬空。
+  // 使用“内部布局校准 (8)”最终坐标，替换主体GLB内原有的旧操作件。
+  const cabinetCenterZ = -0.21;
+  const cabinetButtonZ = cabinetCenterZ - 0.135;
   const leftScreenOriginal = importedRoot.getObjectByName('左立柱_内侧触摸屏');
   const rightCabinetOriginal = importedRoot.getObjectByName('右立柱_内侧电柜门');
-  const anchorCenter = (object, fallback) => {
-    if (!object) return fallback;
-    const center = new THREE.Box3().setFromObject(object).getCenter(new THREE.Vector3());
-    return parent.worldToLocal(center);
-  };
-  const leftScreenAnchor = anchorCenter(leftScreenOriginal, new THREE.Vector3(-0.895, 1.665, 0));
-  const rightCabinetAnchor = anchorCenter(rightCabinetOriginal, new THREE.Vector3(0.892, 1.55, -0.055));
   leftScreenOriginal?.removeFromParent();
   rightCabinetOriginal?.removeFromParent();
 
-  // 信号灯侧立柱内面：独立触摸屏，不改动立柱本体。
+  // 信号灯侧立柱内面：触摸屏位于背板中央。
+  const screenGroup = new THREE.Group();
+  screenGroup.position.set(-1.052113004643858, 2.0560421225333316, -0.10005655626252286);
+  details.add(screenGroup);
   roundedBox(
-    details,
+    screenGroup,
     [0.032, 0.32, 0.45],
-    [leftScreenAnchor.x, 1.665, 0],
+    [0, 0, 0],
     materials.recess,
     '左立柱内侧触摸屏外框',
     '信号灯侧立柱内面的独立屏幕外框。',
     0.012
   );
   roundedBox(
-    details,
+    screenGroup,
     [0.018, 0.255, 0.37],
-    [leftScreenAnchor.x + 0.021, 1.665, 0],
+    [0.021, 0, 0],
     materials.dark,
     '左立柱内侧触摸屏',
     '用于查看异纤检测参数、相机状态和排杂统计。',
     0.008
   );
   const operatingScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.355, 0.225), makeScreenImageMaterial());
-  operatingScreen.position.set(leftScreenAnchor.x + 0.034, 1.665, 0);
+  operatingScreen.position.set(0.034, 0, 0);
   operatingScreen.rotation.y = Math.PI / 2;
   registerMesh(operatingScreen, '触摸屏运行主画面', '通道状态与32位喷阀统计的正常运行画面。', 'decal');
-  details.add(operatingScreen);
+  screenGroup.add(operatingScreen);
 
-  // 风机侧立柱内面：平整电气柜门与独立旋转按钮。
+  // 风机侧立柱内面：电气柜门位于背板中央。
+  const cabinetGroup = new THREE.Group();
+  cabinetGroup.position.set(1.0485846029540842, 2.082058051536222, -0.10650275590833051);
+  details.add(cabinetGroup);
   roundedBox(
-    details,
+    cabinetGroup,
     [0.032, 0.54, 0.59],
-    [rightCabinetAnchor.x, 1.55, -0.055],
+    [0, 0, 0],
     materials.paint,
     '右立柱内侧电气柜门',
     '风机侧立柱内面的平整电气柜门。',
     0.014
   );
-  roundedBox(details, [0.018, 0.47, 0.52], [rightCabinetAnchor.x - 0.020, 1.55, -0.055], materials.paint, '', '', 0.01);
-  roundedBox(details, [0.018, 0.105, 0.105], [rightCabinetAnchor.x - 0.037, 1.55, -0.19], materials.yellow, '', '', 0.008);
+  roundedBox(cabinetGroup, [0.018, 0.47, 0.52], [-0.020, 0, 0], materials.paint, '', '', 0.01);
+  roundedBox(cabinetGroup, [0.018, 0.105, 0.105], [-0.037, 0, cabinetButtonZ - cabinetCenterZ], materials.yellow, '', '', 0.008);
   cylinder(
-    details,
+    cabinetGroup,
     0.035,
     0.052,
-    [rightCabinetAnchor.x - 0.067, 1.55, -0.19],
+    [-0.067, 0, cabinetButtonZ - cabinetCenterZ],
     [0, 0, Math.PI / 2],
     materials.red,
     '电柜门旋转按钮',
@@ -451,19 +458,18 @@ function addMachineIdentityDetails(parent, importedRoot) {
     'shell',
     28
   );
-  roundedBox(details, [0.058, 0.022, 0.018], [rightCabinetAnchor.x - 0.095, 1.55, -0.19], materials.dark, '', '', 0.006);
+  roundedBox(cabinetGroup, [0.058, 0.022, 0.018], [-0.095, 0, cabinetButtonZ - cabinetCenterZ], materials.dark, '', '', 0.006);
 
-  // 真实外观母版没有着色信号灯，在原机左上方补齐可辨识的红、黄、绿三色灯。
-  const signal = new THREE.Group();
-  signal.name = '三色信号灯总成';
-  signal.position.set(-1.15, 2.97, -0.062);
-  details.add(signal);
-  cylinder(signal, 0.035, 0.16, [0, -0.10, 0], [0, 0, 0], materials.dark, '三色信号灯安装柱', '连接信号灯与机身上盖的黑色安装柱。', 'indicator', 20);
-  cylinder(signal, 0.056, 0.062, [0, 0, 0], [0, 0, 0], materials.dark, '三色信号灯底座', '设备运行状态三色灯底座。', 'indicator', 24);
-  cylinder(signal, 0.047, 0.068, [0, 0.065, 0], [0, 0, 0], materials.signalRed, '三色信号灯红灯', '红灯用于设备报警或停止状态提示。', 'indicator', 24);
-  cylinder(signal, 0.047, 0.068, [0, 0.136, 0], [0, 0, 0], materials.signalAmber, '三色信号灯黄灯', '黄灯用于设备待机或提示状态。', 'indicator', 24);
-  cylinder(signal, 0.047, 0.068, [0, 0.207, 0], [0, 0, 0], materials.signalGreen, '三色信号灯绿灯', '绿灯用于设备正常运行状态提示。', 'indicator', 24);
-  cylinder(signal, 0.054, 0.025, [0, 0.253, 0], [0, 0, 0], materials.dark, '三色信号灯顶盖', '三色信号灯顶部保护盖。', 'indicator', 24);
+  // 仅用贴面级薄片覆盖背面上部横向绿色表面；侧面的绿色识别板保持原样。
+  roundedBox(
+    details,
+    [2.70, 0.76, 0.012],
+    [0, 3.13, -1.035],
+    materials.paint,
+    '背面上部机身白横板',
+    '将背面原绿色横板改为与机身一致的白色。',
+    0.025
+  );
 
   return details;
 }
@@ -547,11 +553,13 @@ const modelStatusValue = document.querySelector('#model-status-value');
 const importedModelLoader = new GLTFLoader();
 importedModelLoader.setMeshoptDecoder(MeshoptDecoder);
 importedModelLoader.load(
-  './assets/models/JWF0019A-第12轮清除旧灯疙瘩并校正圆盘.glb?v=12-clean-shell-align-disk',
+  './assets/models/JWF0019A-新主体对齐-720贴图-2026-07-23.glb?v=aligned-shell-720-20260723',
   (gltf) => {
     const importedRoot = gltf.scene;
+    importedRootModel = importedRoot;
     importedRoot.name = 'JWF0019A外形清理校正版';
     completeModel.add(importedRoot);
+    importedRoot.rotation.y = -Math.PI / 2;
     importedRoot.updateMatrixWorld(true);
 
     const sourceBounds = new THREE.Box3().setFromObject(importedRoot);
@@ -583,9 +591,13 @@ importedModelLoader.load(
 
     addMachineIdentityDetails(completeModel, importedRoot);
 
+    let shellRegionIndex = 0;
     importedRoot.traverse((object) => {
       if (!object.isMesh) return;
       const [name, detail] = importedPartInfo(object.name);
+      object.userData.shellColorId = `主体区域-${shellRegionIndex}`;
+      object.userData.shellColorLabel = name || `主体区域${shellRegionIndex + 1}`;
+      shellRegionIndex += 1;
       const role = /相机|电磁阀|反光镜|检测通道|主通道/.test(object.name) ? 'internal' : 'shell';
       registerMesh(
         object,
@@ -596,6 +608,7 @@ importedModelLoader.load(
       object.castShadow = false;
       object.receiveShadow = true;
     });
+    restoreShellSurfacePaints();
 
     if (gltf.animations.length) {
       modelAnimationMixer = new THREE.AnimationMixer(importedRoot);
@@ -640,6 +653,7 @@ const calibrationMaterials = {
   magic: new THREE.MeshStandardMaterial({ color: 0xf29b38, roughness: 0.35, metalness: 0.18 }),
   compute: new THREE.MeshStandardMaterial({ color: 0x4dc27a, roughness: 0.42, metalness: 0.16 }),
   mirror: new THREE.MeshPhysicalMaterial({ color: 0xc9f4ff, roughness: 0.05, metalness: 0.72 }),
+  componentBack: new THREE.MeshStandardMaterial({ color: 0x6f787c, roughness: 0.52, metalness: 0.42 }),
   valve: new THREE.MeshStandardMaterial({ color: 0xe85d5d, roughness: 0.38, metalness: 0.22 }),
   cover: new THREE.MeshStandardMaterial({ color: 0xe8eceb, roughness: 0.42, metalness: 0.20 }),
   coverGhost: new THREE.MeshPhysicalMaterial({
@@ -659,6 +673,23 @@ const calibrationMaterials = {
   computeFin: new THREE.MeshStandardMaterial({ color: 0x8d9ba1, roughness: 0.24, metalness: 0.78 }),
   connector: new THREE.MeshStandardMaterial({ color: 0x22292d, roughness: 0.48, metalness: 0.32 }),
   statusLed: new THREE.MeshStandardMaterial({ color: 0x77f082, emissive: 0x28b94c, emissiveIntensity: 1.5 }),
+  lampPanel: new THREE.MeshStandardMaterial({ color: 0xe8eceb, roughness: 0.38, metalness: 0.22 }),
+  lampWhite: new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    emissive: 0xffffff,
+    emissiveIntensity: 1.0,
+    roughness: 0.12,
+    metalness: 0.02,
+    toneMapped: false
+  }),
+  lampPurple: new THREE.MeshStandardMaterial({
+    color: 0xd9b8ff,
+    emissive: 0xb880ff,
+    emissiveIntensity: 0.92,
+    roughness: 0.14,
+    metalness: 0.02,
+    toneMapped: false
+  }),
   valveBody: new THREE.MeshStandardMaterial({ color: 0x2f6f9f, roughness: 0.34, metalness: 0.54 }),
   valveBodyActive: new THREE.MeshStandardMaterial({ color: 0x297fbd, emissive: 0x0f4d77, emissiveIntensity: 0.62, roughness: 0.24, metalness: 0.46 }),
   valveCoil: new THREE.MeshStandardMaterial({ color: 0x20272b, roughness: 0.42, metalness: 0.34 }),
@@ -668,16 +699,18 @@ const calibrationMaterials = {
   valveNozzle: new THREE.MeshStandardMaterial({
     color: 0xffffff,
     emissive: 0xffffff,
-    emissiveIntensity: 0.38,
+    emissiveIntensity: 0.68,
     roughness: 0.18,
-    metalness: 0.10
+    metalness: 0.10,
+    toneMapped: false
   }),
   valveNozzleActive: new THREE.MeshStandardMaterial({
     color: 0xffffff,
     emissive: 0xffffff,
-    emissiveIntensity: 1.1,
+    emissiveIntensity: 1.35,
     roughness: 0.08,
-    transparent: false
+    transparent: false,
+    toneMapped: false
   }),
   valveOverrideActive: new THREE.MeshStandardMaterial({ color: 0xf53f46, emissive: 0xb60f1d, emissiveIntensity: 0.78 }),
   channelGlass: new THREE.MeshPhysicalMaterial({
@@ -718,22 +751,13 @@ const calibrationMaterials = {
     ior: 1.42,
     depthWrite: false,
     side: THREE.DoubleSide
-  }),
-  rejectVolute: new THREE.MeshPhysicalMaterial({
-    color: 0x76d7e8,
-    transparent: true,
-    opacity: 0.34,
-    roughness: 0.08,
-    transmission: 0.48,
-    depthWrite: false,
-    side: THREE.DoubleSide
   })
 };
 
 const calibrationLayer = makeLayer('calibration');
 calibrationLayer.visible = false;
 const calibrationParts = new Map();
-const calibrationStorageKey = 'jwf0019a-internal-layout-v5';
+const calibrationStorageKey = 'jwf0019a-internal-layout-v8';
 let calibrationEnabled = false;
 let selectedCalibrationPart = null;
 let calibrationHelper = null;
@@ -752,6 +776,41 @@ function addCalibrationMesh(parent, geometry, material, calibrationId) {
   registerMesh(mesh, '', '', 'calibration', true);
   parent.add(mesh);
   return mesh;
+}
+
+function addCalibrationInstances(parent, geometry, material, calibrationId, count) {
+  const mesh = new THREE.InstancedMesh(geometry, material, count);
+  mesh.userData.calibrationId = calibrationId;
+  registerMesh(mesh, '', '', 'calibration', true);
+  parent.add(mesh);
+  return mesh;
+}
+
+function registerExternalCalibrationGroup(group, config) {
+  group.name = config.label;
+  group.userData.calibrationId = config.id;
+  group.userData.label = config.label;
+  group.userData.count = config.count;
+  group.userData.note = config.note;
+  group.userData.config = JSON.parse(JSON.stringify(config));
+  group.userData.defaultTransform = {
+    position: group.position.toArray(),
+    rotation: [
+      THREE.MathUtils.radToDeg(group.rotation.x),
+      THREE.MathUtils.radToDeg(group.rotation.y),
+      THREE.MathUtils.radToDeg(group.rotation.z)
+    ],
+    scale: group.scale.toArray()
+  };
+  group.userData.defaultDimensions = null;
+  group.traverse((object) => {
+    if (!object.isMesh) return;
+    object.userData.calibrationId = config.id;
+  });
+  calibrationParts.set(config.id, group);
+  addCalibrationOption(group, config.id);
+  restoreCalibrationPartFromStorage(group, config.id);
+  updateCalibrationPartVisibility(calibrationEnabled ? 'all' : 'external');
 }
 
 function addCameraRow(group, calibrationId, count, direction) {
@@ -896,7 +955,7 @@ function addValveRow(group, calibrationId, count) {
         calibrationMaterials.valveNozzle,
         calibrationId
       );
-      port.position.set(-0.024 + portIndex * 0.016, 0.178, 0.042);
+      port.position.set(-0.024 + portIndex * 0.016, 0.176, 0);
       port.userData.name = `电磁阀${index + 1}号·喷孔${portIndex + 1}`;
       port.userData.detail = `第${index + 1}个电磁阀对应的第${portIndex + 1}个喷孔；整排共${count * 4}孔。`;
     }
@@ -923,14 +982,18 @@ function flowChannelPathPoints(dimensions) {
   // 主通道组整体比例为0.85；局部延伸0.15/0.85后，当前整机中的实际前伸量为150毫米。
   const outletExtension = 0.15 / 0.85;
   return [
-    new THREE.Vector3(0, -height * 0.50, -offset * 0.50),
-    new THREE.Vector3(0, -height * 0.30, -offset * 0.34),
-    new THREE.Vector3(0, -height * 0.06, -offset * 0.13),
-    new THREE.Vector3(0, height * 0.22, 0),
-    new THREE.Vector3(0, height * 0.38, 0),
-    new THREE.Vector3(0, height * 0.47, offset * 0.10),
-    new THREE.Vector3(0, height * 0.50, offset * 0.28),
-    new THREE.Vector3(0, height * 0.50, offset * 0.50 + outletExtension)
+    // 以弯头连接点为固定点；前六点保持同一直线，使斜段与水平出口的内夹角为110°。
+    new THREE.Vector3(0, -height * 0.24, -offset * 0.807462),
+    new THREE.Vector3(0, -height * 0.08, -offset * 0.629521),
+    new THREE.Vector3(0, height * 0.08, -offset * 0.45158),
+    new THREE.Vector3(0, height * 0.24, -offset * 0.273639),
+    new THREE.Vector3(0, height * 0.40, -offset * 0.095698),
+    new THREE.Vector3(0, height * 0.54, offset * 0.06),
+    // 到箭头头部高度才进入圆滑弯头，最后三点等高形成稳定的水平出口。
+    new THREE.Vector3(0, height * 0.64, offset * 0.19),
+    new THREE.Vector3(0, height * 0.67, offset * 0.34),
+    new THREE.Vector3(0, height * 0.67, offset * 0.46),
+    new THREE.Vector3(0, height * 0.67, offset * 0.50 + outletExtension)
   ];
 }
 
@@ -939,13 +1002,21 @@ function buildParametricCalibrationPart(group) {
   const dimensions = config.dimensions;
   clearCalibrationChildren(group);
   if (config.kind === 'mirror-single') {
-    const mirror = addCalibrationMesh(
+    const mirrorBack = addCalibrationMesh(
       group,
       new THREE.BoxGeometry(dimensions.length - 0.025, Math.max(0.006, dimensions.height), dimensions.depth - 0.018),
+      calibrationMaterials.componentBack,
+      config.id
+    );
+    mirrorBack.userData.name = `${config.label}灰色背面`;
+    const mirrorFace = addCalibrationMesh(
+      group,
+      new THREE.BoxGeometry(dimensions.length - 0.030, 0.0015, dimensions.depth - 0.022),
       calibrationMaterials.mirror,
       config.id
     );
-    mirror.userData.name = config.label;
+    mirrorFace.position.y = Math.max(0.006, dimensions.height) / 2 + 0.00075;
+    mirrorFace.userData.name = `${config.label}镜面正面`;
     const frameThickness = Math.min(0.018, dimensions.depth * 0.12);
     const frameParts = [
       [[dimensions.length, frameThickness, frameThickness], [0, 0, dimensions.depth / 2 - frameThickness / 2]],
@@ -1031,6 +1102,54 @@ function buildParametricCalibrationPart(group) {
       fin.userData.name = config.label;
     }
   }
+  if (config.kind === 'lamp-board') {
+    const length = dimensions.length;
+    const height = dimensions.height;
+    const depth = dimensions.depth;
+    const ledDepth = Math.max(0.002, dimensions.thickness);
+    const panelBack = addCalibrationMesh(
+      group,
+      new RoundedBoxGeometry(length, height, depth, 3, Math.min(0.008, height * 0.22, depth * 0.45)),
+      calibrationMaterials.componentBack,
+      config.id
+    );
+    panelBack.userData.name = `${config.label}灰色背板`;
+    const frontDepth = Math.min(0.0015, depth * 0.18);
+    const panelFace = addCalibrationMesh(
+      group,
+      new THREE.BoxGeometry(length * 0.985, height * 0.84, frontDepth),
+      calibrationMaterials.lampPanel,
+      config.id
+    );
+    panelFace.position.z = depth / 2 + frontDepth / 2;
+    panelFace.userData.name = `${config.label}发光正面`;
+
+    const rows = config.rows || ['purple'];
+    const spacing = 0.01;
+    const margin = 0.015;
+    const ledCount = Math.max(2, Math.floor((length - margin * 2) / spacing) + 1);
+    const firstX = -((ledCount - 1) * spacing) / 2;
+    const ledSize = Math.min(0.006, height * (rows.length > 1 ? 0.28 : 0.46));
+    const rowGap = rows.length > 1 ? Math.min(height * 0.24, 0.014) : 0;
+    const matrix = new THREE.Matrix4();
+
+    rows.forEach((row, rowIndex) => {
+      const leds = addCalibrationInstances(
+        group,
+        new THREE.BoxGeometry(ledSize, ledSize, ledDepth),
+        row === 'white' ? calibrationMaterials.lampWhite : calibrationMaterials.lampPurple,
+        config.id,
+        ledCount
+      );
+      const rowY = rows.length > 1 ? (rowIndex === 0 ? rowGap : -rowGap) : 0;
+      for (let index = 0; index < ledCount; index += 1) {
+        matrix.makeTranslation(firstX + index * spacing, rowY, depth / 2 + ledDepth / 2);
+        leds.setMatrixAt(index, matrix);
+      }
+      leds.instanceMatrix.needsUpdate = true;
+      leds.userData.name = `${config.label}${row === 'white' ? '白光LED排' : '淡紫光LED排'}`;
+    });
+  }
   if (config.kind === 'flow-channel') {
     const width = dimensions.length;
     const depth = dimensions.depth;
@@ -1087,40 +1206,6 @@ function buildParametricCalibrationPart(group) {
     channelSurfaces.push(leftRail, rightRail);
     channelSurfaces.forEach((part) => { part.userData.detail = '主通道主体为白色铁质风道，上方出口向前延伸150毫米；前后相机对射处设置上下各70毫米的透明玻璃检测窗。'; });
   }
-  if (config.kind === 'reject-volute') {
-    const length = dimensions.length;
-    const height = dimensions.height;
-    const depth = dimensions.depth;
-    const drop = dimensions.drop;
-    const wall = Math.min(dimensions.thickness, depth / 4, length / 24);
-    const shell = addCalibrationMesh(group, voluteGeometry(length), calibrationMaterials.rejectVolute, config.id);
-    shell.scale.set(1, height / 0.47, depth / 0.58);
-    shell.userData.name = config.label;
-
-    const throatDepth = Math.max(0.07, depth * 0.34);
-    const throatY = -height / 2 - drop / 2 + wall;
-    const throatParts = [
-      [[length, drop, wall], [0, throatY, throatDepth / 2 - wall / 2]],
-      [[length, drop, wall], [0, throatY, -throatDepth / 2 + wall / 2]],
-      [[wall, drop, throatDepth], [-length / 2 + wall / 2, throatY, 0]],
-      [[wall, drop, throatDepth], [length / 2 - wall / 2, throatY, 0]]
-    ];
-    throatParts.forEach(([size, position]) => {
-      const panel = addCalibrationMesh(group, new THREE.BoxGeometry(...size), calibrationMaterials.rejectVolute, config.id);
-      panel.position.set(...position);
-      panel.userData.name = `${config.label}入口`;
-    });
-
-    const fanStub = addCalibrationMesh(
-      group,
-      new THREE.CylinderGeometry(height * 0.18, height * 0.18, Math.max(0.14, depth * 0.55), 24),
-      calibrationMaterials.rejectVolute,
-      config.id
-    );
-    fanStub.rotation.z = Math.PI / 2;
-    fanStub.position.set(length / 2 + Math.max(0.07, depth * 0.25), height * 0.04, 0);
-    fanStub.userData.name = `${config.label}风机接口`;
-  }
 }
 
 function createCalibrationPart(config) {
@@ -1144,7 +1229,7 @@ function createCalibrationPart(config) {
 
   if (config.kind === 'camera-row') addCameraRow(group, config.id, config.count, config.direction);
   if (config.kind === 'compute-row') addComputeRow(group, config.id, config.count);
-  if (['mirror-single', 'cover', 'heatsink', 'flow-channel', 'reject-volute'].includes(config.kind)) buildParametricCalibrationPart(group);
+  if (['mirror-single', 'cover', 'heatsink', 'lamp-board', 'flow-channel'].includes(config.kind)) buildParametricCalibrationPart(group);
   if (config.kind === 'valve-row') addValveRow(group, config.id, config.count);
 
   calibrationLayer.add(group);
@@ -1155,65 +1240,69 @@ function createCalibrationPart(config) {
 [
   {
     id: 'front-cameras', label: '前视相机组（8台）', count: 8, kind: 'camera-row', direction: 'rear',
-    position: [0.013688, 2.424479, 0.167221], rotation: [0, 0, 0], scale: [0.8617110902523837, 0.8617110902523837, 0.8617110902523837], note: '机器前方低位舱内，直接朝向检测通道。'
+    position: [-0.0381176525108761, 2.584748643053573, 0.16679359654620318], rotation: [6, 0, 0], scale: [0.8617110902523837, 0.8617110902523837, 0.8617110902523837], note: '机器前方低位舱内，直接朝向检测通道。'
   },
   {
     id: 'rear-cameras', label: '后视相机组（8台）', count: 8, kind: 'camera-row', direction: 'down',
-    position: [0.008002, 2.929415, -0.810111], rotation: [0, 0, 0], scale: [0.85, 0.85, 0.85], note: '机器背方高位舱内，镜头朝下，通过反光镜观察通道。'
+    position: [-0.027650401769502255, 3.2854285017619684, -0.8649206308317869], rotation: [0, 0, 0], scale: [0.85, 0.85, 0.85], note: '机器背方高位舱内，镜头朝下，通过反光镜观察通道。'
   },
   {
     id: 'magic-cameras', label: '精灵眼相机组（4台）', count: 4, kind: 'camera-row', direction: 'down',
-    position: [-0.003608207736811635, 2.330293455648308, -0.8887049395669343], rotation: [0, 0, 0], scale: [1, 1, 1], note: '精灵眼罩壳上部；1—2号接通道9，3—4号接通道10。'
+    position: [-0.020258380036813087, 2.5687464148206853, -0.931037815400405], rotation: [0, 0, 0], scale: [1, 1, 1], note: '精灵眼罩壳上部；1—2号接通道9，3—4号接通道10。'
   },
   {
     id: 'compute-boxes', label: '算力盒子组（10个）', count: 10, kind: 'compute-row',
-    position: [-0.046239, 2.034573, -1.117372], rotation: [0, 0, 0], scale: [0.774307, 0.774307, 0.774307], note: '精灵眼罩壳下部，横向排列。'
+    position: [-0.005878268014597491, 2.2357131959323113, -1.1885237207551664], rotation: [0, 0, 0], scale: [0.774307, 0.774307, 0.774307], note: '精灵眼罩壳下部，横向排列。'
   },
   {
     id: 'mirrors', label: '反光镜1', count: 1, kind: 'mirror-single',
-    dimensions: { length: 2.00, height: 0.01, depth: 0.14 },
-    position: [0.004074, 2.558265, -0.829302], rotation: [42, 0, 0], scale: [0.9, 0.9, 0.9], note: '单根反光镜，可复制、位移、旋转和缩放。保留原反光镜组的已校准中心位置。'
+    dimensions: { length: 2.06, height: 0.01, depth: 0.14 },
+    position: [-0.04374060133993681, 2.8245030662672286, -0.866733369020622], rotation: [42, 0, 0], scale: [0.9, 0.9, 0.9], note: '单根反光镜，可复制、位移、旋转和缩放。保留原反光镜组的已校准中心位置。'
   },
   {
     id: 'valves', label: '电磁阀组（32个）', count: 32, kind: 'valve-row',
-    position: [-0.031286, 2.878776, -0.515353], rotation: [90.81208, -0.171593, 0.285773], scale: [0.827251, 0.577727, 0.577727], note: '主检测区域上方的32位喷射排。'
+    position: [-0.01, 3.144103704944298, -0.6565423055022137], rotation: [90.81208, -0.171593, 0.285773], scale: [0.89, 0.89, 0.89], note: '主检测区域上方的32位喷射排。'
   },
   {
     id: 'flow-channel-1', label: '连续棉流主通道（1600×70）', count: 1, kind: 'flow-channel',
-    dimensions: { length: 2.33, height: 2.05, depth: 0.27, thickness: 0.012, offset: 0.72 },
-    position: [-0.04408803968526252, 2.5782623922476064, -0.38111494470446605], rotation: [0, 0, 0], scale: [0.85, 0.85, 0.85],
+    dimensions: { length: 2.46, height: 2.20, depth: 0.22, thickness: 0.012, offset: 0.72 },
+    position: [-0.01, 2.80132326981508, -0.39656706385206403], rotation: [0, 0, 0], scale: [0.85, 0.85, 0.85],
     note: '连续空心白色铁质主通道：下方斜入、贯穿检测区，上方出口向前延伸150毫米；前后相机对射位置分别设置上下各70毫米的透明玻璃检测窗。'
   },
   {
-    id: 'reject-volute-1', label: '排杂漩涡风道＋风机接口', count: 1, kind: 'reject-volute',
-    dimensions: { length: 1.62, height: 0.42, depth: 0.36, thickness: 0.018, drop: 0.22 },
-    position: [-0.06991307341462512, 2.8568308115714007, 0.13062473737787755], rotation: [90, 0, 0], scale: [1.1844425599368247, 0.8680448176009804, 0.8680448176009804],
-    note: '独立排杂支路草模：入口贴近32位喷阀后的异物出口，进入紧凑蜗壳后由右端风机接口抽走；不承担正常棉流输送。'
-  },
-  {
     id: 'cover-1', label: '罩壳1', count: 1, kind: 'cover',
-    dimensions: { length: 1.64, height: 0.24, depth: 0.02, thickness: 0.015 },
-    position: [-0.019831424666720946, 2.388879635895407, 0.30033862543684176], rotation: [0, 0, 0], scale: [1, 1, 1], note: '带10颗螺丝和JWF0019型号字样的正面薄壁罩壳，可调整尺寸、位置和旋转。'
+    dimensions: { length: 1.96, height: 0.24, depth: 0.02, thickness: 0.015 },
+    position: [-0.02005954417434063, 2.6124752384471663, 0.36122633103446933], rotation: [0, 0, 0], scale: [1, 1, 1], note: '带10颗螺丝和JWF0019型号字样的正面薄壁罩壳，可调整尺寸、位置和旋转。'
   },
   {
     id: 'heatsink-1', label: '散热片1', count: 1, kind: 'heatsink',
-    dimensions: { length: 1.34, height: 0.17, depth: 0.08, thickness: 0.018 },
-    position: [0.005711318451512161, 2.04222648449484, -1.18], rotation: [0, 0, 0], scale: [1, 1, 1], note: '银白色密集散热片，带底板和32条散热鳍片；正常模式下贴紧精灵眼外侧。'
+    dimensions: { length: 1.64, height: 0.17, depth: 0.08, thickness: 0.018 },
+    position: [-0.005699054919995963, 2.2493126605606597, -1.3047508808666584], rotation: [0, 0, 0], scale: [1, 1, 1], note: '银白色密集散热片，带底板和32条散热鳍片；正常模式下贴紧精灵眼外侧。'
+  },
+  {
+    id: 'lamp-board-dual-1', label: '双排白光＋淡紫光LED灯板', count: 1, kind: 'lamp-board', rows: ['white', 'purple'],
+    dimensions: { length: 1.60, height: 0.055, depth: 0.012, thickness: 0.004 },
+    position: [0, 2.72, -0.82], rotation: [0, 0, 0], scale: [1, 1, 1], note: '与检测通道等长的窄灯板；白光和淡紫光各一排，LED中心距约10毫米。'
+  },
+  {
+    id: 'lamp-board-purple-1', label: '单排紫光LED灯板', count: 1, kind: 'lamp-board', rows: ['purple'],
+    dimensions: { length: 1.60, height: 0.030, depth: 0.010, thickness: 0.004 },
+    position: [0, 2.50, -1.06], rotation: [0, 0, 0], scale: [1, 1, 1], note: '更窄的单排紫光灯板，LED中心距约10毫米。'
   },
   {
     id: 'mirror-single-1784558446608', label: '反光镜2', count: 1, kind: 'mirror-single', isDuplicate: true,
-    dimensions: { length: 2.00, height: 0.01, depth: 0.14 },
-    position: [-0.03620035075280398, 2.086802611912021, -0.8868139967877691], rotation: [42, 0, 0], scale: [0.9, 0.9, 0.9], note: '用户校准的第二根反光镜。'
+    dimensions: { length: 2.04, height: 0.01, depth: 0.14 },
+    position: [-0.041614977326378706, 2.3197060099466467, -0.938961786490567], rotation: [42, 0, 0], scale: [0.9, 0.9, 0.9], note: '用户校准的第二根反光镜。'
   },
   {
     id: 'mirror-single-1784558638431', label: '反光镜3', count: 1, kind: 'mirror-single', isDuplicate: true,
-    dimensions: { length: 2.00, height: 0.01, depth: 0.14 },
-    position: [-0.01130177222562116, 2.223756485264831, -0.7638272783465556], rotation: [-207, 0, 0], scale: [0.9, 0.9, 0.9], note: '用户校准的第三根反光镜。'
+    dimensions: { length: 2.04, height: 0.01, depth: 0.14 },
+    position: [-0.04, 2.490198234753521, -0.76994431374349], rotation: [150, 0, 0], scale: [0.9, 0.9, 0.9], note: '用户校准的第三根反光镜。'
   },
   {
     id: 'cover-1784559273935', label: '罩壳2', count: 1, kind: 'cover', isDuplicate: true,
-    dimensions: { length: 1.75, height: 0.30, depth: 0.02, thickness: 0.015 },
-    position: [0, 2.92, -0.9838928401126742], rotation: [180, 0, 0], scale: [1, 1, 1], note: '用户校准的第二块可拆罩壳。'
+    dimensions: { length: 1.79, height: 0.39, depth: 0.02, thickness: 0.015 },
+    position: [-0.05, 3.12, -1.05293427963854], rotation: [180, 0, 0], scale: [1, 1, 1], note: '用户校准的第二块可拆罩壳。'
   }
 ].forEach(createCalibrationPart);
 
@@ -1229,6 +1318,199 @@ const calibrationReset = document.querySelector('#calibration-reset');
 const calibrationDuplicate = document.querySelector('#calibration-duplicate');
 const calibrationDelete = document.querySelector('#calibration-delete');
 
+function geometryVertexIndex(geometry, faceIndex, corner) {
+  return geometry.index
+    ? geometry.index.getX(faceIndex * 3 + corner)
+    : faceIndex * 3 + corner;
+}
+
+function shellSurfaceTopology(mesh) {
+  const geometry = mesh?.geometry;
+  if (!geometry?.attributes?.position) return null;
+  const cached = shellSurfaceTopologyCache.get(geometry);
+  if (cached) return cached;
+
+  geometry.computeBoundingBox();
+  const diagonal = geometry.boundingBox.getSize(new THREE.Vector3()).length() || 1;
+  const quantize = diagonal * 0.00002;
+  const position = geometry.attributes.position;
+  const faceCount = Math.floor((geometry.index ? geometry.index.count : position.count) / 3);
+  const normals = Array.from({ length: faceCount }, () => new THREE.Vector3());
+  const planes = Array.from({ length: faceCount }, () => new THREE.Vector3());
+  const adjacency = Array.from({ length: faceCount }, () => []);
+  const edgeFaces = new Map();
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  const c = new THREE.Vector3();
+  const ab = new THREE.Vector3();
+  const ac = new THREE.Vector3();
+  const keyFor = (vertex) => [
+    Math.round(vertex.x / quantize),
+    Math.round(vertex.y / quantize),
+    Math.round(vertex.z / quantize)
+  ].join(',');
+
+  for (let face = 0; face < faceCount; face += 1) {
+    a.fromBufferAttribute(position, geometryVertexIndex(geometry, face, 0));
+    b.fromBufferAttribute(position, geometryVertexIndex(geometry, face, 1));
+    c.fromBufferAttribute(position, geometryVertexIndex(geometry, face, 2));
+    normals[face].crossVectors(ab.subVectors(b, a), ac.subVectors(c, a)).normalize();
+    planes[face].copy(a);
+    const keys = [keyFor(a), keyFor(b), keyFor(c)];
+    [[0, 1], [1, 2], [2, 0]].forEach(([start, end]) => {
+      const edgeKey = keys[start] < keys[end]
+        ? `${keys[start]}|${keys[end]}`
+        : `${keys[end]}|${keys[start]}`;
+      if (!edgeFaces.has(edgeKey)) edgeFaces.set(edgeKey, []);
+      edgeFaces.get(edgeKey).push(face);
+    });
+  }
+
+  edgeFaces.forEach((faces) => {
+    if (faces.length < 2) return;
+    faces.forEach((face) => {
+      faces.forEach((other) => {
+        if (other !== face && !adjacency[face].includes(other)) adjacency[face].push(other);
+      });
+    });
+  });
+
+  const topology = { geometry, diagonal, faceCount, normals, planes, adjacency };
+  shellSurfaceTopologyCache.set(geometry, topology);
+  return topology;
+}
+
+function selectCoplanarShellFaces(mesh, seedFaceIndex) {
+  const topology = shellSurfaceTopology(mesh);
+  if (!topology || !Number.isInteger(seedFaceIndex) || seedFaceIndex < 0 || seedFaceIndex >= topology.faceCount) return [];
+  const seedNormal = topology.normals[seedFaceIndex];
+  const seedPoint = topology.planes[seedFaceIndex];
+  const normalThreshold = Math.cos(THREE.MathUtils.degToRad(9));
+  const planeTolerance = topology.diagonal * 0.006;
+  const selected = [];
+  const visited = new Uint8Array(topology.faceCount);
+  const queue = [seedFaceIndex];
+  visited[seedFaceIndex] = 1;
+  const position = topology.geometry.attributes.position;
+  const vertex = new THREE.Vector3();
+
+  while (queue.length) {
+    const face = queue.shift();
+    if (topology.normals[face].dot(seedNormal) < normalThreshold) continue;
+    let coplanar = true;
+    for (let corner = 0; corner < 3; corner += 1) {
+      vertex.fromBufferAttribute(position, geometryVertexIndex(topology.geometry, face, corner));
+      if (Math.abs(vertex.clone().sub(seedPoint).dot(seedNormal)) > planeTolerance) {
+        coplanar = false;
+        break;
+      }
+    }
+    if (!coplanar) continue;
+    selected.push(face);
+    topology.adjacency[face].forEach((next) => {
+      if (visited[next]) return;
+      visited[next] = 1;
+      queue.push(next);
+    });
+  }
+  return selected.sort((left, right) => left - right);
+}
+
+function shellSurfaceKey(mesh, faceIndices) {
+  return `${mesh.userData.shellColorId || mesh.name || '主体'}:${faceIndices[0] ?? -1}`;
+}
+
+function buildShellSurfaceOverlay(mesh, faceIndices, color) {
+  if (!mesh?.geometry || !faceIndices.length) return null;
+  const source = mesh.geometry;
+  const sourcePosition = source.attributes.position;
+  const sourceNormal = source.attributes.normal;
+  const positions = [];
+  const normals = [];
+  faceIndices.forEach((face) => {
+    for (let corner = 0; corner < 3; corner += 1) {
+      const vertexIndex = geometryVertexIndex(source, face, corner);
+      positions.push(
+        sourcePosition.getX(vertexIndex),
+        sourcePosition.getY(vertexIndex),
+        sourcePosition.getZ(vertexIndex)
+      );
+      if (sourceNormal) {
+        normals.push(
+          sourceNormal.getX(vertexIndex),
+          sourceNormal.getY(vertexIndex),
+          sourceNormal.getZ(vertexIndex)
+        );
+      }
+    }
+  });
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  if (normals.length) geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  else geometry.computeVertexNormals();
+  const material = new THREE.MeshStandardMaterial({
+    color,
+    roughness: 0.48,
+    metalness: 0.12,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2,
+    side: THREE.DoubleSide
+  });
+  const overlay = new THREE.Mesh(geometry, material);
+  overlay.name = '主体GLB所选面填色';
+  overlay.userData.shellSurfacePaintOverlay = true;
+  overlay.userData.baseMaterial = material;
+  overlay.userData.role = 'decal';
+  overlay.renderOrder = 20;
+  mesh.add(overlay);
+  return overlay;
+}
+
+function applyShellSurfaceColor(mesh, seedFaceIndex, color, record = true) {
+  if (!mesh || !Number.isInteger(seedFaceIndex) || !/^#[0-9a-f]{6}$/i.test(color)) return 0;
+  const faceIndices = selectCoplanarShellFaces(mesh, seedFaceIndex);
+  if (!faceIndices.length) return 0;
+  const surfaceKey = shellSurfaceKey(mesh, faceIndices);
+  const previousIndex = shellSurfacePaints.findIndex((item) => item.surfaceKey === surfaceKey);
+  if (previousIndex >= 0) {
+    shellSurfacePaints[previousIndex].overlay?.removeFromParent();
+    shellSurfacePaints[previousIndex].overlay?.geometry?.dispose();
+    shellSurfacePaints[previousIndex].overlay?.material?.dispose();
+    shellSurfacePaints.splice(previousIndex, 1);
+  }
+  const overlay = buildShellSurfaceOverlay(mesh, faceIndices, color);
+  if (!overlay) return 0;
+  shellSurfacePaints.push({
+    meshId: mesh.userData.shellColorId,
+    seedFaceIndex,
+    surfaceKey,
+    color: color.toLowerCase(),
+    overlay
+  });
+  if (record) persistCalibrationLayout();
+  return faceIndices.length;
+}
+
+function restoreShellSurfacePaints() {
+  try {
+    shellSurfacePaints = [];
+    fixedShellSurfacePaints.forEach((record) => {
+      let mesh = null;
+      importedRootModel?.traverse((object) => {
+        if (!mesh && object.isMesh && object.userData.shellColorId === record.meshId) mesh = object;
+      });
+      mesh ||= importedRootModel?.getObjectByProperty('isMesh', true);
+      if (mesh && Number.isInteger(record.seedFaceIndex) && /^#[0-9a-f]{6}$/i.test(record.color)) {
+        applyShellSurfaceColor(mesh, record.seedFaceIndex, record.color, false);
+      }
+    });
+  } catch (error) {
+    shellSurfacePaints = [];
+    console.warn('主体GLB固定表面颜色恢复失败，已使用原始外观', error);
+  }
+}
+
 function addCalibrationOption(part, id) {
   if (calibrationPartSelect.querySelector(`option[value="${id}"]`)) return;
   const option = document.createElement('option');
@@ -1237,12 +1519,18 @@ function addCalibrationOption(part, id) {
   calibrationPartSelect.appendChild(option);
 }
 calibrationParts.forEach(addCalibrationOption);
+const retiredCalibrationIds = new Set(['reject-volute-1', 'operator-screen', 'electrical-cabinet']);
 
 function serializeCalibrationLayout() {
   return {
     model: 'JWF0019A',
-    version: 5,
+    version: 8,
     coordinateSystem: { x: '左右，正数向右', y: '上下，正数向上', z: '前后，正数向前' },
+    shellSurfacePaints: shellSurfacePaints.map((record) => ({
+      meshId: record.meshId,
+      seedFaceIndex: record.seedFaceIndex,
+      color: record.color
+    })),
     parts: [...calibrationParts.entries()].map(([id, part]) => ({
       id,
       name: part.userData.label,
@@ -1267,45 +1555,151 @@ function persistCalibrationLayout(showStatus = false) {
   if (showStatus) calibrationStatus.textContent = '位置已保存';
 }
 
+function applySavedCalibrationItem(part, item) {
+  if (item.dimensions && part.userData.config.dimensions) {
+    part.userData.config.dimensions = { ...item.dimensions };
+    buildParametricCalibrationPart(part);
+  }
+  part.position.set(item.position.x, item.position.y, item.position.z);
+  part.rotation.set(
+    THREE.MathUtils.degToRad(item.rotationDegrees.x),
+    THREE.MathUtils.degToRad(item.rotationDegrees.y),
+    THREE.MathUtils.degToRad(item.rotationDegrees.z)
+  );
+  part.scale.set(item.scale.x, item.scale.y, item.scale.z);
+}
+
+function restoreCalibrationPartFromStorage(part, id) {
+  if (retiredCalibrationIds.has(id)) return;
+  try {
+    const saved = JSON.parse(localStorage.getItem(calibrationStorageKey) || 'null');
+    const item = saved?.parts?.find((entry) => entry.id === id);
+    if (item) applySavedCalibrationItem(part, item);
+  } catch (error) {
+    console.warn(`${part.userData.label}布局记录读取失败，已使用初始位置`, error);
+  }
+}
+
 function restoreCalibrationLayout() {
   try {
     const saved = JSON.parse(localStorage.getItem(calibrationStorageKey) || 'null');
     saved?.parts?.forEach((item) => {
+      if (retiredCalibrationIds.has(item.id)) return;
       let part = calibrationParts.get(item.id);
-      if (!part && item.config) {
+      if (!part && item.config && item.config.kind !== 'external-control') {
         part = createCalibrationPart(item.config);
         addCalibrationOption(part, item.id);
       }
       if (!part) return;
-      if (item.dimensions && part.userData.config.dimensions) {
-        part.userData.config.dimensions = { ...item.dimensions };
-        buildParametricCalibrationPart(part);
-      }
-      part.position.set(item.position.x, item.position.y, item.position.z);
-      part.rotation.set(
-        THREE.MathUtils.degToRad(item.rotationDegrees.x),
-        THREE.MathUtils.degToRad(item.rotationDegrees.y),
-        THREE.MathUtils.degToRad(item.rotationDegrees.z)
-      );
-      part.scale.set(item.scale.x, item.scale.y, item.scale.z);
+      applySavedCalibrationItem(part, item);
     });
   } catch (error) {
     console.warn('内部布局记录读取失败，已使用初始位置', error);
   }
 }
 restoreCalibrationLayout();
-const heatsinkPositionMigrationKey = 'jwf0019a-heatsink-tight-v1';
+const layout9MigrationKey = 'jwf0019a-layout9-final-v1';
+if (!localStorage.getItem(layout9MigrationKey)) {
+  const layout9Items = [
+    { id: 'front-cameras', position: { x: -0.0381176525108761, y: 2.584748643053573, z: 0.16679359654620318 }, rotationDegrees: { x: 6, y: 0, z: 0 }, scale: { x: 0.8617110902523837, y: 0.8617110902523837, z: 0.8617110902523837 } },
+    { id: 'rear-cameras', position: { x: -0.027650401769502255, y: 3.2854285017619684, z: -0.8649206308317869 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 0.85, y: 0.85, z: 0.85 } },
+    { id: 'magic-cameras', position: { x: -0.020258380036813087, y: 2.5687464148206853, z: -0.931037815400405 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'compute-boxes', position: { x: -0.005878268014597491, y: 2.2357131959323113, z: -1.1885237207551664 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 0.774307, y: 0.774307, z: 0.774307 } },
+    { id: 'mirrors', dimensions: { length: 2.06, height: 0.01, depth: 0.14 }, position: { x: -0.04374060133993681, y: 2.8245030662672286, z: -0.866733369020622 }, rotationDegrees: { x: 42, y: 0, z: 0 }, scale: { x: 0.9, y: 0.9, z: 0.9 } },
+    { id: 'valves', position: { x: -0.01, y: 3.144103704944298, z: -0.6565423055022137 }, rotationDegrees: { x: 100, y: 0, z: 0 }, scale: { x: 0.89, y: 0.89, z: 0.89 } },
+    { id: 'flow-channel-1', dimensions: { length: 2.46, height: 2.2, depth: 0.22, thickness: 0.012, offset: 0.72 }, position: { x: -0.01, y: 2.80132326981508, z: -0.39656706385206403 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 0.85, y: 0.85, z: 0.85 } },
+    { id: 'cover-1', dimensions: { length: 1.96, height: 0.24, depth: 0.02, thickness: 0.015 }, position: { x: -0.02005954417434063, y: 2.6124752384471663, z: 0.36122633103446933 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'heatsink-1', dimensions: { length: 1.64, height: 0.17, depth: 0.08, thickness: 0.018 }, position: { x: -0.005699054919995963, y: 2.2493126605606597, z: -1.3047508808666584 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'lamp-board-dual-1', dimensions: { length: 2, height: 0.055, depth: 0.012, thickness: 0.004 }, position: { x: -0.010246147582078485, y: 2.896272925018304, z: -0.6087336762295686 }, rotationDegrees: { x: 60, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'lamp-board-purple-1', dimensions: { length: 2, height: 0.05, depth: 0.01, thickness: 0.004 }, position: { x: -0.0001946733735222816, y: 2.4905258957984535, z: -0.6730703713871884 }, rotationDegrees: { x: 60, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'mirror-single-1784558446608', dimensions: { length: 1.96, height: 0.01, depth: 0.14 }, position: { x: -0.01, y: 2.3197060099466467, z: -0.938961786490567 }, rotationDegrees: { x: 42, y: 0, z: 0 }, scale: { x: 0.9, y: 0.9, z: 0.9 } },
+    { id: 'mirror-single-1784558638431', dimensions: { length: 1.96, height: 0.01, depth: 0.14 }, position: { x: -0.01, y: 2.490198234753521, z: -0.76994431374349 }, rotationDegrees: { x: 150, y: 0, z: 0 }, scale: { x: 0.9, y: 0.9, z: 0.9 } },
+    { id: 'cover-1784559273935', dimensions: { length: 1.79, height: 0.39, depth: 0.02, thickness: 0.015 }, position: { x: -0.05, y: 3.12, z: -1.05293427963854 }, rotationDegrees: { x: 180, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    {
+      id: 'lamp-board-1784821673222',
+      config: { id: 'lamp-board-1784821673222', label: '双排白光＋淡紫光LED灯板副本1', count: 1, kind: 'lamp-board', rows: ['white', 'purple'], dimensions: { length: 2, height: 0.055, depth: 0.012, thickness: 0.004 }, position: [0.10975385241792152, 2.976272925018304, -0.48873367622956865], rotation: [60, 0, 0], scale: [1, 1, 1], note: '与检测通道等长的窄灯板；白光和淡紫光各一排，LED中心距约10毫米。', isDuplicate: true, copyBaseLabel: '双排白光＋淡紫光LED灯板' },
+      dimensions: { length: 2, height: 0.055, depth: 0.012, thickness: 0.004 }, position: { x: -0.02073957754626196, y: 2.7258914909623306, z: -0.6227657946870061 }, rotationDegrees: { x: -40, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 }
+    },
+    {
+      id: 'lamp-board-1784821729871',
+      config: { id: 'lamp-board-1784821729871', label: '双排白光＋淡紫光LED灯板副本2', count: 1, kind: 'lamp-board', rows: ['white', 'purple'], dimensions: { length: 2, height: 0.055, depth: 0.012, thickness: 0.004 }, position: [0.09926042245373803, 2.8058914909623307, -0.5027657946870061], rotation: [-40, 0, 0], scale: [1, 1, 1], note: '与检测通道等长的窄灯板；白光和淡紫光各一排，LED中心距约10毫米。', isDuplicate: true, copyBaseLabel: '双排白光＋淡紫光LED灯板' },
+      dimensions: { length: 2, height: 0.055, depth: 0.012, thickness: 0.004 }, position: { x: -0.007993791484923116, y: 2.788770040336861, z: -0.2987121871765246 }, rotationDegrees: { x: 150, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 }
+    },
+    {
+      id: 'lamp-board-1784821735355',
+      config: { id: 'lamp-board-1784821735355', label: '双排白光＋淡紫光LED灯板副本3', count: 1, kind: 'lamp-board', rows: ['white', 'purple'], dimensions: { length: 2, height: 0.055, depth: 0.012, thickness: 0.004 }, position: [0.2190126794611173, 2.8738346653217612, -0.1606009785824839], rotation: [-40, 0, 0], scale: [1, 1, 1], note: '与检测通道等长的窄灯板；白光和淡紫光各一排，LED中心距约10毫米。', isDuplicate: true, copyBaseLabel: '双排白光＋淡紫光LED灯板' },
+      dimensions: { length: 2, height: 0.055, depth: 0.012, thickness: 0.004 }, position: { x: 0.003344661041022795, y: 2.6334679935475065, z: -0.3167951237861724 }, rotationDegrees: { x: 240, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 }
+    }
+  ];
+  const layout9Ids = new Set(layout9Items.map((item) => item.id));
+  [...calibrationParts.entries()].forEach(([id, part]) => {
+    if (!part.userData.config.isDuplicate || layout9Ids.has(id)) return;
+    part.traverse((object) => {
+      const selectableIndex = selectable.indexOf(object);
+      if (selectableIndex >= 0) selectable.splice(selectableIndex, 1);
+    });
+    calibrationLayer.remove(part);
+    calibrationParts.delete(id);
+    calibrationPartSelect.querySelector(`option[value="${id}"]`)?.remove();
+  });
+  layout9Items.forEach((item) => {
+    let part = calibrationParts.get(item.id);
+    if (!part && item.config) {
+      part = createCalibrationPart(item.config);
+      addCalibrationOption(part, item.id);
+    }
+    if (part) applySavedCalibrationItem(part, item);
+  });
+  localStorage.setItem(layout9MigrationKey, '1');
+  persistCalibrationLayout();
+}
+const frontCameraX6MigrationKey = 'jwf0019a-front-camera-x6-v1';
+if (!localStorage.getItem(frontCameraX6MigrationKey)) {
+  const frontCameraPart = calibrationParts.get('front-cameras');
+  if (frontCameraPart) frontCameraPart.rotation.x = THREE.MathUtils.degToRad(6);
+  localStorage.setItem(frontCameraX6MigrationKey, '1');
+  persistCalibrationLayout();
+}
+const heatsinkPositionMigrationKey = 'jwf0019a-heatsink-tight-v2';
 if (!localStorage.getItem(heatsinkPositionMigrationKey)) {
   const heatsinkPart = calibrationParts.get('heatsink-1');
-  if (heatsinkPart) heatsinkPart.position.z = -1.18;
+  if (heatsinkPart) heatsinkPart.position.z = -1.3047508808666584;
   localStorage.setItem(heatsinkPositionMigrationKey, '1');
   persistCalibrationLayout();
 }
-const frontCoverPositionMigrationKey = 'jwf0019a-front-cover-up-v1';
+const frontCoverPositionMigrationKey = 'jwf0019a-front-cover-up-v2';
 if (!localStorage.getItem(frontCoverPositionMigrationKey)) {
   const frontCoverPart = calibrationParts.get('cover-1');
-  if (frontCoverPart) frontCoverPart.position.y = 2.388879635895407;
+  if (frontCoverPart) frontCoverPart.position.y = 2.6124752384471663;
   localStorage.setItem(frontCoverPositionMigrationKey, '1');
+  persistCalibrationLayout();
+}
+const layout10MigrationKey = 'jwf0019a-layout10-final-v1';
+if (!localStorage.getItem(layout10MigrationKey)) {
+  const layout10Items = [
+    { id: 'front-cameras', position: { x: -0.0381176525108761, y: 2.584748643053573, z: 0.16679359654620318 }, rotationDegrees: { x: 6.000000000000001, y: 0, z: 0 }, scale: { x: 0.8617110902523837, y: 0.8617110902523837, z: 0.8617110902523837 } },
+    { id: 'rear-cameras', position: { x: -0.027650401769502255, y: 3.2854285017619684, z: -0.8649206308317869 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 0.85, y: 0.85, z: 0.85 } },
+    { id: 'magic-cameras', position: { x: -0.02035834257418426, y: 2.5639864882983665, z: -1.012816249371657 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'compute-boxes', position: { x: -0.005878268014597491, y: 2.2357131959323113, z: -1.1885237207551664 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 0.774307, y: 0.774307, z: 0.774307 } },
+    { id: 'mirrors', dimensions: { length: 2.06, height: 0.01, depth: 0.14 }, position: { x: -0.04374060133993681, y: 2.85, z: -0.866733369020622 }, rotationDegrees: { x: 42, y: 0, z: 0 }, scale: { x: 0.9, y: 0.9, z: 0.9 } },
+    { id: 'valves', position: { x: -0.009664791444459015, y: 3.160417187980539, z: -0.6786478890175238 }, rotationDegrees: { x: 112, y: 0, z: 0 }, scale: { x: 0.89, y: 0.89, z: 0.89 } },
+    { id: 'flow-channel-1', dimensions: { length: 2.46, height: 2.2, depth: 0.18, thickness: 0.012, offset: 0.72 }, position: { x: 0, y: 2.42, z: -0.38 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 0.85, y: 0.85, z: 0.85 } },
+    { id: 'cover-1', dimensions: { length: 1.96, height: 0.24, depth: 0.02, thickness: 0.015 }, position: { x: -0.02005954417434063, y: 2.6124752384471663, z: 0.36122633103446933 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'heatsink-1', dimensions: { length: 1.64, height: 0.17, depth: 0.08, thickness: 0.018 }, position: { x: -0.005699054919995963, y: 2.2493126605606597, z: -1.3047508808666584 }, rotationDegrees: { x: 0, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'lamp-board-dual-1', dimensions: { length: 2, height: 0.055, depth: 0.012, thickness: 0.004 }, position: { x: -0.010034790676388535, y: 2.8908172528975116, z: -0.6802913556026182 }, rotationDegrees: { x: 59.99999999999999, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'lamp-board-purple-1', dimensions: { length: 2, height: 0.05, depth: 0.01, thickness: 0.004 }, position: { x: 0.00015583230487511512, y: 2.507753803706803, z: -0.7873339023523009 }, rotationDegrees: { x: 59.99999999999999, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'mirror-single-1784558446608', dimensions: { length: 1.96, height: 0.01, depth: 0.14 }, position: { x: -0.010367736067942128, y: 2.3019106623249423, z: -1.0114554092206343 }, rotationDegrees: { x: 42, y: 0, z: 0 }, scale: { x: 0.9, y: 0.9, z: 0.9 } },
+    { id: 'mirror-single-1784558638431', dimensions: { length: 1.96, height: 0.01, depth: 0.14 }, position: { x: -0.010823729935340547, y: 2.4502867250531324, z: -0.9046411713993665 }, rotationDegrees: { x: 160, y: 0, z: 0 }, scale: { x: 0.9, y: 0.9, z: 0.9 } },
+    { id: 'cover-1784559273935', dimensions: { length: 1.79, height: 0.39, depth: 0.02, thickness: 0.015 }, position: { x: -0.05, y: 3.12, z: -1.05293427963854 }, rotationDegrees: { x: 180, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'lamp-board-1784821673222', dimensions: { length: 2, height: 0.055, depth: 0.012, thickness: 0.004 }, position: { x: -0.02044016364416529, y: 2.740538581143027, z: -0.729235979300345 }, rotationDegrees: { x: -40, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'lamp-board-1784821729871', dimensions: { length: 2, height: 0.055, depth: 0.012, thickness: 0.004 }, position: { x: -0.00742946553547958, y: 2.816420816577462, z: -0.4266984579496416 }, rotationDegrees: { x: 150, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+    { id: 'lamp-board-1784821735355', dimensions: { length: 2, height: 0.055, depth: 0.012, thickness: 0.004 }, position: { x: 0.004295192522338472, y: 2.680016845345684, z: -0.4722439060750575 }, rotationDegrees: { x: 239.99999999999997, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } }
+  ];
+  layout10Items.forEach((item) => {
+    const part = calibrationParts.get(item.id);
+    if (part) applySavedCalibrationItem(part, item);
+  });
+  localStorage.setItem(layout10MigrationKey, '1');
   persistCalibrationLayout();
 }
 
@@ -1325,11 +1719,14 @@ function trackCalibrationExplode(part, id) {
     'rear-cameras': [[0, 0.12, -1], 0.80, 0.25, 0.52],
     'magic-cameras': [[0, -0.10, -1], 0.95, 0.34, 0.60],
     'compute-boxes': [[0, -0.06, -1], 0.88, 0.38, 0.68],
+    'lamp-board-dual-1': [[0, 0, -1], 0.90, 0.28, 0.58],
+    'lamp-board-purple-1': [[0, -0.04, -1], 1.05, 0.32, 0.62],
     valves: [[0, 1, -0.20], 0.55, 0.58, 0.82],
-    'reject-volute-1': [[1, 0.05, 0.15], 0.75, 0.64, 0.88],
     'flow-channel-1': [[0, -1, 0], 0.28, 0.78, 1.00]
   };
-  const plan = plans[id] || (kind === 'mirror-single' ? [[0, 0.22, -1], 0.82, 0.48, 0.74] : null);
+  const plan = plans[id]
+    || (kind === 'mirror-single' ? [[0, 0.22, -1], 0.82, 0.48, 0.74] : null)
+    || (kind === 'lamp-board' ? [[0, 0, -1], 0.92, 0.30, 0.60] : null);
   if (plan) trackExplode(part, plan[0], plan[1], plan[2], plan[3]);
 }
 
@@ -1339,10 +1736,10 @@ function updateCalibrationPartVisibility(mode = 'external') {
   calibrationLayer.visible = true;
   calibrationParts.forEach((part, id) => {
     const kind = part.userData.config.kind;
-    const external = kind === 'cover' || kind === 'heatsink' || id === 'flow-channel-1';
-    const processDuct = id === 'flow-channel-1' || id === 'reject-volute-1';
+    const external = kind === 'cover' || kind === 'heatsink' || kind === 'external-control' || id === 'flow-channel-1';
+    const processDuct = id === 'flow-channel-1';
     const detectionPart = id === 'front-cameras' || id === 'rear-cameras' || id === 'mirrors';
-    const processPart = processDuct || detectionPart || id === 'valves';
+    const processPart = processDuct || detectionPart || id === 'valves' || kind === 'lamp-board';
     part.visible = mode === 'all'
       || external
       || (mode === 'process' && processPart)
@@ -1359,17 +1756,6 @@ function setExternalModulesGhosted(ghosted) {
       object.material = ghosted ? calibrationMaterials.coverGhost : object.userData.baseMaterial;
       object.renderOrder = ghosted ? 12 : 0;
     });
-  });
-}
-
-function setSignalTowerGhosted(ghosted) {
-  const signalTower = completeModel.getObjectByName('三色信号灯总成');
-  if (!signalTower) return;
-  signalTower.traverse((object) => {
-    if (!object.isMesh || !object.userData.baseMaterial) return;
-    object.material = ghosted ? modeMaterials.xrayShell : object.userData.baseMaterial;
-    object.renderOrder = ghosted ? 13 : 0;
-    object.castShadow = !ghosted;
   });
 }
 
@@ -1420,14 +1806,21 @@ function updateCalibrationFields() {
     input.disabled = !calibrationEnabled || !dimensions || !(key in dimensions);
     input.value = dimensions && key in dimensions ? Number(dimensions[key]).toFixed(3) : '';
   });
-  calibrationReset.disabled = !calibrationEnabled || !part;
-  calibrationDuplicate.disabled = !calibrationEnabled || !part || !['mirror-single', 'cover', 'heatsink'].includes(part.userData.config.kind);
+  calibrationDuplicate.disabled = !calibrationEnabled || !part || !['mirror-single', 'cover', 'heatsink', 'lamp-board'].includes(part.userData.config.kind);
   calibrationDelete.disabled = !calibrationEnabled || !part?.userData.config.isDuplicate;
+  calibrationTransformButtons.forEach((button) => { button.disabled = !calibrationEnabled || !part; });
+  calibrationReset.disabled = !calibrationEnabled || !part;
+  calibrationReset.textContent = '复位当前部件';
 }
 
 function selectCalibrationPart(id) {
   const part = calibrationParts.get(id);
   if (!part) return;
+  if (calibrationEnabled) {
+    applyMode('xray');
+    setFlowChannelGhosted(true);
+    setExternalModulesGhosted(true);
+  }
   selectedCalibrationPart = part;
   calibrationPartSelect.value = id;
   transformControls.attach(part);
@@ -1526,12 +1919,22 @@ calibrationExport.addEventListener('click', () => {
 calibrationDuplicate.addEventListener('click', () => {
   if (!selectedCalibrationPart) return;
   const sourceConfig = selectedCalibrationPart.userData.config;
-  if (!['mirror-single', 'cover', 'heatsink'].includes(sourceConfig.kind)) return;
+  if (!['mirror-single', 'cover', 'heatsink', 'lamp-board'].includes(sourceConfig.kind)) return;
   const sameKindCount = [...calibrationParts.values()].filter((part) => part.userData.config.kind === sourceConfig.kind).length;
   const config = JSON.parse(JSON.stringify(sourceConfig));
   config.id = `${sourceConfig.kind}-${Date.now()}`;
   config.isDuplicate = true;
-  config.label = `${sourceConfig.kind === 'mirror-single' ? '反光镜' : sourceConfig.kind === 'cover' ? '罩壳' : '散热片'}${sameKindCount + 1}`;
+  if (sourceConfig.kind === 'lamp-board') {
+    const baseLabel = sourceConfig.copyBaseLabel || sourceConfig.label;
+    const sameBaseCount = [...calibrationParts.values()].filter((part) => {
+      const partConfig = part.userData.config;
+      return partConfig.kind === 'lamp-board' && (partConfig.copyBaseLabel || partConfig.label) === baseLabel;
+    }).length;
+    config.copyBaseLabel = baseLabel;
+    config.label = `${baseLabel}副本${sameBaseCount}`;
+  } else {
+    config.label = `${sourceConfig.kind === 'mirror-single' ? '反光镜' : sourceConfig.kind === 'cover' ? '罩壳' : '散热片'}${sameKindCount + 1}`;
+  }
   config.position = [
     selectedCalibrationPart.position.x + 0.12,
     selectedCalibrationPart.position.y + 0.08,
@@ -2110,7 +2513,7 @@ function updateOpticalPathAnimation(time) {
   if (!opticalPathLayer.visible) return;
   opticalCameraMaterials.forEach(({ material }) => {
     material.color.copy(opticalBlue);
-    material.opacity = 0.11;
+    material.opacity = 0.075;
   });
   calibrationMaterials.cameraGlass.emissive.copy(opticalBlue);
   calibrationMaterials.cameraGlass.emissiveIntensity = 0.82;
@@ -2124,12 +2527,17 @@ function quadraticPoint(start, control, end, progress) {
 }
 
 function rejectRoutePoints(source) {
-  const part = calibrationParts.get('reject-volute-1');
-  const dimensions = part.userData.config.dimensions;
-  const localX = THREE.MathUtils.clamp((source.x - part.position.x) / Math.max(part.scale.x, 0.01), -dimensions.length * 0.45, dimensions.length * 0.45);
-  const inlet = partLocalPoint(part, new THREE.Vector3(localX, -dimensions.height / 2 - dimensions.drop + dimensions.thickness, 0));
-  const center = partLocalPoint(part, new THREE.Vector3(0, 0, 0));
-  const ductEnd = partLocalPoint(part, new THREE.Vector3(dimensions.length / 2 + Math.max(0.18, dimensions.depth * 0.55), dimensions.height * 0.04, 0));
+  // 可见排杂草模已移除；仅保留固定的动画路线锚点，避免影响现有喷射演示。
+  const dimensions = { length: 1.70, height: 0.42, depth: 0.36, thickness: 0.018, drop: 0.22 };
+  const anchorPosition = new THREE.Vector3(-0.03, 3.146863905652378, -0.050457074158259785);
+  const anchorScale = new THREE.Vector3(1.1844425599368247, 0.8680448176009804, 0.8680448176009804);
+  const anchorQuaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI / 2, 0, 0));
+  const anchorMatrix = new THREE.Matrix4().compose(anchorPosition, anchorQuaternion, anchorScale);
+  const routePoint = (localPoint) => localPoint.clone().applyMatrix4(anchorMatrix);
+  const localX = THREE.MathUtils.clamp((source.x - anchorPosition.x) / Math.max(anchorScale.x, 0.01), -dimensions.length * 0.45, dimensions.length * 0.45);
+  const inlet = routePoint(new THREE.Vector3(localX, -dimensions.height / 2 - dimensions.drop + dimensions.thickness, 0));
+  const center = routePoint(new THREE.Vector3(0, 0, 0));
+  const ductEnd = routePoint(new THREE.Vector3(dimensions.length / 2 + Math.max(0.18, dimensions.depth * 0.55), dimensions.height * 0.04, 0));
   const outletDisk = completeModel.getObjectByName('第10轮_出口圆盘_连续低模');
   const funnel = new THREE.Vector3(0.897, 2.347, 0.749);
   if (outletDisk) {
@@ -2166,7 +2574,7 @@ function valvePosition(lane) {
   const index = THREE.MathUtils.clamp(Math.round(((lane + 1) / 2) * 31), 0, 31);
   const ports = Array.from({ length: 4 }, (_, portIndex) => partLocalPoint(
     row,
-    new THREE.Vector3((index - 15.5) * 0.072 - 0.024 + portIndex * 0.016, 0.178, 0.042)
+    new THREE.Vector3((index - 15.5) * 0.072 - 0.024 + portIndex * 0.016, 0.176, 0)
   ));
   const position = ports.reduce((center, port) => center.add(port), new THREE.Vector3()).multiplyScalar(0.25);
   return { index, position, ports };
@@ -2438,14 +2846,17 @@ function applyMode(mode) {
     if (role === 'calibration') {
       const calibrationId = object.userData.calibrationId;
       const calibrationKind = calibrationParts.get(calibrationId)?.userData.config.kind;
-      const isXrayShell = calibrationId === 'flow-channel-1' || calibrationKind === 'cover';
+      const isPresentationShell = calibrationId === 'flow-channel-1'
+        || calibrationKind === 'cover'
+        || calibrationKind === 'heatsink';
       const isGlassWindow = /透明检测窗/.test(object.userData.name || '');
-      object.material = mode === 'xray' && isXrayShell
-        ? (isGlassWindow ? modeMaterials.xrayWindow : modeMaterials.xrayCalibrationShell)
-        : object.userData.baseMaterial;
+      if (mode === 'wireframe' && isPresentationShell) object.material = modeMaterials.wireShell;
+      else if (mode === 'xray' && isPresentationShell) {
+        object.material = isGlassWindow ? modeMaterials.xrayWindow : modeMaterials.xrayCalibrationShell;
+      } else object.material = object.userData.baseMaterial;
       object.visible = true;
       object.castShadow = mode !== 'xray';
-      object.renderOrder = mode === 'xray' && isXrayShell ? (isGlassWindow ? 12 : 9) : 0;
+      object.renderOrder = mode === 'xray' && isPresentationShell ? (isGlassWindow ? 12 : 9) : 0;
       return;
     }
     if (role === 'flow' || role === 'indicator') {
@@ -2587,7 +2998,6 @@ function setProcessDemo(enabled) {
     setValveRowActive(true);
     setFlowChannelPlaybackAppearance(true);
     setExternalModulesGhosted(true);
-    setSignalTowerGhosted(true);
     setOpticalPathState('process', 0);
     setLayerVisible('hunyuan', importedModelReady);
     setLayerVisible('shell', !importedModelReady);
@@ -2606,7 +3016,6 @@ function setProcessDemo(enabled) {
     applyMode('solid');
     setFlowChannelPlaybackAppearance(false);
     setExternalModulesGhosted(false);
-    setSignalTowerGhosted(false);
     setOpticalPathState('off');
   }
 }
@@ -2661,7 +3070,7 @@ function explodeStageLabel(amount) {
   if (amount < 0.20) return '拆开罩板';
   if (amount < 0.38) return '外移银白散热片';
   if (amount < 0.62) return '展开相机与10个算力盒';
-  if (amount < 0.82) return '展开阀组与排杂风道';
+  if (amount < 0.82) return '展开电磁阀组';
   return '完整拆解';
 }
 
