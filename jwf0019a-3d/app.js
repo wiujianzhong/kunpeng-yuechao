@@ -579,6 +579,9 @@ importedModelLoader.load(
     const outletDisk = importedRoot.getObjectByName('第10轮_出口圆盘_连续低模');
     if (outletDisk) outletDisk.position.y += 0.10 / scale;
 
+    const removedOverlapTriangles = removeImportedOverlapInsideLowerFlowChannel(importedRoot);
+    console.info(`主通道下半段穿模清理完成：删除${removedOverlapTriangles}个重叠三角面`);
+
     // 外加罩板和电柜门沿用母版机身白漆，避免前罩板比主机明显更白。
     const shellReference = importedRoot.getObjectByName('第10轮_母版保形上部外观_锁定');
     const shellMaterial = Array.isArray(shellReference?.material)
@@ -757,6 +760,7 @@ const calibrationMaterials = {
 const calibrationLayer = makeLayer('calibration');
 calibrationLayer.visible = false;
 const calibrationParts = new Map();
+const cameraLensMeshes = [];
 const calibrationStorageKey = 'jwf0019a-internal-layout-v8';
 let calibrationEnabled = false;
 let selectedCalibrationPart = null;
@@ -815,6 +819,11 @@ function registerExternalCalibrationGroup(group, config) {
 
 function addCameraRow(group, calibrationId, count, direction) {
   const spacing = count > 4 ? 0.29 : 0.42;
+  const opticalType = calibrationId === 'magic-cameras'
+    ? 'spirit'
+    : calibrationId === 'front-cameras'
+      ? 'front'
+      : 'rear';
   for (let index = 0; index < count; index += 1) {
     const unit = new THREE.Group();
     unit.position.x = (index - (count - 1) / 2) * spacing;
@@ -840,9 +849,12 @@ function addCameraRow(group, calibrationId, count, direction) {
     const lensGlass = addCalibrationMesh(
       unit,
       new THREE.CylinderGeometry(0.030, 0.030, 0.008, 20),
-      calibrationMaterials.cameraGlass,
+      calibrationMaterials.cameraGlass.clone(),
       calibrationId
     );
+    lensGlass.userData.opticalCameraType = opticalType;
+    lensGlass.userData.opticalCameraIndex = index;
+    cameraLensMeshes.push(lensGlass);
     const rearConnector = addCalibrationMesh(
       unit,
       new THREE.CylinderGeometry(0.020, 0.020, 0.035, 12),
@@ -995,6 +1007,115 @@ function flowChannelPathPoints(dimensions) {
     new THREE.Vector3(0, height * 0.67, offset * 0.46),
     new THREE.Vector3(0, height * 0.67, offset * 0.50 + outletExtension)
   ];
+}
+
+function removeImportedOverlapInsideLowerFlowChannel(importedRoot) {
+  const channel = calibrationParts.get('flow-channel-1');
+  const dimensions = channel?.userData.config.dimensions;
+  if (!channel || !dimensions) return 0;
+
+  channel.updateWorldMatrix(true, true);
+  importedRoot.updateWorldMatrix(true, true);
+
+  const wall = Math.min(dimensions.thickness, dimensions.depth / 3, dimensions.length / 20);
+  const innerHalfWidth = dimensions.length / 2 - wall * 1.2;
+  const innerHalfDepth = dimensions.depth / 2 - wall * 1.2;
+  const cutEndProgress = 0.28;
+  const curve = new THREE.CatmullRomCurve3(flowChannelPathPoints(dimensions), false, 'centripetal');
+  const pathSamples = Array.from({ length: 33 }, (_, index) => (
+    curve.getPoint(cutEndProgress * index / 32)
+  ));
+  const localPoint = new THREE.Vector3();
+  const segment = new THREE.Vector2();
+  const relative = new THREE.Vector2();
+
+  function insideOpenChannel(point) {
+    if (Math.abs(point.x) >= innerHalfWidth) return false;
+    let nearestDistanceSquared = Infinity;
+    for (let index = 0; index < pathSamples.length - 1; index += 1) {
+      const start = pathSamples[index];
+      const end = pathSamples[index + 1];
+      segment.set(end.z - start.z, end.y - start.y);
+      const segmentLengthSquared = segment.lengthSq();
+      if (segmentLengthSquared <= 0.0000001) continue;
+      relative.set(point.z - start.z, point.y - start.y);
+      const amount = THREE.MathUtils.clamp(relative.dot(segment) / segmentLengthSquared, 0, 1);
+      const nearestZ = start.z + segment.x * amount;
+      const nearestY = start.y + segment.y * amount;
+      const deltaZ = point.z - nearestZ;
+      const deltaY = point.y - nearestY;
+      nearestDistanceSquared = Math.min(nearestDistanceSquared, deltaZ * deltaZ + deltaY * deltaY);
+    }
+    return nearestDistanceSquared < innerHalfDepth * innerHalfDepth;
+  }
+
+  const barycentricSamples = [
+    [1, 0, 0], [0, 1, 0], [0, 0, 1],
+    [0.5, 0.5, 0], [0.5, 0, 0.5], [0, 0.5, 0.5],
+    [1 / 3, 1 / 3, 1 / 3],
+    [0.5, 0.25, 0.25], [0.25, 0.5, 0.25], [0.25, 0.25, 0.5]
+  ];
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  const c = new THREE.Vector3();
+  const sample = new THREE.Vector3();
+  let removedTriangles = 0;
+
+  importedRoot.traverse((mesh) => {
+    if (!mesh.isMesh || !mesh.geometry?.attributes.position) return;
+    const geometry = mesh.geometry.clone();
+    const position = geometry.attributes.position;
+    const index = geometry.index;
+    const triangleCount = index ? index.count / 3 : position.count / 3;
+    let meshChanged = false;
+    mesh.updateWorldMatrix(true, false);
+
+    for (let triangle = 0; triangle < triangleCount; triangle += 1) {
+      const indexOffset = triangle * 3;
+      const indexA = index ? index.getX(indexOffset) : indexOffset;
+      const indexB = index ? index.getX(indexOffset + 1) : indexOffset + 1;
+      const indexC = index ? index.getX(indexOffset + 2) : indexOffset + 2;
+      a.fromBufferAttribute(position, indexA);
+      b.fromBufferAttribute(position, indexB);
+      c.fromBufferAttribute(position, indexC);
+      mesh.localToWorld(a);
+      mesh.localToWorld(b);
+      mesh.localToWorld(c);
+      channel.worldToLocal(a);
+      channel.worldToLocal(b);
+      channel.worldToLocal(c);
+
+      const intersectsOpenChannel = barycentricSamples.some(([weightA, weightB, weightC]) => {
+        sample.set(0, 0, 0)
+          .addScaledVector(a, weightA)
+          .addScaledVector(b, weightB)
+          .addScaledVector(c, weightC);
+        localPoint.copy(sample);
+        return insideOpenChannel(localPoint);
+      });
+      if (!intersectsOpenChannel) continue;
+
+      if (index) {
+        index.setX(indexOffset + 1, indexA);
+        index.setX(indexOffset + 2, indexA);
+      } else {
+        position.setXYZ(indexB, position.getX(indexA), position.getY(indexA), position.getZ(indexA));
+        position.setXYZ(indexC, position.getX(indexA), position.getY(indexA), position.getZ(indexA));
+      }
+      removedTriangles += 1;
+      meshChanged = true;
+    }
+
+    if (!meshChanged) return;
+    if (index) index.needsUpdate = true;
+    else position.needsUpdate = true;
+    geometry.computeBoundingBox();
+    geometry.computeBoundingSphere();
+    mesh.geometry = geometry;
+    mesh.userData.flowChannelOverlapTrianglesRemoved = removedTriangles;
+  });
+
+  return removedTriangles;
 }
 
 function buildParametricCalibrationPart(group) {
@@ -1156,17 +1277,30 @@ function buildParametricCalibrationPart(group) {
     const wall = Math.min(dimensions.thickness, depth / 3, width / 20);
     const points = flowChannelPathPoints(dimensions);
     const curveLength = new THREE.CatmullRomCurve3(points, false, 'centripetal').getLength();
-    const windowCenter = 0.30;
     const halfWindowProgress = Math.min(0.07 / Math.max(curveLength, 0.01), 0.08);
-    const windowStart = windowCenter - halfWindowProgress;
-    const windowEnd = windowCenter + halfWindowProgress;
-    const wallRanges = [[0, windowStart], [windowEnd, 1]];
+    const mainWindow = {
+      start: 0.30 - halfWindowProgress,
+      end: 0.30 + halfWindowProgress,
+      name: '透明检测窗（上下各70毫米）'
+    };
+    const spiritEyeWindow = {
+      start: 0.15 - halfWindowProgress,
+      end: 0.15 + halfWindowProgress,
+      name: '精灵眼透明检测窗（上下各70毫米）'
+    };
     const wallOffsets = [
-      { offset: (depth - wall) / 2, side: '前壁' },
-      { offset: -(depth - wall) / 2, side: '后壁' }
+      { offset: (depth - wall) / 2, side: '前壁', windows: [mainWindow] },
+      { offset: -(depth - wall) / 2, side: '后壁', windows: [spiritEyeWindow, mainWindow] }
     ];
     const channelSurfaces = [];
-    wallOffsets.forEach(({ offset, side }) => {
+    wallOffsets.forEach(({ offset, side, windows }) => {
+      const wallRanges = [];
+      let rangeStart = 0;
+      windows.forEach((window) => {
+        wallRanges.push([rangeStart, window.start]);
+        rangeStart = window.end;
+      });
+      wallRanges.push([rangeStart, 1]);
       wallRanges.forEach(([start, end]) => {
         const metalWall = addCalibrationMesh(
           group,
@@ -1177,15 +1311,17 @@ function buildParametricCalibrationPart(group) {
         metalWall.userData.name = `主通道铁质${side}`;
         channelSurfaces.push(metalWall);
       });
-      const glassWindow = addCalibrationMesh(
-        group,
-        sweptWideDuctGeometry(points, width, wall, 10, offset, windowStart, windowEnd),
-        calibrationMaterials.channelWindowGlass,
-        config.id
-      );
-      glassWindow.userData.name = `${side}透明检测窗（上下各70毫米）`;
-      glassWindow.renderOrder = 9;
-      channelSurfaces.push(glassWindow);
+      windows.forEach((window) => {
+        const glassWindow = addCalibrationMesh(
+          group,
+          sweptWideDuctGeometry(points, width, wall, 10, offset, window.start, window.end),
+          calibrationMaterials.channelWindowGlass,
+          config.id
+        );
+        glassWindow.userData.name = `${side}${window.name}`;
+        glassWindow.renderOrder = 9;
+        channelSurfaces.push(glassWindow);
+      });
     });
     const leftRail = addCalibrationMesh(
       group,
@@ -1204,7 +1340,7 @@ function buildParametricCalibrationPart(group) {
     leftRail.userData.name = '主通道左侧铁质边框';
     rightRail.userData.name = '主通道右侧铁质边框';
     channelSurfaces.push(leftRail, rightRail);
-    channelSurfaces.forEach((part) => { part.userData.detail = '主通道主体为白色铁质风道，上方出口向前延伸150毫米；前后相机对射处设置上下各70毫米的透明玻璃检测窗。'; });
+    channelSurfaces.forEach((part) => { part.userData.detail = '主通道主体为白色铁质风道；主检测区域保留前后透明玻璃窗，精灵眼折射检测位置在靠近相机的后壁增加同规格透明玻璃窗。'; });
   }
 }
 
@@ -1739,7 +1875,11 @@ function updateCalibrationPartVisibility(mode = 'external') {
     const external = kind === 'cover' || kind === 'heatsink' || kind === 'external-control' || id === 'flow-channel-1';
     const processDuct = id === 'flow-channel-1';
     const detectionPart = id === 'front-cameras' || id === 'rear-cameras' || id === 'mirrors';
-    const processPart = processDuct || detectionPart || id === 'valves' || kind === 'lamp-board';
+    const spiritEyeProcessPart = id === 'magic-cameras'
+      || id === 'compute-boxes'
+      || id === 'mirror-single-1784558446608'
+      || id === 'mirror-single-1784558638431';
+    const processPart = processDuct || detectionPart || spiritEyeProcessPart || id === 'valves' || kind === 'lamp-board';
     part.visible = mode === 'all'
       || external
       || (mode === 'process' && processPart)
@@ -2269,8 +2409,8 @@ function queueProcessVoiceCue(cue, clipName) {
   playNextProcessVoice();
 }
 
-const cottonLobeGeometry = new THREE.SphereGeometry(0.034, 8, 6);
-const impurityLobeGeometry = new THREE.DodecahedronGeometry(0.038, 0);
+const cottonLobeGeometry = new THREE.SphereGeometry(0.022, 7, 5);
+const cottonFiberGeometry = new THREE.CapsuleGeometry(0.0055, 0.036, 2, 5);
 const cottonMaterial = new THREE.MeshStandardMaterial({ color: 0xf5f0df, roughness: 1, transparent: true, opacity: 0.82 });
 const cottonShadowMaterial = new THREE.MeshStandardMaterial({ color: 0xded8c7, roughness: 1, transparent: true, opacity: 0.62 });
 const redImpurityMaterial = new THREE.MeshStandardMaterial({ color: 0xc92d32, roughness: 0.82, emissive: 0x3c080a, emissiveIntensity: 0.35 });
@@ -2278,6 +2418,12 @@ const blackImpurityMaterial = new THREE.MeshStandardMaterial({ color: 0x15191c, 
 const blueImpurityMaterial = new THREE.MeshStandardMaterial({ color: 0x2468d8, roughness: 0.80, emissive: 0x071c49, emissiveIntensity: 0.28 });
 const yellowImpurityMaterial = new THREE.MeshStandardMaterial({ color: 0xe1b62b, roughness: 0.84, emissive: 0x4a3506, emissiveIntensity: 0.24 });
 const greenImpurityMaterial = new THREE.MeshStandardMaterial({ color: 0x24945a, roughness: 0.82, emissive: 0x062c17, emissiveIntensity: 0.24 });
+const fluorescentWhiteImpurityMaterial = new THREE.MeshStandardMaterial({
+  color: 0xfaffff,
+  roughness: 0.66,
+  emissive: 0xd9ffff,
+  emissiveIntensity: 0.38
+});
 
 function seededUnit(seed) {
   const value = Math.sin(seed * 91.733) * 43758.5453;
@@ -2286,34 +2432,57 @@ function seededUnit(seed) {
 
 function makeFluffyTuft(seed, material = cottonMaterial, impurity = false) {
   const tuft = new THREE.Group();
-  const count = impurity ? 6 : 11;
-  for (let index = 0; index < count; index += 1) {
+  const lobeCount = impurity ? 6 : 7;
+  for (let index = 0; index < lobeCount; index += 1) {
     const angle = seededUnit(seed + index * 3.1) * Math.PI * 2;
-    const radius = impurity ? 0.026 + seededUnit(seed + index * 5.7) * 0.032 : 0.030 + seededUnit(seed + index * 5.7) * 0.058;
-    const lobe = new THREE.Mesh(impurity ? impurityLobeGeometry : cottonLobeGeometry, index === count - 1 && !impurity ? cottonShadowMaterial : material);
-    lobe.position.set(Math.cos(angle) * radius, (seededUnit(seed + index * 7.9) - 0.5) * 0.075, Math.sin(angle) * radius * 0.72);
-    lobe.scale.set(0.72 + seededUnit(seed + index * 11.1) * 0.65, 0.55 + seededUnit(seed + index * 13.3) * 0.70, 0.65 + seededUnit(seed + index * 17.7) * 0.55);
+    const radius = 0.014 + seededUnit(seed + index * 5.7) * 0.034;
+    const lobe = new THREE.Mesh(cottonLobeGeometry, index === lobeCount - 1 && !impurity ? cottonShadowMaterial : material);
+    lobe.position.set(Math.cos(angle) * radius, (seededUnit(seed + index * 7.9) - 0.5) * 0.052, Math.sin(angle) * radius * 0.58);
+    lobe.scale.set(0.58 + seededUnit(seed + index * 11.1) * 0.50, 0.38 + seededUnit(seed + index * 13.3) * 0.46, 0.52 + seededUnit(seed + index * 17.7) * 0.42);
     registerMesh(lobe, '', '', 'flow', false);
     tuft.add(lobe);
+  }
+  for (let index = 0; index < 3; index += 1) {
+    const angle = seededUnit(seed + 80 + index * 4.3) * Math.PI * 2;
+    const radius = 0.012 + seededUnit(seed + 90 + index * 6.1) * 0.034;
+    const fiber = new THREE.Mesh(cottonFiberGeometry, material);
+    fiber.position.set(Math.cos(angle) * radius, (seededUnit(seed + 100 + index * 8.3) - 0.5) * 0.045, Math.sin(angle) * radius * 0.55);
+    fiber.rotation.set(
+      (seededUnit(seed + 110 + index * 5.1) - 0.5) * Math.PI,
+      seededUnit(seed + 120 + index * 7.7) * Math.PI,
+      (seededUnit(seed + 130 + index * 9.9) - 0.5) * Math.PI
+    );
+    fiber.scale.setScalar(0.72 + seededUnit(seed + 140 + index * 10.7) * 0.34);
+    registerMesh(fiber, '', '', 'flow', false);
+    tuft.add(fiber);
   }
   cottonFlow.add(tuft);
   return tuft;
 }
 
-const whiteCottonTufts = Array.from({ length: 42 }, (_, index) => {
+const cottonTuftCount = 84;
+const whiteCottonTufts = Array.from({ length: cottonTuftCount }, (_, index) => {
   const tuft = makeFluffyTuft(index + 1);
-  tuft.userData.flowOffset = index / 42;
+  tuft.userData.flowOffset = index / cottonTuftCount;
   tuft.userData.lane = -0.82 + seededUnit(index + 20) * 1.64;
-  tuft.userData.baseScale = 0.78 + seededUnit(index + 40) * 0.58;
+  tuft.userData.baseScale = 0.68 + seededUnit(index + 40) * 0.34;
   return tuft;
 });
 
 const impurityEvents = [
-  { label: '红色异物', start: 6.0, lane: -0.42, tuft: makeFluffyTuft(101, redImpurityMaterial, true) },
-  { label: '黑色异物', start: 15.0, lane: 0.47, tuft: makeFluffyTuft(202, blackImpurityMaterial, true) },
-  { label: '蓝色异物', start: 24.0, lane: -0.10, tuft: makeFluffyTuft(303, blueImpurityMaterial, true) },
-  { label: '黄色异物', start: 33.0, lane: 0.22, tuft: makeFluffyTuft(404, yellowImpurityMaterial, true) },
-  { label: '绿色异物', start: 42.0, lane: -0.67, tuft: makeFluffyTuft(505, greenImpurityMaterial, true) }
+  { label: '红色异物', start: 4.0, lane: -0.42, detector: 'front', tuft: makeFluffyTuft(101, redImpurityMaterial, true) },
+  { label: '黑色异物', start: 10.0, lane: 0.47, detector: 'rear', tuft: makeFluffyTuft(202, blackImpurityMaterial, true) },
+  { label: '蓝色异物', start: 16.0, lane: -0.10, detector: 'front', tuft: makeFluffyTuft(303, blueImpurityMaterial, true) },
+  { label: '黄色异物', start: 22.0, lane: 0.22, detector: 'rear', tuft: makeFluffyTuft(404, yellowImpurityMaterial, true) },
+  { label: '绿色异物', start: 28.0, lane: -0.67, detector: 'front', tuft: makeFluffyTuft(505, greenImpurityMaterial, true) },
+  {
+    label: '荧光白色异纤',
+    start: 34.0,
+    lane: 0.62,
+    detector: 'spirit',
+    fluorescent: true,
+    tuft: makeFluffyTuft(606, fluorescentWhiteImpurityMaterial, true)
+  }
 ];
 impurityEvents.forEach((event, eventIndex) => {
   event.tuft.visible = false;
@@ -2358,8 +2527,11 @@ opticalPathLayer.visible = false;
 machine.add(opticalPathLayer);
 const opticalCameraMaterials = [];
 const opticalBlue = new THREE.Color(0x38a9ff);
+const opticalFlashWhite = new THREE.Color(0xffffff);
 let opticalPathMode = 'off';
 let opticalTriggerStrength = 0;
+let opticalTriggerType = null;
+let opticalTriggerIndex = -1;
 
 function clearOpticalPaths() {
   opticalPathLayer.children.forEach((child) => child.geometry?.dispose());
@@ -2433,6 +2605,17 @@ function currentFlowCurve() {
   return new THREE.CatmullRomCurve3(points, false, 'centripetal');
 }
 
+function flowChannelWallPoint(part, progress, side = 'rear') {
+  const dimensions = part.userData.config.dimensions;
+  const localCurve = new THREE.CatmullRomCurve3(flowChannelPathPoints(dimensions), false, 'centripetal');
+  const point = localCurve.getPoint(progress);
+  const tangent = localCurve.getTangent(progress).normalize();
+  const normal = new THREE.Vector3(0, -tangent.z, tangent.y).normalize();
+  const wall = Math.min(dimensions.thickness, dimensions.depth / 3, dimensions.length / 20);
+  const offset = (dimensions.depth - wall) / 2 * (side === 'rear' ? -1 : 1);
+  return partLocalPoint(part, point.add(normal.multiplyScalar(offset)));
+}
+
 function lanePoint(curve, progress, lane, width) {
   const point = curve.getPoint(THREE.MathUtils.clamp(progress, 0, 1));
   point.x += lane * width * 0.5;
@@ -2457,28 +2640,54 @@ function mirrorHitPoint(mirror, targetX) {
   return partLocalPoint(mirror, new THREE.Vector3(localX, 0, 0));
 }
 
-function addCameraCoveragePath({ rowId, count, direction, mirrorForIndex, progress, type }) {
+function addCameraCoveragePath({
+  rowId,
+  count,
+  direction,
+  mirrorForIndex,
+  mirrorPathForIndex,
+  progress,
+  targetSide,
+  type,
+  coverageWidth = 0.30
+}) {
   const row = calibrationParts.get(rowId);
   const channel = calibrationParts.get('flow-channel-1');
   if (!row || !channel) return;
   const curve = currentFlowCurve();
   const channelWidth = channel.userData.config.dimensions.length * channel.scale.x;
-  const coverageWidth = 0.30;
-  const span = count > 4 ? Math.max(0, channelWidth - coverageWidth) : coverageWidth * (count - 1);
+  const span = count > 1 ? Math.max(0, channelWidth - coverageWidth) : 0;
 
   for (let index = 0; index < count; index += 1) {
-    const target = curve.getPoint(progress);
+    const target = targetSide
+      ? flowChannelWallPoint(channel, progress, targetSide)
+      : curve.getPoint(progress);
     target.x += count === 1 ? 0 : (index / (count - 1) - 0.5) * span;
     const source = cameraLensPoint(row, index, count, direction);
     const material = makeOpticalCameraMaterial(index, count, type);
-    const mirror = mirrorForIndex ? calibrationParts.get(mirrorForIndex(index)) : null;
-
-    if (mirror) {
-      const hit = mirrorHitPoint(mirror, target.x);
-      makeOpticalWedge(source, hit, 0.025, 0.075, material);
-      makeOpticalWedge(hit, target, 0.075, coverageWidth, material);
-    } else {
-      makeOpticalWedge(source, target, 0.025, coverageWidth, material);
+    const mirrorIds = mirrorPathForIndex
+      ? mirrorPathForIndex(index)
+      : mirrorForIndex
+        ? [mirrorForIndex(index)]
+        : [];
+    const hits = mirrorIds
+      .map((mirrorId) => calibrationParts.get(mirrorId))
+      .filter(Boolean)
+      .map((mirror) => mirrorHitPoint(mirror, target.x));
+    const path = [source, ...hits, target];
+    const widths = hits.length === 2
+      ? [0.025, 0.060, 0.105, coverageWidth]
+      : hits.length === 1
+        ? [0.025, 0.075, coverageWidth]
+        : [0.025, coverageWidth];
+    for (let segmentIndex = 0; segmentIndex < path.length - 1; segmentIndex += 1) {
+      makeOpticalWedge(
+        path[segmentIndex],
+        path[segmentIndex + 1],
+        widths[segmentIndex],
+        widths[segmentIndex + 1],
+        material
+      );
     }
   }
 }
@@ -2493,15 +2702,31 @@ function rebuildOpticalPaths() {
     rowId: 'rear-cameras', count: 8, direction: 'down', progress: 0.30,
     mirrorForIndex: () => 'mirrors', type: 'rear'
   });
+  addCameraCoveragePath({
+    rowId: 'magic-cameras', count: 4, direction: 'down', progress: 0.15,
+    mirrorPathForIndex: () => [
+      'mirror-single-1784558446608',
+      'mirror-single-1784558638431'
+    ],
+    targetSide: 'rear',
+    type: 'spirit',
+    coverageWidth: 0.60
+  });
 }
 
-function setOpticalPathState(mode = 'off', triggerStrength = 0) {
-  opticalTriggerStrength = THREE.MathUtils.clamp(triggerStrength, 0, 1);
+function setOpticalPathState(mode = 'off', trigger = null) {
+  opticalTriggerStrength = THREE.MathUtils.clamp(trigger?.strength || 0, 0, 1);
+  opticalTriggerType = trigger?.type || null;
+  opticalTriggerIndex = Number.isInteger(trigger?.index) ? trigger.index : -1;
   if (mode === 'off') {
     opticalPathMode = 'off';
     opticalPathLayer.visible = false;
     calibrationMaterials.cameraGlass.emissive.setHex(0x000000);
     calibrationMaterials.cameraGlass.emissiveIntensity = 0;
+    cameraLensMeshes.forEach((lens) => {
+      lens.userData.baseMaterial.emissive.setHex(0x000000);
+      lens.userData.baseMaterial.emissiveIntensity = 0;
+    });
     return;
   }
   if (!opticalPathLayer.children.length || opticalPathMode !== mode) rebuildOpticalPaths();
@@ -2511,12 +2736,20 @@ function setOpticalPathState(mode = 'off', triggerStrength = 0) {
 
 function updateOpticalPathAnimation(time) {
   if (!opticalPathLayer.visible) return;
-  opticalCameraMaterials.forEach(({ material }) => {
-    material.color.copy(opticalBlue);
-    material.opacity = 0.075;
+  opticalCameraMaterials.forEach(({ material, index, type }) => {
+    const isTriggeredCamera = type === opticalTriggerType && index === opticalTriggerIndex;
+    const flash = isTriggeredCamera ? opticalTriggerStrength : 0;
+    material.color.copy(opticalBlue).lerp(opticalFlashWhite, flash * 0.62);
+    material.opacity = 0.055 + flash * 0.34;
   });
-  calibrationMaterials.cameraGlass.emissive.copy(opticalBlue);
-  calibrationMaterials.cameraGlass.emissiveIntensity = 0.82;
+  cameraLensMeshes.forEach((lens) => {
+    const isTriggeredCamera = lens.userData.opticalCameraType === opticalTriggerType
+      && lens.userData.opticalCameraIndex === opticalTriggerIndex;
+    const flash = isTriggeredCamera ? opticalTriggerStrength : 0;
+    const material = lens.userData.baseMaterial;
+    material.emissive.copy(opticalBlue).lerp(opticalFlashWhite, flash * 0.72);
+    material.emissiveIntensity = 0.16 + flash * 2.10;
+  });
 }
 
 function quadraticPoint(start, control, end, progress) {
@@ -2527,17 +2760,7 @@ function quadraticPoint(start, control, end, progress) {
 }
 
 function rejectRoutePoints(source) {
-  // 可见排杂草模已移除；仅保留固定的动画路线锚点，避免影响现有喷射演示。
-  const dimensions = { length: 1.70, height: 0.42, depth: 0.36, thickness: 0.018, drop: 0.22 };
-  const anchorPosition = new THREE.Vector3(-0.03, 3.146863905652378, -0.050457074158259785);
-  const anchorScale = new THREE.Vector3(1.1844425599368247, 0.8680448176009804, 0.8680448176009804);
-  const anchorQuaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI / 2, 0, 0));
-  const anchorMatrix = new THREE.Matrix4().compose(anchorPosition, anchorQuaternion, anchorScale);
-  const routePoint = (localPoint) => localPoint.clone().applyMatrix4(anchorMatrix);
-  const localX = THREE.MathUtils.clamp((source.x - anchorPosition.x) / Math.max(anchorScale.x, 0.01), -dimensions.length * 0.45, dimensions.length * 0.45);
-  const inlet = routePoint(new THREE.Vector3(localX, -dimensions.height / 2 - dimensions.drop + dimensions.thickness, 0));
-  const center = routePoint(new THREE.Vector3(0, 0, 0));
-  const ductEnd = routePoint(new THREE.Vector3(dimensions.length / 2 + Math.max(0.18, dimensions.depth * 0.55), dimensions.height * 0.04, 0));
+  // 固定为四段连续路线：阀位向前推出、横向到风机处、斜向到落点上方500毫米、垂直落下。
   const outletDisk = completeModel.getObjectByName('第10轮_出口圆盘_连续低模');
   const funnel = new THREE.Vector3(0.897, 2.347, 0.749);
   if (outletDisk) {
@@ -2545,9 +2768,14 @@ function rejectRoutePoints(source) {
     diskBounds.getCenter(funnel);
     funnel.y = diskBounds.min.y - 0.02;
   }
-  const turn = new THREE.Vector3(ductEnd.x, funnel.y + 0.16, funnel.z);
-  const drop = funnel.clone().add(new THREE.Vector3(0, -0.62, 0));
-  return { inlet, center, ductEnd, turn, funnel, drop };
+  const inlet = source.clone().add(new THREE.Vector3(0, 0, 0.30));
+  const fanPoint = new THREE.Vector3(funnel.x, inlet.y, inlet.z);
+  const horizontalDirection = Math.sign(fanPoint.x - inlet.x) || 1;
+  const ductEnd = fanPoint.clone().add(new THREE.Vector3(horizontalDirection * 0.20, 0, 0));
+  const shiftedLanding = funnel.clone().add(new THREE.Vector3(horizontalDirection * 0.20, 0, 0));
+  const landingAbove = shiftedLanding.clone().add(new THREE.Vector3(0, 0.50, 0));
+  const drop = shiftedLanding.clone().add(new THREE.Vector3(0, -0.62, 0));
+  return { inlet, fanPoint, ductEnd, landingAbove, funnel, drop };
 }
 
 function pointAlongRoute(points, progress) {
@@ -2578,6 +2806,55 @@ function valvePosition(lane) {
   ));
   const position = ports.reduce((center, port) => center.add(port), new THREE.Vector3()).multiplyScalar(0.25);
   return { index, position, ports };
+}
+
+function closestProgressOnFlowCurve(curve, target, lane, width, startProgress, endProgress) {
+  let closestProgress = startProgress;
+  let closestDistance = Infinity;
+  const sampleCount = 160;
+  for (let index = 0; index <= sampleCount; index += 1) {
+    const progress = THREE.MathUtils.lerp(startProgress, endProgress, index / sampleCount);
+    const distance = lanePoint(curve, progress, lane, width).distanceToSquared(target);
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestProgress = progress;
+    }
+  }
+  return closestProgress;
+}
+
+function progressBeforeFlowDistance(curve, endProgress, distance) {
+  let previousPoint = curve.getPoint(endProgress);
+  let travelled = 0;
+  const step = 0.002;
+  for (let progress = endProgress - step; progress >= 0; progress -= step) {
+    const point = curve.getPoint(progress);
+    travelled += point.distanceTo(previousPoint);
+    if (travelled >= distance) return progress;
+    previousPoint = point;
+  }
+  return 0;
+}
+
+function cameraIndexForLane(lane, count) {
+  return THREE.MathUtils.clamp(Math.floor(((lane + 1) / 2) * count), 0, count - 1);
+}
+
+function showValveJet(valve, target, progress) {
+  valvePulse.visible = true;
+  setValveRowActive(true);
+  valvePulse.children.forEach((pulsePoint, index) => {
+    pulsePoint.position.copy(valve.ports[index]);
+    pulsePoint.scale.setScalar(0.72 + Math.sin(progress * Math.PI * 5) * 0.28);
+  });
+  airJet.visible = true;
+  airJet.children.forEach((particle, index) => {
+    const portIndex = index % 4;
+    const streamIndex = Math.floor(index / 4);
+    const jetProgress = (progress * 1.12 + streamIndex / 4) % 1;
+    particle.position.lerpVectors(valve.ports[portIndex], target, jetProgress);
+    particle.scale.setScalar(0.55 + (1 - jetProgress) * 0.65);
+  });
 }
 
 function setValveRowActive(active) {
@@ -2635,7 +2912,7 @@ function updateCottonProcess(time) {
     return;
   }
   let activeStatus = '白色棉絮正常通过：下方进入，顶部出口消失';
-  const cycleDuration = 50;
+  const cycleDuration = 42;
   const impurityDuration = 7.4;
   const voiceCycleIndex = Math.floor(time / (cycleDuration * 1000));
   if (processDemoPlaying && voiceCycleIndex !== processVoiceCycleIndex) {
@@ -2644,7 +2921,8 @@ function updateCottonProcess(time) {
     queueProcessVoiceCue(`第${voiceCycleIndex + 1}轮棉流进入主通道`, 'intake');
   }
   const cycleSeconds = (time / 1000) % cycleDuration;
-  let cameraTriggerStrength = 0;
+  let activeCameraTrigger = null;
+  fluorescentWhiteImpurityMaterial.emissiveIntensity = 0.38;
   if (processDemoPlaying && time >= 2500) queueProcessVoiceCue('扫描透明检测窗', 'scan');
 
   impurityEvents.forEach((event, eventIndex) => {
@@ -2655,32 +2933,77 @@ function updateCottonProcess(time) {
     if (!active) return;
 
     const progress = elapsed / impurityDuration;
-    // 异物尚未到达阀位时就完成识别并预喷，避免越过后再倒吸回来。
-    const ejectPoint = lanePoint(curve, 0.30, event.lane, width);
-    const route = rejectRoutePoints(ejectPoint);
+    const detectionProgress = event.detector === 'spirit' ? 0.15 : 0.30;
     const valve = valvePosition(event.lane);
+    const valveChannelProgress = closestProgressOnFlowCurve(
+      curve,
+      valve.position,
+      event.lane,
+      width,
+      detectionProgress,
+      0.95
+    );
+    const preBlowChannelProgress = Math.max(
+      detectionProgress + 0.01,
+      progressBeforeFlowDistance(curve, valveChannelProgress, 0.05)
+    );
+    // 相机在检测点闪烁；异纤随后连续上飘，距真实阀位50毫米预吹，到达阀位后横向喷出。
+    const ejectPoint = lanePoint(curve, valveChannelProgress, event.lane, width);
+    const route = rejectRoutePoints(ejectPoint);
     event.tuft.rotation.y += 0.035;
     event.tuft.rotation.z += 0.021;
     event.tuft.scale.setScalar(1.08);
+    const detectorCount = event.detector === 'spirit' ? 4 : 8;
+    const detectorIndex = cameraIndexForLane(event.lane, detectorCount);
+    const triggerIn = THREE.MathUtils.smoothstep(progress, 0.20, 0.24);
+    const triggerOut = 1 - THREE.MathUtils.smoothstep(progress, 0.26, 0.30);
+    const eventTrigger = triggerIn * triggerOut;
+    if (eventTrigger > 0.001 && (!activeCameraTrigger || eventTrigger > activeCameraTrigger.strength)) {
+      activeCameraTrigger = {
+        type: event.detector,
+        index: detectorIndex,
+        strength: eventTrigger
+      };
+    }
+    if (event.fluorescent) {
+      fluorescentWhiteImpurityMaterial.emissiveIntensity = 0.38 + eventTrigger * 2.45;
+    }
 
-    if (progress < 0.30) {
-      const channelProgress = 0.04 + (progress / 0.30) * 0.26;
+    if (progress < 0.25) {
+      const channelProgress = 0.04 + (progress / 0.25) * (detectionProgress - 0.04);
       event.tuft.position.copy(lanePoint(curve, channelProgress, event.lane, width));
-      const triggerIn = THREE.MathUtils.smoothstep(progress, 0.12, 0.22);
-      const triggerOut = 1 - THREE.MathUtils.smoothstep(progress, 0.25, 0.30);
-      const eventTrigger = triggerIn * triggerOut;
-      cameraTriggerStrength = Math.max(cameraTriggerStrength, eventTrigger);
-      if (progress > 0.12) {
-        activeStatus = `相机淡蓝光幕识别到${event.label}：通道30%位置预先锁定第${valve.index + 1}号电磁阀`;
+      if (progress > 0.20) {
+        const detectorLabel = event.detector === 'spirit'
+          ? `精灵眼${detectorIndex + 1}号相机`
+          : `${event.detector === 'front' ? '前视' : '后视'}${detectorIndex + 1}号相机`;
+        activeStatus = `${detectorLabel}的淡蓝光幕识别到${event.label}，提前锁定第${valve.index + 1}号电磁阀`;
         if (eventIndex === 0) queueProcessVoiceCue('识别第一处异纤', 'detect');
       }
       return;
     }
 
-    if (progress < 0.50) {
+    if (progress < 0.40) {
+      const approachProgress = (progress - 0.25) / 0.15;
+      const channelProgress = THREE.MathUtils.lerp(detectionProgress, preBlowChannelProgress, approachProgress);
+      event.tuft.position.copy(lanePoint(curve, channelProgress, event.lane, width));
+      if (event.fluorescent) fluorescentWhiteImpurityMaterial.emissiveIntensity = 0.72;
+      activeStatus = `${event.label}已被识别，继续随棉流向第${valve.index + 1}号电磁阀移动`;
+      return;
+    }
+
+    if (progress < 0.43) {
+      const preBlowProgress = (progress - 0.40) / 0.03;
+      const channelProgress = THREE.MathUtils.lerp(preBlowChannelProgress, valveChannelProgress, preBlowProgress);
+      event.tuft.position.copy(lanePoint(curve, channelProgress, event.lane, width));
+      showValveJet(valve, route.inlet, preBlowProgress);
+      activeStatus = `${event.label}接近第${valve.index + 1}号电磁阀，4个喷孔提前开启`;
+      return;
+    }
+
+    if (progress < 0.49) {
       if (eventIndex === 0) queueProcessVoiceCue('第一次喷射排杂', 'eject');
-      const ejectProgress = (progress - 0.30) / 0.20;
-      const control = ejectPoint.clone().lerp(route.inlet, 0.5).add(new THREE.Vector3(0, 0.10, 0));
+      const ejectProgress = (progress - 0.43) / 0.06;
+      const control = ejectPoint.clone().lerp(route.inlet, 0.5);
       event.tuft.position.copy(quadraticPoint(ejectPoint, control, route.inlet, ejectProgress));
       event.sprayCotton.forEach((tuft, index) => {
         const localProgress = THREE.MathUtils.clamp(ejectProgress * 1.08 - index * 0.025, 0, 1);
@@ -2694,49 +3017,41 @@ function updateCottonProcess(time) {
         tuft.rotation.y += 0.028;
         tuft.rotation.z += 0.018;
       });
-      valvePulse.visible = true;
-      setValveRowActive(true);
-      valvePulse.children.forEach((pulsePoint, index) => {
-        pulsePoint.position.copy(valve.ports[index]);
-        pulsePoint.scale.setScalar(0.72 + Math.sin(ejectProgress * Math.PI * 5) * 0.28);
-      });
-      airJet.visible = true;
-      airJet.children.forEach((particle, index) => {
-        const portIndex = index % 4;
-        const streamIndex = Math.floor(index / 4);
-        const jetProgress = (ejectProgress * 1.12 + streamIndex / 4) % 1;
-        particle.position.lerpVectors(valve.ports[portIndex], route.inlet, jetProgress);
-        particle.scale.setScalar(0.55 + (1 - jetProgress) * 0.65);
-      });
+      showValveJet(valve, route.inlet, ejectProgress);
       activeStatus = `第${valve.index + 1}号电磁阀“噗”地喷射：${event.label}连同周围白棉进入排杂风道`;
       return;
     }
 
     if (eventIndex === 0) queueProcessVoiceCue('第一次风机吸杂', 'suction');
-    const suctionProgress = (progress - 0.50) / 0.50;
-    const pathProgress = THREE.MathUtils.clamp(suctionProgress / 0.84, 0, 1);
-    const dropProgress = THREE.MathUtils.clamp((suctionProgress - 0.84) / 0.16, 0, 1);
-    const routePath = [route.inlet, route.center, route.ductEnd, route.turn, route.funnel];
-    event.tuft.position.copy(suctionProgress < 0.84
+    const suctionProgress = (progress - 0.49) / 0.34;
+    if (suctionProgress >= 1) {
+      event.tuft.visible = false;
+      event.sprayCotton.forEach((tuft) => { tuft.visible = false; });
+      return;
+    }
+    const pathProgress = THREE.MathUtils.clamp(suctionProgress / 0.72, 0, 1);
+    const dropProgress = THREE.MathUtils.clamp((suctionProgress - 0.72) / 0.28, 0, 1);
+    const routePath = [route.inlet, route.fanPoint, route.ductEnd, route.landingAbove];
+    event.tuft.position.copy(suctionProgress < 0.72
       ? pointAlongRoute(routePath, pathProgress)
-      : route.funnel.clone().lerp(route.drop, dropProgress));
+      : route.landingAbove.clone().lerp(route.drop, dropProgress));
     event.tuft.scale.setScalar(Math.max(0.02, 1.08 * (1 - dropProgress)));
     event.sprayCotton.forEach((tuft, index) => {
       const offset = new THREE.Vector3(tuft.userData.sprayOffset * (1 - dropProgress), 0, 0);
-      tuft.position.copy(suctionProgress < 0.84
+      tuft.position.copy(suctionProgress < 0.72
         ? pointAlongRoute(routePath, pathProgress)
-        : route.funnel.clone().lerp(route.drop, dropProgress)).add(offset);
+        : route.landingAbove.clone().lerp(route.drop, dropProgress)).add(offset);
       tuft.visible = true;
       tuft.scale.setScalar(Math.max(0.02, tuft.userData.baseScale * (1 - dropProgress)));
       tuft.rotation.y += 0.032;
     });
-    activeStatus = suctionProgress < 0.84
-      ? `排杂风机将${event.label}和伴随白棉沿排杂管送到末端，再拐向圆盘漏斗`
-      : `${event.label}和伴随白棉从圆盘漏斗落下并消失，其余白棉继续通过`;
+    activeStatus = suctionProgress < 0.72
+      ? `排杂风机将${event.label}和伴随白棉横向送到风机处，再斜向送到落点上方500毫米`
+      : `${event.label}和伴随白棉从落点上方垂直落下并消失，其余白棉继续通过`;
   });
 
   if (processDemoPlaying) {
-    setOpticalPathState('process', cameraTriggerStrength);
+    setOpticalPathState('process', activeCameraTrigger);
   }
 
   updateProcessStatus(activeStatus);
