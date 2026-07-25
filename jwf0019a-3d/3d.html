@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JWF0019A 设备超级知识平台</title>
   <meta name="description" content="JWF0019A异纤机3D结构、工作原理、操作保养、故障诊断、参数质量与设备知识库。">
-  <link rel="stylesheet" href="./styles.css?v=5-glb-region-editor">
+  <script defer src="https://xiaowustudio.cn/assets/analytics.js?v=20260710"></script>
+  <link rel="stylesheet" href="./styles.css?v=7-compact-controls">
   <script type="importmap">
     {
       "imports": {
@@ -35,21 +36,17 @@
         </div>
       </div>
 
-      <section>
+      <section class="view-presets">
         <h2>固定视角</h2>
         <div class="views">
-          <button data-view="isoRight" class="active">右前45°</button>
-          <button data-view="isoLeft">左前45°</button>
-          <button data-view="front">正面</button>
-          <button data-view="rear">背面</button>
-          <button data-view="left">左侧</button>
-          <button data-view="right">右侧</button>
+          <button data-view="front" class="active">正面</button>
+          <button data-view="left">左面</button>
+          <button data-view="right">右面</button>
           <button data-view="top">俯视</button>
         </div>
       </section>
 
-      <details class="panel-tools">
-        <summary>更多讲解控制</summary>
+      <div class="panel-tools panel-tools-open">
         <section>
           <h2>查看模式</h2>
           <div class="modes">
@@ -78,7 +75,7 @@
             </div>
           </div>
         </section>
-      </details>
+      </div>
 
       <section>
         <div class="range-head"><h2>分步拆解</h2><button id="dismantle-play" class="mini">播放拆解</button><output id="explode-value">0% · 整机</output></div>
@@ -140,22 +137,11 @@
         </div>
       </section>
 
-      <details class="reference">
-        <summary>对照图实物</summary>
-        <img src="./assets/JWF0019A-对照实物-官方图.png" alt="JWF0019A官方整机实物对照图">
-      </details>
-
-      <section class="selection">
-        <h2 id="part-title">模型说明</h2>
-        <p id="part-detail">点击相机、电磁阀、反光镜、算力盒子、主通道或外壳查看结构说明。</p>
-      </section>
-
-      <section class="facts" hidden>
-        <div><span>模型状态</span><strong id="model-status-value">低模外形与拟真内部加载中</strong></div>
-        <div><span>检测通道</span><strong>1600×70 mm</strong></div>
-        <div><span>已确认相机</span><strong>8＋8＋4</strong></div>
-        <div><span>算力盒子</span><strong>10个拟真低模</strong></div>
-      </section>
+      <div class="workbench-hidden-status" hidden aria-hidden="true">
+        <span id="part-title">模型说明</span>
+        <span id="part-detail">点击内部部件查看结构说明。</span>
+        <span id="model-status-value">低模外形与拟真内部加载中</span>
+      </div>
     </aside>
   </main>
 
@@ -179,7 +165,7 @@
 
         <div class="knowledge-module-head">
           <div>
-            <span id="knowledge-module-evidence">已脱敏正式知识</span>
+            <span id="knowledge-module-evidence">设备知识</span>
             <h3 id="knowledge-module-title">认识设备</h3>
             <p id="knowledge-module-description"></p>
           </div>
@@ -205,8 +191,8 @@
     </div>
   </dialog>
 
-  <script type="module" src="./app.js?v=31-channel-spirit-cut-20260724"></script>
-  <script type="module" src="./knowledge-app.js?v=3-compact-knowledge"></script>
+  <script type="module" src="./app.js?v=59-screen-outermost-layer"></script>
+  <script type="module" src="./knowledge-app.js?v=4-customer-copy"></script>
   <script src="./ui-access.js?v=1-calibration-lock"></script>
 </body>
 </html>

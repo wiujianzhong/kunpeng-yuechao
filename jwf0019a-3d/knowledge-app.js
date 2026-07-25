@@ -25,8 +25,8 @@ const statusNames = {
   active: '正式知识',
   confirmed: '现场确认',
   reviewed: '案例复核',
-  mixed: '含待验证项',
-  draft: '待补充'
+  mixed: '现场经验',
+  draft: '参考资料'
 };
 
 function escapeHtml(value = '') {
@@ -249,7 +249,7 @@ function renderContent() {
   } else {
     moduleTitle.textContent = module.name;
     moduleDescription.textContent = module.description;
-    moduleEvidence.textContent = module.id === 'quality' ? '事实与实验设想分层' : '已脱敏正式知识';
+    moduleEvidence.textContent = '设备知识';
   }
 
   const faultMatches = normalizedTerm

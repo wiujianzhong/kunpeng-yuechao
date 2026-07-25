@@ -14,12 +14,12 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0b1013);
-scene.fog = new THREE.Fog(0x0b1013, 8, 15);
+scene.background = new THREE.Color(0xe8eee8);
+scene.fog = new THREE.Fog(0xe8eee8, 8, 15);
 
 const camera = new THREE.OrthographicCamera(-2.5, 2.5, 2.5, -2.5, 0.1, 100);
-camera.position.set(4.9, 3.55, 5.7);
-camera.zoom = 1.08;
+camera.position.set(0, 1.85, 7.2);
+camera.zoom = 1.12;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0.1, 1.7, 0);
@@ -45,7 +45,7 @@ scene.add(rimLight);
 
 const floor = new THREE.Mesh(
   new THREE.CircleGeometry(5.5, 96),
-  new THREE.MeshStandardMaterial({ color: 0x141b1e, roughness: 0.94 })
+  new THREE.MeshStandardMaterial({ color: 0xd9e1da, roughness: 0.94 })
 );
 floor.rotation.x = -Math.PI / 2;
 floor.receiveShadow = true;
@@ -121,14 +121,22 @@ const machine = new THREE.Group();
 machine.position.y = 0.035;
 scene.add(machine);
 let currentMode = 'solid';
-let currentView = 'isoRight';
+let currentView = 'front';
 let importedModelReady = false;
 let importedRootModel = null;
 let shellSurfacePaints = [];
 const shellSurfaceTopologyCache = new WeakMap();
 const fixedShellSurfacePaints = [
-  4877, 4875, 362, 364, 4375, 627, 4073, 1409, 4169, 3268, 4018, 4488
-].map((seedFaceIndex) => ({ meshId: '主体区域-0', seedFaceIndex, color: '#d9ddda' }));
+  4877, 4875, 362, 364, 4375, 627, 4073, 1409, 4169, 3268, 4018, 4488,
+  976, 1038, 2196, 2979, 4857, 4859
+].map((seedFaceIndex) => ({
+  meshId: '主体区域-0',
+  seedFaceIndex,
+  color: seedFaceIndex === 364
+    ? '#a5adad'
+    : [976, 1038, 2196, 2979, 4857, 4859].includes(seedFaceIndex) ? '#d9e2e2' : '#d9ddda',
+  repairPaint: [364, 976, 1038, 2196, 2979, 4857, 4859].includes(seedFaceIndex)
+}));
 let modelAnimationMixer = null;
 let modelAnimationActions = [];
 let modelAnimationDuration = 0;
@@ -331,7 +339,7 @@ function extrudeSideProfileGeometry(width, points) {
   return geometry;
 }
 
-function textPlate(parent, text, width, height, position, fontSize = 70, color = '#687174') {
+function textPlate(parent, text, width, height, position, fontSize = 70, color = '#687174', rotation = [0, 0, 0]) {
   const labelCanvas = document.createElement('canvas');
   labelCanvas.width = 640;
   labelCanvas.height = 160;
@@ -346,10 +354,52 @@ function textPlate(parent, text, width, height, position, fontSize = 70, color =
   texture.colorSpace = THREE.SRGBColorSpace;
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(width, height),
-    new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false })
+    new THREE.MeshBasicMaterial({
+      map: texture,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+      polygonOffsetUnits: -2
+    })
   );
   mesh.position.set(...position);
+  mesh.rotation.set(...rotation);
+  mesh.renderOrder = 22;
   registerMesh(mesh, '', '', 'decal', false);
+  parent.add(mesh);
+  return mesh;
+}
+
+function componentNumberPlate(parent, text, width, height, position, color, rotation) {
+  const labelCanvas = document.createElement('canvas');
+  labelCanvas.width = /^\d$/.test(text) ? 128 : /^\d{2}$/.test(text) ? 192 : 256;
+  labelCanvas.height = 128;
+  const context = labelCanvas.getContext('2d');
+  context.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
+  context.fillStyle = color;
+  context.font = '700 112px Arial, "PingFang SC", sans-serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(text, labelCanvas.width / 2, labelCanvas.height / 2);
+  const texture = new THREE.CanvasTexture(labelCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2
+  });
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), material);
+  mesh.position.set(...position);
+  mesh.rotation.set(...rotation);
+  mesh.renderOrder = 22;
+  registerMesh(mesh, '', '', 'decal', false);
+  mesh.userData.componentNumberLabel = true;
   parent.add(mesh);
   return mesh;
 }
@@ -394,6 +444,15 @@ function addMachineIdentityDetails(parent, importedRoot) {
   const details = new THREE.Group();
   details.name = 'JWF0019A机身标识与立柱操作件';
   parent.add(details);
+  const cabinetShellPaint = new THREE.MeshStandardMaterial({
+    color: 0xd9e2e2,
+    roughness: 0.36,
+    metalness: 0.48,
+    emissive: 0x1c1e1d,
+    emissiveIntensity: 0.08
+  });
+  const screenBackingPaint = cabinetShellPaint.clone();
+  screenBackingPaint.color.set(0xa5adad);
 
   // 使用“内部布局校准 (8)”最终坐标，替换主体GLB内原有的旧操作件。
   const cabinetCenterZ = -0.21;
@@ -411,7 +470,7 @@ function addMachineIdentityDetails(parent, importedRoot) {
     screenGroup,
     [0.032, 0.32, 0.45],
     [0, 0, 0],
-    materials.recess,
+    screenBackingPaint,
     '左立柱内侧触摸屏外框',
     '信号灯侧立柱内面的独立屏幕外框。',
     0.012
@@ -439,7 +498,7 @@ function addMachineIdentityDetails(parent, importedRoot) {
     cabinetGroup,
     [0.032, 0.54, 0.59],
     [0, 0, 0],
-    materials.paint,
+    cabinetShellPaint,
     '右立柱内侧电气柜门',
     '风机侧立柱内面的平整电气柜门。',
     0.014
@@ -553,7 +612,7 @@ const modelStatusValue = document.querySelector('#model-status-value');
 const importedModelLoader = new GLTFLoader();
 importedModelLoader.setMeshoptDecoder(MeshoptDecoder);
 importedModelLoader.load(
-  './assets/models/JWF0019A-新主体对齐-720贴图-2026-07-23.glb?v=aligned-shell-720-20260723',
+  './assets/models/JWF0019A-新主体对齐-720贴图-前罩底板削平-2026-07-25.glb?v=front-cover-base-flat-20260725',
   (gltf) => {
     const importedRoot = gltf.scene;
     importedRootModel = importedRoot;
@@ -824,6 +883,7 @@ function addCameraRow(group, calibrationId, count, direction) {
     : calibrationId === 'front-cameras'
       ? 'front'
       : 'rear';
+  const numberPrefix = opticalType === 'front' ? '前' : opticalType === 'rear' ? '后' : '';
   for (let index = 0; index < count; index += 1) {
     const unit = new THREE.Group();
     unit.position.x = (index - (count - 1) / 2) * spacing;
@@ -876,6 +936,17 @@ function addCameraRow(group, calibrationId, count, direction) {
       lensBarrel.position.y = -0.108;
       lensGlass.position.y = -0.136;
       rearConnector.position.set(0.064, 0.083, 0);
+      const numberLabel = componentNumberPlate(
+        unit,
+        `${numberPrefix}${index + 1}`,
+        opticalType === 'spirit' ? 0.120 : 0.170,
+        0.075,
+        [0, 0, -0.076],
+        '#ffffff',
+        [0, Math.PI, 0]
+      );
+      numberLabel.userData.calibrationId = calibrationId;
+      numberLabel.userData.name = `${group.userData.label}${index + 1}号散热扇侧编号`;
     } else {
       const sign = direction === 'front' ? 1 : -1;
       [frontPlate, lensBarrel, lensGlass, rearConnector].forEach((part) => { part.rotation.x = Math.PI / 2; });
@@ -883,28 +954,52 @@ function addCameraRow(group, calibrationId, count, direction) {
       lensBarrel.position.z = sign * 0.110;
       lensGlass.position.z = sign * 0.138;
       rearConnector.position.set(0.064, 0.080, -sign * 0.055);
+      const numberLabel = componentNumberPlate(
+        unit,
+        `${numberPrefix}${index + 1}`,
+        0.170,
+        0.075,
+        [0, 0, -sign * 0.076],
+        '#ffffff',
+        [0, sign > 0 ? Math.PI : 0, 0]
+      );
+      numberLabel.userData.calibrationId = calibrationId;
+      numberLabel.userData.name = `${group.userData.label}${index + 1}号背面编号`;
     }
     group.add(unit);
   }
 }
 
 function addComputeRow(group, calibrationId, count) {
+  const physicalNumbers = [1, 2, 3, 4, 9, 10, 5, 6, 7, 8];
   for (let index = 0; index < count; index += 1) {
+    const physicalNumber = physicalNumbers[index] || index + 1;
     const unit = new THREE.Group();
     unit.position.x = (index - (count - 1) / 2) * 0.22;
     const body = addCalibrationMesh(unit, new RoundedBoxGeometry(0.19, 0.24, 0.10, 3, 0.012), calibrationMaterials.computeBody, calibrationId);
-    body.userData.name = `算力盒子${index + 1}号`;
+    body.userData.name = `算力盒子${physicalNumber}号`;
     for (let finIndex = 0; finIndex < 5; finIndex += 1) {
       const fin = addCalibrationMesh(unit, new THREE.BoxGeometry(0.018, 0.19, 0.018), calibrationMaterials.computeFin, calibrationId);
       fin.position.set((finIndex - 2) * 0.032, 0.012, 0.056);
-      fin.userData.name = `算力盒子${index + 1}号散热鳍片`;
+      fin.userData.name = `算力盒子${physicalNumber}号散热鳍片`;
     }
     const socket = addCalibrationMesh(unit, new THREE.BoxGeometry(0.048, 0.030, 0.022), calibrationMaterials.connector, calibrationId);
     socket.position.set(-0.045, -0.094, 0.058);
-    socket.userData.name = `算力盒子${index + 1}号接口`;
+    socket.userData.name = `算力盒子${physicalNumber}号接口`;
     const led = addCalibrationMesh(unit, new THREE.SphereGeometry(0.009, 10, 8), calibrationMaterials.statusLed, calibrationId);
     led.position.set(0.060, -0.095, 0.061);
-    led.userData.name = `算力盒子${index + 1}号状态灯`;
+    led.userData.name = `算力盒子${physicalNumber}号状态灯`;
+    const numberLabel = componentNumberPlate(
+      unit,
+      `${physicalNumber}`,
+      physicalNumber >= 10 ? 0.165 : 0.120,
+      0.120,
+      [0, 0, -0.051],
+      '#ffffff',
+      [0, Math.PI, 0]
+    );
+    numberLabel.userData.calibrationId = calibrationId;
+    numberLabel.userData.name = `算力盒子${physicalNumber}号后面编号`;
     group.add(unit);
   }
 }
@@ -959,6 +1054,17 @@ function addValveRow(group, calibrationId, count) {
       part.userData.name = `MAC52A电磁阀${index + 1}号`;
       part.userData.detail = '蓝色阀体、黑色电磁线圈安装在银色阀板上；每个阀位控制4个喷孔。';
     });
+    const numberLabel = componentNumberPlate(
+      unit,
+      `${index + 1}`,
+      0.054,
+      0.056,
+      [0, 0.012, -0.041],
+      '#ffffff',
+      [0, Math.PI, 0]
+    );
+    numberLabel.userData.calibrationId = calibrationId;
+    numberLabel.userData.name = `MAC52A电磁阀${index + 1}号顶部编号`;
 
     for (let portIndex = 0; portIndex < 4; portIndex += 1) {
       const port = addCalibrationMesh(
@@ -1156,6 +1262,100 @@ function buildParametricCalibrationPart(group) {
     const height = dimensions.height;
     const depth = dimensions.depth;
     const thickness = Math.min(dimensions.thickness, length / 3, height / 3, depth / 2);
+    if (config.id === 'cover-1') {
+      const frontCoverPaint = new THREE.MeshStandardMaterial({
+        color: 0xd9e2e2,
+        roughness: 0.36,
+        metalness: 0.48,
+        emissive: 0x1c1e1d,
+        emissiveIntensity: 0.08
+      });
+      const faceHeight = height + 0.08;
+      const coverThickness = Math.max(0.0125, thickness * 1.25);
+      const coverAssembly = new THREE.Group();
+      coverAssembly.position.set(0, -0.0077, -0.0485);
+      group.add(coverAssembly);
+
+      const faceRadius = Math.min(0.018, faceHeight * 0.075);
+      const face = addCalibrationMesh(
+        coverAssembly,
+        new RoundedBoxGeometry(length, faceHeight, coverThickness, 4, faceRadius),
+        frontCoverPaint,
+        config.id
+      );
+      face.position.z = coverThickness / 2;
+      face.userData.name = config.label;
+
+      const flangeDepth = Math.max(0.28, height * 1.18);
+      const flangePivot = new THREE.Group();
+      flangePivot.position.set(0, faceHeight / 2, 0);
+      flangePivot.rotation.x = THREE.MathUtils.degToRad(12.9);
+      coverAssembly.add(flangePivot);
+      const flange = addCalibrationMesh(
+        flangePivot,
+        new RoundedBoxGeometry(length, coverThickness, flangeDepth, 4, Math.min(0.012, coverThickness * 0.45)),
+        frontCoverPaint,
+        config.id
+      );
+      flange.position.set(0, coverThickness / 2, -flangeDepth / 2);
+      flange.userData.name = `${config.label}顶部水平折边`;
+
+      const screwRadius = Math.min(0.015, height * 0.060);
+      const screwMarginX = Math.max(0.09, screwRadius * 2.4);
+      const screwMarginY = Math.max(0.040, screwRadius * 2.5);
+      const screwXs = Array.from({ length: 4 }, (_, column) => (
+        -length / 2 + screwMarginX + column * ((length - screwMarginX * 2) / 3)
+      ));
+      screwXs.forEach((x, index) => {
+        const screw = addCalibrationMesh(
+          coverAssembly,
+          new THREE.CylinderGeometry(screwRadius, screwRadius, 0.008, 18),
+          calibrationMaterials.valveMetal,
+          config.id
+        );
+        screw.rotation.x = Math.PI / 2;
+        screw.position.set(x, -faceHeight / 2 + screwMarginY, coverThickness + 0.004);
+        screw.userData.name = `${config.label}下排固定螺丝${index + 1}`;
+        const slot = addCalibrationMesh(
+          coverAssembly,
+          new THREE.BoxGeometry(screwRadius * 1.25, screwRadius * 0.22, 0.003),
+          calibrationMaterials.cameraDark,
+          config.id
+        );
+        slot.position.set(x, -faceHeight / 2 + screwMarginY, coverThickness + 0.009);
+        slot.userData.name = screw.userData.name;
+      });
+      screwXs.forEach((x, index) => {
+        const screw = addCalibrationMesh(
+          flangePivot,
+          new THREE.CylinderGeometry(screwRadius, screwRadius, 0.008, 18),
+          calibrationMaterials.valveMetal,
+          config.id
+        );
+        screw.position.set(x, coverThickness + 0.004, -flangeDepth * 0.58 - 0.065);
+        screw.userData.name = `${config.label}上排固定螺丝${index + 1}`;
+        const slot = addCalibrationMesh(
+          flangePivot,
+          new THREE.BoxGeometry(screwRadius * 1.25, 0.003, screwRadius * 0.22),
+          calibrationMaterials.cameraDark,
+          config.id
+        );
+        slot.position.set(x, coverThickness + 0.009, -flangeDepth * 0.58 - 0.065);
+        slot.userData.name = screw.userData.name;
+      });
+
+      const modelLabel = textPlate(
+        coverAssembly,
+        'JWF0019',
+        0.72,
+        0.095,
+        [-length / 2 + 0.43, 0.020, coverThickness + 0.012],
+        78,
+        '#505b60'
+      );
+      modelLabel.userData.calibrationId = config.id;
+      return;
+    }
     const panels = [
       [[length, height, thickness], [0, 0, depth / 2 - thickness / 2]],
       [[length, thickness, depth - thickness], [0, height / 2 - thickness / 2, -thickness / 2]],
@@ -1198,10 +1398,6 @@ function buildParametricCalibrationPart(group) {
       slot.position.set(screw.position.x, screw.position.y, depth / 2 + 0.008);
       slot.userData.name = screw.userData.name;
     });
-    if (config.id === 'cover-1') {
-      const modelLabel = textPlate(group, 'JWF0019', 0.62, 0.10, [0, 0, depth / 2 + 0.012], 62, '#505b60');
-      modelLabel.userData.calibrationId = config.id;
-    }
   }
   if (config.kind === 'heatsink') {
     const length = dimensions.length;
@@ -1639,6 +1835,35 @@ function restoreShellSurfacePaints() {
       mesh ||= importedRootModel?.getObjectByProperty('isMesh', true);
       if (mesh && Number.isInteger(record.seedFaceIndex) && /^#[0-9a-f]{6}$/i.test(record.color)) {
         applyShellSurfaceColor(mesh, record.seedFaceIndex, record.color, false);
+        const restored = shellSurfacePaints.at(-1)?.overlay;
+        if (restored && record.repairPaint) {
+          restored.material.dispose();
+          restored.material = new THREE.MeshStandardMaterial({
+            color: record.color,
+            roughness: 0.36,
+            metalness: 0.48,
+            emissive: 0x1c1e1d,
+            emissiveIntensity: 0.08,
+            polygonOffset: true,
+            polygonOffsetFactor: -2,
+            polygonOffsetUnits: -2,
+            side: THREE.DoubleSide
+          });
+          restored.userData.baseMaterial = restored.material;
+          const position = restored.geometry.attributes.position;
+          const normal = restored.geometry.attributes.normal;
+          if (position && normal) {
+            for (let index = 0; index < position.count; index += 1) {
+              position.setXYZ(
+                index,
+                position.getX(index) + normal.getX(index) * 0.0015,
+                position.getY(index) + normal.getY(index) * 0.0015,
+                position.getZ(index) + normal.getZ(index) * 0.0015
+              );
+            }
+            position.needsUpdate = true;
+          }
+        }
       }
     });
   } catch (error) {
@@ -1850,12 +2075,15 @@ function trackCalibrationExplode(part, id) {
     trackExplode(part, [0, 0.10, -1], 1.42, 0.18, 0.48);
     return;
   }
+  if (kind === 'lamp-board' && (part.userData.config.rows || []).length === 2) {
+    trackExplode(part, [0, 1, 0], 0.92, 0.28, 0.58);
+    return;
+  }
   const plans = {
     'front-cameras': [[0, 0, 1], 0.70, 0.20, 0.46],
     'rear-cameras': [[0, 0.12, -1], 0.80, 0.25, 0.52],
     'magic-cameras': [[0, -0.10, -1], 0.95, 0.34, 0.60],
     'compute-boxes': [[0, -0.06, -1], 0.88, 0.38, 0.68],
-    'lamp-board-dual-1': [[0, 0, -1], 0.90, 0.28, 0.58],
     'lamp-board-purple-1': [[0, -0.04, -1], 1.05, 0.32, 0.62],
     valves: [[0, 1, -0.20], 0.55, 0.58, 0.82],
     'flow-channel-1': [[0, -1, 0], 0.28, 0.78, 1.00]
@@ -2187,14 +2415,6 @@ registerMesh(
 );
 bodyFrame.add(frontCameraBay);
 
-const frontCover = new THREE.Group();
-frontCover.position.z = 0.388;
-shell.add(frontCover);
-roundedBox(frontCover, [2.67, 0.48, 0.045], [-0.035, 2.31, 0], materials.paint, '主机正面白色罩板', '整张白色罩板的左右边缘与两根支撑腿外边对齐。', 0.018);
-textPlate(frontCover, 'JWF0019', 0.66, 0.13, [0.38, 2.34, 0.024], 68);
-addBoltRow(frontCover, 2.08, 0.029, 11);
-trackExplode(frontCover, [0, 0, 1], 0.95);
-
 const rearCover = new THREE.Group();
 rearCover.position.z = -0.388;
 shell.add(rearCover);
@@ -2470,18 +2690,34 @@ const whiteCottonTufts = Array.from({ length: cottonTuftCount }, (_, index) => {
 });
 
 const impurityEvents = [
-  { label: '红色异物', start: 4.0, lane: -0.42, detector: 'front', tuft: makeFluffyTuft(101, redImpurityMaterial, true) },
-  { label: '黑色异物', start: 10.0, lane: 0.47, detector: 'rear', tuft: makeFluffyTuft(202, blackImpurityMaterial, true) },
-  { label: '蓝色异物', start: 16.0, lane: -0.10, detector: 'front', tuft: makeFluffyTuft(303, blueImpurityMaterial, true) },
-  { label: '黄色异物', start: 22.0, lane: 0.22, detector: 'rear', tuft: makeFluffyTuft(404, yellowImpurityMaterial, true) },
-  { label: '绿色异物', start: 28.0, lane: -0.67, detector: 'front', tuft: makeFluffyTuft(505, greenImpurityMaterial, true) },
+  { label: '红色异物', start: 3.5, lane: -0.42, detector: 'front', tuft: makeFluffyTuft(101, redImpurityMaterial, true) },
+  { label: '黑色异物', start: 8.5, lane: 0.47, detector: 'rear', tuft: makeFluffyTuft(202, blackImpurityMaterial, true) },
+  { label: '蓝色异物', start: 13.5, lane: -0.10, detector: 'front', tuft: makeFluffyTuft(303, blueImpurityMaterial, true) },
+  { label: '黄色异物', start: 18.5, lane: 0.22, detector: 'rear', tuft: makeFluffyTuft(404, yellowImpurityMaterial, true) },
+  { label: '绿色异物', start: 23.5, lane: -0.67, detector: 'front', tuft: makeFluffyTuft(505, greenImpurityMaterial, true) },
   {
-    label: '荧光白色异纤',
-    start: 34.0,
-    lane: 0.62,
+    label: '荧光白色异纤1',
+    start: 27.0,
+    lane: -0.58,
     detector: 'spirit',
     fluorescent: true,
     tuft: makeFluffyTuft(606, fluorescentWhiteImpurityMaterial, true)
+  },
+  {
+    label: '荧光白色异纤2',
+    start: 35.0,
+    lane: 0.03,
+    detector: 'spirit',
+    fluorescent: true,
+    tuft: makeFluffyTuft(607, fluorescentWhiteImpurityMaterial, true)
+  },
+  {
+    label: '荧光白色异纤3',
+    start: 43.0,
+    lane: 0.63,
+    detector: 'spirit',
+    fluorescent: true,
+    tuft: makeFluffyTuft(608, fluorescentWhiteImpurityMaterial, true)
   }
 ];
 impurityEvents.forEach((event, eventIndex) => {
@@ -2912,7 +3148,7 @@ function updateCottonProcess(time) {
     return;
   }
   let activeStatus = '白色棉絮正常通过：下方进入，顶部出口消失';
-  const cycleDuration = 42;
+  const cycleDuration = 52;
   const impurityDuration = 7.4;
   const voiceCycleIndex = Math.floor(time / (cycleDuration * 1000));
   if (processDemoPlaying && voiceCycleIndex !== processVoiceCycleIndex) {
@@ -3057,7 +3293,7 @@ function updateCottonProcess(time) {
   updateProcessStatus(activeStatus);
 }
 
-const grid = new THREE.GridHelper(8, 24, 0x344148, 0x202a2f);
+const grid = new THREE.GridHelper(8, 24, 0xaab8ae, 0xcfd8d1);
 grid.position.y = 0.006;
 scene.add(grid);
 
@@ -3087,6 +3323,12 @@ function pickAt(event) {
       || hits.find((item) => worldVisible(item.object))
     : hits.find((item) => worldVisible(item.object));
   if (!hit) return;
+  window.__lastPick = {
+    faceIndex: hit.faceIndex,
+    objectName: hit.object.name,
+    shellColorId: hit.object.userData.shellColorId,
+    partName: hit.object.userData.name
+  };
   if (calibrationEnabled && hit.object.userData.calibrationId) {
     selectCalibrationPart(hit.object.userData.calibrationId);
     return;
@@ -3182,7 +3424,7 @@ function applyMode(mode) {
     }
     if (role === 'decal') {
       object.material = object.userData.baseMaterial;
-      object.visible = mode === 'solid';
+      object.visible = mode === 'solid' || object.userData.componentNumberLabel === true;
       return;
     }
     object.visible = true;
