@@ -1,0 +1,67 @@
+const SUBJECT_POINTS = { math: 5, physics: 6, chinese: 5, english: 5 };
+
+function makeChoice(subject, code, skill, title, stem, options, answer, idea, steps, trap) {
+  return {
+    id: `CV-${code}`,
+    subject,
+    skill,
+    title,
+    stem,
+    type: "choice",
+    options,
+    answer,
+    difficulty: 2,
+    points: SUBJECT_POINTS[subject],
+    estimatedSeconds: 90,
+    hints: ["先判断这道题考查的核心概念。", "把已知条件与对应规则一一匹配。", "最后将结果代回题干检查。"],
+    explanation: { idea, steps, trap },
+    sourceType: "baseline-diagnostic",
+  };
+}
+
+export const COVERAGE_QUESTIONS = [
+  makeChoice("math", "M-SETS", "sets", "集合的交集", "已知 A={1,2,3}，B={2,3,4}，则 A∩B 等于（　）", ["{1,4}", "{2,3}", "{1,2,3,4}", "∅"], 1, "交集只保留同时属于两个集合的元素。", ["列出 A 中的元素。", "检查它们是否也在 B 中。", "公共元素是 2、3。"], "不要把交集与并集混淆。"),
+  makeChoice("math", "M-LOGIC", "logic", "全称命题的否定", "命题“对任意 x>0，都有 x²>0”的否定是（　）", ["对任意 x>0，x²≤0", "存在 x>0，使 x²≤0", "存在 x≤0，使 x²>0", "对任意 x≤0，x²≤0"], 1, "否定全称命题时，“任意”改为“存在”，结论同时否定。", ["量词由任意改为存在。", "x²>0 的否定是 x²≤0。", "得到“存在 x>0，使 x²≤0”。"], "只否定结论、忘记改变量词。"),
+  makeChoice("math", "M-INEQ", "inequality", "基本不等式", "当 x>0 时，x+1/x 的最小值是（　）", ["1", "2", "3", "4"], 1, "正数和定积型可用基本不等式。", ["x 与 1/x 都为正数。", "x+1/x≥2√(x·1/x)=2。", "x=1 时取到等号。"], "必须同时检查正数条件和等号条件。"),
+  makeChoice("math", "M-EXPLOG", "exponential-log", "对数运算", "log₂8+log₃9 等于（　）", ["3", "4", "5", "6"], 2, "先分别把真数写成底数的幂。", ["8=2³，所以 log₂8=3。", "9=3²，所以 log₃9=2。", "相加得 5。"], "不同底的对数不能直接合并真数。"),
+  makeChoice("math", "M-TRIG", "trig-transform", "两角和公式", "sin75° 等于（　）", ["(√6−√2)/4", "(√6+√2)/4", "√3/2", "√2/2"], 1, "将 75° 拆成 45°+30°。", ["使用 sin(α+β)=sinαcosβ+cosαsinβ。", "代入 45° 与 30° 的特殊值。", "化简为 (√6+√2)/4。"], "正弦和角公式中两项都是正号。"),
+  makeChoice("math", "M-RECUR", "recurrence", "递推数列求项", "数列满足 a₁=1，aₙ₊₁=2aₙ+1，则 a₃=（　）", ["3", "5", "7", "9"], 2, "按递推关系从首项逐步计算。", ["a₂=2×1+1=3。", "a₃=2×3+1=7。", "所以 a₃=7。"], "注意求 a₃ 需要连续递推两次。"),
+  makeChoice("math", "M-SVECTOR", "space-vector", "空间向量垂直", "非零空间向量 a、b 垂直的充要条件是（　）", ["a+b=0", "a·b=0", "|a|=|b|", "a·b=1"], 1, "向量垂直可转化为数量积为零。", ["a·b=|a||b|cosθ。", "垂直时 θ=90°。", "cos90°=0，因此 a·b=0。"], "向量等长不代表方向垂直。"),
+  makeChoice("math", "M-LINE", "line", "直线的斜率与截距", "直线 2x−y−3=0 的斜率和在 y 轴上的截距分别是（　）", ["2，−3", "−2，−3", "2，3", "−2，3"], 0, "把直线方程化成 y=kx+b，再读取斜率 k 与纵截距 b。", ["移项得 y=2x−3。", "x 的系数 2 是斜率。", "常数项 −3 是直线在 y 轴上的截距。"], "截距是带符号的数，不是到原点的距离。"),
+  makeChoice("math", "M-CONIC", "conic", "椭圆焦距参数", "椭圆 x²/25+y²/9=1 中，c 的值为（　）", ["3", "4", "5", "16"], 1, "椭圆满足 c²=a²−b²。", ["a²=25，b²=9。", "c²=25−9=16。", "c=4。"], "不要误用双曲线的 c²=a²+b²。"),
+  makeChoice("math", "M-COUNT", "counting", "组合计数", "从 5 名同学中选 2 名参加志愿服务，不考虑顺序，共有（　）种选法。", ["5", "8", "10", "20"], 2, "只选人不安排职务，使用组合。", ["计算 C₅²。", "C₅²=5×4/(2×1)。", "结果为 10。"], "不考虑顺序时不能用排列数。"),
+  makeChoice("math", "M-STAT", "statistics", "平均数", "数据 2，4，6，8 的平均数是（　）", ["4", "5", "6", "20"], 1, "平均数等于数据总和除以数据个数。", ["总和为 20。", "共有 4 个数据。", "20÷4=5。"], "不要把总和当作平均数。"),
+  makeChoice("math", "M-COMPLEX", "complex", "复数运算", "复数 (1+i)² 等于（　）", ["2", "2i", "1+i", "−2"], 1, "展开后使用 i²=−1。", ["(1+i)²=1+2i+i²。", "i²=−1。", "结果为 2i。"], "核心是记住 i²=−1。"),
+
+  makeChoice("physics", "P-CIRC", "circular", "向心加速度", "物体以 4 m/s 的速率做半径为 2 m 的匀速圆周运动，向心加速度为（　）", ["2 m/s²", "4 m/s²", "8 m/s²", "16 m/s²"], 2, "向心加速度 a=v²/r。", ["v²=16。", "除以半径 2。", "a=8 m/s²。"], "公式中速率需要平方。"),
+  makeChoice("physics", "P-GRAV", "gravitation", "高空重力加速度", "距地面高度等于地球半径 R 处，重力加速度约为地面的（　）", ["1/2", "1/3", "1/4", "1/8"], 2, "重力加速度与到地心距离的平方成反比。", ["此处到地心距离为 2R。", "g'/g=R²/(2R)²。", "结果为 1/4。"], "题目给的是距地面高度，不是到地心距离。"),
+  makeChoice("physics", "P-EPOT", "electric-field", "电场力做功", "正电荷从 A 点移到 B 点，电场力做正功，则电势能（　）", ["增大", "减小", "不变", "无法判断"], 1, "电场力做功与电势能变化互为相反数。", ["W电=−ΔEₚ。", "电场力做正功，W电>0。", "因此 ΔEₚ<0，电势能减小。"], "不要把电场力做功与电势能变化同号处理。"),
+  makeChoice("physics", "P-CIRCUITLAB", "circuit-experiment", "电压表接法", "用电压表测量定值电阻两端电压时，电压表应（　）", ["与电阻串联", "与电阻并联", "与电源断开", "与滑动变阻器串联"], 1, "电压表测量元件两端电势差，必须并联。", ["确定被测元件是定值电阻。", "电压表两端分别接电阻两端。", "因此是并联。"], "电流表串联，电压表并联。"),
+  makeChoice("physics", "P-MFIELD", "magnetic-field", "安培力方向", "在匀强磁场中，通电直导线与磁场方向平行时，所受安培力大小为（　）", ["0", "BIL", "BIL/2", "2BIL"], 0, "安培力 F=BILsinθ。", ["导线与磁场平行，θ=0°。", "sin0°=0。", "所以 F=0。"], "只有导线与磁场垂直时才取最大值 BIL。"),
+  makeChoice("physics", "P-IND", "induction", "楞次定律", "穿过闭合线圈的磁通量正在增大，感应电流的磁场总是（　）", ["促进原磁通量增大", "阻碍原磁通量增大", "与原磁场垂直", "始终为零"], 1, "感应电流的效果总是阻碍引起它的磁通量变化。", ["先判断原磁通量在增大。", "感应磁场要阻碍这一增大。", "所以它的效果是阻碍原磁通量增大。"], "“阻碍变化”不等于“阻止变化”。"),
+  makeChoice("physics", "P-AC", "ac", "交变电流有效值", "正弦交流电压最大值约为 311 V，其有效值约为（　）", ["110 V", "220 V", "311 V", "440 V"], 1, "正弦交流电的有效值 U=Uₘ/√2。", ["Uₘ=311 V。", "311/√2≈220。", "有效值约为 220 V。"], "有效值不等于最大值。"),
+  makeChoice("physics", "P-THERMO", "thermodynamics", "热力学第一定律", "密闭容器中的理想气体等容升温，其内能和对外做功情况是（　）", ["内能增大，对外做功为 0", "内能不变，对外做正功", "内能减小，对外做功为 0", "内能增大，对外做负功"], 0, "理想气体内能由温度决定，等容过程体积不变。", ["升温使理想气体内能增大。", "容器体积不变，气体边界不移动。", "对外做功为 0。"], "升温不一定伴随体积变化。"),
+  makeChoice("physics", "P-OPTICS", "optics", "薄透镜成像", "凸透镜焦距为 10 cm，物体放在距透镜 30 cm 处，像距为（　）", ["10 cm", "15 cm", "20 cm", "30 cm"], 1, "使用薄透镜公式 1/f=1/u+1/v。", ["1/10=1/30+1/v。", "1/v=1/15。", "v=15 cm。"], "物距与像距不能直接相减得到焦距。"),
+  makeChoice("physics", "P-WAVES", "waves", "波长、频率与波速", "一列波的传播速度为 10 m/s，频率为 5 Hz，波长为（　）", ["0.5 m", "2 m", "5 m", "50 m"], 1, "波速满足 v=λf。", ["λ=v/f。", "代入 10/5。", "波长为 2 m。"], "频率在分母，不是与波速相乘。"),
+  makeChoice("physics", "P-MODERN", "modern-physics", "光子能量", "光在真空中的频率增大时，单个光子的能量（　）", ["增大", "减小", "不变", "先增大后减小"], 0, "光子能量 E=hν。", ["普朗克常量 h 不变。", "频率 ν 增大。", "E 随之增大。"], "光强影响光子数，频率影响单个光子能量。"),
+
+  makeChoice("chinese", "C-LITERARY", "literary-reading", "叙事视角作用", "小说以人物的限知视角叙事，最直接的表达效果是（　）", ["可以自由介绍所有人的内心", "读者随人物逐步发现信息", "消除故事的全部悬念", "使叙事时间必然顺序化"], 1, "限知视角只呈现人物能知道的信息。", ["先界定“限知”。", "读者的信息范围与人物接近。", "这会形成逐步发现的阅读体验。"], "限知视角不能无限进入所有人物心理。"),
+  makeChoice("chinese", "C-CULTURE", "classical-culture", "古代文化常识", "古代男子二十岁左右行冠礼，“弱冠”通常指（　）", ["十五岁的女子", "二十岁左右的男子", "三十岁的男子", "六十岁的老人"], 1, "识记年龄称谓与古代礼制的对应关系。", ["“冠”与男子冠礼有关。", "冠礼通常在二十岁左右。", "因此“弱冠”指二十岁左右的男子。"], "“弱冠”指男子，不是女子。"),
+  makeChoice("chinese", "C-POETRY", "poetry", "诗歌景情关系", "诗人用明丽春景反衬离别之愁，这种写法是（　）", ["以哀景写哀情", "以乐景写乐情", "以乐景写哀情", "直抒胸臆"], 2, "先判断景物的感情色彩，再判断人物情感。", ["明丽春景属于乐景。", "离别之愁属于哀情。", "二者反差是以乐景写哀情。"], "不要只看景物是否明丽，还要对照人物情感。"),
+  makeChoice("chinese", "C-LINES", "famous-lines", "名篇名句理解性默写", "补写：“长风破浪会有时，____。”", ["直挂云帆济沧海", "轻舟已过万重山", "唯见长江天际流", "大漠孤烟直"], 0, "根据上下句语意和固定篇目准确识记。", ["上句表达冲破困境的信念。", "下句以云帆沧海承接。", "原句是“直挂云帆济沧海”。"], "注意“挂”“沧”等字的准确写法。"),
+  makeChoice("chinese", "C-LANG", "language-use", "语病辨析", "下列句子没有语病的一项是（　）", ["通过复盘，使我找到了失分原因。", "我们要防止类似错误不再发生。", "每天二十分钟的限时阅读提高了我的速度。", "是否坚持复习，是成绩提高的关键。"], 2, "从成分残缺、否定失当和两面对一面逐项检查。", ["A 缺主语。", "B 否定失当，D 两面对一面。", "C 结构和搭配均正常。"], "“是否”通常要与两面性结果搭配。"),
+  makeChoice("chinese", "C-RHETORIC", "rhetoric", "修辞手法", "“树叶在夜风中低声交谈”主要使用了（　）", ["比喻", "拟人", "借代", "反问"], 1, "将人的动作或情态赋予无生命事物，是拟人。", ["“交谈”是人的行为。", "句中把树叶当作人来写。", "判定为拟人。"], "句中没有“像”也没有本体喻体的对照，不是比喻。"),
+  makeChoice("chinese", "C-SENTENCE", "sentence", "压缩语段", "将“为满足学生晚间学习需求，学校图书馆将从下月起把闭馆时间延后一小时”压缩为一句话，最准确的是（　）", ["学生喜欢晚上学习。", "学校图书馆下月起延长开放一小时。", "学校有一个图书馆。", "图书馆的灯会晚一小时关闭。"], 1, "压缩时保留主体、时间和核心事件。", ["主体是学校图书馆。", "时间是下月起。", "事件是延长开放一小时。"], "压缩不能把原文内容换成自己的推测。"),
+  makeChoice("chinese", "C-CONT", "continuation", "情境表达", "要在班级群通知“周五下午三点在阶梯教室开备考会”，下列表达最完整得体的是（　）", ["开会了，都来。", "请同学们于周五下午三点到阶梯教室参加备考会，请准时到场。", "周五有事，勿忘。", "阶梯教室等你。"], 1, "情境表达要信息完整、对象明确、语气得体。", ["保留时间、地点、事项。", "用“请”保持得体。", "B 项信息最完整。"], "简洁不等于省略关键信息。"),
+  makeChoice("chinese", "C-PRACTICAL", "practical-writing", "通知要素", "一则校园活动通知的正文中，最需要明确的信息组合是（　）", ["天气和心情", "时间、地点、对象和事项", "作者的爱好", "活动起源的详细历史"], 1, "应用文首先服务于信息传达和行动执行。", ["读者需要知道何时何地。", "还需要确认谁参加、做什么。", "所以正文应明确时间、地点、对象和事项。"], "格式正确不能弥补关键信息缺失。"),
+  makeChoice("chinese", "C-BOOK", "whole-book", "整本书阅读方法", "阅读长篇作品时，为理清人物变化，最有效的做法是（　）", ["只记住结尾", "按关键事件记录人物选择与动机变化", "只抄录环境描写", "跳过所有次要人物"], 1, "人物弧光要通过“事件—选择—动机”链条跟踪。", ["找出推动人物的关键事件。", "记录人物当时的选择与理由。", "前后对照才能看出变化。"], "整本书阅读不是情节摘抄的堆积。"),
+
+  makeChoice("english", "E-WORDFORM", "wordformation", "词性转换", "The experiment was a great ___ and encouraged the whole team.", ["succeed", "success", "successful", "successfully"], 1, "不定冠词 a 和形容词 great 后需要名词。", ["空前是 a great。", "该位置需要单数名词。", "success 是名词。"], "successful 是形容词，successfully 是副词。"),
+  makeChoice("english", "E-CLOZE", "cloze", "完形填空语境", "Nina felt nervous before the speech, but her teacher's smile gave her the ___ to begin.", ["courage", "silence", "distance", "danger"], 0, "通过 but 后的语义转折推断所需词义。", ["前文说 Nina 紧张。", "老师的微笑帮助她开始演讲。", "courage 符合语境。"], "不要单看选项，要连起前后因果。"),
+  makeChoice("english", "E-SEVEN", "seven-five", "七选五衔接", "You may feel tired after studying for an hour. ___. A five-minute walk can help you focus again.", ["So never make a plan", "In that case, take a short break", "However, sleep is unnecessary", "For example, avoid all movement"], 1, "后句的五分钟散步是对疲劳的建议。", ["前句提出疲劳问题。", "后句给出散步这一短休方式。", "B 起到问题与建议的衔接作用。"], "注意代词、逻辑连接词与语义复现。"),
+  makeChoice("english", "E-THEME", "thematic-reading", "长难句主干", "In the sentence \"The book that my teacher recommended has changed the way I study,\" the main predicate is ___.", ["recommended", "has changed", "study", "is"], 1, "先暂时去掉定语从句，找主句主干。", ["主语是 The book。", "that my teacher recommended 是修饰 book 的定语从句。", "主句谓语是 has changed。"], "recommended 是从句谓语，不是主句谓语。"),
+  makeChoice("english", "E-WRITING", "writing", "应用文语气", "Which sentence is most appropriate in an email asking a teacher for advice?", ["You must answer me today.", "Could you please give me some advice on my study plan?", "My plan is bad. Fix it.", "I want advice, whatever."], 1, "向老师请求建议时应明确、礼貌、语气适度。", ["确定写作对象是老师。", "Could you please 是礼貌请求。", "B 项事项明确且语气得体。"], "礼貌不等于含糊，请求的内容仍要具体。"),
+  makeChoice("english", "E-CONTWRITE", "continuation-writing", "读后续写衔接", "In a continuation, the character has just lost a map but still needs to reach the village. Which next event is most coherent?", ["The story suddenly moves to space.", "She checks the river direction and asks a farmer for help.", "A new character wins a race unrelated to the trip.", "She forgets the village and starts cooking."], 1, "续写事件要承接已有目标和困境。", ["人物目标是到达村庄。", "当前困境是地图丢失。", "判断方向并求助直接推动主线。"], "续写不能只追求意外，还要保持人物动机与因果链。"),
+  makeChoice("english", "E-TRANSLATE", "translation", "句子表达升级", "“坚持复盘帮助我们避免重复错误。”最准确的英文是（　）", ["Regular review helps us avoid repeating mistakes.", "Review makes mistakes repeat us.", "We avoid review and repeat mistakes.", "Mistakes help us stop regular review."], 0, "用 help sb. do sth. 和 avoid doing sth. 表达因果。", ["“帮助我们”对应 helps us。", "“避免重复”对应 avoid repeating。", "A 项语义和搭配都正确。"], "avoid 后接动名词，不接 to do。"),
+  makeChoice("english", "E-LISTEN", "listening", "听力信息定位", "Man: Shall we meet at the library at two? Woman: I have class until two thirty. How about three? When will they probably meet?", ["At 2:00.", "At 2:30.", "At 3:00.", "At 3:30."], 2, "听力对话中的最终建议通常是答案。", ["男士首先建议两点。", "女士说两点半前有课。", "她最后建议三点。"], "不要被对话开头的时间诱导，要听最终决定。"),
+];
