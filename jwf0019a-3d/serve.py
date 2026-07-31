@@ -2,15 +2,30 @@
 import argparse
 import json
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from urllib.parse import urlsplit
 
 
 class JWF0019AHandler(SimpleHTTPRequestHandler):
+    REMOTE_ASSET_BASE = "https://wiujianzhong.github.io/kunpeng-yuechao/jwf0019a-3d"
+
     def end_headers(self):
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
         self.send_header("X-Frame-Options", "SAMEORIGIN")
         super().end_headers()
+
+    def send_head(self):
+        request_path = urlsplit(self.path).path
+        local_path = Path(self.translate_path(self.path))
+        is_remote_asset = request_path.startswith(("/assets/", "/vendor/"))
+        if is_remote_asset and not local_path.is_file():
+            self.send_response(302)
+            self.send_header("Location", f"{self.REMOTE_ASSET_BASE}{self.path}")
+            self.send_header("Cache-Control", "public, max-age=300")
+            self.end_headers()
+            return None
+        return super().send_head()
 
     def do_GET(self):
         if urlsplit(self.path).path == "/health":
