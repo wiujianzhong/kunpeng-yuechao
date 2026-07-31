@@ -726,11 +726,57 @@
       "./assets/audio/structure-elfeye.mp3",
       "./assets/audio/structure-ejection.mp3"
     ];
+    const operationVoice = [
+      "./assets/audio/operation-01.mp3",
+      "./assets/audio/operation-02.mp3",
+      "./assets/audio/operation-03.mp3",
+      "./assets/audio/operation-04.mp3",
+      "./assets/audio/operation-05.mp3"
+    ];
+    const faultVoice = {
+      camera: [
+        "./assets/audio/fault-camera-01.mp3",
+        "./assets/audio/fault-camera-02.mp3",
+        "./assets/audio/fault-camera-03.mp3",
+        "./assets/audio/fault-camera-04.mp3",
+        "./assets/audio/fault-camera-05.mp3"
+      ],
+      channel: [
+        "./assets/audio/fault-channel-01.mp3",
+        "./assets/audio/fault-channel-02.mp3",
+        "./assets/audio/fault-channel-03.mp3",
+        "./assets/audio/fault-channel-04.mp3",
+        "./assets/audio/fault-channel-05.mp3"
+      ],
+      temperature: [
+        "./assets/audio/fault-temperature-01.mp3",
+        "./assets/audio/fault-temperature-02.mp3",
+        "./assets/audio/fault-temperature-03.mp3",
+        "./assets/audio/fault-temperature-04.mp3",
+        "./assets/audio/fault-temperature-05.mp3"
+      ],
+      flow: [
+        "./assets/audio/fault-flow-01.mp3",
+        "./assets/audio/fault-flow-02.mp3",
+        "./assets/audio/fault-flow-03.mp3",
+        "./assets/audio/fault-flow-04.mp3",
+        "./assets/audio/fault-flow-05.mp3"
+      ]
+    };
+    const referenceVoice = [
+      "./assets/audio/reference-01.mp3",
+      "./assets/audio/reference-02.mp3",
+      "./assets/audio/reference-03.mp3",
+      "./assets/audio/reference-04.mp3",
+      "./assets/audio/reference-05.mp3"
+    ];
     const voiceTracks = {
       "认识结构": structureVoice,
-      "工作原理": principleVoice
+      "工作原理": principleVoice,
+      "操作保养": operationVoice,
+      "参数资料": referenceVoice
     };
-    Object.values(voiceTracks).flat().forEach(src => {
+    [...Object.values(voiceTracks), ...Object.values(faultVoice)].flat().forEach(src => {
       fetch(src, { cache: "force-cache" }).catch(() => {});
     });
     const voicePlayer = new Audio();
@@ -741,6 +787,10 @@
     function getSteps() {
       const module = modules[currentModule];
       return module.symptoms?.[currentSymptom]?.steps || module.steps;
+    }
+
+    function getVoiceTrack(moduleName = currentModule) {
+      return moduleName === "故障诊断" ? faultVoice[currentSymptom] : voiceTracks[moduleName];
     }
 
     function stopPlayback() {
@@ -762,7 +812,7 @@
     function playStepVoice(index) {
       stopVoice();
       if (!voiceEnabled) return;
-      const src = voiceTracks[currentModule]?.[index];
+      const src = getVoiceTrack()?.[index];
       if (!src) return;
       const token = activeVoiceToken;
       let failed = false;
@@ -785,7 +835,7 @@
     }
 
     function updateVoiceControl() {
-      const hasVoice = Boolean(voiceTracks[currentModule]);
+      const hasVoice = Boolean(getVoiceTrack());
       voiceButton.disabled = !hasVoice;
       voiceButton.hidden = !hasVoice;
       voiceButton.classList.toggle("active", hasVoice && voiceEnabled);
@@ -832,7 +882,7 @@
     function scheduleNext(forceTimer = false) {
       clearTimeout(stepTimer);
       if (paused) return;
-      if (!forceTimer && voiceEnabled && voiceTracks[currentModule]) return;
+      if (!forceTimer && voiceEnabled && getVoiceTrack()) return;
       stepTimer = setTimeout(advanceStep, 4200 / speed);
     }
 
@@ -862,7 +912,7 @@
         currentStep = 0;
         paused = true;
         pauseButton.textContent = "开始";
-        modeHint.textContent = voiceTracks[currentModule]
+        modeHint.textContent = getVoiceTrack()
           ? "已接入五段讲解语音，点击带我学习后自动播放。"
           : "该模块先播放画面与字幕；等你确认内容并补充真人录音后再接入语音。";
         renderStep(false);
@@ -908,7 +958,7 @@
       pauseButton.textContent = currentMode === "guided" ? "开始" : "暂停";
       updateVoiceControl();
       if (currentMode === "guided") {
-        modeHint.textContent = voiceTracks[name]
+        modeHint.textContent = getVoiceTrack(name)
           ? "已接入五段讲解语音，当前会自动播放。"
           : "该模块先播放画面与字幕；等你确认内容并补充真人录音后再接入语音。";
         playFromCurrent();
@@ -938,7 +988,10 @@
       currentStep = 0;
       paused = true;
       pauseButton.textContent = currentMode === "guided" ? "开始" : "暂停";
-      if (currentMode === "guided") renderStep(false);
+      if (currentMode === "guided") {
+        playFromCurrent();
+        revealPlaybackControls();
+      }
     }));
 
     document.querySelector("#prev-step").addEventListener("click", () => {
@@ -962,7 +1015,7 @@
       }
     });
     voiceButton.addEventListener("click", () => {
-      if (!voiceTracks[currentModule]) return;
+      if (!getVoiceTrack()) return;
       voiceEnabled = !voiceEnabled;
       updateVoiceControl();
       if (voiceEnabled && currentMode === "guided" && !paused) {
