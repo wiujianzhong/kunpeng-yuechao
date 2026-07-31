@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#fff7ed" />
+    <meta name="description" content="面向准高三学生的趣味化高考复习、错题与复盘系统" />
+    <title>梁芷若的星航学习岛｜准高三备考</title>
+    <link rel="icon" type="image/png" href="assets/zhiruo-avatar-192.png" />
+    <link rel="apple-touch-icon" href="assets/zhiruo-apple-touch.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css?v=20260731-video2" />
+    <link rel="stylesheet" href="cute-theme.css?v=20260731-video2" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <div class="ambient" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <button class="brand" type="button" data-route="home" aria-label="返回学习岛首页">
+          <span class="brand-mark" aria-hidden="true">
+            <i></i><b></b>
+          </span>
+          <span>
+            <strong>芷若学习岛</strong>
+            <small>ZHIRUO · STUDY ISLAND</small>
+          </span>
+        </button>
+
+        <div class="topbar-center" aria-label="高考倒计时">
+          <span>距离高考</span>
+          <strong id="countdown-days">—</strong>
+          <span>天</span>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="focus-toggle" id="focus-toggle" type="button" aria-pressed="false">
+            <span class="focus-dot"></span>
+            <span>安静模式</span>
+          </button>
+          <button class="avatar-button" type="button" data-route="report" aria-label="打开梁芷若的学习报告">
+            <img src="assets/zhiruo-avatar-192.png" alt="" />
+            <span class="avatar-copy"><strong>梁芷若</strong><small>我的成长</small></span>
+          </button>
+        </div>
+      </header>
+
+      <aside class="side-nav" aria-label="主要导航">
+        <button class="nav-item active" type="button" data-route="home">
+          <span class="nav-icon" aria-hidden="true">🏡</span><span>学习岛</span>
+        </button>
+        <button class="nav-item" type="button" data-route="practice">
+          <span class="nav-icon" aria-hidden="true">✏️</span><span>专题练习</span>
+        </button>
+        <button class="nav-item" type="button" data-route="wrongbook">
+          <span class="nav-icon" aria-hidden="true">📚</span><span>错题复盘</span>
+          <em id="nav-wrong-count" hidden>0</em>
+        </button>
+        <button class="nav-item" type="button" data-route="exam">
+          <span class="nav-icon" aria-hidden="true">🏁</span><span>限时小卷</span>
+        </button>
+        <button class="nav-item" type="button" data-route="report">
+          <span class="nav-icon" aria-hidden="true">🌱</span><span>学习报告</span>
+        </button>
+
+        <div class="nav-spacer"></div>
+        <button class="nav-item tutor-entry" id="open-tutor" type="button">
+          <span class="nav-icon tutor-pulse" aria-hidden="true">🌟</span><span>星星老师</span>
+        </button>
+      </aside>
+
+      <main id="main-content" tabindex="-1"></main>
+    </div>
+
+    <aside class="tutor-drawer" id="tutor-drawer" aria-hidden="true" aria-label="AI 老师">
+      <div class="tutor-head">
+        <div>
+          <span class="tutor-avatar">AI</span>
+          <span><strong>星星老师</strong><small id="tutor-status">本地讲解可用</small></span>
+        </div>
+        <button id="close-tutor" type="button" aria-label="关闭 AI 老师">×</button>
+      </div>
+      <div class="tutor-messages" id="tutor-messages" aria-live="polite"></div>
+      <div class="tutor-quick-actions" id="tutor-quick-actions">
+        <button type="button" data-tutor-action="hint">只提示下一步</button>
+        <button type="button" data-tutor-action="explain">换种说法</button>
+        <button type="button" data-tutor-action="diagnose">帮我找错因</button>
+      </div>
+      <form class="tutor-input" id="tutor-form">
+        <label class="sr-only" for="tutor-question">向 AI 老师提问</label>
+        <textarea id="tutor-question" rows="2" placeholder="把卡住的地方告诉我…"></textarea>
+        <button type="submit">发送</button>
+      </form>
+    </aside>
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="src/app.js?v=20260731-video2"></script>
+  </body>
+</html>

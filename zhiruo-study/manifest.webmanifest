@@ -1,0 +1,14 @@
+{
+  "name": "梁芷若的星航学习岛",
+  "short_name": "芷若学习岛",
+  "description": "梁芷若的准高三备考与错题复盘系统",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fff7ed",
+  "theme_color": "#fff7ed",
+  "icons": [
+    { "src": "assets/zhiruo-avatar-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/zhiruo-avatar-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
