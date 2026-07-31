@@ -3,10 +3,11 @@ import {
   QUESTIONS,
   SKILLS,
   SUBJECTS,
+  VIDEO_RESOURCES,
   getLesson,
   getQuestion,
   getSkill,
-} from "./data.js";
+} from "./data.js?v=20260731-video2";
 import { CURRICULUM, getCurriculumStats } from "./curriculum.js";
 import { DIMENSION_LABELS } from "./learning-guides.js";
 import { celebrateSuccess, initPlayfulUI, refreshPlayfulUI } from "./playful-ui.js";
@@ -68,7 +69,7 @@ function bootstrap() {
   updateBadges();
   bindStaticEvents();
   const hashRoute = window.location.hash.replace("#", "");
-  navigate(["home", "practice", "wrongbook", "exam", "report", "lesson", "knowledge"].includes(hashRoute) ? hashRoute : "home", {}, false);
+  navigate(["home", "practice", "wrongbook", "exam", "report", "lesson", "knowledge", "videos"].includes(hashRoute) ? hashRoute : "home", {}, false);
   window.setInterval(updateCountdown, 60_000);
 }
 
@@ -134,6 +135,7 @@ function render() {
     report: renderReport,
     lesson: renderLesson,
     knowledge: renderKnowledge,
+    videos: renderVideos,
   };
   main.innerHTML = (renderers[route] || renderHome)();
   refreshPlayfulUI(main);
@@ -233,6 +235,16 @@ function renderHome() {
           <div class="subjects-grid">
             ${Object.values(SUBJECTS).map(renderSubjectCard).join("")}
           </div>
+        </section>
+
+        <section class="panel video-teaser" aria-labelledby="video-teaser-title">
+          <div class="video-teaser-illustration" aria-hidden="true"><span>▶</span><i>✦</i><b>♫</b></div>
+          <div>
+            <span class="eyebrow">严选外部课程</span>
+            <h2 id="video-teaser-title">名师视频馆</h2>
+            <p>四科官方课程入口已经整理好。先用视频把难点看懂，再回学习岛做题验证，避免“看懂了却不会做”。</p>
+          </div>
+          <button class="primary-button" type="button" data-route-action="videos">打开视频馆 <span class="button-icon">→</span></button>
         </section>
       </div>
     </div>
@@ -378,6 +390,85 @@ function renderKnowledge() {
         </div>
       </section>
     </div>
+  `;
+}
+
+function renderVideos() {
+  const selectedSubject = routeContext.subject === "all" || SUBJECTS[routeContext.subject] ? routeContext.subject || "all" : "all";
+  const resources = VIDEO_RESOURCES.filter((resource) => selectedSubject === "all" || resource.subject === "all" || resource.subject === selectedSubject);
+  const subjectFilters = [
+    { id: "all", name: "全部", color: "#ff8fb8" },
+    ...Object.values(SUBJECTS),
+  ];
+
+  return `
+    <div class="page videos-page">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">先看懂 · 再做会</span>
+          <h1>名师视频馆</h1>
+          <p>只收录来源明确的官方平台或老师本人课程页。视频负责讲明白，练习负责确认真的会。</p>
+        </div>
+        <div class="status-cluster">
+          <span class="status-pill">四科 <strong>全覆盖</strong></span>
+          <span class="status-pill">入口 <strong>${VIDEO_RESOURCES.length}</strong> 个</span>
+          <span class="status-pill">已检查 <strong>2026-07-31</strong></span>
+        </div>
+      </div>
+
+      <section class="video-study-rule" aria-label="视频学习三步法">
+        <div><span>1</span><strong>带着问题看</strong><small>先写下卡住的知识点</small></div>
+        <i>→</i>
+        <div><span>2</span><strong>只看一小节</strong><small>建议一次 15～30 分钟</small></div>
+        <i>→</i>
+        <div><span>3</span><strong>立刻做题</strong><small>至少完成 4 道专项题</small></div>
+      </section>
+
+      <div class="video-subjects" aria-label="筛选视频学科">
+        ${subjectFilters.map((item) => `
+          <button type="button" data-video-subject="${item.id}" class="${selectedSubject === item.id ? "active" : ""}" style="--subject-color:${item.color}">
+            ${item.id === "all" ? "🌈" : item.short} ${item.name}
+          </button>
+        `).join("")}
+      </div>
+
+      <div class="video-library-grid">
+        ${resources.map(renderVideoResource).join("")}
+      </div>
+
+      <aside class="video-safety-note">
+        <span aria-hidden="true">🧭</span>
+        <p><strong>伍润芝的视频使用规则：</strong>不追求收藏很多老师，也不连续刷课。一个知识点选一位老师，看完能独立做题才算学会；外部平台内容或入口如有调整，可以回来告诉星星老师。</p>
+      </aside>
+    </div>
+  `;
+}
+
+function renderVideoResource(resource) {
+  const subject = resource.subject === "all"
+    ? { name: "四科综合", color: "#ff8fb8", short: "全" }
+    : SUBJECTS[resource.subject];
+  return `
+    <article class="video-resource-card" style="--subject-color:${subject.color}">
+      <div class="video-resource-top">
+        <span class="video-resource-icon" aria-hidden="true">${resource.icon}</span>
+        <span class="video-resource-tag">${resource.tag}</span>
+      </div>
+      <span class="video-resource-subject">${subject.short} · ${subject.name}</span>
+      <h2>${resource.title}</h2>
+      <p class="video-resource-provider">${resource.provider}</p>
+      <p class="video-resource-description">${resource.description}</p>
+      <div class="video-resource-best">
+        ${resource.bestFor.map((item) => `<span>${item}</span>`).join("")}
+      </div>
+      <div class="video-resource-tip"><strong>怎么学：</strong>${resource.watchTip}</div>
+      <div class="video-resource-actions">
+        <a class="primary-button" data-video-link="${resource.id}" href="${resource.url}" target="_blank" rel="noopener noreferrer">打开官方课程 ↗</a>
+        ${resource.subject === "all"
+          ? `<button class="ghost-button" type="button" data-route-action="knowledge">查看知识树</button>`
+          : `<button class="ghost-button" type="button" data-subject-id="${resource.subject}">看完做题</button>`}
+      </div>
+    </article>
   `;
 }
 
@@ -868,6 +959,12 @@ function handleMainClick(event) {
   const knowledgeSubject = event.target.closest("[data-knowledge-subject]");
   if (knowledgeSubject) {
     routeContext.subject = knowledgeSubject.dataset.knowledgeSubject;
+    return render();
+  }
+
+  const videoSubject = event.target.closest("[data-video-subject]");
+  if (videoSubject) {
+    routeContext.subject = videoSubject.dataset.videoSubject;
     return render();
   }
 
