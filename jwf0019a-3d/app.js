@@ -605,14 +605,33 @@ function importedPartInfo(name) {
   return [name || 'JWF0019A整机', '依据官方外形、现场拆板照片和已确认结构重新绘制的低面数可拆模型。'];
 }
 
-// 第13轮恢复：回退到第11轮完整外形母体，保留已校准内部布局。
+// 正式外形只允许加载当前新主体；旧程序化草模永不作为弱网回退显示。
 const completeModel = makeLayer('hunyuan');
 const modelLoadStatus = document.querySelector('#model-load-status');
 const modelStatusValue = document.querySelector('#model-status-value');
 const importedModelLoader = new GLTFLoader();
 importedModelLoader.setMeshoptDecoder(MeshoptDecoder);
-importedModelLoader.load(
-  './assets/models/JWF0019A-新主体对齐-720贴图-前罩底板削平-2026-07-25.glb?v=front-cover-base-flat-20260725',
+const CURRENT_MODEL_PATH = 'assets/models/JWF0019A-新主体对齐-720贴图-前罩底板削平-2026-07-25.glb';
+const CURRENT_MODEL_VERSION = 'e5e75993-20260802';
+const CURRENT_MODEL_ATTEMPTS_PER_SOURCE = 2;
+const currentModelSources = [...new Map([
+  `./${CURRENT_MODEL_PATH}?v=${CURRENT_MODEL_VERSION}`,
+  `https://wiujianzhong.github.io/kunpeng-yuechao/jwf0019a-3d/${CURRENT_MODEL_PATH}?v=${CURRENT_MODEL_VERSION}`,
+  `https://cdn.jsdelivr.net/gh/wiujianzhong/kunpeng-yuechao@747a801/jwf0019a-3d/${CURRENT_MODEL_PATH}?v=${CURRENT_MODEL_VERSION}`
+].map((source) => [new URL(source, window.location.href).href, source])).values()];
+let currentModelSourceIndex = 0;
+let currentModelAttempt = 0;
+
+function loadCurrentModel() {
+  const source = currentModelSources[currentModelSourceIndex];
+  const sourceUrl = new URL(source, window.location.href);
+  if (currentModelAttempt > 0) sourceUrl.searchParams.set('retry', `${currentModelAttempt + 1}`);
+  completeModel.visible = false;
+  if (layers.shell) layers.shell.visible = false;
+  modelStatusValue.textContent = `当前新模型加载中 · 线路${currentModelSourceIndex + 1}`;
+
+  importedModelLoader.load(
+  sourceUrl.href,
   (gltf) => {
     const importedRoot = gltf.scene;
     importedRootModel = importedRoot;
@@ -686,6 +705,8 @@ importedModelLoader.load(
     }
 
     importedModelReady = true;
+    completeModel.visible = true;
+    if (layers.shell) layers.shell.visible = false;
     modelLoadStatus.innerHTML = '<span class="dot ready"></span>外形清理校正版已加载 · 31252三角面';
     modelStatusValue.textContent = '旧灯与疙瘩已清除 · 圆盘管口已对中';
     updateExplode();
@@ -697,17 +718,33 @@ importedModelLoader.load(
     modelStatusValue.textContent = `真实外观加载 ${progress}%`;
   },
   (error) => {
-    console.error('外形清理校正版加载失败', error);
+    console.warn(`当前新模型加载失败：线路${currentModelSourceIndex + 1}，第${currentModelAttempt + 1}次`, error);
     completeModel.visible = false;
-    if (layers.shell) layers.shell.visible = true;
-    const hunyuanToggle = document.querySelector('[data-layer="hunyuan"]');
-    const shellToggle = document.querySelector('[data-layer="shell"]');
-    if (hunyuanToggle) hunyuanToggle.checked = false;
-    if (shellToggle) shellToggle.checked = true;
-    modelLoadStatus.innerHTML = '<span class="dot warning"></span>低模修复校对版加载失败 · 已回退校对草模';
-    modelStatusValue.textContent = '校对草模回退';
+    if (layers.shell) layers.shell.visible = false;
+
+    if (currentModelAttempt + 1 < CURRENT_MODEL_ATTEMPTS_PER_SOURCE) {
+      currentModelAttempt += 1;
+      modelStatusValue.textContent = `网络较慢，正在重试当前新模型 · ${currentModelAttempt + 1}/${CURRENT_MODEL_ATTEMPTS_PER_SOURCE}`;
+      window.setTimeout(loadCurrentModel, 700);
+      return;
+    }
+
+    currentModelSourceIndex += 1;
+    currentModelAttempt = 0;
+    if (currentModelSourceIndex < currentModelSources.length) {
+      modelStatusValue.textContent = `正在切换备用线路加载当前新模型 · ${currentModelSourceIndex + 1}/${currentModelSources.length}`;
+      window.setTimeout(loadCurrentModel, 700);
+      return;
+    }
+
+    console.error('当前新模型的全部加载线路均失败');
+    modelLoadStatus.innerHTML = '<span class="dot warning"></span>当前新模型暂未加载，请检查网络后刷新';
+    modelStatusValue.textContent = '当前新模型加载失败 · 不显示旧模型';
   }
-);
+  );
+}
+
+loadCurrentModel();
 
 const calibrationMaterials = {
   front: new THREE.MeshStandardMaterial({ color: 0x37b8e5, roughness: 0.35, metalness: 0.18 }),
@@ -2359,6 +2396,7 @@ calibrationReset.addEventListener('click', () => {
 });
 
 const shell = makeLayer('shell');
+shell.visible = false;
 
 // 图7左侧落地承重柱：灰色机身、竖向绿色饰板和下部散热孔。
 const leftColumn = new THREE.Group();
@@ -3349,7 +3387,7 @@ canvas.addEventListener('pointerup', (event) => {
   if (distance <= 5) pickAt(event);
 });
 
-// 第4轮开始只显示正式GLB；旧程序化草模保留为加载失败时的自动回退，不再与正式模型叠加。
+// 只显示正式GLB；旧程序化草模保留给代码历史，但任何模式都不再显示。
 ['shell', 'front', 'rear', 'magic', 'compute', 'channel', 'ejection'].forEach((name) => {
   if (layers[name]) layers[name].visible = false;
 });
@@ -3475,7 +3513,7 @@ function setTourStep(step) {
   cottonFlow.visible = false;
   setOpticalPathState('off');
   setLayerVisible('hunyuan', importedModelReady);
-  setLayerVisible('shell', !importedModelReady);
+  setLayerVisible('shell', false);
   updateCalibrationPartVisibility('external');
   setValveRowActive(false);
 
@@ -3557,7 +3595,7 @@ function setProcessDemo(enabled) {
     setExternalModulesGhosted(true);
     setOpticalPathState('process', 0);
     setLayerVisible('hunyuan', importedModelReady);
-    setLayerVisible('shell', !importedModelReady);
+    setLayerVisible('shell', false);
     partTitle.textContent = '异纤机工作原理动画';
     partDetail.textContent = '实体展示时主通道为白色铁质风道，前后相机对射位置是透明玻璃窗；播放时整条通道切换为淡蓝透明，玻璃窗发白，便于观察内部棉流。';
   } else {
