@@ -1,4 +1,4 @@
-const SUBJECT_POINTS = { math: 5, physics: 6, chinese: 5, english: 5 };
+const SUBJECT_POINTS = { math: 5, physics: 6, chemistry: 6, biology: 6, chinese: 5, english: 5 };
 
 function makeChoice(subject, code, skill, title, stem, options, answer, idea, steps, trap) {
   return {

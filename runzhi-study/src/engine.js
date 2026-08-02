@@ -374,7 +374,7 @@ export function generateExam(state, options = {}) {
       createdAt: new Date().toISOString(),
     };
   }
-  const priority = { math: 0.38, physics: 0.34, chinese: 0.14, english: 0.14 };
+  const priority = { math: 0.23, physics: 0.18, chemistry: 0.16, biology: 0.15, chinese: 0.14, english: 0.14 };
   const subjects = Object.keys(priority);
   const selected = [];
   const used = new Set();
@@ -398,7 +398,7 @@ export function generateExam(state, options = {}) {
 
   return {
     id: `EXAM-${seed}`,
-    title: options.title || "高考四科联合小卷",
+    title: options.title || "高考六科联合小卷",
     durationMinutes: Number(options.durationMinutes) || 25,
     questionIds: seededShuffle(selected, seed + 7).map((question) => question.id),
     totalPoints: selected.reduce((sum, question) => sum + question.points, 0),

@@ -143,6 +143,126 @@ const SUBJECT_CURRICULUM = {
       skills: [["experiment", "力学实验与数据处理", 66, 8, { featured: true, x: 69, y: 83 }]],
     },
   ],
+  chemistry: [
+    {
+      id: "chemistry-foundation",
+      name: "化学计量与反应基础",
+      skills: [
+        ["chem-amount", "物质的量、气体摩尔体积与浓度", 56, 9],
+        ["chem-ions", "离子反应与离子方程式", 54, 9],
+        ["chem-redox", "氧化还原反应与电子守恒", 49, 10],
+      ],
+    },
+    {
+      id: "chemistry-elements",
+      name: "元素及其化合物",
+      skills: [
+        ["chem-metals", "钠、铝、铁及其化合物", 58, 8],
+        ["chem-nonmetals", "氯、硫、氮及其化合物", 55, 9],
+        ["chem-periodic", "元素周期律与元素推断", 57, 8],
+      ],
+    },
+    {
+      id: "chemistry-principles",
+      name: "化学反应原理",
+      skills: [
+        ["chem-thermo", "反应热与盖斯定律", 53, 8],
+        ["chem-rate-equilibrium", "反应速率与化学平衡", 47, 10],
+        ["chem-aqueous", "水溶液中的离子平衡", 46, 10],
+        ["chem-solubility", "沉淀溶解平衡", 50, 9],
+        ["chem-electrochemistry", "原电池、电解池与金属腐蚀", 48, 10],
+      ],
+    },
+    {
+      id: "chemistry-structure",
+      name: "物质结构与性质",
+      skills: [
+        ["chem-structure", "原子结构与化学键", 61, 7],
+        ["chem-crystal", "分子结构、性质与晶体", 55, 8],
+      ],
+    },
+    {
+      id: "chemistry-organic",
+      name: "有机化学基础",
+      skills: [
+        ["chem-organic-basic", "有机物结构与同分异构", 58, 8],
+        ["chem-hydrocarbon", "烃与卤代烃", 60, 7],
+        ["chem-oxygen-organic", "烃的含氧衍生物", 52, 9],
+        ["chem-synthesis", "有机推断与合成路线", 45, 10],
+        ["chem-polymer", "生物大分子与合成高分子", 64, 6],
+      ],
+    },
+    {
+      id: "chemistry-lab",
+      name: "化学实验",
+      skills: [
+        ["chem-lab-basic", "实验安全、仪器与基本操作", 62, 8],
+        ["chem-lab-inquiry", "制备、检验、分离与探究", 48, 10],
+      ],
+    },
+  ],
+  biology: [
+    {
+      id: "biology-cell",
+      name: "分子与细胞",
+      skills: [
+        ["bio-molecules", "细胞中的元素与化合物", 63, 7],
+        ["bio-cell-structure", "细胞结构与功能", 59, 8],
+        ["bio-membrane", "生物膜与物质运输", 55, 9],
+      ],
+    },
+    {
+      id: "biology-metabolism",
+      name: "细胞代谢",
+      skills: [
+        ["bio-atp-enzyme", "酶、ATP与代谢条件", 57, 8],
+        ["bio-respiration", "细胞呼吸", 52, 9],
+        ["bio-photosynthesis", "光合作用", 47, 10],
+      ],
+    },
+    {
+      id: "biology-life-course",
+      name: "细胞生命历程",
+      skills: [
+        ["bio-mitosis", "细胞增殖、分化、衰老与死亡", 60, 8],
+        ["bio-meiosis", "减数分裂与受精", 49, 10],
+      ],
+    },
+    {
+      id: "biology-genetics",
+      name: "遗传、变异与进化",
+      skills: [
+        ["bio-mendel", "孟德尔遗传规律", 45, 10],
+        ["bio-chromosome", "伴性遗传与人类遗传病", 50, 9],
+        ["bio-dna", "DNA结构、复制与基因本质", 58, 8],
+        ["bio-expression", "转录、翻译与基因表达调控", 51, 9],
+        ["bio-mutation", "变异、育种与生物进化", 54, 9],
+      ],
+    },
+    {
+      id: "biology-regulation",
+      name: "稳态与调节",
+      skills: [
+        ["bio-homeostasis", "内环境与稳态", 62, 7],
+        ["bio-neuro-humoral", "神经调节与体液调节", 50, 10],
+        ["bio-immune", "免疫调节", 56, 8],
+        ["bio-plant-hormone", "植物生命活动调节", 55, 8],
+      ],
+    },
+    {
+      id: "biology-ecology",
+      name: "生物与环境",
+      skills: [
+        ["bio-population", "种群、群落与演替", 58, 8],
+        ["bio-ecosystem", "生态系统与环境保护", 61, 8],
+      ],
+    },
+    {
+      id: "biology-biotech",
+      name: "生物技术与工程",
+      skills: [["bio-biotech", "发酵、细胞工程与基因工程", 52, 9]],
+    },
+  ],
   chinese: [
     {
       id: "chinese-modern",

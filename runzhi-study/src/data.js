@@ -1,7 +1,14 @@
 import { CURRICULUM_SKILLS } from "./curriculum.js";
 import { GENERATED_QUESTIONS } from "./question-bank.js";
 import { COVERAGE_QUESTIONS } from "./coverage-bank.js";
-import { MATH_DEPTH_QUESTIONS, PHYSICS_DEPTH_QUESTIONS, CHINESE_DEPTH_QUESTIONS, ENGLISH_DEPTH_QUESTIONS } from "./depth-bank.js";
+import {
+  MATH_DEPTH_QUESTIONS,
+  PHYSICS_DEPTH_QUESTIONS,
+  CHEMISTRY_DEPTH_QUESTIONS,
+  BIOLOGY_DEPTH_QUESTIONS,
+  CHINESE_DEPTH_QUESTIONS,
+  ENGLISH_DEPTH_QUESTIONS,
+} from "./depth-bank.js";
 import { getSkillAnalogy } from "./learning-guides.js";
 
 export const SUBJECTS = {
@@ -22,6 +29,24 @@ export const SUBJECTS = {
     accent: "#d4ceff",
     target: 75,
     description: "模型识别比盲目计算更重要",
+  },
+  chemistry: {
+    id: "chemistry",
+    name: "化学",
+    short: "化",
+    color: "#ffb84d",
+    accent: "#ffe7b0",
+    target: 80,
+    description: "守恒搭骨架，条件决定反应方向",
+  },
+  biology: {
+    id: "biology",
+    name: "生物",
+    short: "生",
+    color: "#38c98b",
+    accent: "#bdf2d8",
+    target: 80,
+    description: "结构连功能，过程画成因果链",
   },
   chinese: {
     id: "chinese",
@@ -470,6 +495,8 @@ const RAW_QUESTIONS = [
   ...COVERAGE_QUESTIONS,
   ...MATH_DEPTH_QUESTIONS,
   ...PHYSICS_DEPTH_QUESTIONS,
+  ...CHEMISTRY_DEPTH_QUESTIONS,
+  ...BIOLOGY_DEPTH_QUESTIONS,
   ...CHINESE_DEPTH_QUESTIONS,
   ...ENGLISH_DEPTH_QUESTIONS,
 ];
@@ -583,7 +610,7 @@ export const VIDEO_RESOURCES = [
     title: "国家中小学智慧教育平台",
     provider: "教育部官方平台",
     description: "按年级、学科和教材版本选择同步课程，适合准高三系统查漏，不依赖单一老师。",
-    bestFor: ["四科同步复习", "教材章节查漏", "免费系统课程"],
+    bestFor: ["六科同步复习", "教材章节查漏", "免费系统课程"],
     watchTip: "先在平台选择高中、高二或高三，再按正在复习的章节进入课程。",
     url: "https://basic.smartedu.cn/",
   },
@@ -610,6 +637,30 @@ export const VIDEO_RESOURCES = [
     bestFor: ["概念理解", "模型推导", "物理图景"],
     watchTip: "暂停视频，先自己画受力图或运动过程图，再继续看老师的推导。",
     url: "https://www.bilibili.com/list/9458053?bvid=BV1Lz42197T1&oid=1351342373",
+  },
+  {
+    id: "chemistry-daniel",
+    subject: "chemistry",
+    icon: "🧪",
+    tag: "一轮体系",
+    title: "Daniel 高考化学 · 一轮复习系统课",
+    provider: "Daniel 高考化学",
+    description: "按物质观、变化观、结构观和实验逐章搭框架，适合物化生学生开始高三一轮复习。",
+    bestFor: ["知识体系", "反应原理", "实验与推断"],
+    watchTip: "每节先写一张反应条件卡，看完立刻做对应 4 道专项题，错题只回看相关片段。",
+    url: "https://www.bilibili.com/video/BV1CFMQzXEyP/",
+  },
+  {
+    id: "biology-jinjing",
+    subject: "biology",
+    icon: "🌱",
+    tag: "思维导图",
+    title: "金晶生物 · 高考一轮系统复习",
+    provider: "金晶生物",
+    description: "以思维导图串联教材概念，并配套基础题讲解，适合从细胞到遗传、稳态和生态系统查漏。",
+    bestFor: ["概念网络", "教材回归", "题型迁移"],
+    watchTip: "先自己画过程箭头，再对照老师的图；看完用自己的话讲一遍，不能只记结论。",
+    url: "https://www.bilibili.com/video/BV1Cz4y1379F/",
   },
   {
     id: "chinese-daijianye",
@@ -641,6 +692,8 @@ export const DEFAULT_MISSIONS = [
   { id: "mission-weak", type: "practice", subject: "math", title: "抢救最弱点", subtitle: "导数与函数 · 3 题", minutes: 12, xp: 40 },
   { id: "mission-video", type: "lesson", subject: "physics", title: "看懂一个模型", subtitle: "平抛运动动态微课", minutes: 4, xp: 20, lessonId: "L-PHYSICS-PROJECTILE" },
   { id: "mission-review", type: "review", subject: "mixed", title: "消灭到期错题", subtitle: "按记忆节奏复练", minutes: 10, xp: 35 },
+  { id: "mission-chemistry", type: "practice", subject: "chemistry", title: "化学守恒训练", subtitle: "计量 + 反应原理 · 2 题", minutes: 9, xp: 30 },
+  { id: "mission-biology", type: "practice", subject: "biology", title: "生物因果训练", subtitle: "细胞 + 遗传 · 2 题", minutes: 9, xp: 30 },
   { id: "mission-language", type: "practice", subject: "english", title: "英语保温舱", subtitle: "语法 + 阅读 · 2 题", minutes: 8, xp: 25 },
 ];
 

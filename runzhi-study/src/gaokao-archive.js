@@ -1,8 +1,10 @@
 const SUBJECT_NAMES = {
-  chinese: "语文",
   math: "数学",
-  english: "英语",
   physics: "物理",
+  chemistry: "化学",
+  biology: "生物",
+  chinese: "语文",
+  english: "英语",
 };
 
 const MATH_PDF_PATHS = {
@@ -29,43 +31,45 @@ function trustedSearchUrl(query) {
 function paperScheme(year, subject) {
   if (year === 2017 && ["chinese", "math"].includes(subject)) return "山东卷";
   if (subject === "physics") return year >= 2020 ? "山东省等级考" : "全国Ⅰ卷理综·物理";
+  if (subject === "chemistry") return year >= 2020 ? "山东省等级考" : "全国Ⅰ卷理综·化学";
+  if (subject === "biology") return year >= 2020 ? "山东省等级考" : "全国Ⅰ卷理综·生物";
   return year >= 2020 ? (year >= 2025 ? "全国Ⅰ卷" : "新高考Ⅰ卷") : "全国Ⅰ卷";
 }
 
 function paperLink(year, subject) {
   if (subject === "math") return githubRawUrl(MATH_PDF_PATHS[year]);
   const scheme = paperScheme(year, subject);
-  const domain = subject === "physics" && year >= 2020 ? "sdzk.cn" : "gaokao.eol.cn";
+  const domain = ["physics", "chemistry", "biology"].includes(subject) && year >= 2020 ? "sdzk.cn" : "gaokao.eol.cn";
   return trustedSearchUrl(`site:${domain} ${year} ${scheme} ${SUBJECT_NAMES[subject]} 高考 真题 答案`);
 }
 
 function officialReviewUrl(year) {
   if (year <= 2021) return "https://gaokao.neea.edu.cn/xhtml1/folder/1510/811-1.htm";
-  return trustedSearchUrl(`site:moe.gov.cn OR site:neea.edu.cn ${year} 高考 试题评析 语文 数学 英语 物理`);
+  return trustedSearchUrl(`site:moe.gov.cn OR site:neea.edu.cn ${year} 高考 试题评析 语文 数学 英语 物理 化学 生物`);
 }
 
 export const GAOKAO_YEARS = Array.from({ length: 10 }, (_, index) => 2026 - index).map((year) => ({
   year,
   scheme: year >= 2020 ? (year >= 2025 ? "全国Ⅰ卷＋山东等级考" : "新高考Ⅰ卷＋山东等级考") : year === 2017 ? "山东语数＋全国Ⅰ卷英理综" : "全国Ⅰ卷",
-  note: year >= 2020 ? "语数英按Ⅰ卷，物理按山东省等级考核对" : year === 2017 ? "语文、数学为山东卷；英语、理综物理为全国Ⅰ卷" : "语数英与理综物理按全国Ⅰ卷核对",
+  note: year >= 2020 ? "语数英按Ⅰ卷，物理、化学、生物按山东省等级考核对" : year === 2017 ? "语文、数学为山东卷；英语与理综物化生为全国Ⅰ卷" : "语数英与理综物化生按全国Ⅰ卷核对",
   officialReviewUrl: officialReviewUrl(year),
   papers: Object.keys(SUBJECT_NAMES).map((subject) => ({
     subject,
     name: SUBJECT_NAMES[subject],
     scheme: paperScheme(year, subject),
     url: paperLink(year, subject),
-    source: subject === "math" ? "开源原卷 PDF" : subject === "physics" && year >= 2020 ? "山东考试院检索" : "中国教育在线检索",
+    source: subject === "math" ? "开源原卷 PDF" : ["physics", "chemistry", "biology"].includes(subject) && year >= 2020 ? "山东考试院检索" : "中国教育在线检索",
   })),
 }));
 
 export const GAOKAO_MOCK_PRESETS = [
   {
     id: "mixed-short",
-    title: "四科诊断小卷",
+    title: "六科诊断小卷",
     subject: null,
     size: 8,
     durationMinutes: 25,
-    description: "数学、物理占七成，先快速暴露最需要补的知识点。",
+    description: "六科各有覆盖，优先抽取掌握度较低的知识点做快速诊断。",
   },
   {
     id: "math-rhythm",
@@ -82,6 +86,22 @@ export const GAOKAO_MOCK_PRESETS = [
     size: 15,
     durationMinutes: 90,
     description: "覆盖力、电、磁、实验与近代物理，训练模型识别。",
+  },
+  {
+    id: "chemistry-rhythm",
+    title: "化学等级考节奏卷",
+    subject: "chemistry",
+    size: 15,
+    durationMinutes: 90,
+    description: "覆盖计量、元素、反应原理、有机和实验，训练守恒与条件判断。",
+  },
+  {
+    id: "biology-rhythm",
+    title: "生物等级考节奏卷",
+    subject: "biology",
+    size: 15,
+    durationMinutes: 90,
+    description: "覆盖细胞、遗传、调节、生态和生物技术，训练因果链与实验分析。",
   },
   {
     id: "chinese-objective",
@@ -143,6 +163,20 @@ export const GAOKAO_TEACHING_TEAM = [
     role: "物理图景与推导",
     method: "先画过程图和受力图，再把图翻译成方程。",
     url: "https://www.bilibili.com/list/9458053?bvid=BV1Lz42197T1&oid=1351342373",
+  },
+  {
+    subject: "chemistry",
+    name: "Daniel 高考化学",
+    role: "化学知识体系与反应条件",
+    method: "先做物质分类和价态表，再用守恒、条件、现象三步锁定反应。",
+    url: "https://www.bilibili.com/video/BV1CFMQzXEyP/",
+  },
+  {
+    subject: "biology",
+    name: "金晶生物",
+    role: "生物概念网络与一轮复习",
+    method: "先画结构—功能—过程图，再用教材原话和实验变量完成表达。",
+    url: "https://www.bilibili.com/video/BV1Cz4y1379F/",
   },
   {
     subject: "chinese",

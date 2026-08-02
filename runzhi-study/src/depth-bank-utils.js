@@ -1,4 +1,4 @@
-const SUBJECT_POINTS = { math: 5, physics: 6, chinese: 5, english: 5 };
+const SUBJECT_POINTS = { math: 5, physics: 6, chemistry: 6, biology: 6, chinese: 5, english: 5 };
 
 const DIMENSION_HINTS = {
   application: ["先圈出题目给出的量和最终所求。", "选择只含这些量的规则或关系式。", "算完后代回题意检查范围、单位或语境。"],

@@ -987,8 +987,8 @@ body.focus-mode .topbar .brand span:not(.brand-mark) { opacity: 0.22; }
   .mission-mini-stats { gap: 7px; margin-top: 12px; }
   .mission-mini-stats span { padding: 6px; }
   .mission-mini-stats strong { font-size: 14px; }
-  .mission-list,
-  .subjects-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .mission-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .subjects-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
   .practice-layout { grid-template-columns: minmax(0, 1fr) 245px; gap: 14px; }
   .practice-toolbar { margin-bottom: 12px; }
@@ -1010,7 +1010,7 @@ body.focus-mode .topbar .brand span:not(.brand-mark) { opacity: 0.22; }
   .lesson-stage { min-height: 430px; }
   .video-library-grid,
   .knowledge-chapters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .knowledge-subjects { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .knowledge-subjects { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
   .tutor-drawer { width: min(410px, 72vw); }
   .toast { bottom: 14px; }

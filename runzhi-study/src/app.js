@@ -15,7 +15,7 @@ import {
   GAOKAO_SOURCES,
   GAOKAO_TEACHING_TEAM,
   GAOKAO_YEARS,
-} from "./gaokao-archive.js?v=20260802-gaokao1";
+} from "./gaokao-archive.js?v=20260802-pcb1";
 import { celebrateSuccess, initPlayfulUI, refreshPlayfulUI } from "./playful-ui.js";
 import {
   STORAGE_KEY,
@@ -237,7 +237,7 @@ function renderHome() {
         </section>
 
         <section class="subjects-section" aria-labelledby="subjects-title">
-          <div class="section-heading"><h2 id="subjects-title">四科小岛</h2><p>选一座小岛，从最需要的考点开始</p></div>
+          <div class="section-heading"><h2 id="subjects-title">六科小岛</h2><p>选一座小岛，从最需要的考点开始</p></div>
           <div class="subjects-grid">
             ${Object.values(SUBJECTS).map(renderSubjectCard).join("")}
           </div>
@@ -248,7 +248,7 @@ function renderHome() {
           <div>
             <span class="eyebrow">严选外部课程</span>
             <h2 id="video-teaser-title">名师视频馆</h2>
-            <p>四科官方课程入口已经整理好。先用视频把难点看懂，再回学习岛做题验证，避免“看懂了却不会做”。</p>
+            <p>六科官方平台与口碑课程入口已经整理好。先用视频把难点看懂，再回学习岛做题验证，避免“看懂了却不会做”。</p>
           </div>
           <button class="primary-button" type="button" data-route-action="videos">打开视频馆 <span class="button-icon">→</span></button>
         </section>
@@ -347,7 +347,7 @@ function renderKnowledge() {
         <div>
           <span class="eyebrow">知识森林地图</span>
           <h1>完整知识树</h1>
-          <p>四科 ${SKILLS.length} 个核心考点，${QUESTIONS.length} 道本地练习题；有题的考点可直接进入专项练习。</p>
+          <p>六科 ${SKILLS.length} 个核心考点，${QUESTIONS.length} 道本地练习题；每个考点都可直接进入多维专项练习。</p>
         </div>
         <div class="status-cluster">
           <span class="status-pill">章节 <strong>${Object.values(curriculumStats).reduce((sum, item) => sum + item.chapters, 0)}</strong></span>
@@ -416,7 +416,7 @@ function renderVideos() {
           <p>只收录来源明确的官方平台或老师本人课程页。视频负责讲明白，练习负责确认真的会。</p>
         </div>
         <div class="status-cluster">
-          <span class="status-pill">四科 <strong>全覆盖</strong></span>
+          <span class="status-pill">六科 <strong>全覆盖</strong></span>
           <span class="status-pill">入口 <strong>${VIDEO_RESOURCES.length}</strong> 个</span>
           <span class="status-pill">已检查 <strong>2026-07-31</strong></span>
         </div>
@@ -452,7 +452,7 @@ function renderVideos() {
 
 function renderVideoResource(resource) {
   const subject = resource.subject === "all"
-    ? { name: "四科综合", color: "#ff8fb8", short: "全" }
+    ? { name: "六科综合", color: "#ff8fb8", short: "全" }
     : SUBJECTS[resource.subject];
   return `
     <article class="video-resource-card" style="--subject-color:${subject.color}">
@@ -742,12 +742,12 @@ function renderExam() {
           <span class="eyebrow">在线可判分模拟</span>
           <h2>不会不是失败，是系统找到教学入口</h2>
           <p>系统优先抽取薄弱考点。考试中可以标记不会；需要时点“不会，教我”，星星老师会从最小一步开始讲，并把这道题列入交卷后的重点复练。</p>
-          <div class="exam-specs"><span>卷型<strong>5 种</strong></span><span>讲解<strong>4 层</strong></span><span>真题档案<strong>10 年</strong></span></div>
+          <div class="exam-specs"><span>卷型<strong>7 种</strong></span><span>讲解<strong>4 层</strong></span><span>真题档案<strong>10 年</strong></span></div>
           <button class="primary-button" type="button" data-start-exam>生成并开始模拟 →</button>
         </section>
         <aside class="exam-side">
           <section class="panel exam-option-card">
-            <h3>选择模拟卷</h3><p>第一次建议先做四科诊断小卷，找到最需要补的地方。</p>
+            <h3>选择模拟卷</h3><p>第一次建议先做六科诊断小卷，找到最需要补的地方。</p>
             <label class="exam-preset-label">模拟卷类型
               <select id="exam-preset">
                 ${GAOKAO_MOCK_PRESETS.map((preset) => `<option value="${preset.id}">${preset.title} · ${preset.size}题/${preset.durationMinutes}分钟</option>`).join("")}
@@ -783,12 +783,12 @@ function renderGaokaoArchive() {
   return `
     <div class="page gaokao-archive-page">
       <div class="page-heading">
-        <div><span class="eyebrow">2017—2026</span><h1>近10年高考真题档案</h1><p>按山东考生当年实际卷型整理：2017语数为山东卷，2018年起语数英转全国卷，2020年起物理为山东等级考。</p></div>
-        <div class="status-cluster"><span class="status-pill">年份 <strong>10</strong></span><span class="status-pill">科目入口 <strong>40</strong></span></div>
+        <div><span class="eyebrow">2017—2026</span><h1>近10年高考真题档案</h1><p>按山东考生当年实际卷型整理：2017语数为山东卷，2018年起语数英转全国卷，2020年起物理、化学、生物为山东等级考。</p></div>
+        <div class="status-cluster"><span class="status-pill">年份 <strong>10</strong></span><span class="status-pill">科目入口 <strong>60</strong></span></div>
       </div>
       ${renderExamViewTabs("archive")}
       <aside class="archive-truth-note">
-        <span>🛡️</span><p><strong>严谨说明：</strong>数学原卷可直接打开开源 PDF；语文、英语和物理使用限定年份、卷型、科目和可信站点的检索入口。受版权或转载限制的解析不复制，优先看官方评析，再回学习岛做可判分训练。</p>
+        <span>🛡️</span><p><strong>严谨说明：</strong>数学原卷可直接打开开源 PDF；其他科目使用限定年份、卷型、科目和可信站点的检索入口。受版权或转载限制的解析不复制，优先看官方评析，再回学习岛做可判分训练。</p>
       </aside>
       <div class="gaokao-year-grid">
         ${GAOKAO_YEARS.map((record) => `
