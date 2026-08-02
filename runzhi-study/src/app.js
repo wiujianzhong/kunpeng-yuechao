@@ -10,6 +10,12 @@ import {
 } from "./data.js?v=20260731-video2";
 import { CURRICULUM, getCurriculumStats } from "./curriculum.js";
 import { DIMENSION_LABELS } from "./learning-guides.js";
+import {
+  GAOKAO_MOCK_PRESETS,
+  GAOKAO_SOURCES,
+  GAOKAO_TEACHING_TEAM,
+  GAOKAO_YEARS,
+} from "./gaokao-archive.js?v=20260802-gaokao1";
 import { celebrateSuccess, initPlayfulUI, refreshPlayfulUI } from "./playful-ui.js";
 import {
   STORAGE_KEY,
@@ -722,27 +728,33 @@ function renderWrongCard(item) {
 function renderExam() {
   if (examSession?.result) return renderExamResult();
   if (examSession?.exam) return renderExamRunning();
+  if (routeContext.examView === "archive") return renderGaokaoArchive();
 
   const lastExam = state.examHistory.at(-1);
   return `
     <div class="page exam-page">
       <div class="page-heading">
-        <div><span class="eyebrow">周末检验</span><h1>限时挑战赛</h1><p>练习看过程，挑战赛看能不能在规定时间里把会做的分拿稳。</p></div>
+        <div><span class="eyebrow">高考实战舱</span><h1>模拟高考</h1><p>先用在线节奏卷练取舍，再到近10年真题档案做完整原卷。</p></div>
       </div>
+      ${renderExamViewTabs("mock")}
       <div class="exam-launch-grid">
         <section class="panel exam-hero">
-          <span class="eyebrow">四科联合挑战</span>
-          <h2>25 分钟，检验这一周有没有真正学会</h2>
-          <p>数学、物理占七成，语文、英语做保温。系统优先抽取薄弱考点，交卷后自动拆出错因和复练队列。</p>
-          <div class="exam-specs"><span>默认题量<strong>8 题</strong></span><span>建议用时<strong>25 分</strong></span><span>主科占比<strong>72%</strong></span></div>
-          <button class="primary-button" type="button" data-start-exam>生成并开始小卷 →</button>
+          <span class="eyebrow">在线可判分模拟</span>
+          <h2>不会不是失败，是系统找到教学入口</h2>
+          <p>系统优先抽取薄弱考点。考试中可以标记不会；需要时点“不会，教我”，星星老师会从最小一步开始讲，并把这道题列入交卷后的重点复练。</p>
+          <div class="exam-specs"><span>卷型<strong>5 种</strong></span><span>讲解<strong>4 层</strong></span><span>真题档案<strong>10 年</strong></span></div>
+          <button class="primary-button" type="button" data-start-exam>生成并开始模拟 →</button>
         </section>
         <aside class="exam-side">
           <section class="panel exam-option-card">
-            <h3>本次设置</h3><p>先用小卷建立节奏，稳定后再逐步增加题量。</p>
-            <div class="field-row">
-              <label>题量<select id="exam-size"><option value="8">8 题</option><option value="12">12 题</option><option value="16">16 题</option></select></label>
-              <label>限时<select id="exam-duration"><option value="25">25 分钟</option><option value="40">40 分钟</option><option value="60">60 分钟</option></select></label>
+            <h3>选择模拟卷</h3><p>第一次建议先做四科诊断小卷，找到最需要补的地方。</p>
+            <label class="exam-preset-label">模拟卷类型
+              <select id="exam-preset">
+                ${GAOKAO_MOCK_PRESETS.map((preset) => `<option value="${preset.id}">${preset.title} · ${preset.size}题/${preset.durationMinutes}分钟</option>`).join("")}
+              </select>
+            </label>
+            <div class="exam-preset-list">
+              ${GAOKAO_MOCK_PRESETS.map((preset) => `<div><strong>${preset.title}</strong><small>${preset.description}</small></div>`).join("")}
             </div>
           </section>
           <section class="panel exam-option-card">
@@ -750,10 +762,57 @@ function renderExam() {
             ${lastExam ? `<div class="exam-history-item"><div><strong>${lastExam.title}</strong><small>${formatDate(lastExam.completedAt)} · ${lastExam.correctCount}/${lastExam.questionCount} 题</small></div><span class="exam-history-score">${lastExam.percentage}%</span></div>` : `<p style="margin-bottom:0">还没有小卷记录。第一次成绩只做基线，不做评价。</p>`}
           </section>
           <section class="panel exam-option-card">
-            <h3>考场规则</h3><p style="margin-bottom:0">不开提示，不即时判分；不会的先标记、继续向后，把会做的分拿稳。</p>
+            <h3>考场规则</h3><p style="margin-bottom:0">严格模拟时只标记不求助；陪练时可以点“不会，教我”。在线卷用于练节奏，语文作文、英语写作和复杂主观题仍需使用真题原卷完成。</p>
           </section>
         </aside>
       </div>
+    </div>
+  `;
+}
+
+function renderExamViewTabs(active) {
+  return `
+    <div class="exam-view-tabs" role="tablist" aria-label="选择高考训练方式">
+      <button type="button" data-exam-view="mock" class="${active === "mock" ? "active" : ""}">⏱ 在线模拟</button>
+      <button type="button" data-exam-view="archive" class="${active === "archive" ? "active" : ""}">📜 近10年真题</button>
+    </div>
+  `;
+}
+
+function renderGaokaoArchive() {
+  return `
+    <div class="page gaokao-archive-page">
+      <div class="page-heading">
+        <div><span class="eyebrow">2017—2026</span><h1>近10年高考真题档案</h1><p>按山东考生当年实际卷型整理：2017语数为山东卷，2018年起语数英转全国卷，2020年起物理为山东等级考。</p></div>
+        <div class="status-cluster"><span class="status-pill">年份 <strong>10</strong></span><span class="status-pill">科目入口 <strong>40</strong></span></div>
+      </div>
+      ${renderExamViewTabs("archive")}
+      <aside class="archive-truth-note">
+        <span>🛡️</span><p><strong>严谨说明：</strong>数学原卷可直接打开开源 PDF；语文、英语和物理使用限定年份、卷型、科目和可信站点的检索入口。受版权或转载限制的解析不复制，优先看官方评析，再回学习岛做可判分训练。</p>
+      </aside>
+      <div class="gaokao-year-grid">
+        ${GAOKAO_YEARS.map((record) => `
+          <article class="gaokao-year-card">
+            <div class="gaokao-year-head"><span>${record.year}</span><div><strong>${record.scheme}</strong><small>${record.note}</small></div></div>
+            <div class="gaokao-paper-links">
+              ${record.papers.map((paper) => `<a href="${paper.url}" target="_blank" rel="noopener noreferrer" data-paper-link="${record.year}-${paper.subject}"><span>${SUBJECTS[paper.subject].short}</span><strong>${paper.name}</strong><small>${paper.scheme}<br>${paper.source} ↗</small></a>`).join("")}
+            </div>
+            <a class="official-review-link" href="${record.officialReviewUrl}" target="_blank" rel="noopener noreferrer">查看 ${record.year} 官方试题评析 ↗</a>
+          </article>
+        `).join("")}
+      </div>
+
+      <section class="archive-section">
+        <div class="section-heading"><div><h2>讲明白的老师与方法</h2><p>不迷信“押题”，按学科选择擅长把底层逻辑讲清楚的公开课程。</p></div></div>
+        <div class="gaokao-teacher-grid">
+          ${GAOKAO_TEACHING_TEAM.map((teacher) => `<article style="--subject-color:${SUBJECTS[teacher.subject].color}"><span>${SUBJECTS[teacher.subject].short}</span><div><h3>${teacher.name}</h3><small>${teacher.role}</small><p>${teacher.method}</p><a href="${teacher.url}" target="_blank" rel="noopener noreferrer">打开课程 ↗</a></div></article>`).join("")}
+        </div>
+      </section>
+
+      <section class="archive-section archive-sources">
+        <div class="section-heading"><div><h2>题源与校验依据</h2><p>开源数据只作为索引与复核材料，题目进入本地练习前仍要通过答案、解析、公式和移动端显示检查。</p></div></div>
+        <div>${GAOKAO_SOURCES.map((source) => `<a href="${source.url}" target="_blank" rel="noopener noreferrer"><strong>${source.name}</strong><small>${source.role} ↗</small></a>`).join("")}</div>
+      </section>
     </div>
   `;
 }
@@ -776,14 +835,14 @@ function renderExamRunning() {
           </div>
           <div class="question-actions">
             <div class="question-actions-left"><button class="ghost-button" type="button" data-exam-prev ${examSession.index === 0 ? "disabled" : ""}>← 上一题</button></div>
-            <div class="question-actions-right"><button class="secondary-button" type="button" data-exam-mark>${examSession.marked.has(question.id) ? "取消标记" : "标记不会"}</button><button class="primary-button" type="button" data-exam-next>${examSession.index === exam.questionIds.length - 1 ? "检查答题卡" : "下一题 →"}</button></div>
+            <div class="question-actions-right"><button class="ghost-button exam-help-button" type="button" data-exam-help>🌟 不会，教我</button><button class="secondary-button" type="button" data-exam-mark>${examSession.marked.has(question.id) ? "取消标记" : "标记不会"}</button><button class="primary-button" type="button" data-exam-next>${examSession.index === exam.questionIds.length - 1 ? "检查答题卡" : "下一题 →"}</button></div>
           </div>
         </section>
         <aside class="panel exam-navigator">
           <h3>答题卡</h3>
           <div class="exam-number-grid">${exam.questionIds.map((id, index) => `<button type="button" data-exam-jump="${index}" class="${index === examSession.index ? "current" : ""} ${examSession.answers[id] !== undefined && examSession.answers[id] !== null && examSession.answers[id] !== "" ? "answered" : ""}" aria-label="第 ${index + 1} 题${examSession.marked.has(id) ? "，已标记" : ""}">${examSession.marked.has(id) ? "?" : index + 1}</button>`).join("")}</div>
           <button class="primary-button exam-submit" type="button" data-submit-exam>交卷</button>
-          <p style="margin:12px 0 0;color:var(--muted);font-size:9px;line-height:1.6">已答 ${Object.values(examSession.answers).filter((answer) => answer !== null && answer !== "").length} / ${exam.questionIds.length} 题</p>
+          <p style="margin:12px 0 0;color:var(--muted);font-size:9px;line-height:1.6">已答 ${Object.values(examSession.answers).filter((answer) => answer !== null && answer !== "").length} / ${exam.questionIds.length} 题 · 求助 ${examSession.assisted.size} 题</p>
         </aside>
       </div>
     </div>
@@ -793,20 +852,21 @@ function renderExamRunning() {
 function renderExamResult() {
   const result = examSession.result;
   const wrongIds = result.details.filter((item) => !item.correct).map((item) => item.questionId);
+  const teachingIds = [...new Set([...wrongIds, ...examSession.assisted])];
   return `
     <div class="page">
       <section class="panel exam-result">
         <span class="eyebrow">挑战结果</span>
         <div class="result-ring" style="--score:${result.percentage}"><span>${result.percentage}<small>得分率</small></span></div>
         <h2>${result.percentage >= 85 ? "节奏和掌握都很稳" : result.percentage >= 60 ? "基础能取分，薄弱点已经看清" : "这张卷的价值是把漏洞暴露出来"}</h2>
-        <p>${result.correctCount} / ${examSession.exam.questionIds.length} 题正确，得分 ${result.score} / ${result.total}。错题已经进入记忆复习队列。</p>
+        <p>${result.correctCount} / ${examSession.exam.questionIds.length} 题正确，得分 ${result.score} / ${result.total}。失分题和求助题都已进入重点复练。</p>
         <div class="result-breakdown">
           <div class="summary-card"><span>正确题数</span><strong>${result.correctCount}</strong><small>共 ${examSession.exam.questionIds.length} 题</small></div>
           <div class="summary-card"><span>失分题数</span><strong>${wrongIds.length}</strong><small>进入错题复盘</small></div>
-          <div class="summary-card"><span>得分率</span><strong>${result.percentage}%</strong><small>本次基线</small></div>
+          <div class="summary-card"><span>求助题数</span><strong>${examSession.assisted.size}</strong><small>答对也要再独立做</small></div>
         </div>
         <div class="mission-actions" style="justify-content:center">
-          ${wrongIds.length ? `<button class="secondary-button" type="button" data-retry-question-ids="${wrongIds.join(",")}">复练失分题</button>` : ""}
+          ${teachingIds.length ? `<button class="secondary-button" type="button" data-retry-question-ids="${teachingIds.join(",")}">逐题讲明白并复练</button>` : ""}
           <button class="primary-button" type="button" data-new-exam>再生成一卷</button>
           <button class="ghost-button" type="button" data-route-action="report">查看学习报告</button>
         </div>
@@ -989,12 +1049,15 @@ function handleMainClick(event) {
   const tutorQuestionButton = event.target.closest("[data-tutor-question]");
   if (tutorQuestionButton) { openTutor(getQuestion(tutorQuestionButton.dataset.tutorQuestion)); return; }
 
+  const examView = event.target.closest("[data-exam-view]");
+  if (examView) { routeContext.examView = examView.dataset.examView; return render(); }
   if (event.target.closest("[data-start-exam]")) return startExam();
   if (event.target.closest("[data-exam-prev]")) return moveExam(-1);
   if (event.target.closest("[data-exam-next]")) return moveExam(1);
   const jump = event.target.closest("[data-exam-jump]");
   if (jump) { examSession.index = Number(jump.dataset.examJump); return render(); }
   if (event.target.closest("[data-exam-mark]")) return toggleExamMark();
+  if (event.target.closest("[data-exam-help]")) return requestExamHelp();
   if (event.target.closest("[data-submit-exam]")) return submitExam();
   if (event.target.closest("[data-new-exam]")) { clearExam(); return render(); }
 
@@ -1107,15 +1170,23 @@ function previousPracticeQuestion() {
 }
 
 function startExam() {
-  const size = Number(document.querySelector("#exam-size")?.value || 8);
-  const durationMinutes = Number(document.querySelector("#exam-duration")?.value || 25);
-  const exam = generateExam(state, { size, durationMinutes, seed: Date.now() });
+  const presetId = document.querySelector("#exam-preset")?.value || GAOKAO_MOCK_PRESETS[0].id;
+  const preset = GAOKAO_MOCK_PRESETS.find((item) => item.id === presetId) || GAOKAO_MOCK_PRESETS[0];
+  const exam = generateExam(state, {
+    size: preset.size,
+    durationMinutes: preset.durationMinutes,
+    subject: preset.subject,
+    title: preset.title,
+    seed: Date.now(),
+  });
   examSession = {
     exam,
     index: 0,
     answers: {},
     marked: new Set(),
-    remainingSeconds: durationMinutes * 60,
+    assisted: new Set(),
+    helpLevels: {},
+    remainingSeconds: preset.durationMinutes * 60,
     result: null,
     startedAt: Date.now(),
   };
@@ -1153,6 +1224,13 @@ function toggleExamMark() {
   render();
 }
 
+function requestExamHelp() {
+  const id = examSession.exam.questionIds[examSession.index];
+  examSession.assisted.add(id);
+  examSession.marked.add(id);
+  openTutor(getQuestion(id));
+}
+
 function updateExamNavigatorOnly() {
   const buttons = main.querySelectorAll("[data-exam-jump]");
   buttons.forEach((button) => {
@@ -1161,7 +1239,7 @@ function updateExamNavigatorOnly() {
     button.classList.toggle("answered", answer !== undefined && answer !== null && answer !== "");
   });
   const copy = main.querySelector(".exam-navigator p");
-  if (copy) copy.textContent = `已答 ${Object.values(examSession.answers).filter((answer) => answer !== null && answer !== "").length} / ${examSession.exam.questionIds.length} 题`;
+  if (copy) copy.textContent = `已答 ${Object.values(examSession.answers).filter((answer) => answer !== null && answer !== "").length} / ${examSession.exam.questionIds.length} 题 · 求助 ${examSession.assisted.size} 题`;
 }
 
 function submitExam(auto = false) {
@@ -1177,7 +1255,7 @@ function submitExam(auto = false) {
       questionId,
       answer: examSession.answers[questionId] ?? "",
       responseSeconds: perQuestionSeconds,
-      hintsUsed: 0,
+      hintsUsed: examSession.helpLevels[questionId] || 0,
       mode: "exam",
     }).state;
   }
@@ -1260,6 +1338,15 @@ function closeTutor() {
 
 async function askTutor(action, customText = "") {
   const context = getTutorContext();
+  if (route === "exam" && examSession && context.question) {
+    examSession.assisted.add(context.question.id);
+    if (action === "hint") {
+      examSession.helpLevels[context.question.id] = Math.min(
+        (examSession.helpLevels[context.question.id] || 0) + 1,
+        context.question.hints.length,
+      );
+    }
+  }
   const prompts = {
     hint: "我卡住了，只提示下一步，不要直接给答案。",
     explain: "请换一种更直观的说法讲给我听。",
@@ -1290,7 +1377,8 @@ async function askTutor(action, customText = "") {
 
 function getTutorContext() {
   const practiceItem = practiceSession && route === "practice" ? practiceSession.items[practiceSession.index] : null;
-  const question = practiceItem?.question || null;
+  const examQuestion = examSession && route === "exam" ? getQuestion(examSession.exam.questionIds[examSession.index]) : null;
+  const question = practiceItem?.question || examQuestion || null;
   return {
     route,
     question: question ? {
@@ -1302,8 +1390,8 @@ function getTutorContext() {
       hints: question.hints,
       explanation: question.explanation,
     } : null,
-    answer: practiceItem?.answer ?? null,
-    hintsUsed: practiceItem?.hintsUsed ?? 0,
+    answer: practiceItem?.answer ?? (examQuestion ? examSession.answers[examQuestion.id] ?? null : null),
+    hintsUsed: practiceItem?.hintsUsed ?? (examQuestion ? examSession.helpLevels[examQuestion.id] || 0 : 0),
     result: practiceItem?.result ? { correct: practiceItem.result.correct, errorType: practiceItem.result.errorType } : null,
     weakestSkills: getWeakSkills(state, 3).map((skill) => ({ name: skill.name, mastery: skill.mastery })),
   };

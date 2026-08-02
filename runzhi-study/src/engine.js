@@ -1,4 +1,4 @@
-import { DEFAULT_MISSIONS, QUESTIONS, SKILLS, getQuestion } from "./data.js";
+import { DEFAULT_MISSIONS, QUESTIONS, SKILLS, SUBJECTS, getQuestion } from "./data.js";
 
 export const STORAGE_KEY = "xinghang-gaokao-state-v1";
 
@@ -358,6 +358,22 @@ export function completeMission(state, missionId, now = new Date()) {
 export function generateExam(state, options = {}) {
   const size = clamp(Number(options.size) || 8, 4, QUESTIONS.length);
   const seed = Number(options.seed) || Date.now();
+  const requestedSubject = Object.prototype.hasOwnProperty.call(SUBJECTS, options.subject) ? options.subject : null;
+  if (requestedSubject) {
+    const candidates = seededShuffle(
+      QUESTIONS.filter((question) => question.subject === requestedSubject),
+      seed + requestedSubject.length,
+    ).sort((a, b) => (state.mastery[a.skill] ?? 50) - (state.mastery[b.skill] ?? 50));
+    const selected = candidates.slice(0, Math.min(size, candidates.length));
+    return {
+      id: `EXAM-${seed}`,
+      title: options.title || `${SUBJECTS[requestedSubject].name}高考节奏卷`,
+      durationMinutes: Number(options.durationMinutes) || 60,
+      questionIds: seededShuffle(selected, seed + 7).map((question) => question.id),
+      totalPoints: selected.reduce((sum, question) => sum + question.points, 0),
+      createdAt: new Date().toISOString(),
+    };
+  }
   const priority = { math: 0.38, physics: 0.34, chinese: 0.14, english: 0.14 };
   const subjects = Object.keys(priority);
   const selected = [];
