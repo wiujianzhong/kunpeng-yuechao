@@ -336,10 +336,6 @@ function detectionEventsSuppressed() {
   return state.scenario === "fan-overload" && phaseIsObservable();
 }
 
-function trainingTimelinePaused() {
-  return state.awaitingManual;
-}
-
 function initializeHourlySpray(total) {
   const currentHour = trainingHour();
   const weights = Array.from({ length: currentHour + 1 }, (_, index) => 72 + (index * 17) % 41 + Math.round(Math.sin(index * .81) * 9));
@@ -392,7 +388,7 @@ function updateClock() {
 }
 
 function tickClock() {
-  if (trainingTimelinePaused() || hmiDisplayFrozen()) return;
+  if (hmiDisplayFrozen()) return;
   state.simClockAt += 1000;
   updateClock();
 }
@@ -464,7 +460,7 @@ function renderCameras() {
 }
 
 function tickCameraFrames() {
-  if (!state.running || physicalDetectionPaused() || trainingTimelinePaused() || hmiDisplayFrozen()) return;
+  if (!state.running || physicalDetectionPaused() || hmiDisplayFrozen()) return;
   const cards = document.querySelectorAll(".camera-card");
   for (let offset = 0; offset < 4; offset += 1) {
     const index = (state.cameraCursor + offset) % 16;
@@ -1117,15 +1113,6 @@ function advanceScenarioPhase() {
 function tickMachine() {
   if (!state.running) return;
   const paused = physicalDetectionPaused();
-  const timelinePaused = trainingTimelinePaused();
-  if (timelinePaused) {
-    if (hmiDisplayFrozen()) renderFrozenTrainingState();
-    else {
-      renderPhase();
-      renderPhysicalReadout();
-    }
-    return;
-  }
   if (hmiDisplayFrozen()) {
     advanceScenarioPhase();
     renderFrozenTrainingState();
@@ -1133,7 +1120,7 @@ function tickMachine() {
   }
   state.tick += 1;
   if (state.roundClockActive && state.playing) state.playbackElapsed += 1;
-  if (!paused && !timelinePaused) {
+  if (!paused) {
     state.runtimeSeconds += 1;
     state.liveFlow = scenarioFlowValue();
     state.flowSamples.push(Number(state.liveFlow.toFixed(2)));
@@ -1148,7 +1135,7 @@ function tickMachine() {
       if (localFaultEventDue()) emitDetectionEvent(true);
     }
   }
-  if (!paused && !timelinePaused && state.tick % 3 === 0 && state.scenario !== "flow-abnormal" && faultPhaseActive()) pushRuntimeEvent(liveEventText(), true);
+  if (!paused && state.tick % 3 === 0 && state.scenario !== "flow-abnormal" && faultPhaseActive()) pushRuntimeEvent(liveEventText(), true);
   advanceScenarioPhase();
   if (hmiDisplayFrozen()) {
     renderFrozenTrainingState();
