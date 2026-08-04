@@ -72,6 +72,9 @@ button { cursor: pointer; }
 .camera-card .hang-mark { left: 47%; bottom: -7%; width: 4%; height: 64%; border-radius: 80% 36% 60% 30%; background: linear-gradient(#b9b4a9, #f5f2e8 45%, #dfdbcf); box-shadow: 0 0 4px rgba(255,255,255,.6); transform: rotate(-8deg); }
 .camera-card.large .hang-mark { width: 22%; left: 38%; height: 78%; }
 .camera-card .blockage-mark { left: 29%; top: 5%; width: 41%; height: 90%; border-radius: 48% 36% 54% 44%; background: radial-gradient(circle at 35% 25%, #f5f3eb, #c7c3b8 64%, #928d84); filter: blur(.5px); }
+.camera-card.duct-drift::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at 24% 50%, rgba(222,158,65,.34), transparent 38%), linear-gradient(102deg, rgba(54,139,172,.26) 0 30%, transparent 54%, rgba(215,170,82,.22) 100%); }
+.camera-card.duct-drift::after { content: "培训示意·偏流"; position: absolute; left: 4px; top: 3px; z-index: 3; padding: 1px 3px; border-radius: 2px; color: #fff; background: rgba(52,67,61,.72); font-size: 6px; line-height: 1.2; pointer-events: none; }
+.camera-card.duct-drift small { z-index: 3; }
 .runtime-log { min-width: 0; min-height: 0; overflow: hidden; border-left: 1px solid #bfc5c0; background: #f8f8f6; }
 .runtime-log > div { overflow: hidden; }
 .runtime-log #runtime-log-list { height: 100%; }

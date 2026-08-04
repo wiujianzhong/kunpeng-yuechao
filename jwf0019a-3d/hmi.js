@@ -286,6 +286,18 @@ function phaseEffect() {
   return 1;
 }
 
+function faultPhaseActive() {
+  return state.scenario !== "normal" && [PHASE.FAULT_FORMING, PHASE.FAULT_OBSERVABLE, PHASE.ALARM_ACTIVE].includes(state.phase);
+}
+
+const LOCAL_FAULT_EVENT_SCENARIOS = new Set([
+  "high-spray", "hang-large", "recognized-no-eject", "valve-weak-blow", "blockage"
+]);
+
+function localFaultEventDue() {
+  return faultPhaseActive() && LOCAL_FAULT_EVENT_SCENARIOS.has(state.scenario) && state.tick % 3 === 0;
+}
+
 function phaseIsObservable() {
   return phaseEffect() >= .95;
 }
@@ -310,7 +322,7 @@ function physicalDetectionPaused() {
 }
 
 function detectionEventsSuppressed() {
-  return state.scenario === "fan-overload" && phaseEffect() > 0;
+  return state.scenario === "fan-overload" && phaseIsObservable();
 }
 
 function trainingTimelinePaused() {
@@ -388,11 +400,23 @@ function cameraClasses(index) {
   const target = targetCameraIndex();
   const classes = ["camera-card"];
   if (frozenCameraIndexes().includes(index)) classes.push("freeze");
-  if (phaseEffect() > 0 && ["hang-small", "hang-large"].includes(state.scenario) && index === target) classes.push("hang");
-  if (state.scenario === "hang-large" && index === target) classes.push("large");
-  if (phaseEffect() > 0 && state.scenario === "blockage" && (index === target || index === target + 1)) classes.push("blocked");
-  if (phaseEffect() > 0 && state.scenario === "lamp-brightness" && index === target) classes.push("brightness-abnormal");
+  if (faultPhaseActive() && ["hang-small", "hang-large"].includes(state.scenario) && index === target) classes.push("hang");
+  if (faultPhaseActive() && state.scenario === "hang-large" && index === target) classes.push("large");
+  if (faultPhaseActive() && state.scenario === "blockage" && (index === target || index === target + 1)) classes.push("blocked");
+  if (faultPhaseActive() && state.scenario === "duct-blockage" && ductDriftCameraIndexes().has(index)) classes.push("duct-drift");
+  if (faultPhaseActive() && state.scenario === "lamp-brightness" && index === target) classes.push("brightness-abnormal");
   return classes;
+}
+
+function ductDriftCameraIndexes() {
+  const indexes = new Set();
+  const center = state.position - 1;
+  for (let valveIndex = Math.max(0, center - 3); valveIndex <= Math.min(31, center + 3); valveIndex += 1) {
+    const firstCamera = Math.floor(valveIndex / 4) * 2;
+    indexes.add(firstCamera);
+    indexes.add(firstCamera + 1);
+  }
+  return indexes;
 }
 
 function renderCameras() {
@@ -514,11 +538,11 @@ function chartBlock(title, values, labels, hot = [], cold = []) {
 
 function renderValveStats() {
   const hot = [];
-  if (phaseEffect() > 0 && ["high-spray", "hang-large"].includes(state.scenario)) hot.push(trainingHour());
-  const affected = phaseEffect() > 0 && ["high-spray", "hang-large"].includes(state.scenario)
+  if (faultPhaseActive() && ["high-spray", "hang-large"].includes(state.scenario)) hot.push(trainingHour());
+  const affected = faultPhaseActive() && ["high-spray", "hang-large"].includes(state.scenario)
     ? Array.from({ length: 32 }, (_, index) => index).filter((index) => Math.abs(index + 1 - state.position) <= 1)
     : [];
-  const commandOnly = phaseEffect() > 0 && ["recognized-no-eject", "valve-weak-blow"].includes(state.scenario)
+  const commandOnly = faultPhaseActive() && ["recognized-no-eject", "valve-weak-blow"].includes(state.scenario)
     ? [state.position - 1]
     : [];
   document.querySelector("#stat-valve").innerHTML = [
@@ -556,12 +580,12 @@ function renderFlowStats() {
   const positions = Array.from({ length: 32 }, (_, index) => 10.2 + Math.sin(index * .72) * .3);
   let danger = [];
   const center = state.position - 1;
-  if (phaseEffect() > 0 && state.scenario === "hang-small") positions[center] = 9.65;
-  if (phaseEffect() > 0 && state.scenario === "hang-large") {
+  if (faultPhaseActive() && state.scenario === "hang-small") positions[center] = 9.65;
+  if (faultPhaseActive() && state.scenario === "hang-large") {
     danger = [center - 1, center, center + 1].filter((index) => index >= 0 && index < 32);
     danger.forEach((index) => { positions[index] = index === center ? 6.9 : 8.15; });
   }
-  if (phaseEffect() > 0 && ["blockage", "duct-blockage"].includes(state.scenario)) {
+  if (faultPhaseActive() && ["blockage", "duct-blockage"].includes(state.scenario)) {
     danger = Array.from({ length: 7 }, (_, offset) => center - 3 + offset).filter((index) => index >= 0 && index < 32);
     danger.forEach((index) => {
       const distance = Math.abs(index - center);
@@ -569,7 +593,7 @@ function renderFlowStats() {
       else positions[index] = [5.9, 7.2, 13.5, 12.8][distance];
     });
   }
-  if (phaseEffect() > 0 && state.scenario === "flow-abnormal") {
+  if (faultPhaseActive() && state.scenario === "flow-abnormal") {
     danger = Array.from({ length: 32 }, (_, index) => index);
     positions.forEach((value, index) => { positions[index] = 12.7 + Math.sin(index * .9) * 1.05; });
   }
@@ -717,6 +741,7 @@ function renderPhase() {
 
 function scenarioFlowValue() {
   const baseline = 10.05 + Math.sin(state.tick * .72) * .22;
+  if (state.phase === PHASE.RECOVERY) return state.scenario === "flow-abnormal" ? 10.2 : baseline;
   const effect = phaseEffect();
   if (!effect) return baseline;
   if (state.scenario === "flow-abnormal") {
@@ -759,10 +784,12 @@ function updateLiveIndicators() {
 }
 
 function renderPhysicalReadout() {
-  const active = phaseEffect() > 0;
+  const active = faultPhaseActive();
   let pressure = "未接入真实压力值";
   let action = !state.running
     ? "已停止检测，无检测与喷射动作"
+    : state.phase === PHASE.RECOVERY
+      ? "处理后观察培训态；是否真实恢复需现场确认"
     : active
       ? "物理动作待现场确认"
       : state.scenario === "normal"
@@ -875,18 +902,24 @@ function updateSettingsMonitors() {
   // 实机设置页顶部六项仅作固定标签还原；动态培训数值留在右侧培训面板。
 }
 
-function sprayIncrement() {
+function sprayIncrement(isFaultEvent = false) {
   if (state.phase === PHASE.STOPPED) return 0;
-  if (phaseEffect() > 0 && state.scenario === "high-spray") return 9;
-  if (phaseEffect() > 0 && state.scenario === "hang-large") return 6;
+  if (isFaultEvent && state.scenario === "high-spray") return 9;
+  if (isFaultEvent && state.scenario === "hang-large") return 6;
   return 2 + state.tick % 2;
 }
 
-function currentDetectionEvent() {
-  const localBlockageEvent = phaseEffect() > 0 && state.scenario === "blockage" && state.tick % 3 === 0;
-  const targeted = phaseEffect() > 0 && (["high-spray", "hang-large", "recognized-no-eject", "valve-weak-blow"].includes(state.scenario) || localBlockageEvent);
+function currentDetectionEvent(isFaultEvent = false) {
+  const targeted = isFaultEvent && faultPhaseActive() && LOCAL_FAULT_EVENT_SCENARIOS.has(state.scenario);
   let front = targeted || state.tick % 2 === 0;
-  let valveIndex = targeted ? state.position - 1 : (front ? state.tick * 3 : state.tick * 5) % 32;
+  let valveIndex = targeted
+    ? state.scenario === "hang-large"
+      ? Math.max(0, Math.min(31, state.position - 1 + [-1, 0, 1][Math.floor(state.tick / 3) % 3]))
+      : state.position - 1
+    : (front ? state.tick * 3 : state.tick * 5) % 32;
+  if (!targeted && faultPhaseActive() && LOCAL_FAULT_EVENT_SCENARIOS.has(state.scenario) && Math.abs(valveIndex - (state.position - 1)) <= 1) {
+    valveIndex = (valveIndex + 8) % 32;
+  }
   let group = Math.floor(valveIndex / 4);
   let cameraSourceNumber = group * 2 + (front ? 1 : 2);
   const unavailable = new Set(frozenCameraIndexes().map((index) => index + 1));
@@ -896,26 +929,27 @@ function currentDetectionEvent() {
     group = Math.floor((cameraSourceNumber - 1) / 2);
     valveIndex = group * 4 + state.tick % 4;
   }
-  return { front, valveIndex, cameraSourceNumber };
+  return { front, valveIndex, cameraSourceNumber, isFaultEvent: targeted };
 }
 
-function emitDetectionEvent(amount) {
-  const event = currentDetectionEvent();
-  const noEject = phaseEffect() > 0 && state.scenario === "recognized-no-eject";
+function emitDetectionEvent(isFaultEvent = false) {
+  const event = currentDetectionEvent(isFaultEvent);
+  const amount = sprayIncrement(event.isFaultEvent);
+  const noEject = event.isFaultEvent && state.scenario === "recognized-no-eject";
   const currentHour = trainingHour();
   if (!noEject) {
     state.hourlySpray[currentHour] = (state.hourlySpray[currentHour] || 0) + amount;
     (event.front ? state.frontValves : state.rearValves)[event.valveIndex] += amount;
     state.dayTotal += amount;
   }
-  const repeated = phaseEffect() > 0 && ["high-spray", "hang-large", "recognized-no-eject", "valve-weak-blow"].includes(state.scenario);
+  const repeated = event.isFaultEvent;
   state.triggerEvents.unshift({
     id: `training-${++state.triggerSerial}`,
     imageIndex: repeated ? [28, 29][state.tick % 2] : (state.tick - 1) % 32 + 1,
     cameraSourceNumber: event.cameraSourceNumber,
     at: state.roundClockActive ? state.playbackClock + state.playbackElapsed * 1000 : state.simClockAt,
     repeated,
-    kind: repeated ? state.scenario : "normal"
+    kind: event.isFaultEvent ? state.scenario : "normal"
   });
   state.triggerEvents = state.triggerEvents.slice(0, 32);
 }
@@ -976,10 +1010,11 @@ function syncPositionLock() {
 function phaseScreen(phase) {
   if ([PHASE.STOPPED, PHASE.RUN_BASELINE, PHASE.FAULT_FORMING, PHASE.RECOVERY].includes(phase)) return ["main", null];
   if (state.scenario === "temperature") return ["main", null];
+  if (state.scenario === "duct-blockage") return phase === PHASE.FAULT_OBSERVABLE ? ["main", null] : ["stats", "flow"];
   if (["high-spray", "hang-large", "recognized-no-eject", "valve-weak-blow"].includes(state.scenario)) {
     return phase === PHASE.FAULT_OBSERVABLE ? ["triggers", null] : ["stats", "valve"];
   }
-  if (["hang-small", "blockage", "duct-blockage", "flow-abnormal"].includes(state.scenario)) return ["stats", "flow"];
+  if (["hang-small", "blockage", "flow-abnormal"].includes(state.scenario)) return ["stats", "flow"];
   return ["main", null];
 }
 
@@ -1075,9 +1110,12 @@ function tickMachine() {
     state.hourlyFlow[trainingHour()] = Number(state.liveFlow.toFixed(2));
     sampleFlowAlarm();
     updateTemperature();
-    if (!detectionEventsSuppressed()) emitDetectionEvent(sprayIncrement());
+    if (!detectionEventsSuppressed()) {
+      emitDetectionEvent(false);
+      if (localFaultEventDue()) emitDetectionEvent(true);
+    }
   }
-  if (!paused && !timelinePaused && state.tick % 3 === 0 && state.scenario !== "flow-abnormal" && state.phase !== PHASE.RUN_BASELINE) pushRuntimeEvent(liveEventText(), state.scenario !== "normal");
+  if (!paused && !timelinePaused && state.tick % 3 === 0 && state.scenario !== "flow-abnormal" && faultPhaseActive()) pushRuntimeEvent(liveEventText(), true);
   advanceScenarioPhase();
   if (hmiDisplayFrozen()) {
     renderFrozenTrainingState();
