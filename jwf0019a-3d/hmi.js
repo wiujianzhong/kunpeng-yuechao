@@ -208,6 +208,7 @@ const MANUAL_RECOVERY_SCENARIOS = new Set([
 const state = {
   scenario: "normal",
   position: 18,
+  targetView: "front",
   screen: "main",
   stat: "valve",
   selectedChannel: 1,
@@ -244,6 +245,7 @@ const state = {
   frontValves: [],
   rearValves: [],
   baseline: "capture-composite",
+  normalLogCursor: 0,
   simClockAt: EVIDENCE_CAPTURE_AT
 };
 
@@ -271,11 +273,20 @@ const triggerCameraSources = Array.from({ length: 32 }, (_, index) => index < 20
 
 const pad2 = (value) => String(value).padStart(2, "0");
 const targetChannel = () => Math.max(1, Math.min(8, Math.ceil(state.position / 4)));
-const targetCameraIndex = () => (targetChannel() - 1) * 2;
+const targetPairCameraIndex = () => (targetChannel() - 1) * 2;
+const targetCameraIndex = () => targetPairCameraIndex() + (state.targetView === "rear" ? 1 : 0);
 const cameraSource = (index, phase) => `${ASSET_BASE}/cameras/cam-${pad2(index + 1)}-${index < 16 && phase ? "b" : "a"}.png`;
 const readyCameraFrames = new Set();
 const trainingText = (text) => text.startsWith("培训模拟：") ? text : `培训模拟：${text}`;
 const trainingLogText = (text) => text.startsWith("【培训提示】") ? text : `【培训提示】${text}`;
+const NORMAL_MACHINE_EVENTS = ["通道1吹阀保护开", "通道3吹阀保护开", "通道5吹阀保护开", "阀保护计数正常"];
+const TARGET_VIEW_SCENARIOS = new Set([
+  "high-spray", "hang-small", "hang-large", "camera-fault",
+  "recognized-no-eject", "lamp-brightness", "valve-weak-blow", "camera-485"
+]);
+const targetViewText = (text) => state.targetView === "rear" && TARGET_VIEW_SCENARIOS.has(state.scenario)
+  ? text.replaceAll("前视", "后视")
+  : text;
 const trainingNow = () => new Date(state.simClockAt);
 const trainingHour = () => trainingNow().getHours();
 
@@ -307,7 +318,7 @@ function frozenCameraIndexes() {
   const target = targetCameraIndex();
   if (state.scenario === "camera-fault") return [target];
   if (state.scenario === "camera-485") return [target];
-  if (state.scenario === "channel-fault") return [target, target + 1];
+  if (state.scenario === "channel-fault") return [targetPairCameraIndex(), targetPairCameraIndex() + 1];
   if (state.scenario === "screen-freeze") return Array.from({ length: 20 }, (_, index) => index);
   return [];
 }
@@ -402,7 +413,7 @@ function cameraClasses(index) {
   if (frozenCameraIndexes().includes(index)) classes.push("freeze");
   if (faultPhaseActive() && ["hang-small", "hang-large"].includes(state.scenario) && index === target) classes.push("hang");
   if (faultPhaseActive() && state.scenario === "hang-large" && index === target) classes.push("large");
-  if (faultPhaseActive() && state.scenario === "blockage" && (index === target || index === target + 1)) classes.push("blocked");
+  if (faultPhaseActive() && state.scenario === "blockage" && (index === targetPairCameraIndex() || index === targetPairCameraIndex() + 1)) classes.push("blocked");
   if (faultPhaseActive() && state.scenario === "duct-blockage" && ductDriftCameraIndexes().has(index)) classes.push("duct-drift");
   if (faultPhaseActive() && state.scenario === "lamp-brightness" && index === target) classes.push("brightness-abnormal");
   return classes;
@@ -482,21 +493,21 @@ function eventTimeText(timestamp) {
 
 function scenarioLogLines() {
   if (!state.running) return ["设备已停止检测", "画面刷新、流速采样与喷次累计均已暂停"].map(trainingLogText);
-  if (state.phase === PHASE.RUN_BASELINE || state.scenario === "normal") return scenarios.normal.machineLogs.map(trainingLogText);
+  if (state.phase === PHASE.RUN_BASELINE || state.scenario === "normal") return scenarios.normal.machineLogs;
   if (state.scenario === "waste-bag-full" && state.phase === PHASE.FAULT_FORMING) {
     return [`废料满袋光电遮挡计时 ${Math.min(10, state.phaseTick)}/10秒`, "喷次与触发记录不作为满袋判据", "等待进入报警培训态"].map(trainingLogText);
   }
   if (state.phase === PHASE.FAULT_FORMING) return ["主检测画面持续刷新", "监控采样连续记录中", `当前流速 ${state.liveFlow.toFixed(2)}`].map(trainingLogText);
   if (state.phase === PHASE.RECOVERY) return ["已进入处理后观察培训推演", "是否真实恢复需由现场继续确认", `当前流速 ${state.liveFlow.toFixed(2)}`].map(trainingLogText);
-  if (state.scenario !== "flow-abnormal" && !["blockage", "duct-blockage"].includes(state.scenario)) return scenarios[state.scenario].machineLogs.map(trainingLogText);
+  if (state.scenario !== "flow-abnormal" && !["blockage", "duct-blockage"].includes(state.scenario)) return scenarios[state.scenario].machineLogs.map(targetViewText).map(trainingLogText);
   if (state.flowAlarm) return ["连续3次流速越界", "通道流速监控状态异常", `当前流速 ${state.liveFlow.toFixed(2)}`].map(trainingLogText);
   if (state.flowAbnormalCount > 0) return [`流速越界采样 ${state.flowAbnormalCount}/3`, "前2次只记录计数，尚未触发报警"].map(trainingLogText);
-  return scenarios[state.scenario].machineLogs.map(trainingLogText);
+  return scenarios[state.scenario].machineLogs.map(targetViewText).map(trainingLogText);
 }
 
 function renderLogs() {
   const base = scenarioLogLines();
-  const normal = ["通道5吹阀保护开", "通道3吹阀保护开", "通道1吹阀保护开", "阀保护计数正常"].map(trainingLogText);
+  const normal = NORMAL_MACHINE_EVENTS;
   const entries = Array.from({ length: 28 }, (_, index) => {
     if (state.logEvents[index]) return state.logEvents[index];
     const text = index < base.length ? base[index] : normal[index % normal.length];
@@ -545,10 +556,14 @@ function renderValveStats() {
   const commandOnly = faultPhaseActive() && ["recognized-no-eject", "valve-weak-blow"].includes(state.scenario)
     ? [state.position - 1]
     : [];
+  const affectedFront = state.targetView === "front" ? affected : [];
+  const affectedRear = state.targetView === "rear" ? affected : [];
+  const commandFront = state.targetView === "front" ? commandOnly : [];
+  const commandRear = state.targetView === "rear" ? commandOnly : [];
   document.querySelector("#stat-valve").innerHTML = [
     chartBlock("JLEye总数统计", state.hourlySpray, Array.from({ length: 25 }, (_, index) => index), hot),
-    chartBlock("前视统计", valveValues(false), Array.from({ length: 32 }, (_, index) => index + 1), affected, commandOnly),
-    chartBlock("后视统计", valveValues(true), Array.from({ length: 32 }, (_, index) => index + 1), [])
+    chartBlock("前视统计", valveValues(false), Array.from({ length: 32 }, (_, index) => index + 1), affectedFront, commandFront),
+    chartBlock("后视统计", valveValues(true), Array.from({ length: 32 }, (_, index) => index + 1), affectedRear, commandRear)
   ].join("");
 }
 
@@ -704,9 +719,9 @@ function selectTrigger(index) {
 function renderReading() {
   const data = scenarios[state.scenario];
   const prefix = state.scenario === "normal" ? (text) => text : trainingText;
-  document.querySelector("#scene-phenomenon").textContent = prefix(data.phenomenon);
+  document.querySelector("#scene-phenomenon").textContent = prefix(targetViewText(data.phenomenon));
   const flowProgress = state.scenario === "flow-abnormal" ? ` 当前连续越界计数：${state.flowAbnormalCount}/3${state.flowAlarm ? "，已报警。" : "，尚未报警。"}` : "";
-  document.querySelector("#scene-screen").textContent = prefix(`${data.screen}${flowProgress}`);
+  document.querySelector("#scene-screen").textContent = prefix(`${targetViewText(data.screen)}${flowProgress}`);
   document.querySelector("#scene-diagnosis").textContent = prefix(data.diagnosis);
   document.querySelector("#scene-handling").textContent = prefix(data.handling);
   renderPhase();
@@ -829,6 +844,14 @@ function pushRuntimeEvent(text, warn = false) {
   state.logEvents.unshift({ text: trainingLogText(text), warn, at });
 }
 
+function pushNormalMachineEvent() {
+  const text = NORMAL_MACHINE_EVENTS[state.normalLogCursor % NORMAL_MACHINE_EVENTS.length];
+  state.normalLogCursor += 1;
+  state.logClock = state.simClockAt;
+  state.logEvents.unshift({ text, warn: false, at: state.simClockAt });
+  state.logEvents = state.logEvents.slice(0, 28);
+}
+
 function liveEventText() {
   const events = {
     normal: "前16幅主检测画面刷新正常；精灵眼正常运行形态待取证",
@@ -911,7 +934,7 @@ function sprayIncrement(isFaultEvent = false) {
 
 function currentDetectionEvent(isFaultEvent = false) {
   const targeted = isFaultEvent && faultPhaseActive() && LOCAL_FAULT_EVENT_SCENARIOS.has(state.scenario);
-  let front = targeted || state.tick % 2 === 0;
+  let front = targeted ? state.targetView === "front" : state.tick % 2 === 0;
   let valveIndex = targeted
     ? state.scenario === "hang-large"
       ? Math.max(0, Math.min(31, state.position - 1 + [-1, 0, 1][Math.floor(state.tick / 3) % 3]))
@@ -1003,8 +1026,15 @@ function restorePlaybackBaseline() {
 
 function syncPositionLock() {
   const slider = document.querySelector("#position-slider");
+  const viewSelect = document.querySelector("#target-view");
+  viewSelect.value = state.targetView;
   slider.disabled = state.playing || state.awaitingManual;
   slider.title = slider.disabled ? "联动播放或等待人工处理期间位置已锁定" : "";
+  const viewLocked = !TARGET_VIEW_SCENARIOS.has(state.scenario) || state.playing || state.awaitingManual;
+  viewSelect.disabled = viewLocked;
+  viewSelect.title = !TARGET_VIEW_SCENARIOS.has(state.scenario)
+    ? "当前场景不区分前视与后视目标"
+    : viewLocked ? "联动播放或等待人工处理期间检测面已锁定" : "";
 }
 
 function phaseScreen(phase) {
@@ -1111,6 +1141,9 @@ function tickMachine() {
     sampleFlowAlarm();
     updateTemperature();
     if (!detectionEventsSuppressed()) {
+      if ((state.scenario === "normal" || state.phase === PHASE.RUN_BASELINE) && state.tick % 3 === 0) {
+        pushNormalMachineEvent();
+      }
       emitDetectionEvent(false);
       if (localFaultEventDue()) emitDetectionEvent(true);
     }
@@ -1243,6 +1276,7 @@ function setScenario(name) {
   restorePlaybackBaseline();
   state.logEvents = [];
   state.scenario = name;
+  if (!TARGET_VIEW_SCENARIOS.has(name)) state.targetView = "front";
   state.playbackBaseline = null;
   state.playbackClock = null;
   state.triggerEvents = [];
@@ -1253,8 +1287,9 @@ function setScenario(name) {
   state.phaseTick = 0;
   state.liveFlow = state.running ? scenarioFlowValue() : 0;
   setScreen("main");
-  if (state.running) pushRuntimeEvent("已选择培训场景，等待播放");
+  if (state.running && name !== "normal") pushRuntimeEvent("已选择培训场景，等待播放");
   document.querySelectorAll("[data-scenario]").forEach((button) => button.classList.toggle("active", button.dataset.scenario === name));
+  syncPositionLock();
   renderAll();
 }
 
@@ -1276,7 +1311,9 @@ function setRunning(running) {
   state.liveFlow = running ? scenarioFlowValue() : 0;
   if (!running) state.temperature = 57;
   updateLiveIndicators();
-  pushRuntimeEvent(running ? "设备开始检测，前16幅主检测画面恢复刷新；精灵眼正常运行形态待取证" : "设备已停止检测，累计与流速采样暂停", !running);
+  if (state.scenario !== "normal") {
+    pushRuntimeEvent(running ? "设备开始检测，前16幅主检测画面恢复刷新；精灵眼正常运行形态待取证" : "设备已停止检测，累计与流速采样暂停", !running);
+  }
   renderAll();
 }
 
@@ -1294,6 +1331,15 @@ document.querySelector("#position-slider").addEventListener("input", (event) => 
   }
   state.position = Number(event.target.value);
   document.querySelector("#position-value").textContent = `${state.position}号阀`;
+  renderAll();
+});
+
+document.querySelector("#target-view").addEventListener("change", (event) => {
+  if (state.playing || state.awaitingManual) return;
+  restorePlaybackBaseline();
+  state.playbackBaseline = null;
+  state.playbackClock = null;
+  state.targetView = event.target.value === "rear" ? "rear" : "front";
   renderAll();
 });
 
@@ -1329,7 +1375,7 @@ document.querySelector("#play-scenario").addEventListener("click", () => {
   button.textContent = "正在播放联动…";
   syncPositionLock();
   setScreen("main");
-  pushRuntimeEvent("开始播放培训联动");
+  if (state.scenario !== "normal") pushRuntimeEvent("开始播放培训联动");
   renderAll();
 });
 

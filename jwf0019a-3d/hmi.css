@@ -242,6 +242,9 @@ button { cursor: pointer; }
 .position-control { margin-top: 18px; display: block; }
 .position-control > span { display: flex; align-items: baseline; justify-content: space-between; color: #4a5d51; font-size: 12px; font-weight: 700; }
 .position-control output { color: #4b8b3c; font-size: 16px; }
+.position-control .target-view-row { margin-top: 8px; align-items: center; }
+.target-view-row select { min-width: 88px; height: 28px; padding: 2px 8px; border: 1px solid #c5cfc7; border-radius: 7px; color: #3c5043; background: #fff; font-size: 11px; }
+.target-view-row select:disabled { opacity: .48; }
 .position-control input { width: 100%; margin: 9px 0 3px; accent-color: #4b8b3c; }
 .position-control input:disabled { cursor: not-allowed; opacity: .48; }
 .position-control small { color: #89948d; font-size: 9px; }

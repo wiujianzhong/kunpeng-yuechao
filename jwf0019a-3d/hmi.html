@@ -6,7 +6,7 @@
   <title>JWF0019A 实机界面培训模拟</title>
   <meta name="description" content="依据真实JWF0019A运行界面、相机画面和触发记录制作的培训模拟。">
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./hmi.css?v=34">
+  <link rel="stylesheet" href="./hmi.css?v=35">
 </head>
 <body>
   <header class="page-head">
@@ -24,7 +24,7 @@
     <div class="hmi-stage">
     <p class="hmi-scroll-hint">左右滑动查看完整实机界面</p>
     <section class="hmi-window" aria-label="JWF0019A实机界面模拟">
-      <div class="hmi-titlebar">KDistributionUIPlatform <small>· 离线培训副本，不连接生产设备</small></div>
+      <div class="hmi-titlebar">KDistributionUIPlatform</div>
 
       <header class="machine-header">
         <div class="scheme">当前方案: <b>912</b></div>
@@ -205,6 +205,12 @@
 
       <label class="position-control">
         <span>异常中心位置 <output id="position-value">18号阀</output></span>
+        <span class="target-view-row">目标检测面
+          <select id="target-view" aria-label="异常目标检测面">
+            <option value="front">前视</option>
+            <option value="rear">后视</option>
+          </select>
+        </span>
         <input id="position-slider" type="range" min="1" max="32" value="18">
         <small>1号靠近屏幕，32号靠近风机</small>
       </label>
@@ -226,6 +232,6 @@
     </aside>
   </main>
 
-  <script src="./hmi.js?v=34"></script>
+  <script src="./hmi.js?v=35"></script>
 </body>
 </html>
