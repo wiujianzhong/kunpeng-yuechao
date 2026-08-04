@@ -307,7 +307,7 @@ function faultPhaseActive() {
 }
 
 const LOCAL_FAULT_EVENT_SCENARIOS = new Set([
-  "high-spray", "hang-large", "recognized-no-eject", "valve-weak-blow", "blockage"
+  "high-spray", "hang-large", "recognized-no-eject", "valve-weak-blow"
 ]);
 
 function localFaultEventDue() {
@@ -434,7 +434,7 @@ function ductDriftCameraIndexes() {
 function renderCameras() {
   const root = document.querySelector("#camera-grid");
   const previousSources = new Map(Array.from(root.querySelectorAll(".camera-card")).map((card) => [Number(card.dataset.camera), card.querySelector("img")?.src]));
-  root.innerHTML = cameraLabels.map((label, index) => {
+  const cards = cameraLabels.map((label, index) => {
     const classes = cameraClasses(index);
     const marker = classes.includes("hang") ? '<i class="hang-mark"></i>' : classes.includes("blocked") ? '<i class="blockage-mark"></i>' : "";
     const frozenSource = previousSources.get(index);
@@ -446,6 +446,10 @@ function renderCameras() {
       ${marker}<small>${label}</small>
     </div>`;
   }).join("");
+  const evidenceBoundary = faultPhaseActive() && state.scenario === "fan-overload"
+    ? '<p class="camera-evidence-boundary">培训边界：风机过载后的相机与界面刷新状态尚未取证</p>'
+    : "";
+  root.innerHTML = `${cards}${evidenceBoundary}`;
   root.querySelectorAll(".camera-card img").forEach((image) => {
     image.addEventListener("load", () => {
       const source = image.getAttribute("src");
@@ -824,6 +828,7 @@ function renderPhysicalReadout() {
       ? `光电遮挡计时 ${Math.min(10, state.phaseTick)}/10秒`
       : "废料满袋报警培训态；检查袋体和光电头";
   }
+  if (active && state.scenario === "blockage") action = "局部流速明显偏移；喷射偏移方向和距离未取证，不绑定精准阀位";
   if (active && state.scenario === "fan-overload") action = "风机接触器断开，当前无法检测；HMI联动待取证";
   if (active && state.scenario === "valve-long-blow") action = `第${state.position}号阀持续漏气；软件喷次不等同漏气时长`;
   if (active && state.scenario === "valve-weak-blow") action = `第${state.position}号阀有命令，实际喷气不足`;
@@ -860,7 +865,7 @@ function liveEventText() {
     "high-spray": `第${state.position}号阀局部喷次继续升高`,
     "hang-small": `第${state.position}号阀附近流速轻微波动`,
     "hang-large": `第${state.position}号阀附近反复出现扭曲触发图，局部白棉喷次增加`,
-    blockage: `第${state.position}号阀附近流速下降，两侧位置流速升高`,
+    blockage: `以第${state.position}号位置为中心约30厘米区域流速下降，两侧位置流速升高`,
     "duct-blockage": "主检测画面持续刷新，实时位置流速出现明显偏移",
     "flow-abnormal": state.flowAlarm ? "连续3次流速越界，已触发报警" : `流速越界采样 ${state.flowAbnormalCount}/3`,
     "camera-fault": `${cameraLabels[targetCameraIndex()]}画面未刷新，其余主检测画面继续刷新`,

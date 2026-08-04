@@ -183,6 +183,47 @@ try {
   assert.match(multiDayReference.detail, /日累计喷次/, "多日参考必须明确日累计口径");
   assert.match(multiDayReference.detail, /P50 83440/, "多日参考应展示可回溯的中位数");
 
+  const blockageBoundary = await evaluate(`(() => {
+    setScenario("blockage");
+    state.phase = PHASE.FAULT_OBSERVABLE;
+    state.phaseTick = 1;
+    state.tick = 6;
+    renderAll();
+    const event = currentDetectionEvent(true);
+    return {
+      forcedFaultEvent: localFaultEventDue(),
+      eventIsTargeted: event.isFaultEvent,
+      action: document.querySelector("#physical-action").textContent,
+      eventText: liveEventText()
+    };
+  })()`);
+  assert.equal(blockageBoundary.forcedFaultEvent, false, "30厘米堵花不得强制生成精准阀位故障事件");
+  assert.equal(blockageBoundary.eventIsTargeted, false, "30厘米堵花不得把检测事件绑定成精准目标喷射");
+  assert.match(blockageBoundary.action, /不绑定精准阀位/, "30厘米堵花必须标明喷射偏移尚未取证");
+  assert.match(blockageBoundary.eventText, /约30厘米区域/, "30厘米堵花实时描述必须使用区域口径");
+  assert.doesNotMatch(blockageBoundary.eventText, /号阀/, "30厘米堵花实时描述不得指向单个电磁阀");
+
+  const brightnessBoundary = await evaluate(`(() => {
+    setScenario("lamp-brightness");
+    state.phase = PHASE.FAULT_OBSERVABLE;
+    renderAll();
+    const abnormal = document.querySelector(".camera-card.brightness-abnormal img");
+    const normal = document.querySelector(".camera-card:not(.brightness-abnormal) img");
+    return {
+      abnormalFilter: getComputedStyle(abnormal).filter,
+      normalFilter: getComputedStyle(normal).filter
+    };
+  })()`);
+  assert.equal(brightnessBoundary.abnormalFilter, brightnessBoundary.normalFilter, "亮度异常方向未取证时不得固定画成变暗");
+
+  const fanBoundary = await evaluate(`(() => {
+    setScenario("fan-overload");
+    state.phase = PHASE.FAULT_OBSERVABLE;
+    renderAll();
+    return document.querySelector(".camera-evidence-boundary")?.textContent || "";
+  })()`);
+  assert.match(fanBoundary, /相机与界面刷新状态尚未取证/, "风机过载动态区域必须显示证据边界");
+
   const frozenStart = await evaluate(`(() => {
     setScenario("screen-freeze");
     state.phase = PHASE.ALARM_ACTIVE;
@@ -209,7 +250,7 @@ try {
   assert.deepEqual(frozenAfter, frozenStart, "整屏卡住时界面时间、统计和20幅画面都应保持不变");
   assert.equal(frozenAfter.runButton, "开车", "整屏卡住时应保留卡住前的开车按钮画面");
 
-  console.log("HMI回归通过：19场景入口、只读边界、等待人工局部冻结、整屏卡住全冻结");
+  console.log("HMI回归通过：19场景入口、只读边界、堵花不绑定精准阀位、亮度方向不臆测、风机过载证据边界");
 } finally {
   client?.close();
   const waitForExit = (process) => process && process.exitCode === null

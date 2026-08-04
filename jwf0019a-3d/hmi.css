@@ -64,7 +64,7 @@ button { cursor: pointer; }
 .machine-screen { height: 560px; min-height: 0; background: var(--hmi-bg); }
 .machine-screen[hidden], .stat-content[hidden], .history-content[hidden] { display: none !important; }
 .main-screen { overflow: hidden; display: grid; grid-template-columns: minmax(0, 70.9fr) minmax(0, 29.1fr); gap: 3px; padding: 3px; }
-.camera-grid { min-width: 0; min-height: 0; overflow: hidden; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(10, minmax(0, 1fr)); gap: 3px; }
+.camera-grid { position: relative; min-width: 0; min-height: 0; overflow: hidden; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(10, minmax(0, 1fr)); gap: 3px; }
 .camera-card { position: relative; min-width: 0; overflow: hidden; border: 1px solid #d9dcda; background: #686d6b; }
 .camera-card img { width: 100%; height: 100%; display: block; object-fit: cover; filter: grayscale(1) contrast(.93) brightness(1.05); }
 .camera-card small { position: absolute; right: 3px; bottom: 1px; color: rgba(255,255,255,.76); font: 7px/1 ui-monospace, monospace; text-shadow: 0 1px #333; }
@@ -75,6 +75,7 @@ button { cursor: pointer; }
 .camera-card.duct-drift::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at 24% 50%, rgba(222,158,65,.34), transparent 38%), linear-gradient(102deg, rgba(54,139,172,.26) 0 30%, transparent 54%, rgba(215,170,82,.22) 100%); }
 .camera-card.duct-drift::after { content: "培训示意·偏流"; position: absolute; left: 4px; top: 3px; z-index: 3; padding: 1px 3px; border-radius: 2px; color: #fff; background: rgba(52,67,61,.72); font-size: 6px; line-height: 1.2; pointer-events: none; }
 .camera-card.duct-drift small { z-index: 3; }
+.camera-evidence-boundary { position: absolute; left: 50%; top: 8px; z-index: 6; margin: 0; padding: 4px 8px; border: 1px solid rgba(255,218,151,.88); border-radius: 3px; color: #fff7df; background: rgba(91,66,34,.88); font-size: 7px; line-height: 1.35; transform: translateX(-50%); pointer-events: none; white-space: nowrap; }
 .runtime-log { min-width: 0; min-height: 0; overflow: hidden; border-left: 1px solid #bfc5c0; background: #f8f8f6; }
 .runtime-log > div { overflow: hidden; }
 .runtime-log #runtime-log-list { height: 100%; }
@@ -229,7 +230,7 @@ button { cursor: pointer; }
 .physical-readout { margin-top: 8px; padding: 9px 11px; display: grid; gap: 6px; border: 1px solid #d3dcd5; border-radius: 10px; background: rgba(255,255,255,.72); color: #748078; font-size: 9px; }
 .physical-readout span { display: grid; grid-template-columns: 60px 1fr; gap: 8px; }
 .physical-readout i { color: #405348; font-style: normal; font-weight: 700; }
-.camera-card.brightness-abnormal img { filter: brightness(.58) contrast(1.12); }
+.camera-card.brightness-abnormal { outline: 2px solid #d99031; outline-offset: -2px; }
 .baseline-control { margin-top: 10px; padding: 10px 11px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 7px 10px; border: 1px solid #d3dcd5; border-radius: 10px; background: rgba(255,255,255,.72); }
 .baseline-control > span { color: #4a5d51; font-size: 10px; font-weight: 700; }
 .baseline-control select { min-width: 0; height: 30px; padding: 3px 8px; border: 1px solid #c5cfc7; border-radius: 7px; color: #3c5043; background: #fff; font-size: 10px; }
