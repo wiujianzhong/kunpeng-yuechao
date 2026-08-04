@@ -309,6 +309,10 @@ function physicalDetectionPaused() {
   return false;
 }
 
+function detectionEventsSuppressed() {
+  return state.scenario === "fan-overload" && phaseEffect() > 0;
+}
+
 function trainingTimelinePaused() {
   return state.awaitingManual;
 }
@@ -757,7 +761,13 @@ function updateLiveIndicators() {
 function renderPhysicalReadout() {
   const active = phaseEffect() > 0;
   let pressure = "未接入真实压力值";
-  let action = active ? "物理动作待现场确认" : "检测与喷射动作正常（培训基线）";
+  let action = !state.running
+    ? "已停止检测，无检测与喷射动作"
+    : active
+      ? "物理动作待现场确认"
+      : state.scenario === "normal"
+        ? "检测与喷射动作正常（培训基线）"
+        : "当前为正常运行基线，异常场景尚未激活";
   if (active && state.scenario === "screen-freeze") action = "界面停留在开车画面；设备实际动作待现场确认";
   if (active && state.scenario === "lamp-brightness") action = `${cameraLabels[targetCameraIndex()]}仍刷新，局部亮度偏离`;
   if (active && state.scenario === "air-pressure-low") {
@@ -773,7 +783,7 @@ function renderPhysicalReadout() {
   if (active && state.scenario === "valve-long-blow") action = `第${state.position}号阀持续漏气；软件喷次不等同漏气时长`;
   if (active && state.scenario === "valve-weak-blow") action = `第${state.position}号阀有命令，实际喷气不足`;
   if (active && state.scenario === "camera-485") action = `${cameraLabels[targetCameraIndex()]}停止刷新且无新增触发`;
-  if (state.awaitingManual) action = "培训时间线已暂停；不代表实机停机";
+  if (state.awaitingManual) action = "培训回放停在当前异常画面；不代表实机停机";
   document.querySelector("#air-pressure").textContent = pressure;
   document.querySelector("#physical-action").textContent = action;
 }
@@ -879,7 +889,7 @@ function currentDetectionEvent() {
   let valveIndex = targeted ? state.position - 1 : (front ? state.tick * 3 : state.tick * 5) % 32;
   let group = Math.floor(valveIndex / 4);
   let cameraSourceNumber = group * 2 + (front ? 1 : 2);
-  const unavailable = new Set(["screen-freeze", "channel-fault"].includes(state.scenario) ? [] : frozenCameraIndexes().map((index) => index + 1));
+  const unavailable = new Set(frozenCameraIndexes().map((index) => index + 1));
   if (unavailable.has(cameraSourceNumber)) {
     cameraSourceNumber = Array.from({ length: 16 }, (_, index) => index + 1).find((source) => !unavailable.has(source)) || cameraSourceNumber;
     front = cameraSourceNumber % 2 === 1;
@@ -1065,7 +1075,7 @@ function tickMachine() {
     state.hourlyFlow[trainingHour()] = Number(state.liveFlow.toFixed(2));
     sampleFlowAlarm();
     updateTemperature();
-    emitDetectionEvent(sprayIncrement());
+    if (!detectionEventsSuppressed()) emitDetectionEvent(sprayIncrement());
   }
   if (!paused && !timelinePaused && state.tick % 3 === 0 && state.scenario !== "flow-abnormal" && state.phase !== PHASE.RUN_BASELINE) pushRuntimeEvent(liveEventText(), state.scenario !== "normal");
   advanceScenarioPhase();
@@ -1193,6 +1203,7 @@ function cancelScenarioPlayback() {
 function setScenario(name) {
   cancelScenarioPlayback();
   restorePlaybackBaseline();
+  state.logEvents = [];
   state.scenario = name;
   state.playbackBaseline = null;
   state.playbackClock = null;
@@ -1203,6 +1214,7 @@ function setScenario(name) {
   state.phase = state.running ? PHASE.RUN_BASELINE : PHASE.STOPPED;
   state.phaseTick = 0;
   state.liveFlow = state.running ? scenarioFlowValue() : 0;
+  setScreen("main");
   if (state.running) pushRuntimeEvent("已选择培训场景，等待播放");
   document.querySelectorAll("[data-scenario]").forEach((button) => button.classList.toggle("active", button.dataset.scenario === name));
   renderAll();
