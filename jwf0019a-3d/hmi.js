@@ -731,8 +731,14 @@ function updateLiveIndicators() {
   document.querySelector("#log-spray").textContent = state.dayTotal;
   const indicator = document.querySelector("#run-state");
   const paused = physicalDetectionPaused();
-  indicator.textContent = paused ? "● 检测动作已暂停（培训推演）" : state.running ? "● 正在开车（培训模拟）" : "● 已关车（培训模拟）";
-  indicator.classList.toggle("stopped", !state.running || paused);
+  indicator.textContent = state.awaitingManual
+    ? "● 等待人工处理（培训时间线暂停）"
+    : paused
+      ? "● 检测动作已暂停（培训推演）"
+      : state.running
+        ? "● 正在开车（培训模拟）"
+        : "● 已关车（培训模拟）";
+  indicator.classList.toggle("stopped", state.awaitingManual || !state.running || paused);
   const live = document.querySelector(".training-live");
   const formalAlarm = state.scenario === "flow-abnormal" && state.flowAlarm;
   const observation = !formalAlarm && [PHASE.FAULT_OBSERVABLE, PHASE.ALARM_ACTIVE].includes(state.phase);
@@ -857,12 +863,12 @@ function sprayIncrement() {
   if (state.phase === PHASE.STOPPED) return 0;
   if (phaseEffect() > 0 && state.scenario === "high-spray") return 9;
   if (phaseEffect() > 0 && state.scenario === "hang-large") return 6;
-  if (phaseEffect() > 0 && state.scenario === "blockage") return 4;
   return 2 + state.tick % 2;
 }
 
 function currentDetectionEvent() {
-  const targeted = phaseEffect() > 0 && ["high-spray", "hang-large", "blockage", "recognized-no-eject", "valve-weak-blow"].includes(state.scenario);
+  const localBlockageEvent = phaseEffect() > 0 && state.scenario === "blockage" && state.tick % 3 === 0;
+  const targeted = phaseEffect() > 0 && (["high-spray", "hang-large", "recognized-no-eject", "valve-weak-blow"].includes(state.scenario) || localBlockageEvent);
   let front = targeted || state.tick % 2 === 0;
   let valveIndex = targeted ? state.position - 1 : (front ? state.tick * 3 : state.tick * 5) % 32;
   let group = Math.floor(valveIndex / 4);
@@ -1038,6 +1044,11 @@ function tickMachine() {
       renderPhase();
       renderPhysicalReadout();
     }
+    return;
+  }
+  if (hmiDisplayFrozen()) {
+    advanceScenarioPhase();
+    renderFrozenTrainingState();
     return;
   }
   state.tick += 1;
