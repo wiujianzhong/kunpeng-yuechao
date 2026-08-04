@@ -146,6 +146,42 @@ try {
   const runningAfter = await evaluate("({ clock: state.simClockAt, runtime: state.runtimeSeconds })");
   assert.ok(runningAfter.clock > cameraStart.clock, "等待人工时界面时钟应继续");
   assert.ok(runningAfter.runtime > cameraStart.runtime, "等待人工时运行时长与统计应继续");
+  const waitingReadout = await evaluate(`({
+    runState: document.querySelector("#run-state").textContent,
+    phaseLabel: document.querySelector("#phase-label").textContent
+  })`);
+  assert.match(waitingReadout.runState, /正在开车/, "等待人工处理不应伪装成实机停机");
+  assert.equal(waitingReadout.phaseLabel, "等待人工处理", "培训阶段应单独标记等待人工处理");
+
+  const smallHangAfter = await evaluate(`(() => {
+    setScenario("hang-small");
+    state.playing = true;
+    state.phase = PHASE.FAULT_OBSERVABLE;
+    state.phaseTick = phaseDuration(PHASE.FAULT_OBSERVABLE) - 1;
+    advanceScenarioPhase();
+    return {
+      phase: state.phase,
+      playing: state.playing,
+      awaitingManual: state.awaitingManual,
+      latestLog: state.logEvents[0]?.text || ""
+    };
+  })()`);
+  assert.equal(smallHangAfter.phase, "RUN_BASELINE", "1厘米小挂花观察结束后应回到基线");
+  assert.equal(smallHangAfter.playing, false, "1厘米小挂花不应继续进入报警阶段");
+  assert.equal(smallHangAfter.awaitingManual, false, "1厘米小挂花不应强制等待人工处理");
+  assert.match(smallHangAfter.latestLog, /未升级为报警/, "1厘米小挂花应明确记录为观察而非报警");
+
+  const multiDayReference = await evaluate(`(() => {
+    state.baseline = "yaxin-f1-20260727-0731";
+    renderBaselineProfile();
+    return {
+      selected: document.querySelector("#baseline-select").value,
+      detail: document.querySelector("#baseline-detail").textContent
+    };
+  })()`);
+  assert.equal(multiDayReference.selected, "yaxin-f1-20260727-0731", "应能选择2026-07-27—31多线多日参考");
+  assert.match(multiDayReference.detail, /日累计喷次/, "多日参考必须明确日累计口径");
+  assert.match(multiDayReference.detail, /P50 83440/, "多日参考应展示可回溯的中位数");
 
   const frozenStart = await evaluate(`(() => {
     setScenario("screen-freeze");
@@ -158,7 +194,8 @@ try {
       clock: state.simClockAt,
       runtime: state.runtimeSeconds,
       phases: state.cameraPhases.slice(),
-      sources: Array.from(document.querySelectorAll(".camera-card img"), (image) => image.src)
+      sources: Array.from(document.querySelectorAll(".camera-card img"), (image) => image.src),
+      runButton: document.querySelector("#run-toggle").textContent.replace(/\s+/g, "")
     };
   })()`);
   await new Promise((resolveWait) => setTimeout(resolveWait, 1_250));
@@ -166,9 +203,11 @@ try {
     clock: state.simClockAt,
     runtime: state.runtimeSeconds,
     phases: state.cameraPhases.slice(),
-    sources: Array.from(document.querySelectorAll(".camera-card img"), (image) => image.src)
+    sources: Array.from(document.querySelectorAll(".camera-card img"), (image) => image.src),
+    runButton: document.querySelector("#run-toggle").textContent.replace(/\s+/g, "")
   })`);
   assert.deepEqual(frozenAfter, frozenStart, "整屏卡住时界面时间、统计和20幅画面都应保持不变");
+  assert.equal(frozenAfter.runButton, "开车", "整屏卡住时应保留卡住前的开车按钮画面");
 
   console.log("HMI回归通过：19场景入口、只读边界、等待人工局部冻结、整屏卡住全冻结");
 } finally {

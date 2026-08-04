@@ -23,6 +23,9 @@ const baselineProfiles = {
   },
   "axin-shift-summary": {
     label: "阿新跨班次汇总", samples: 67, lines: "多车间、多产线", dates: "日期含义待核", p25: 4002, p50: 4643, p75: 5632
+  },
+  "yaxin-f1-20260727-0731": {
+    label: "雅新一分厂7线 2026-07-27—31", samples: 35, lines: "清花1-1至1-7线", dates: "2026-07-27—31", measure: "日累计喷次", p25: 72821, p50: 83440, p75: 95310
   }
 };
 
@@ -199,11 +202,13 @@ function phaseDuration(phase = state.phase) {
 }
 
 const MANUAL_RECOVERY_SCENARIOS = new Set([
-  "high-spray", "hang-small", "hang-large", "blockage", "duct-blockage",
+  "high-spray", "hang-large", "blockage", "duct-blockage",
   "flow-abnormal", "camera-fault", "channel-fault", "screen-freeze",
   "recognized-no-eject", "temperature", "lamp-brightness", "air-pressure-low",
   "waste-bag-full", "fan-overload", "valve-long-blow", "valve-weak-blow", "camera-485"
 ]);
+
+const OBSERVATION_ONLY_SCENARIOS = new Set(["hang-small"]);
 
 const state = {
   scenario: "normal",
@@ -729,7 +734,7 @@ function renderBaselineProfile() {
   const detail = document.querySelector("#baseline-detail");
   select.value = state.baseline;
   detail.textContent = profile.samples
-    ? `人工日报参考资料（不参与本次模拟）· ${profile.lines} · ${profile.dates} · ${profile.samples}点 · P25 ${profile.p25} / P50 ${profile.p50} / P75 ${profile.p75}。不是HMI原始日志。`
+    ? `人工日报参考资料（不参与本次模拟）· ${profile.lines} · ${profile.dates} · ${profile.samples}点 · 口径：${profile.measure || "次/小时"} · P25 ${profile.p25} / P50 ${profile.p50} / P75 ${profile.p75}。不是HMI原始日志。`
     : profile.detail;
 }
 
@@ -777,14 +782,16 @@ function updateLiveIndicators() {
   document.querySelector("#log-spray").textContent = state.dayTotal;
   const indicator = document.querySelector("#run-state");
   const paused = physicalDetectionPaused();
-  indicator.textContent = state.awaitingManual
-    ? "● 等待人工处理（培训时间线暂停）"
-    : paused
+  indicator.textContent = hmiDisplayFrozen()
+    ? "● 上位机画面冻结；设备状态待现场确认"
+    : detectionEventsSuppressed()
+      ? "● 风机过载，检测动作已停止（培训推演）"
+      : paused
       ? "● 检测动作已暂停（培训推演）"
       : state.running
         ? "● 正在开车（培训模拟）"
         : "● 已关车（培训模拟）";
-  indicator.classList.toggle("stopped", state.awaitingManual || !state.running || paused);
+  indicator.classList.toggle("stopped", hmiDisplayFrozen() || detectionEventsSuppressed() || !state.running || paused);
   const live = document.querySelector(".training-live");
   const formalAlarm = state.scenario === "flow-abnormal" && state.flowAlarm;
   const observation = !formalAlarm && [PHASE.FAULT_OBSERVABLE, PHASE.ALARM_ACTIVE].includes(state.phase);
@@ -821,7 +828,6 @@ function renderPhysicalReadout() {
   if (active && state.scenario === "valve-long-blow") action = `第${state.position}号阀持续漏气；软件喷次不等同漏气时长`;
   if (active && state.scenario === "valve-weak-blow") action = `第${state.position}号阀有命令，实际喷气不足`;
   if (active && state.scenario === "camera-485") action = `${cameraLabels[targetCameraIndex()]}停止刷新且无新增触发`;
-  if (state.awaitingManual) action = "培训回放停在当前异常画面；不代表实机停机";
   document.querySelector("#air-pressure").textContent = pressure;
   document.querySelector("#physical-action").textContent = action;
 }
@@ -1064,7 +1070,9 @@ function enterPhase(phase) {
 function finishScenarioPlayback() {
   state.playing = false;
   state.awaitingManual = false;
-  pushRuntimeEvent("本轮处理后观察培训推演结束；是否真实恢复需现场确认");
+  pushRuntimeEvent(OBSERVATION_ONLY_SCENARIOS.has(state.scenario)
+    ? "本轮观察结束；小挂花未扩大，未升级为报警或人工处理"
+    : "本轮处理后观察培训推演结束；是否真实恢复需现场确认");
   state.roundClockActive = false;
   state.phase = PHASE.RUN_BASELINE;
   state.phaseTick = 0;
@@ -1094,6 +1102,10 @@ function advanceScenarioPhase() {
     pushRuntimeEvent("本培训不自动推演恢复；真实恢复条件待取证，需人工确认完成现场处理", true);
     syncPositionLock();
     renderPhase();
+    return;
+  }
+  if (state.phase === PHASE.FAULT_OBSERVABLE && OBSERVATION_ONLY_SCENARIOS.has(state.scenario)) {
+    finishScenarioPlayback();
     return;
   }
   const next = {
@@ -1206,6 +1218,12 @@ function updateRunToggleButton() {
   if (!state.running || state.phase === PHASE.STOPPED) {
     button.innerHTML = "停止<br>检测";
     button.title = "当前已停止检测";
+    return;
+  }
+  if (hmiDisplayFrozen()) {
+    button.classList.add("start");
+    button.innerHTML = "开<br>车";
+    button.title = "上位机画面冻结，此处保留卡住前显示";
     return;
   }
   if (state.phase === PHASE.RECOVERY) {
