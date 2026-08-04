@@ -28,8 +28,8 @@ const baselineProfiles = {
 
 const scenarios = {
   normal: {
-    phenomenon: "前16幅错峰持续刷新，刷新周期以实机为准；4幅精灵眼黑帧。",
-    screen: "10个算力通道状态正常；前16幅相邻刷新帧中的棉流位置连续变化。",
+    phenomenon: "前16幅错峰持续刷新，刷新周期以实机为准；本次取证末4幅精灵眼素材为黑帧，不能作为正常标准。",
+    screen: "10个算力通道状态正常；前16幅相邻刷新帧中的棉流位置连续变化，精灵眼正常运行形态待补充取证。",
     diagnosis: "正常基线要看画面是否持续更新，而不是看有没有移动线条。",
     handling: "无需处置；持续对照画面刷新、流速和局部喷次基线。",
     machineLogs: ["通道5吹阀保护开", "通道3吹阀保护开", "通道1吹阀保护开"]
@@ -77,7 +77,7 @@ const scenarios = {
     machineLogs: ["实时流速超出8.00至12.00范围", "流速连续异常计数增加", "通道流速监控状态异常"]
   },
   "camera-fault": {
-    phenomenon: "单个主检测相机画面不再刷新，其余15幅主检测画面继续更新，4幅精灵眼仍保持黑帧。",
+    phenomenon: "单个主检测相机画面不再刷新，其余15幅主检测画面继续更新。",
     screen: "只有一幅主检测画面冻结，右侧以【培训提示】标出对应相机监控异常。",
     diagnosis: "先断电20秒重启复核；反复出现时检查接线并准备更换对应相机。",
     handling: "记录不刷新的相机号；断电20秒后重启复核，若高频复发，检查线缆并更换对应相机。",
@@ -85,10 +85,10 @@ const scenarios = {
   },
   "channel-fault": {
     phenomenon: "同一算力通道关联的两台相机同时停止刷新。",
-    screen: "同一行两幅画面冻结；顶部通道的真实报警颜色尚未取证，只在机外培训面板标出通讯监控异常。",
-    diagnosis: "优先排查该通道线缆和算力盒子，不先判断两台相机同时损坏。",
+    screen: "同一行两幅上位机画面冻结；下位机可能仍在检测喷出，也可能是通道完全不工作，不能只凭画面下结论。",
+    diagnosis: "先结合喷次、流速、日志和现场动作区分显示不同步与通道完全故障，再排查线缆和算力盒子。",
     handling: "记录异常通道号；断电20秒后重启复核，若反复出现，重点检查线缆并更换对应算力盒子。",
-    machineLogs: ["同一通道两幅画面同时停止刷新", "其他通道画面继续刷新", "未刷新的两幅画面不再产生新触发记录"]
+    machineLogs: ["同一通道两幅上位机画面同时停止刷新", "其他通道画面继续刷新", "物理检测状态需结合喷次、流速、日志与现场动作确认"]
   },
   "screen-freeze": {
     phenomenon: "上位机停留在开车画面，20幅相机画面、界面时间与信息不再刷新；设备实际运行状态不能由冻结画面反推。",
@@ -119,25 +119,25 @@ const scenarios = {
     machineLogs: ["目标相机画面持续刷新", "目标区域亮度偏离相邻画面", "灯管亮度监控现象需人工核查"]
   },
   "air-pressure-low": {
-    phenomenon: "识别与阀命令仍可出现，但供气不足导致实际喷气力量整体偏弱。",
-    screen: "触发记录和软件阀计数不能证明物理喷气充足；气压值未接入模拟器，只在外部培训面板提示。",
-    diagnosis: "先查气源、压力、阀板供气与漏气点，再判断电磁阀或喷嘴。",
+    phenomenon: "厂家资料确认气源压力不足会报警；当前缺少同机台报警时的阀命令与喷气联动录像。",
+    screen: "只显示低压报警培训态；不把软件阀计数、触发记录与实际喷气强度强行绑定。",
+    diagnosis: "先查外部气源、压力、通道挂花堵花、阀板供气与漏气点，再判断电磁阀或喷嘴。",
     handling: "按现场安全流程检查气源与供气管路；恢复后用现场可验证方法确认实际喷气，不只看软件计数。",
-    machineLogs: ["识别记录与阀命令仍可产生", "实际喷气强度需要现场核查", "气源压力不足为培训推演"]
+    machineLogs: ["气源压力不足报警培训态", "检查外部气源与通道挂花堵花", "实际喷气与界面联动待实机取证"]
   },
   "waste-bag-full": {
-    phenomenon: "废料袋逐步充满并形成大面积遮挡，约10秒后进入满袋观察阶段。",
-    screen: "不强制抬高喷次，也不生成异常触发图；右侧培训面板显示满袋形成过程。",
-    diagnosis: "废料满袋属于排杂末端物理状态，不能仅靠喷次或触发图反推。",
-    handling: "按安全规程停止相关设备并处理废料袋；处理后观察培训推演不代表已完成实机闭环验证。",
-    machineLogs: ["废料袋遮挡逐步形成", "约10秒后进入满袋观察", "喷次与触发记录不作为满袋判据"]
+    phenomenon: "废棉袋光电头被遮挡约10秒后，界面进入“废料满袋”报警培训态。",
+    screen: "显示光电遮挡计时，不用喷次或触发图模拟袋体实际装满。",
+    diagnosis: "报警既可能来自废料袋状态，也可能来自光电头被棉絮遮挡，应同时检查。",
+    handling: "按安全规程检查废料袋并清理光电头；恢复后继续观察是否再次报警。",
+    machineLogs: ["废料满袋光电遮挡计时", "约10秒后进入报警培训态", "检查废料袋并清理光电头"]
   },
   "fan-overload": {
-    phenomenon: "风机热过载现象持续后，培训模拟停止检测动作。",
-    screen: "停止后运行时间、相机刷新、触发记录和喷次累计暂停；正式报警文字与复位闭环待实机取证。",
-    diagnosis: "先检查风机积花、通风、负载和热保护，不把停检直接判成相机故障。",
-    handling: "按安全规程停机并检查风机；人工确认处理后仅推演重新观察，不宣称实机已经恢复。",
-    machineLogs: ["风机热过载现象持续", "培训模拟停止检测动作", "等待人工检查风机与热保护"]
+    phenomenon: "风机热过载时接触器断开，设备无法继续检测。",
+    screen: "只确定显示风机过载培训报警；运行时间、相机刷新、喷次等具体界面联动仍待实机取证。",
+    diagnosis: "先检查风机积花、堵塞、通风、负载和热保护，不把无法检测直接判成相机故障。",
+    handling: "按安全规程停机清堵，由合格人员检查并复位热继电器；恢复后再确认检测状态。",
+    machineLogs: ["风机热过载，接触器断开", "当前无法检测", "清堵后由合格人员检查并复位热继电器"]
   },
   "valve-long-blow": {
     phenomenon: "目标电磁阀出现持续漏气或长喷的机械现象。",
@@ -305,7 +305,8 @@ function hmiDisplayFrozen() {
 }
 
 function physicalDetectionPaused() {
-  return state.scenario === "fan-overload" && state.phase === PHASE.ALARM_ACTIVE;
+  // 现有证据只证明风机过载后设备无法检测，尚不能证明整套HMI同步冻结。
+  return false;
 }
 
 function trainingTimelinePaused() {
@@ -455,7 +456,7 @@ function scenarioLogLines() {
   if (!state.running) return ["设备已停止检测", "画面刷新、流速采样与喷次累计均已暂停"].map(trainingLogText);
   if (state.phase === PHASE.RUN_BASELINE || state.scenario === "normal") return scenarios.normal.machineLogs.map(trainingLogText);
   if (state.scenario === "waste-bag-full" && state.phase === PHASE.FAULT_FORMING) {
-    return [`废料袋遮挡形成 ${Math.min(10, state.phaseTick)}/10秒`, "喷次不强制抬高", "不生成异常触发记录"].map(trainingLogText);
+    return [`废料满袋光电遮挡计时 ${Math.min(10, state.phaseTick)}/10秒`, "喷次与触发记录不作为满袋判据", "等待进入报警培训态"].map(trainingLogText);
   }
   if (state.phase === PHASE.FAULT_FORMING) return ["主检测画面持续刷新", "监控采样连续记录中", `当前流速 ${state.liveFlow.toFixed(2)}`].map(trainingLogText);
   if (state.phase === PHASE.RECOVERY) return ["已进入处理后观察培训推演", "是否真实恢复需由现场继续确认", `当前流速 ${state.liveFlow.toFixed(2)}`].map(trainingLogText);
@@ -490,16 +491,21 @@ function valveValues(rear = false) {
 function chartBlock(title, values, labels, hot = [], cold = []) {
   const numericValues = values.filter((value) => Number.isFinite(value));
   const max = Math.max(...numericValues, 1);
+  const axisStep = values.length === 25 ? 1000 : 500;
+  const axisFloor = values.length === 25 ? 5000 : 2000;
+  const axisMax = Math.max(axisFloor, Math.ceil(max / axisStep) * axisStep);
+  const axisTicks = [axisMax, axisMax * .75, axisMax * .5, axisMax * .25, 0]
+    .map((value) => `<span>${Math.round(value)}</span>`).join("");
   const bars = values.map((value, index) => {
     const future = !Number.isFinite(value);
     const classes = ["bar"];
     if (hot.includes(index)) classes.push("hot");
     if (cold.includes(index)) classes.push("cold");
     if (future) classes.push("future");
-    const height = future ? 0 : Math.max(2, value / max * 88);
+    const height = future ? 0 : Math.max(2, value / axisMax * 88);
     return `<span class="${classes.join(" ")}" style="height:${height}%">${future ? "" : `<em>${value}</em>`}<i>${labels[index]}</i></span>`;
   }).join("");
-  return `<article class="chart-block"><h2>${title}</h2><div class="bar-chart">${bars}</div></article>`;
+  return `<article class="chart-block"><h2>${title}</h2><b class="chart-axis-title">次数</b><span class="chart-y-axis" aria-hidden="true">${axisTicks}</span><div class="bar-chart">${bars}</div></article>`;
 }
 
 function renderValveStats() {
@@ -512,7 +518,7 @@ function renderValveStats() {
     ? [state.position - 1]
     : [];
   document.querySelector("#stat-valve").innerHTML = [
-    chartBlock("气阀吹气总数统计", state.hourlySpray, Array.from({ length: 25 }, (_, index) => index), hot),
+    chartBlock("JLEye总数统计", state.hourlySpray, Array.from({ length: 25 }, (_, index) => index), hot),
     chartBlock("前视统计", valveValues(false), Array.from({ length: 32 }, (_, index) => index + 1), affected, commandOnly),
     chartBlock("后视统计", valveValues(true), Array.from({ length: 32 }, (_, index) => index + 1), [])
   ].join("");
@@ -756,14 +762,14 @@ function renderPhysicalReadout() {
   if (active && state.scenario === "lamp-brightness") action = `${cameraLabels[targetCameraIndex()]}仍刷新，局部亮度偏离`;
   if (active && state.scenario === "air-pressure-low") {
     pressure = "低于现场正常区间（培训推演）";
-    action = "阀命令可产生，实际喷气整体偏弱";
+    action = "低压报警已证实；喷气与界面联动待取证";
   }
   if (active && state.scenario === "waste-bag-full") {
     action = state.phase === PHASE.FAULT_FORMING
-      ? `废料袋遮挡形成中 ${Math.min(10, state.phaseTick)}/10秒`
-      : "废料袋大面积遮挡（培训推演）";
+      ? `光电遮挡计时 ${Math.min(10, state.phaseTick)}/10秒`
+      : "废料满袋报警培训态；检查袋体和光电头";
   }
-  if (active && state.scenario === "fan-overload") action = physicalDetectionPaused() ? "检测动作暂停，等待人工检查" : "风机热过载现象持续";
+  if (active && state.scenario === "fan-overload") action = "风机接触器断开，当前无法检测；HMI联动待取证";
   if (active && state.scenario === "valve-long-blow") action = `第${state.position}号阀持续漏气；软件喷次不等同漏气时长`;
   if (active && state.scenario === "valve-weak-blow") action = `第${state.position}号阀有命令，实际喷气不足`;
   if (active && state.scenario === "camera-485") action = `${cameraLabels[targetCameraIndex()]}停止刷新且无新增触发`;
@@ -788,7 +794,7 @@ function pushRuntimeEvent(text, warn = false) {
 
 function liveEventText() {
   const events = {
-    normal: "前16幅主检测画面刷新正常，4幅精灵眼保持黑帧",
+    normal: "前16幅主检测画面刷新正常；精灵眼正常运行形态待取证",
     "high-spray": `第${state.position}号阀局部喷次继续升高`,
     "hang-small": `第${state.position}号阀附近流速轻微波动`,
     "hang-large": `第${state.position}号阀附近反复出现扭曲触发图，局部白棉喷次增加`,
@@ -796,14 +802,14 @@ function liveEventText() {
     "duct-blockage": "主检测画面持续刷新，实时位置流速出现明显偏移",
     "flow-abnormal": state.flowAlarm ? "连续3次流速越界，已触发报警" : `流速越界采样 ${state.flowAbnormalCount}/3`,
     "camera-fault": `${cameraLabels[targetCameraIndex()]}画面未刷新，其余主检测画面继续刷新`,
-    "channel-fault": `通道${targetChannel()}两路画面同时未刷新`,
+    "channel-fault": `通道${targetChannel()}两路上位机画面未刷新；物理检测状态待确认`,
     "screen-freeze": "上位机20幅相机画面与界面时间同时停止刷新",
     "recognized-no-eject": `${cameraLabels[targetCameraIndex()]}产生识别记录，但第${state.position}号阀计数未随该条记录增加`,
     temperature: `通道${targetChannel()}当前温度 ${state.temperature.toFixed(1)}℃`,
     "lamp-brightness": `${cameraLabels[targetCameraIndex()]}仍刷新，但局部亮度偏离相邻画面`,
-    "air-pressure-low": "阀命令仍可产生，实际喷气强度需要现场核查",
-    "waste-bag-full": "废料袋形成大面积遮挡，喷次与触发记录不作为判据",
-    "fan-overload": physicalDetectionPaused() ? "风机热过载后检测动作暂停" : "风机热过载现象持续",
+    "air-pressure-low": "气源压力不足报警培训态；实际喷气与界面联动待取证",
+    "waste-bag-full": "废料满袋光电遮挡计时达到约10秒",
+    "fan-overload": "风机热过载，接触器断开，当前无法检测",
     "valve-long-blow": `第${state.position}号阀持续漏气，软件喷次不强制抬高`,
     "valve-weak-blow": `第${state.position}号阀有命令计数，但实际喷气不足`,
     "camera-485": `${cameraLabels[targetCameraIndex()]}画面停止刷新且不再新增触发记录`
@@ -873,7 +879,7 @@ function currentDetectionEvent() {
   let valveIndex = targeted ? state.position - 1 : (front ? state.tick * 3 : state.tick * 5) % 32;
   let group = Math.floor(valveIndex / 4);
   let cameraSourceNumber = group * 2 + (front ? 1 : 2);
-  const unavailable = new Set(state.scenario === "screen-freeze" ? [] : frozenCameraIndexes().map((index) => index + 1));
+  const unavailable = new Set(["screen-freeze", "channel-fault"].includes(state.scenario) ? [] : frozenCameraIndexes().map((index) => index + 1));
   if (unavailable.has(cameraSourceNumber)) {
     cameraSourceNumber = Array.from({ length: 16 }, (_, index) => index + 1).find((source) => !unavailable.has(source)) || cameraSourceNumber;
     front = cameraSourceNumber % 2 === 1;
@@ -884,7 +890,6 @@ function currentDetectionEvent() {
 }
 
 function emitDetectionEvent(amount) {
-  if (phaseEffect() > 0 && state.scenario === "waste-bag-full") return;
   const event = currentDetectionEvent();
   const noEject = phaseEffect() > 0 && state.scenario === "recognized-no-eject";
   const currentHour = trainingHour();
@@ -1221,7 +1226,7 @@ function setRunning(running) {
   state.liveFlow = running ? scenarioFlowValue() : 0;
   if (!running) state.temperature = 57;
   updateLiveIndicators();
-  pushRuntimeEvent(running ? "设备开始检测，前16幅主检测画面恢复刷新，4幅精灵眼保持黑帧" : "设备已停止检测，累计与流速采样暂停", !running);
+  pushRuntimeEvent(running ? "设备开始检测，前16幅主检测画面恢复刷新；精灵眼正常运行形态待取证" : "设备已停止检测，累计与流速采样暂停", !running);
   renderAll();
 }
 
