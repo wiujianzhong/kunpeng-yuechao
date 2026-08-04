@@ -130,7 +130,7 @@ h1 { margin: 0; color: var(--ink); font-size: 22px; line-height: 1.2; }
   box-shadow: 0 12px 26px rgba(47,101,57,.18);
 }
 .primary-demo-button:hover { border-color: #244f2d; background: #244f2d; }
-.platform-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 11px; }
+.platform-switch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 11px; }
 .platform-switch a {
   padding: 8px 10px;
   border: 1px solid var(--line);

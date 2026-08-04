@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JWF0019A 实机界面培训模拟</title>
+  <meta name="description" content="依据真实JWF0019A运行界面、相机画面和触发记录制作的培训模拟。">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./hmi.css?v=30">
+</head>
+<body>
+  <header class="page-head">
+    <div>
+      <span>JWF0019A</span>
+      <strong>实机界面培训模拟</strong>
+    </div>
+    <nav>
+      <a href="./">返回知识平台</a>
+      <a href="./3d.html?review=simplified">打开真实3D</a>
+    </nav>
+  </header>
+
+  <main class="training-layout">
+    <div class="hmi-stage">
+    <p class="hmi-scroll-hint">左右滑动查看完整实机界面</p>
+    <section class="hmi-window" aria-label="JWF0019A实机界面模拟">
+      <div class="hmi-titlebar">KDistributionUIPlatform <small>· 离线培训副本，不连接生产设备</small></div>
+
+      <header class="machine-header">
+        <div class="scheme">当前方案: <b>912</b></div>
+        <div id="channel-status" class="channel-status"></div>
+        <button id="run-toggle" class="stop-button start" type="button" aria-label="当前运行与报警状态" title="当前正在开车" disabled>开<br>车</button>
+        <div class="machine-info">
+          <strong id="machine-date"></strong>
+          <span>灯管寿命　2483/30000</span>
+          <span>运行　　　<b id="runtime-value">0154时13分43秒</b></span>
+          <span>版本　　　JLH_2026.01.10.0930</span>
+        </div>
+      </header>
+
+      <section id="screen-main" class="machine-screen main-screen">
+        <div id="camera-grid" class="camera-grid" aria-label="20路相机画面"></div>
+        <aside class="runtime-log">
+          <div id="runtime-log-list"></div>
+        </aside>
+      </section>
+
+      <section id="screen-stats" class="machine-screen stats-screen" hidden>
+        <div class="stats-toolbar">
+          <div class="stats-tabs">
+            <button class="active" data-stat="valve">喷阀统计</button>
+            <button data-stat="flow">流速统计</button>
+            <button data-stat="spirit">精灵Eye统计</button>
+            <button data-stat="history">历史记录</button>
+            <button class="muted" type="button" disabled title="当前实机取证未覆盖跨日返回逻辑">返回今天</button>
+          </div>
+          <b id="stats-date">8月02</b>
+          <div class="stats-totals">
+            <span>日光吹阀总数:<b id="day-total">69708</b></span>
+            <span>精灵眼吹阀总数:<b id="spirit-total">0</b></span>
+          </div>
+          <div class="stats-actions"><button type="button" disabled title="培训模拟不导出现场数据">导出记录</button><button type="button" disabled title="培训模拟禁止清空">喷阀清空</button></div>
+        </div>
+
+        <div id="stat-valve" class="stat-content"></div>
+        <div id="stat-flow" class="stat-content two-chart-stats" hidden></div>
+        <div id="stat-spirit" class="stat-content two-chart-stats" hidden></div>
+        <div id="stat-history" class="history-content" hidden>
+          <div class="calendar">
+            <header><button type="button" disabled title="月份切换待实机取证">‹</button><b>八月　2026</b><button type="button" disabled title="月份切换待实机取证">›</button></header>
+            <div class="week"><b>周</b><b>周日</b><b>周一</b><b>周二</b><b>周三</b><b>周四</b><b>周五</b><b>周六</b></div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-triggers" class="machine-screen trigger-screen" hidden>
+        <div class="trigger-toolbar"><button type="button" disabled title="设置操作尚无完整实机取证">▼　设置</button></div>
+        <div id="trigger-grid" class="trigger-grid" aria-label="真实触发图像"></div>
+        <div class="trigger-tools"><button type="button" disabled title="培训模拟不下载现场数据">↧</button><button type="button" disabled title="该工具操作尚无完整实机取证">⌕</button></div>
+        <div class="trigger-detail">
+          <img id="trigger-large-image" src="./assets/hmi-real/triggers/detail.png" alt="当前高清触发详情">
+          <span id="trigger-box" class="trigger-box"></span>
+          <b id="trigger-number">13</b>
+          <p id="trigger-evidence" class="trigger-evidence" hidden></p>
+        </div>
+      </section>
+
+      <aside id="account-failure-dialog" class="account-failure-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="account-failure-title">
+        <header><span>▦</span><b id="account-failure-title">登录失败</b><button id="account-failure-close" type="button" aria-label="关闭">×</button></header>
+        <div class="account-failure-body">
+          <strong aria-hidden="true">×</strong>
+          <p>无法登录系统!错误原因可能是:<br>1.账号密码不匹配!<br>数据库文件丢失!</p>
+        </div>
+        <footer><button id="account-failure-confirm" type="button"><span>✓</span> 确定</button></footer>
+      </aside>
+
+      <section id="screen-settings" class="machine-screen settings-screen" hidden>
+        <div class="settings-serial">
+          <span>选择串口：</span><button type="button" disabled>ttyS2</button><button type="button" disabled>关闭串口</button><button type="button" disabled>刷新串口</button>
+          <button class="settings-home" data-screen="main" type="button" aria-label="返回主界面">⬆</button>
+        </div>
+        <div class="monitor-row">
+          <span>✓ 棉流监控</span><span>✓ 灯管亮度监控</span><span>✓ 通道异常监控</span>
+          <span>✓ 相机异常监控</span><span>✓ 高温报警监控</span><span>✓ 相机485通讯监控</span>
+        </div>
+        <div class="settings-head">
+          <button class="active" type="button" disabled>系统设置</button>
+          <button type="button" disabled>通道流速监测</button>
+        </div>
+        <div class="settings-grid">
+          <article class="system-parameters" aria-label="系统参数"><dl>
+            <div data-icon="n123"><dt>系统类型<small>0=窄幅，1=宽幅</small></dt><dd><span>1</span></dd></div><div data-icon="half"><dt>像素精度<small>单位毫米</small></dt><dd><span>0.15</span></dd></div>
+            <div data-icon="n123"><dt>亮度基准值<small>0-255</small></dt><dd><span>120</span></dd></div><div data-icon="n123"><dt>亮度范围阈值<small>1-200</small></dt><dd><span>20</span></dd></div>
+            <div data-icon="half"><dt>流速基准<small>当前流速的基准值</small></dt><dd><span>10.00</span></dd></div><div data-icon="half"><dt>范围阈值<small>流速正负波动范围</small></dt><dd><span>2.00</span></dd></div>
+            <div data-icon="n123"><dt>连续异常报警<small>连续异常报警次数</small></dt><dd><span>3</span></dd></div><div data-icon="half"><dt>高温报警<small>高温报警阈值</small></dt><dd><span>60.00</span></dd></div>
+          </dl></article>
+          <div class="settings-subtabs" aria-label="实机设置页签（只读）">
+            <button type="button" disabled>光源参数</button>
+            <button type="button" disabled>相机触发参数</button>
+            <button class="active" type="button" disabled>气阀参数</button>
+          </div>
+          <article class="valve-parameters" aria-label="气阀参数"><dl>
+            <div data-icon="n123"><dt>吹阀延迟<small>范围1-500</small></dt><dd><span>6</span></dd></div><div data-icon="n123"><dt>扩阀模式<small>0不扩阀，1左右扩一，2左右扩二</small></dt><dd><span>0</span></dd></div><div data-icon="n123"><dt>吹气时间<small>单位0.05ms</small></dt><dd><span>350</span></dd></div>
+            <div data-icon="n123"><dt>精灵吹阀延迟<small>范围1-500</small></dt><dd><span>16</span></dd></div><div data-icon="n123"><dt>精灵扩阀模式<small>0不扩阀，1左右扩一，2左右扩二</small></dt><dd><span>0</span></dd></div><div data-icon="n123"><dt>精灵吹气时间<small>单位0.05ms</small></dt><dd><span>300</span></dd></div>
+            <div data-icon="n123"><dt>开阀时间<small>单位0.05ms</small></dt><dd><span>220</span></dd></div><div data-icon="n123"><dt>停止充电时间<small>单位0.05ms</small></dt><dd><span>50</span></dd></div><div data-icon="n123"><dt>续充电时间<small>单位0.05ms</small></dt><dd><span>20</span></dd></div>
+          </dl></article>
+          <div class="valve-tabs" aria-label="气阀设置页签（只读）"><button class="active" type="button" disabled>吹阀设置</button><button type="button" disabled>测阀</button></div>
+          <div class="valve-options" aria-label="气阀保护与自动延迟参数（只读）">
+            <span>☑ 阀保护开关</span><label>吹阀保护次数/分钟 <output>400</output></label>
+            <span>☑ 自动延迟开关</span><label>吹阀距离 <output>300</output></label><label>自动延迟 <output>6</output></label>
+            <label>精灵吹阀距离 <output>580</output></label><label>精灵自动延迟 <output>17</output></label>
+          </div>
+        </div>
+        <footer class="settings-bottom-nav" aria-label="现行版底部导航（只读）">
+          <button type="button" disabled><span>▦</span><b>账户</b></button><button type="button" disabled><span>▣</span><b>保存方案</b></button><button type="button" disabled><span>AI</span><b>AI模型</b></button>
+          <button type="button" disabled><span>⌬</span><b>自学习</b></button><button type="button" disabled><span>▦</span><b>图像采集</b></button>
+          <button type="button" disabled><span>▣</span><b>主界面</b></button><button class="active" type="button" disabled><span>⌁</span><b>系统设置</b></button>
+          <button type="button" disabled><span>⌁</span><b>统计</b></button><button type="button" disabled><span>▦</span><b>触发图像</b></button>
+        </footer>
+      </section>
+
+      <footer class="machine-nav">
+        <button id="account-button" type="button"><span class="windows-mark">▦</span><b>账户</b></button>
+        <button class="active" data-screen="main"><span>▣</span><b>主界面</b></button>
+        <button data-screen="stats"><span>⌁</span><b>统计</b></button>
+        <button data-screen="triggers"><span>▦</span><b>触发图像</b></button>
+      </footer>
+    </section>
+    </div>
+
+    <aside class="training-panel">
+      <p class="eyebrow">培训联动</p>
+      <h1>现象出现时，界面哪里会变化</h1>
+      <p class="lead">相机画面来自实机取证。选择场景后，画面刷新、通道状态、日志、统计和触发记录会按同一逻辑联动。</p>
+
+      <div class="training-live" aria-live="polite">
+        <b id="run-state" class="run-state">● 正在开车（培训模拟）</b>
+        <span>当前流速 <i id="live-flow">10.00</i> m/s</span>
+        <span>模拟日喷次 <i id="log-spray">69708</i></span>
+      </div>
+
+      <div class="physical-readout" aria-live="polite">
+        <span>气压观察 <i id="air-pressure">未接入真实压力值</i></span>
+        <span>物理动作 <i id="physical-action">检测与喷射动作正常（培训基线）</i></span>
+      </div>
+
+      <label class="baseline-control">
+        <span>人工日报参考资料（不参与模拟）</span>
+        <select id="baseline-select">
+          <option value="capture-composite">实机单日合成示例</option>
+          <option value="yaxin-f1-april">雅新一分厂4月</option>
+          <option value="yaxin-f3-august">雅新三分厂8月</option>
+          <option value="yaxin-f3-september">雅新三分厂9月</option>
+          <option value="yaxin-f3-october">雅新三分厂10月</option>
+          <option value="ruxin-f1-july">如新一分厂7月</option>
+          <option value="axin-shift-summary">阿新跨班次汇总</option>
+        </select>
+        <small id="baseline-detail">多端点单日取证合成培训数据，不对应某一台实机。</small>
+      </label>
+
+      <div id="scenario-list" class="scenario-list">
+        <button class="active" data-scenario="normal">正常运行</button>
+        <button data-scenario="high-spray">局部喷次升高</button>
+        <button data-scenario="hang-small">玻璃下缘挂花 1cm</button>
+        <button data-scenario="hang-large">玻璃下缘脏花 10cm</button>
+        <button data-scenario="blockage">通道局部堵花 30cm</button>
+        <button data-scenario="duct-blockage">排杂风道局部堵塞</button>
+        <button data-scenario="flow-abnormal">流速异常</button>
+        <button data-scenario="camera-fault">单相机不刷新</button>
+        <button data-scenario="channel-fault">通道通讯故障</button>
+        <button data-scenario="screen-freeze">上位机画面卡住</button>
+        <button data-scenario="recognized-no-eject">识别后未喷出</button>
+        <button data-scenario="temperature">算力通道高温</button>
+        <button data-scenario="lamp-brightness">灯管亮度异常</button>
+        <button data-scenario="air-pressure-low">气源压力不足</button>
+        <button data-scenario="waste-bag-full">废料满袋</button>
+        <button data-scenario="fan-overload">风机热过载</button>
+        <button data-scenario="valve-long-blow">电磁阀长喷／漏气</button>
+        <button data-scenario="valve-weak-blow">电磁阀弱喷</button>
+        <button data-scenario="camera-485">相机485通讯异常</button>
+      </div>
+
+      <button class="read-settings" data-screen="settings" type="button" title="来源于2026-07-22实机参数截图，仅供只读对照，不代表合成机台当时参数">查看当前系统参数快照（只读）</button>
+
+      <label class="position-control">
+        <span>异常中心位置 <output id="position-value">18号阀</output></span>
+        <input id="position-slider" type="range" min="1" max="32" value="18">
+        <small>1号靠近屏幕，32号靠近风机</small>
+      </label>
+
+      <div class="phase-strip" aria-live="polite">
+        <span id="phase-label">实时基线</span>
+        <progress id="phase-progress" max="100" value="0"></progress>
+      </div>
+
+      <article class="logic-card">
+        <div><span>机器可观察现象</span><p id="scene-phenomenon"></p></div>
+        <div><span>实机界面表现</span><p id="scene-screen"></p></div>
+        <div><span>培训诊断（非机器报警原文）</span><p id="scene-diagnosis"></p></div>
+        <div><span>现场处理顺序（培训建议）</span><p id="scene-handling"></p></div>
+      </article>
+
+      <button id="play-scenario" class="play-scenario" type="button">播放完整联动</button>
+      <p class="evidence-note">运行主页与相机素材来自实机；统计数值和异常过程为多端点证据合成培训数据，不对应某一台真实机器，不连接生产设备、不写入参数。</p>
+    </aside>
+  </main>
+
+  <script src="./hmi.js?v=30"></script>
+</body>
+</html>
