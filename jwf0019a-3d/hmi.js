@@ -234,6 +234,30 @@ const scenarios = {
   }
 };
 
+// 证据等级：A厂家说明书，B厂家培训/正式函，C现场截图/维修记录，D长期实机经验，E培训推演。
+// “已确认”可以进入运行模拟；“未取证”不得伪造成实机报警原文或确定的物理联动。
+const scenarioEvidence = {
+  normal: { level: "C/D", confirmed: "前16幅主检测画面应持续错峰刷新。", unknown: "本次取证末4幅精灵眼为黑帧，不能作为正常运行标准。" },
+  "high-spray": { level: "C/D/E", confirmed: "统计页可见1至32号阀喷次，现场存在局部喷次升高和重复触发。", unknown: "单凭喷次不能直接判定挂花、原料异物或阀体故障。" },
+  "hang-small": { level: "D/E", confirmed: "约1厘米玻璃下缘挂花通常只影响邻近区域。", unknown: "精确流速变化和报警条件未形成实机闭环。" },
+  "hang-large": { level: "D/E", confirmed: "5至10厘米脏挂花可造成局部偏流、重复触发和误喷白棉。", unknown: "具体阀位增量和触发图为培训合成。" },
+  blockage: { level: "D/E", confirmed: "约30厘米局部棉团会让棉流从两侧绕行。", unknown: "喷射偏移方向、距离和精准阀位未实测。" },
+  "duct-blockage": { level: "B/C/D/E", confirmed: "排杂风道堵塞会削弱抽吸并可能诱发严重偏流。", unknown: "当前机台的精确报警文字和统计联动未取证。" },
+  "flow-abnormal": { level: "A/C/D", confirmed: "当前基准10.00、范围±2.00，连续异常3次才报警。", unknown: "报警原文和处理后自动复位过程仍待实机取证。" },
+  "camera-fault": { level: "D/E", confirmed: "单幅约0.5至1秒应刷新却停止，其余主检测画面继续。", unknown: "正式报警原文、颜色及对应物理检测状态未取证。" },
+  "channel-fault": { level: "A/D/E", confirmed: "同一算力通道配对的两幅画面同时停止，其余画面继续。", unknown: "下位机是否仍检测喷出，不能只凭冻结画面下结论。" },
+  "screen-freeze": { level: "A/D/E", confirmed: "20幅画面、界面时间与信息同时冻结。", unknown: "冻结时下位机是否继续检测或喷射尚未取证。" },
+  "recognized-no-eject": { level: "B/C/E", confirmed: "识别记录、阀命令与实际喷出是三段不同证据。", unknown: "现无同机台完整时间同步录像证明具体失效环节。" },
+  temperature: { level: "C/D/E", confirmed: "当前高温阈值60℃，散热积花、风扇和散热片均需检查。", unknown: "真实报警颜色、原文及相机/统计联动未取证。" },
+  "lamp-brightness": { level: "C/D/E", confirmed: "存在灯管亮度监控，目标画面仍刷新但亮度偏离。", unknown: "异常究竟偏亮或偏暗不能固定模拟。" },
+  "air-pressure-low": { level: "A/E", confirmed: "厂家资料确认气源压力不足会报警。", unknown: "软件阀计数、触发记录与实际喷气强度的同步联动未取证。" },
+  "waste-bag-full": { level: "A/E", confirmed: "废棉袋光电头持续遮挡约10秒会进入满袋报警。", unknown: "袋体装满外观和当前软件正式报警样式未取证。" },
+  "fan-overload": { level: "A/E", confirmed: "风机热过载会使交流接触器断开并导致无法检测。", unknown: "过载后相机、流速和统计是否继续刷新尚未取证。" },
+  "valve-long-blow": { level: "D/E", confirmed: "机械长喷或漏气不等于软件喷次持续增加。", unknown: "当前缺少阀体动作与界面计数同步录像。" },
+  "valve-weak-blow": { level: "D/E", confirmed: "有识别记录和阀命令也不等于实际喷气足够。", unknown: "弱喷强度、持续时间和统计联动未取证。" },
+  "camera-485": { level: "D/E", confirmed: "现场也可能表现为单幅画面不刷新。", unknown: "仅凭冻结画面不能与普通相机故障区分，必须结合报警对象和线路检查。" }
+};
+
 const PHASE = {
   STOPPED: "STOPPED",
   RUN_BASELINE: "RUN_BASELINE",
@@ -542,7 +566,15 @@ function renderCameras() {
   const previousSources = new Map(Array.from(root.querySelectorAll(".camera-card")).map((card) => [Number(card.dataset.camera), card.querySelector("img")?.src]));
   const cards = cameraLabels.map((label, index) => {
     const classes = cameraClasses(index);
-    const marker = classes.includes("hang") ? '<i class="hang-mark"></i>' : classes.includes("blocked") ? '<i class="blockage-mark"></i>' : "";
+    const isolatedFreeze = classes.includes("freeze") && state.scenario !== "screen-freeze";
+    const freezeLabel = state.scenario === "channel-fault" ? "同通道未刷新" : "画面未刷新";
+    const marker = classes.includes("hang")
+      ? '<i class="hang-mark"></i>'
+      : classes.includes("blocked")
+      ? '<i class="blockage-mark"></i>'
+      : isolatedFreeze
+      ? `<i class="freeze-mark">${freezeLabel}</i>`
+      : "";
     const frozenSource = previousSources.get(index);
     const shouldHoldFrame = classes.includes("freeze") || !state.running;
     const phase = index < 16 ? state.cameraPhases[index] : 0;
@@ -552,8 +584,15 @@ function renderCameras() {
       ${marker}<small>${label}</small>
     </div>`;
   }).join("");
-  const evidenceBoundary = faultPhaseActive() && state.scenario === "fan-overload"
-    ? '<p class="camera-evidence-boundary">培训边界：保留故障前最后画面；过载后HMI刷新状态尚未取证</p>'
+  const evidenceBoundaryText = faultPhaseActive() ? ({
+    "camera-fault": "单幅画面冻结，其余主检测画面继续刷新",
+    "channel-fault": "同通道两幅画面冻结；物理检测状态未知",
+    "screen-freeze": "20幅画面与界面时间同时冻结；设备动作未知",
+    "camera-485": "单幅冻结；仅凭画面不能与普通相机故障区分",
+    "fan-overload": "培训边界：保留故障前最后画面；过载后HMI刷新状态尚未取证"
+  })[state.scenario] : "";
+  const evidenceBoundary = evidenceBoundaryText
+    ? `<p class="camera-evidence-boundary">${evidenceBoundaryText}</p>`
     : "";
   root.innerHTML = `${cards}${evidenceBoundary}`;
   root.querySelectorAll(".camera-card img").forEach((image) => {
@@ -922,16 +961,21 @@ function renderReading() {
     document.querySelector("#scene-screen").textContent = `可查看：${snapshot.available.map((page) => ({ main: "主界面", valve: "阀统计", flow: "流速", spirit: "精灵统计", history: "历史", triggers: "触发" })[page]).join("、")}。`;
     document.querySelector("#scene-diagnosis").textContent = "未取证页不生成数据，也不借用其他端点资料。";
     document.querySelector("#scene-handling").textContent = "仅供证据对照；不连接设备、不写设置。";
+    document.querySelector("#scene-evidence-level").textContent = "证据边界 · 只读快照";
+    document.querySelector("#scene-evidence").textContent = "已确认：仅显示该端点已取证页面；未取证：不借用其他端点补齐。";
     renderPhase();
     return;
   }
   const data = scenarios[state.scenario];
+  const evidence = scenarioEvidence[state.scenario];
   const prefix = state.scenario === "normal" ? (text) => text : trainingText;
   document.querySelector("#scene-phenomenon").textContent = prefix(targetViewText(data.phenomenon));
   const flowProgress = state.scenario === "flow-abnormal" ? ` 当前连续越界计数：${state.flowAbnormalCount}/3${state.flowAlarm ? "，已报警。" : "，尚未报警。"}` : "";
   document.querySelector("#scene-screen").textContent = prefix(`${targetViewText(data.screen)}${flowProgress}`);
   document.querySelector("#scene-diagnosis").textContent = prefix(data.diagnosis);
   document.querySelector("#scene-handling").textContent = prefix(data.handling);
+  document.querySelector("#scene-evidence-level").textContent = `证据边界 · ${evidence.level}`;
+  document.querySelector("#scene-evidence").textContent = `已确认：${evidence.confirmed} 未取证：${evidence.unknown}`;
   renderPhase();
 }
 
@@ -1240,7 +1284,20 @@ function updateTemperature() {
 }
 
 function updateSettingsMonitors() {
-  // 实机设置页顶部六项仅作固定标签还原；动态培训数值留在右侧培训面板。
+  const scenarioMonitor = {
+    blockage: "flow",
+    "duct-blockage": "flow",
+    "flow-abnormal": "flow",
+    "lamp-brightness": "brightness",
+    "channel-fault": "channel",
+    "camera-fault": "camera",
+    temperature: "temperature",
+    "camera-485": "camera485"
+  };
+  const activeMonitor = !isEvidenceSnapshot() && faultPhaseActive() ? scenarioMonitor[state.scenario] : null;
+  document.querySelectorAll("[data-monitor]").forEach((monitor) => {
+    monitor.classList.toggle("training-alert", monitor.dataset.monitor === activeMonitor);
+  });
 }
 
 function sprayIncrement(isFaultEvent = false) {

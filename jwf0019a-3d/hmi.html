@@ -6,7 +6,7 @@
   <title>JWF0019A 实机界面培训模拟</title>
   <meta name="description" content="依据真实JWF0019A运行界面、相机画面和触发记录制作的培训模拟。">
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./hmi.css?v=20260805c">
+  <link rel="stylesheet" href="./hmi.css?v=20260805e">
 </head>
 <body>
   <header class="page-head">
@@ -104,8 +104,8 @@
           <button class="settings-home" data-screen="main" type="button" aria-label="返回主界面">⬆</button>
         </div>
         <div class="monitor-row">
-          <span>✓ 棉流监控</span><span>✓ 灯管亮度监控</span><span>✓ 通道异常监控</span>
-          <span>✓ 相机异常监控</span><span>✓ 高温报警监控</span><span>✓ 相机485通讯监控</span>
+          <span data-monitor="flow">✓ 棉流监控</span><span data-monitor="brightness">✓ 灯管亮度监控</span><span data-monitor="channel">✓ 通道异常监控</span>
+          <span data-monitor="camera">✓ 相机异常监控</span><span data-monitor="temperature">✓ 高温报警监控</span><span data-monitor="camera485">✓ 相机485通讯监控</span>
         </div>
         <div class="settings-head">
           <button class="active" type="button" disabled>系统设置</button>
@@ -242,6 +242,7 @@
         <div><span>实机界面表现</span><p id="scene-screen"></p></div>
         <div><span>培训诊断（非机器报警原文）</span><p id="scene-diagnosis"></p></div>
         <div><span>现场处理顺序（培训建议）</span><p id="scene-handling"></p></div>
+        <div class="logic-evidence"><span id="scene-evidence-level">证据边界</span><p id="scene-evidence"></p></div>
       </article>
 
       <button id="play-scenario" class="play-scenario" type="button">播放完整联动</button>
@@ -249,6 +250,6 @@
     </aside>
   </main>
 
-  <script src="./hmi.js?v=20260805d"></script>
+  <script src="./hmi.js?v=20260805e"></script>
 </body>
 </html>

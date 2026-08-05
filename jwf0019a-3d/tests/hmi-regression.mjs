@@ -364,6 +364,75 @@ try {
     detailNumber: "13"
   }, "触发图实机基线应保留32个槽位、3个空槽和29条记录");
 
+  const scenarioEvidenceContract = await evaluate(`(() => ({
+    scenarioCount: Object.keys(scenarios).length,
+    evidenceCount: Object.keys(scenarioEvidence).length,
+    complete: Object.keys(scenarios).every((key) => {
+      const item = scenarioEvidence[key];
+      return Boolean(item?.level && item?.confirmed && item?.unknown);
+    })
+  }))()`);
+  assert.deepEqual(scenarioEvidenceContract, {
+    scenarioCount: 19,
+    evidenceCount: 19,
+    complete: true
+  }, "19个场景都必须有证据等级、已确认事实和未取证边界");
+
+  const cameraFaultMarkers = await evaluate(`(() => {
+    const inspect = (name) => {
+      setScenario(name);
+      state.phase = PHASE.ALARM_ACTIVE;
+      renderCameras();
+      return {
+        marks: document.querySelectorAll("#camera-grid .freeze-mark").length,
+        note: document.querySelector("#camera-grid .camera-evidence-boundary")?.textContent || ""
+      };
+    };
+    return {
+      camera: inspect("camera-fault"),
+      channel: inspect("channel-fault"),
+      camera485: inspect("camera-485"),
+      screen: inspect("screen-freeze")
+    };
+  })()`);
+  assert.equal(cameraFaultMarkers.camera.marks, 1, "单相机故障只应标记一幅未刷新画面");
+  assert.match(cameraFaultMarkers.camera.note, /其余主检测画面继续刷新/, "单相机故障应解释其余画面仍刷新");
+  assert.equal(cameraFaultMarkers.channel.marks, 2, "通道通讯故障应标记同通道两幅未刷新画面");
+  assert.match(cameraFaultMarkers.channel.note, /物理检测状态未知/, "通道故障不得由冻结画面反推物理检测状态");
+  assert.equal(cameraFaultMarkers.camera485.marks, 1, "485异常只应标记一幅未刷新画面");
+  assert.match(cameraFaultMarkers.camera485.note, /不能与普通相机故障区分/, "485异常必须保留与普通相机故障的鉴别边界");
+  assert.equal(cameraFaultMarkers.screen.marks, 0, "整屏冻结不应在20幅画面重复堆叠标记");
+  assert.match(cameraFaultMarkers.screen.note, /设备动作未知/, "整屏冻结不得反推设备动作");
+
+  const settingsMonitorContract = await evaluate(`(() => {
+    const inspect = (name) => {
+      setScenario(name);
+      state.phase = PHASE.ALARM_ACTIVE;
+      updateSettingsMonitors();
+      return Array.from(document.querySelectorAll("[data-monitor].training-alert"), (node) => node.dataset.monitor);
+    };
+    const result = {
+      flow: inspect("flow-abnormal"),
+      channel: inspect("channel-fault"),
+      camera: inspect("camera-fault"),
+      temperature: inspect("temperature"),
+      camera485: inspect("camera-485")
+    };
+    setSnapshot("endpoint-1-1");
+    updateSettingsMonitors();
+    result.snapshot = Array.from(document.querySelectorAll("[data-monitor].training-alert"), (node) => node.dataset.monitor);
+    setSnapshot("training");
+    return result;
+  })()`);
+  assert.deepEqual(settingsMonitorContract, {
+    flow: ["flow"],
+    channel: ["channel"],
+    camera: ["camera"],
+    temperature: ["temperature"],
+    camera485: ["camera485"],
+    snapshot: []
+  }, "培训场景只联动对应监控项；实机只读快照不得叠加培训报警");
+
   const triggerEvidenceFilled = await evaluate(`(() => {
     state.triggerEvents = Array.from({ length: 3 }, (_, index) => ({
       id: "training-fill-" + index,
