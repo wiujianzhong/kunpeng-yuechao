@@ -203,6 +203,37 @@ try {
   assert.match(blockageBoundary.eventText, /约30厘米区域/, "30厘米堵花实时描述必须使用区域口径");
   assert.doesNotMatch(blockageBoundary.eventText, /号阀/, "30厘米堵花实时描述不得指向单个电磁阀");
 
+  const physicalReadoutMatrix = await evaluate(`(() => {
+    const abnormalScenarios = Object.keys(scenarios).filter((name) => name !== "normal");
+    const phases = [PHASE.FAULT_FORMING, PHASE.FAULT_OBSERVABLE, PHASE.ALARM_ACTIVE, PHASE.RECOVERY];
+    const rows = [];
+    for (const name of abnormalScenarios) {
+      setScenario(name);
+      for (const phase of phases) {
+        state.phase = phase;
+        renderPhysicalReadout();
+        rows.push({ name, phase, action: document.querySelector("#physical-action").textContent });
+      }
+    }
+    setScenario("normal");
+    renderPhysicalReadout();
+    return {
+      rows,
+      normalAction: document.querySelector("#physical-action").textContent,
+      ductTargeted: (() => {
+        setScenario("duct-blockage");
+        state.phase = PHASE.FAULT_OBSERVABLE;
+        return currentDetectionEvent(true).isFaultEvent;
+      })()
+    };
+  })()`);
+  assert.equal(physicalReadoutMatrix.rows.length, 72, "18个异常场景应覆盖4个培训阶段");
+  physicalReadoutMatrix.rows.forEach(({ name, phase, action }) => {
+    assert.doesNotMatch(action, /检测与喷射动作正常/, `${name}/${phase}不得误报物理动作正常`);
+  });
+  assert.match(physicalReadoutMatrix.normalAction, /物理检测和喷气未接入/, "正常培训基线不得冒充物理设备真实状态");
+  assert.equal(physicalReadoutMatrix.ductTargeted, false, "风道堵塞不得伪造精准阀位故障喷次");
+
   const brightnessBoundary = await evaluate(`(() => {
     setScenario("lamp-brightness");
     state.phase = PHASE.FAULT_OBSERVABLE;
@@ -220,9 +251,89 @@ try {
     setScenario("fan-overload");
     state.phase = PHASE.FAULT_OBSERVABLE;
     renderAll();
-    return document.querySelector(".camera-evidence-boundary")?.textContent || "";
+    const before = {
+      runtime: state.runtimeSeconds,
+      flowLength: state.flowSamples.length,
+      hourlyFlow: state.hourlyFlow.slice(),
+      dayTotal: state.dayTotal,
+      frontValves: state.frontValves.slice(),
+      rearValves: state.rearValves.slice(),
+      cameraPhases: state.cameraPhases.slice()
+    };
+    tickMachine();
+    tickCameraFrames();
+    return {
+      boundary: document.querySelector(".camera-evidence-boundary")?.textContent || "",
+      before,
+      after: {
+        runtime: state.runtimeSeconds,
+        flowLength: state.flowSamples.length,
+        hourlyFlow: state.hourlyFlow.slice(),
+        dayTotal: state.dayTotal,
+        frontValves: state.frontValves.slice(),
+        rearValves: state.rearValves.slice(),
+        cameraPhases: state.cameraPhases.slice()
+      }
+    };
   })()`);
-  assert.match(fanBoundary, /相机与界面刷新状态尚未取证/, "风机过载动态区域必须显示证据边界");
+  assert.match(fanBoundary.boundary, /保留故障前最后画面/, "风机过载动态区域必须显示证据边界");
+  assert.deepEqual(fanBoundary.after, fanBoundary.before, "风机过载后不得继续伪造相机、流速、喷次和运行统计");
+
+  const scenarioIsolation = await evaluate(`(() => {
+    setScenario("high-spray");
+    capturePlaybackBaseline();
+    const baseline = {
+      dayTotal: state.dayTotal,
+      hourlySpray: state.hourlySpray.slice(),
+      hourlyFlow: state.hourlyFlow.slice(),
+      flowSamples: state.flowSamples.slice(),
+      frontValves: state.frontValves.slice(),
+      rearValves: state.rearValves.slice(),
+      cameraPhases: state.cameraPhases.slice()
+    };
+    state.playing = true;
+    state.roundClockActive = true;
+    state.phase = PHASE.FAULT_OBSERVABLE;
+    for (let index = 0; index < 6; index += 1) tickMachine();
+    state.simClockAt += 30000;
+    const beforeSwitch = { clock: state.simClockAt, runtime: state.runtimeSeconds };
+    setScenario("normal");
+    return {
+      baseline,
+      restored: {
+        dayTotal: state.dayTotal,
+        hourlySpray: state.hourlySpray.slice(),
+        hourlyFlow: state.hourlyFlow.slice(),
+        flowSamples: state.flowSamples.slice(),
+        frontValves: state.frontValves.slice(),
+        rearValves: state.rearValves.slice(),
+        cameraPhases: state.cameraPhases.slice()
+      },
+      beforeSwitch,
+      afterSwitch: { clock: state.simClockAt, runtime: state.runtimeSeconds },
+      flags: {
+        phase: state.phase,
+        playing: state.playing,
+        awaitingManual: state.awaitingManual,
+        roundClockActive: state.roundClockActive,
+        triggerCount: state.triggerEvents.length,
+        flowAlarm: state.flowAlarm,
+        flowAbnormalCount: state.flowAbnormalCount
+      }
+    };
+  })()`);
+  assert.deepEqual(scenarioIsolation.restored, scenarioIsolation.baseline, "切换场景后必须恢复播放前的喷次、流速、阀统计和相机相位");
+  assert.ok(scenarioIsolation.afterSwitch.clock >= scenarioIsolation.beforeSwitch.clock, "切换场景后界面时间不得倒退");
+  assert.ok(scenarioIsolation.afterSwitch.runtime >= scenarioIsolation.beforeSwitch.runtime, "切换场景后运行时长不得倒退");
+  assert.deepEqual(scenarioIsolation.flags, {
+    phase: "RUN_BASELINE",
+    playing: false,
+    awaitingManual: false,
+    roundClockActive: false,
+    triggerCount: 0,
+    flowAlarm: false,
+    flowAbnormalCount: 0
+  }, "切换场景后必须清理上一场的运行标志和触发事件");
 
   const frozenStart = await evaluate(`(() => {
     setScenario("screen-freeze");
@@ -250,7 +361,7 @@ try {
   assert.deepEqual(frozenAfter, frozenStart, "整屏卡住时界面时间、统计和20幅画面都应保持不变");
   assert.equal(frozenAfter.runButton, "开车", "整屏卡住时应保留卡住前的开车按钮画面");
 
-  console.log("HMI回归通过：19场景入口、只读边界、堵花不绑定精准阀位、亮度方向不臆测、风机过载证据边界");
+  console.log("HMI回归通过：19场景入口、只读边界、72阶段物理文案、堵花不绑定精准阀位、风机过载保留最后值、切换场景不串数且计时不倒退");
 } finally {
   client?.close();
   const waitForExit = (process) => process && process.exitCode === null

@@ -333,8 +333,8 @@ function hmiDisplayFrozen() {
 }
 
 function physicalDetectionPaused() {
-  // 现有证据只证明风机过载后设备无法检测，尚不能证明整套HMI同步冻结。
-  return false;
+  // 风机过载后只保留故障前最后一组检测数据；HMI实际刷新联动尚未取证。
+  return state.scenario === "fan-overload" && phaseIsObservable();
 }
 
 function detectionEventsSuppressed() {
@@ -447,7 +447,7 @@ function renderCameras() {
     </div>`;
   }).join("");
   const evidenceBoundary = faultPhaseActive() && state.scenario === "fan-overload"
-    ? '<p class="camera-evidence-boundary">培训边界：风机过载后的相机与界面刷新状态尚未取证</p>'
+    ? '<p class="camera-evidence-boundary">培训边界：保留故障前最后画面；过载后HMI刷新状态尚未取证</p>'
     : "";
   root.innerHTML = `${cards}${evidenceBoundary}`;
   root.querySelectorAll(".camera-card img").forEach((image) => {
@@ -815,7 +815,7 @@ function renderPhysicalReadout() {
     : active
       ? "物理动作待现场确认"
       : state.scenario === "normal"
-        ? "检测与喷射动作正常（培训基线）"
+        ? "培训基线：界面刷新与统计模拟正常；物理检测和喷气未接入"
         : "当前为正常运行基线，异常场景尚未激活";
   if (active && state.scenario === "screen-freeze") action = "界面停留在开车画面；设备实际动作待现场确认";
   if (active && state.scenario === "lamp-brightness") action = `${cameraLabels[targetCameraIndex()]}仍刷新，局部亮度偏离`;
@@ -829,7 +829,8 @@ function renderPhysicalReadout() {
       : "废料满袋报警培训态；检查袋体和光电头";
   }
   if (active && state.scenario === "blockage") action = "局部流速明显偏移；喷射偏移方向和距离未取证，不绑定精准阀位";
-  if (active && state.scenario === "fan-overload") action = "风机接触器断开，当前无法检测；HMI联动待取证";
+  if (active && state.scenario === "duct-blockage") action = "风道局部堵塞，流速偏移；喷次变化和精准阀位未取证";
+  if (active && state.scenario === "fan-overload") action = "风机接触器断开，当前无法检测；动态区保留故障前最后值，HMI联动待取证";
   if (active && state.scenario === "valve-long-blow") action = `第${state.position}号阀持续漏气；软件喷次不等同漏气时长`;
   if (active && state.scenario === "valve-weak-blow") action = `第${state.position}号阀有命令，实际喷气不足`;
   if (active && state.scenario === "camera-485") action = `${cameraLabels[targetCameraIndex()]}停止刷新且无新增触发`;
@@ -1010,6 +1011,8 @@ function capturePlaybackBaseline() {
 function restorePlaybackBaseline() {
   const baseline = state.playbackBaseline;
   if (!baseline) return;
+  const latestSimClockAt = state.simClockAt;
+  const latestRuntimeSeconds = state.runtimeSeconds;
   state.runtimeSeconds = baseline.runtimeSeconds;
   state.simClockAt = baseline.simClockAt;
   state.liveFlow = baseline.liveFlow;
@@ -1029,6 +1032,8 @@ function restorePlaybackBaseline() {
   state.cameraPhases = [...baseline.cameraPhases];
   state.triggerEvents = [];
   state.playbackElapsed = 0;
+  state.simClockAt = Math.max(state.simClockAt, latestSimClockAt);
+  state.runtimeSeconds = Math.max(state.runtimeSeconds, latestRuntimeSeconds);
 }
 
 function syncPositionLock() {
