@@ -6,7 +6,7 @@
   <title>JWF0019A 实机界面培训模拟</title>
   <meta name="description" content="依据真实JWF0019A运行界面、相机画面和触发记录制作的培训模拟。">
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./hmi.css?v=20260805e">
+  <link rel="stylesheet" href="./hmi.css?v=20260805f">
 </head>
 <body>
   <header class="page-head">
@@ -237,6 +237,14 @@
         <progress id="phase-progress" max="100" value="0"></progress>
       </div>
 
+      <div id="narration-strip" class="narration-strip" aria-live="polite" hidden>
+        <div>
+          <strong id="narration-title">原声讲解已准备</strong>
+          <button id="narration-retry" type="button" hidden>开启语音继续</button>
+        </div>
+        <p id="narration-caption">异常进入可观察阶段后，讲解会按诊断顺序播放。</p>
+      </div>
+
       <article class="logic-card">
         <div><span>机器可观察现象</span><p id="scene-phenomenon"></p></div>
         <div><span>实机界面表现</span><p id="scene-screen"></p></div>
@@ -250,6 +258,6 @@
     </aside>
   </main>
 
-  <script src="./hmi.js?v=20260805e"></script>
+  <script src="./hmi.js?v=20260805f"></script>
 </body>
 </html>

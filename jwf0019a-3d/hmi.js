@@ -166,7 +166,7 @@ const scenarios = {
     phenomenon: "上位机停留在开车画面，20幅相机画面、界面时间与信息不再刷新；设备实际运行状态不能由冻结画面反推。",
     screen: "整组相机画面同时冻结；这与单相机不刷新、同一通道两幅画面不刷新必须分开判断。",
     diagnosis: "优先判断上位机软件或系统卡住，不把它误判成20台相机同时故障；真实报警文字仍待实机取证。",
-    handling: "按安全流程停止检测和整机断电，等待20秒后重新上电；Linux和检测软件加载约需3分钟，恢复后确认20幅画面重新刷新。",
+    handling: "按安全流程停止检测和整机断电，等待20秒后重新上电；Linux和检测软件加载约需3分钟。培训恢复观察只核对前16幅主检测画面与界面时钟，精灵眼正常刷新形态仍待取证。",
     machineLogs: ["上位机相机画面整体停止刷新", "界面时间与信息停留在同一时刻", "设备运行状态需结合现场另行确认"]
   },
   "recognized-no-eject": {
@@ -267,6 +267,78 @@ const PHASE = {
   RECOVERY: "RECOVERY"
 };
 
+const NARRATION_STAGE = {
+  MANUAL_WAIT: "MANUAL_WAIT"
+};
+
+// 这些原声是诊断与处理顺序，不冒充机器报警播报；阶段映射只负责让画面与讲解不抢跑。
+const SCENARIO_NARRATION = {
+  "camera-fault": {
+    tracks: Array.from({ length: 5 }, (_, index) => `./assets/audio/fault-camera-0${index + 1}.mp3`),
+    captions: [
+      "观察20个相机画面，确认只有一个画面停止刷新。",
+      "读取主屏右侧报警信息，记录对应相机编号。",
+      "关闭整机电源，等待20秒后重新上电复核。",
+      "如果短期内反复出现，检查接线并准备对应相机。",
+      "确认故障持续后，更换对应相机并验证画面刷新。"
+    ],
+    stages: {
+      [PHASE.FAULT_OBSERVABLE]: [0],
+      [PHASE.ALARM_ACTIVE]: [1],
+      [NARRATION_STAGE.MANUAL_WAIT]: [2, 3],
+      [PHASE.RECOVERY]: [4]
+    }
+  },
+  "channel-fault": {
+    tracks: Array.from({ length: 5 }, (_, index) => `./assets/audio/fault-channel-0${index + 1}.mp3`),
+    captions: [
+      "确认同一通道的两个相机画面都停止刷新。",
+      "读取报警信息，记录故障通道编号。",
+      "断电等待20秒后重新上电，观察通讯是否恢复。",
+      "若故障很快再次出现，检查该通道线缆与接口。",
+      "确认通讯仍异常后，更换对应算力盒子并复核。"
+    ],
+    stages: {
+      [PHASE.FAULT_OBSERVABLE]: [0],
+      [PHASE.ALARM_ACTIVE]: [1],
+      [NARRATION_STAGE.MANUAL_WAIT]: [2, 3],
+      [PHASE.RECOVERY]: [4]
+    }
+  },
+  "flow-abnormal": {
+    tracks: Array.from({ length: 5 }, (_, index) => `./assets/audio/fault-flow-0${index + 1}.mp3`),
+    captions: [
+      "观察棉流是否明显偏向通道一侧。",
+      "停机检查入口、出口和上部风口是否积花或漏风。",
+      "检查检测玻璃是否有棉蜡，必要时用湿布清洁。",
+      "恢复运行后观察流速是否回到基准范围。",
+      "偏流仍存在时，再检查前后工序风量与管道连接。"
+    ],
+    stages: {
+      [PHASE.FAULT_OBSERVABLE]: [0],
+      [PHASE.ALARM_ACTIVE]: [1],
+      [NARRATION_STAGE.MANUAL_WAIT]: [2],
+      [PHASE.RECOVERY]: [3, 4]
+    }
+  },
+  temperature: {
+    tracks: Array.from({ length: 5 }, (_, index) => `./assets/audio/fault-temperature-0${index + 1}.mp3`),
+    captions: [
+      "读取报警温度和对应通道，先停止高负荷运行。",
+      "检查散热风扇是否转动，周围是否被棉花堵塞。",
+      "检查散热片与风扇间距，清除影响风量的积花。",
+      "恢复运行后继续观察温度变化。",
+      "温度仍持续升高时，进一步检查风扇和算力盒子。"
+    ],
+    stages: {
+      [PHASE.FAULT_OBSERVABLE]: [0],
+      [PHASE.ALARM_ACTIVE]: [1],
+      [NARRATION_STAGE.MANUAL_WAIT]: [2],
+      [PHASE.RECOVERY]: [3, 4]
+    }
+  }
+};
+
 const PHASE_LABELS = {
   [PHASE.STOPPED]: "已关车",
   [PHASE.RUN_BASELINE]: "实时基线",
@@ -327,6 +399,7 @@ const state = {
   logEvents: [],
   flowAbnormalCount: 0,
   flowAlarm: false,
+  flowRecoveryInRangeCount: 0,
   logClock: EVIDENCE_CAPTURE_AT,
   temperature: 57,
   selectedTrigger: 9,
@@ -345,11 +418,24 @@ const state = {
   rearValves: [],
   baseline: "capture-composite",
   normalLogCursor: 0,
-  simClockAt: EVIDENCE_CAPTURE_AT
+  simClockAt: EVIDENCE_CAPTURE_AT,
+  recoveryValidation: null,
+  narrationStage: null,
+  narrationQueue: [],
+  narrationQueuePosition: 0,
+  narrationCurrentStep: null,
+  narrationPlaying: false,
+  narrationStageComplete: true,
+  narrationNeedsGesture: false,
+  narrationPrimed: false,
+  narrationMessage: ""
 };
 
 let trainingStateBeforeSnapshot = null;
 let trainingPlayButtonBeforeSnapshot = null;
+const narrationPlayer = new Audio();
+narrationPlayer.preload = "auto";
+let narrationToken = 0;
 const activeEvidenceSnapshot = () => evidenceSnapshots[state.snapshot] || null;
 const isEvidenceSnapshot = () => Boolean(activeEvidenceSnapshot());
 
@@ -398,6 +484,182 @@ const targetViewText = (text) => state.targetView === "rear" && TARGET_VIEW_SCEN
   : text;
 const trainingNow = () => new Date(state.simClockAt);
 const trainingHour = () => trainingNow().getHours();
+
+function narrationConfig() {
+  return SCENARIO_NARRATION[state.scenario] || null;
+}
+
+function narrationStepsFor(stage) {
+  return narrationConfig()?.stages?.[stage] || [];
+}
+
+function narrationStagePending(stage = state.phase) {
+  return state.narrationStage === stage && !state.narrationStageComplete;
+}
+
+function stopNarration() {
+  narrationToken += 1;
+  narrationPlayer.pause();
+  narrationPlayer.loop = false;
+  narrationPlayer.muted = false;
+  narrationPlayer.onended = null;
+  narrationPlayer.onerror = null;
+  try { narrationPlayer.currentTime = 0; } catch {}
+  state.narrationStage = null;
+  state.narrationQueue = [];
+  state.narrationQueuePosition = 0;
+  state.narrationCurrentStep = null;
+  state.narrationPlaying = false;
+  state.narrationStageComplete = true;
+  state.narrationNeedsGesture = false;
+  state.narrationPrimed = false;
+  state.narrationMessage = "";
+}
+
+function updateManualRecoveryButton() {
+  if (!state.awaitingManual) return;
+  const button = document.querySelector("#play-scenario");
+  const pending = narrationStagePending(NARRATION_STAGE.MANUAL_WAIT);
+  button.disabled = isEvidenceSnapshot() || pending;
+  button.classList.remove("playing");
+  button.textContent = pending
+    ? state.narrationNeedsGesture
+      ? "请先开启语音，继续现场处理讲解"
+      : "正在讲解现场处理步骤…"
+    : "确认已完成现场处理，推演处理后观察";
+}
+
+function renderNarration() {
+  const strip = document.querySelector("#narration-strip");
+  if (!strip) return;
+  const config = narrationConfig();
+  const hidden = isEvidenceSnapshot() || state.scenario === "normal";
+  strip.hidden = hidden;
+  if (hidden) return;
+  const title = document.querySelector("#narration-title");
+  const caption = document.querySelector("#narration-caption");
+  const retry = document.querySelector("#narration-retry");
+  if (!config) {
+    title.textContent = "运行模拟字幕";
+    caption.textContent = "本场景暂无对应原声，画面仍按已确认事实和证据边界播放。";
+    retry.hidden = true;
+    return;
+  }
+  const step = state.narrationCurrentStep;
+  title.textContent = Number.isInteger(step) ? `原声讲解 ${step + 1}/5` : "原声讲解已准备";
+  caption.textContent = Number.isInteger(step)
+    ? config.captions[step]
+    : state.narrationMessage || "异常进入可观察阶段后，讲解会按诊断顺序播放。";
+  retry.hidden = !state.narrationNeedsGesture;
+  retry.textContent = "开启语音继续";
+  strip.classList.toggle("is-playing", state.narrationPlaying);
+  strip.classList.toggle("needs-gesture", state.narrationNeedsGesture);
+}
+
+function failNarration(token) {
+  if (token !== narrationToken) return;
+  state.narrationPlaying = false;
+  state.narrationNeedsGesture = true;
+  state.narrationStageComplete = false;
+  state.narrationMessage = "浏览器拦截了有声播放，请点“开启语音继续”；当前阶段不会跳过。";
+  renderNarration();
+  updateManualRecoveryButton();
+  renderPhase();
+}
+
+function completeNarrationTrack(token) {
+  if (token !== narrationToken) return;
+  state.narrationQueuePosition += 1;
+  if (state.narrationQueuePosition < state.narrationQueue.length) {
+    playNarrationQueueItem();
+    return;
+  }
+  state.narrationPlaying = false;
+  state.narrationStageComplete = true;
+  state.narrationNeedsGesture = false;
+  state.narrationMessage = "本阶段讲解已完整播放。";
+  renderNarration();
+  updateManualRecoveryButton();
+  renderPhase();
+}
+
+function playNarrationQueueItem() {
+  const config = narrationConfig();
+  const step = state.narrationQueue[state.narrationQueuePosition];
+  if (!config || !Number.isInteger(step)) {
+    state.narrationStageComplete = true;
+    renderNarration();
+    return;
+  }
+  const src = config.tracks[step];
+  const token = ++narrationToken;
+  state.narrationCurrentStep = step;
+  state.narrationPlaying = true;
+  state.narrationNeedsGesture = false;
+  state.narrationStageComplete = false;
+  state.narrationMessage = "";
+  narrationPlayer.loop = false;
+  narrationPlayer.muted = false;
+  narrationPlayer.onended = () => completeNarrationTrack(token);
+  narrationPlayer.onerror = () => failNarration(token);
+  const primedFirstTrack = step === 0
+    && state.narrationPrimed
+    && narrationPlayer.src === new URL(src, document.baseURI).href;
+  if (!primedFirstTrack) narrationPlayer.src = src;
+  try { narrationPlayer.currentTime = 0; } catch {}
+  const playPromise = narrationPlayer.play();
+  if (playPromise?.catch) playPromise.catch(() => failNarration(token));
+  renderNarration();
+}
+
+function startNarrationStage(stage) {
+  const queue = narrationStepsFor(stage);
+  state.narrationStage = stage;
+  state.narrationQueue = [...queue];
+  state.narrationQueuePosition = 0;
+  state.narrationCurrentStep = null;
+  state.narrationStageComplete = queue.length === 0;
+  state.narrationNeedsGesture = false;
+  state.narrationMessage = queue.length ? "正在准备本阶段讲解。" : "本阶段没有对应原声。";
+  if (queue.length) playNarrationQueueItem();
+  else renderNarration();
+}
+
+function primeNarration() {
+  stopNarration();
+  const config = narrationConfig();
+  if (!config) {
+    renderNarration();
+    return;
+  }
+  const token = ++narrationToken;
+  state.narrationStage = "PRIMED";
+  state.narrationStageComplete = true;
+  state.narrationMessage = "原声正在预载；异常进入可观察阶段后开始讲解。";
+  narrationPlayer.src = config.tracks[0];
+  narrationPlayer.loop = true;
+  narrationPlayer.muted = true;
+  narrationPlayer.onended = null;
+  narrationPlayer.onerror = () => failNarration(token);
+  try { narrationPlayer.currentTime = 0; } catch {}
+  const playPromise = narrationPlayer.play();
+  if (playPromise?.then) {
+    playPromise.then(() => {
+      if (token !== narrationToken) return;
+      state.narrationPrimed = true;
+      state.narrationMessage = "原声已准备；异常进入可观察阶段后开始讲解。";
+      renderNarration();
+    }).catch(() => failNarration(token));
+  }
+  renderNarration();
+}
+
+function retryNarration() {
+  if (!narrationConfig()) return;
+  state.narrationNeedsGesture = false;
+  if (state.narrationQueue.length && state.narrationQueuePosition < state.narrationQueue.length) playNarrationQueueItem();
+  else primeNarration();
+}
 
 function phaseEffect() {
   if (state.scenario === "normal" || state.phase === PHASE.RUN_BASELINE || state.phase === PHASE.STOPPED) return 0;
@@ -517,11 +779,18 @@ function tickClock() {
 function renderChannels() {
   const root = document.querySelector("#channel-status");
   const selectedChannel = activeEvidenceSnapshot()?.selectedChannel ?? (isEvidenceSnapshot() ? null : state.selectedChannel);
+  const trainingFocusChannel = !isEvidenceSnapshot() && state.scenario === "channel-fault" && phaseIsObservable()
+    ? targetChannel()
+    : null;
   root.innerHTML = channelOrder.map((channel) => {
     const label = channel <= 8 ? `通道${channel}` : `精灵Eye${channel - 8}`;
     const classes = ["channel-chip"];
     if (channel === selectedChannel) classes.push("selected");
-    return `<button class="${classes.join(" ")}" data-channel="${channel}" type="button" disabled title="通道切换行为尚无完整实机取证">${label}</button>`;
+    if (channel === trainingFocusChannel) classes.push("training-focus");
+    const title = channel === trainingFocusChannel
+      ? `培训定位：通道${channel}对应的两幅上位机画面未刷新`
+      : "通道切换行为尚无完整实机取证";
+    return `<button class="${classes.join(" ")}" data-channel="${channel}" type="button" disabled title="${title}">${label}</button>`;
   }).join("");
 }
 
@@ -628,8 +897,68 @@ function tickCameraFrames() {
     if (!image) continue;
     state.cameraPhases[index] = nextPhase;
     image.src = nextSource;
+    recordRecoveryCameraChange(index);
   }
   state.cameraCursor = (state.cameraCursor + 4) % 16;
+}
+
+function recoveryCameraTargets() {
+  if (state.scenario === "camera-fault") return [targetCameraIndex()];
+  if (state.scenario === "channel-fault") return [targetPairCameraIndex(), targetPairCameraIndex() + 1];
+  if (state.scenario === "screen-freeze") return Array.from({ length: 16 }, (_, index) => index);
+  return [];
+}
+
+function beginRecoveryValidation() {
+  state.flowRecoveryInRangeCount = 0;
+  state.recoveryValidation = {
+    startClock: state.simClockAt,
+    cameraTargets: recoveryCameraTargets(),
+    cameraChanges: Array(16).fill(0)
+  };
+}
+
+function recordRecoveryCameraChange(index) {
+  if (state.phase !== PHASE.RECOVERY || !state.recoveryValidation?.cameraTargets.includes(index)) return;
+  state.recoveryValidation.cameraChanges[index] = Math.min(2, state.recoveryValidation.cameraChanges[index] + 1);
+}
+
+function recoveryReady() {
+  if (state.phase !== PHASE.RECOVERY) return true;
+  if (state.scenario === "flow-abnormal") return state.flowRecoveryInRangeCount >= 3;
+  const validation = state.recoveryValidation;
+  if (!validation) return false;
+  if (state.scenario === "camera-fault") {
+    return validation.cameraChanges[targetCameraIndex()] >= 2;
+  }
+  if (state.scenario === "channel-fault") {
+    return [targetPairCameraIndex(), targetPairCameraIndex() + 1]
+      .every((index) => validation.cameraChanges[index] >= 2);
+  }
+  if (state.scenario === "screen-freeze") {
+    return validation.cameraTargets.every((index) => validation.cameraChanges[index] >= 2)
+      && state.simClockAt > validation.startClock;
+  }
+  return true;
+}
+
+function recoveryProgressText() {
+  const validation = state.recoveryValidation;
+  if (state.scenario === "flow-abnormal") return `培训观察：范围内采样 ${state.flowRecoveryInRangeCount}/3`;
+  if (!validation) return "培训恢复观察";
+  if (state.scenario === "camera-fault") {
+    return `培训观察：目标画面刷新 ${validation.cameraChanges[targetCameraIndex()]}/2`;
+  }
+  if (state.scenario === "channel-fault") {
+    const indexes = [targetPairCameraIndex(), targetPairCameraIndex() + 1];
+    return `培训观察：两幅画面刷新 ${validation.cameraChanges[indexes[0]]}/2、${validation.cameraChanges[indexes[1]]}/2`;
+  }
+  if (state.scenario === "screen-freeze") {
+    const recovered = validation.cameraTargets.filter((index) => validation.cameraChanges[index] >= 2).length;
+    const clock = state.simClockAt > validation.startClock ? "时钟继续" : "等待时钟";
+    return `培训观察：前16主相机 ${recovered}/16 · ${clock}`;
+  }
+  return "培训恢复观察";
 }
 
 function timeText(offsetSeconds) {
@@ -970,7 +1299,11 @@ function renderReading() {
   const evidence = scenarioEvidence[state.scenario];
   const prefix = state.scenario === "normal" ? (text) => text : trainingText;
   document.querySelector("#scene-phenomenon").textContent = prefix(targetViewText(data.phenomenon));
-  const flowProgress = state.scenario === "flow-abnormal" ? ` 当前连续越界计数：${state.flowAbnormalCount}/3${state.flowAlarm ? "，已报警。" : "，尚未报警。"}` : "";
+  const flowProgress = state.scenario === "flow-abnormal"
+    ? state.phase === PHASE.RECOVERY
+      ? ` 培训恢复观察：范围内连续采样${state.flowRecoveryInRangeCount}/3；不代表实机自动清警。`
+      : ` 当前连续越界计数：${state.flowAbnormalCount}/3${state.flowAlarm ? "，已报警。" : "，尚未报警。"}`
+    : "";
   document.querySelector("#scene-screen").textContent = prefix(`${targetViewText(data.screen)}${flowProgress}`);
   document.querySelector("#scene-diagnosis").textContent = prefix(data.diagnosis);
   document.querySelector("#scene-handling").textContent = prefix(data.handling);
@@ -1016,7 +1349,8 @@ function renderEvidenceAvailability() {
 function syncSnapshotControls() {
   const readonly = isEvidenceSnapshot();
   document.querySelectorAll("[data-scenario]").forEach((button) => { button.disabled = readonly; });
-  document.querySelector("#play-scenario").disabled = readonly;
+  document.querySelector("#play-scenario").disabled = readonly
+    || (state.awaitingManual && narrationStagePending(NARRATION_STAGE.MANUAL_WAIT));
   document.querySelector("#account-button").disabled = readonly;
   document.querySelector(".read-settings").disabled = readonly;
   syncPositionLock();
@@ -1081,11 +1415,13 @@ function renderPhase() {
   const duration = phaseDuration();
   label.textContent = state.awaitingManual
     ? "等待人工处理"
+    : state.phase === PHASE.RECOVERY
+      ? recoveryProgressText()
     : state.phase === PHASE.ALARM_ACTIVE && state.scenario === "flow-abnormal"
       ? "流速异常报警"
       : PHASE_LABELS[state.phase];
   progress.value = state.phase === PHASE.STOPPED ? 0 : Math.min(100, state.phaseTick / duration * 100);
-  const formalAlarm = state.scenario === "flow-abnormal" && state.flowAlarm;
+  const formalAlarm = state.scenario === "flow-abnormal" && state.flowAlarm && state.phase !== PHASE.RECOVERY;
   const observation = !formalAlarm && [PHASE.FAULT_OBSERVABLE, PHASE.ALARM_ACTIVE].includes(state.phase);
   strip.classList.toggle("warning", formalAlarm);
   strip.classList.toggle("observation", observation);
@@ -1143,7 +1479,7 @@ function updateLiveIndicators() {
         : "● 已关车（培训模拟）";
   indicator.classList.toggle("stopped", hmiDisplayFrozen() || detectionEventsSuppressed() || !state.running || paused);
   const live = document.querySelector(".training-live");
-  const formalAlarm = state.scenario === "flow-abnormal" && state.flowAlarm;
+  const formalAlarm = state.scenario === "flow-abnormal" && state.flowAlarm && state.phase !== PHASE.RECOVERY;
   const observation = !formalAlarm && [PHASE.FAULT_OBSERVABLE, PHASE.ALARM_ACTIVE].includes(state.phase);
   live.classList.toggle("alert", formalAlarm);
   live.classList.toggle("observation", observation);
@@ -1242,6 +1578,7 @@ function liveEventText() {
 function resetFlowAlarm() {
   state.flowAbnormalCount = 0;
   state.flowAlarm = false;
+  state.flowRecoveryInRangeCount = 0;
 }
 
 function sampleFlowAlarm() {
@@ -1250,6 +1587,19 @@ function sampleFlowAlarm() {
     return;
   }
   const outOfRange = state.liveFlow < 8 || state.liveFlow > 12;
+  if (state.phase === PHASE.RECOVERY) {
+    state.flowAbnormalCount = 0;
+    if (outOfRange) {
+      if (state.flowRecoveryInRangeCount > 0) pushRuntimeEvent("培训恢复观察中再次越界，范围内连续采样重新计数", true);
+      state.flowRecoveryInRangeCount = 0;
+      return;
+    }
+    state.flowRecoveryInRangeCount = Math.min(3, state.flowRecoveryInRangeCount + 1);
+    if (state.flowRecoveryInRangeCount === 3) {
+      pushRuntimeEvent("培训观察：连续3次采样回到8.00至12.00范围；不代表实机已自动清警");
+    }
+    return;
+  }
   if (!outOfRange) {
     if (state.flowAbnormalCount > 0) pushRuntimeEvent("流速恢复监控范围，连续异常计数清零");
     resetFlowAlarm();
@@ -1294,7 +1644,11 @@ function updateSettingsMonitors() {
     temperature: "temperature",
     "camera-485": "camera485"
   };
-  const activeMonitor = !isEvidenceSnapshot() && faultPhaseActive() ? scenarioMonitor[state.scenario] : null;
+  const monitorObservable = [PHASE.FAULT_OBSERVABLE, PHASE.ALARM_ACTIVE].includes(state.phase);
+  const flowConfirmed = state.scenario !== "flow-abnormal" || state.flowAlarm;
+  const activeMonitor = !isEvidenceSnapshot() && monitorObservable && flowConfirmed
+    ? scenarioMonitor[state.scenario]
+    : null;
   document.querySelectorAll("[data-monitor]").forEach((monitor) => {
     monitor.classList.toggle("training-alert", monitor.dataset.monitor === activeMonitor);
   });
@@ -1433,6 +1787,7 @@ function enterPhase(phase) {
   state.phase = phase;
   state.phaseTick = 0;
   state.awaitingManual = false;
+  if (phase === PHASE.RECOVERY) beginRecoveryValidation();
   if (phase === PHASE.FAULT_OBSERVABLE && ["high-spray", "hang-large", "recognized-no-eject", "valve-weak-blow"].includes(state.scenario)) {
     state.selectedTrigger = 0;
     state.selectedTriggerKey = null;
@@ -1444,9 +1799,11 @@ function enterPhase(phase) {
   if (phase === PHASE.FAULT_OBSERVABLE && !(state.scenario === "flow-abnormal" && state.flowAlarm)) pushRuntimeEvent(liveEventText(), true);
   if (phase === PHASE.ALARM_ACTIVE && state.scenario !== "flow-abnormal") pushRuntimeEvent("异常现象持续，培训界面进入监控观察阶段", true);
   if (phase === PHASE.RECOVERY) pushRuntimeEvent("已确认现场处理，开始处理后观察培训推演；是否真实恢复需现场确认");
+  if (narrationStepsFor(phase).length) startNarrationStage(phase);
 }
 
 function finishScenarioPlayback() {
+  stopNarration();
   state.playing = false;
   state.awaitingManual = false;
   pushRuntimeEvent(OBSERVATION_ONLY_SCENARIOS.has(state.scenario)
@@ -1467,6 +1824,14 @@ function advanceScenarioPhase() {
   if (!state.playing) return;
   state.phaseTick += 1;
   if (state.phaseTick < phaseDuration()) return;
+  if (narrationStagePending(state.phase)) {
+    state.phaseTick = phaseDuration();
+    return;
+  }
+  if (state.phase === PHASE.RECOVERY && !recoveryReady()) {
+    state.phaseTick = phaseDuration();
+    return;
+  }
   if (state.scenario === "normal" && state.phase === PHASE.RUN_BASELINE) {
     finishScenarioPlayback();
     return;
@@ -1475,9 +1840,8 @@ function advanceScenarioPhase() {
     state.playing = false;
     state.awaitingManual = true;
     state.phaseTick = phaseDuration(PHASE.ALARM_ACTIVE);
-    const button = document.querySelector("#play-scenario");
-    button.classList.remove("playing");
-    button.textContent = "确认已完成现场处理，推演处理后观察";
+    if (narrationStepsFor(NARRATION_STAGE.MANUAL_WAIT).length) startNarrationStage(NARRATION_STAGE.MANUAL_WAIT);
+    updateManualRecoveryButton();
     pushRuntimeEvent("本培训不自动推演恢复；真实恢复条件待取证，需人工确认完成现场处理", true);
     syncPositionLock();
     renderPhase();
@@ -1552,6 +1916,7 @@ function renderAll() {
   renderStats();
   renderTriggers();
   renderReading();
+  renderNarration();
   updateLiveIndicators();
   updateSettingsMonitors();
   updateRunToggleButton();
@@ -1663,6 +2028,7 @@ function setStat(name) {
 }
 
 function cancelScenarioPlayback() {
+  stopNarration();
   state.playing = false;
   state.awaitingManual = false;
   state.roundClockActive = false;
@@ -1759,6 +2125,7 @@ document.querySelector("#snapshot-select").addEventListener("change", (event) =>
 document.querySelector("#play-scenario").addEventListener("click", () => {
   if (isEvidenceSnapshot()) return;
   if (!state.playing && state.awaitingManual && MANUAL_RECOVERY_SCENARIOS.has(state.scenario)) {
+    if (narrationStagePending(NARRATION_STAGE.MANUAL_WAIT)) return;
     state.playing = true;
     enterPhase(PHASE.RECOVERY);
     const recoveryButton = document.querySelector("#play-scenario");
@@ -1771,6 +2138,7 @@ document.querySelector("#play-scenario").addEventListener("click", () => {
   }
   cancelScenarioPlayback();
   if (!state.running) setRunning(true);
+  primeNarration();
   capturePlaybackBaseline();
   restorePlaybackBaseline();
   state.playing = true;
@@ -1787,6 +2155,8 @@ document.querySelector("#play-scenario").addEventListener("click", () => {
   if (state.scenario !== "normal") pushRuntimeEvent("开始播放培训联动");
   renderAll();
 });
+
+document.querySelector("#narration-retry").addEventListener("click", retryNarration);
 
 [
   ...Array.from({ length: 16 }, (_, index) => [cameraSource(index, 0), cameraSource(index, 1)]).flat(),

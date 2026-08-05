@@ -289,6 +289,16 @@ button { cursor: pointer; }
 .phase-strip.warning progress { accent-color: #cf4538; }
 .phase-strip.observation span { color: #8a6427; }
 .phase-strip.observation progress { accent-color: #c48a2d; }
+.narration-strip { margin-top: 9px; padding: 10px 11px; border: 1px solid #cad8cd; border-radius: 10px; background: #f5faf5; }
+.narration-strip[hidden] { display: none; }
+.narration-strip > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.narration-strip strong { color: #3f7045; font-size: 10px; }
+.narration-strip p { margin: 5px 0 0; color: #52645a; font-size: 10px; line-height: 1.55; }
+.narration-strip button { min-height: 28px; padding: 4px 9px; border: 1px solid #b65a4e; border-radius: 7px; color: #9b362d; background: #fff; font-size: 9px; font-weight: 700; }
+.narration-strip.is-playing { border-color: #a8c9ad; background: #eef8ef; }
+.narration-strip.needs-gesture { border-color: #e0aaa3; background: #fff2ef; }
+.narration-strip.needs-gesture strong { color: #a23d34; }
+.channel-chip.training-focus { outline: 2px dashed #b77724; outline-offset: 2px; }
 .logic-card { margin-top: 17px; overflow: hidden; border: 1px solid #d6ddd8; border-radius: 11px; background: #d6ddd8; }
 .logic-card div { padding: 10px 12px; background: #fff; }
 .logic-card div + div { margin-top: 1px; }

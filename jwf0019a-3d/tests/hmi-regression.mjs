@@ -120,6 +120,57 @@ try {
   await waitFor(async () => evaluate("document.readyState === 'complete' && document.querySelectorAll('.camera-card').length === 20"), "HMI页面加载");
   await waitFor(async () => evaluate("readyCameraFrames.size >= 36"), "相机训练帧预载", 15_000);
 
+  const narrationContract = await evaluate(`Object.fromEntries(Object.entries(SCENARIO_NARRATION).map(([name, config]) => [name, {
+    tracks: config.tracks,
+    captions: config.captions.length,
+    stages: config.stages
+  }]))`);
+  const expectedNarrationStages = {
+    "camera-fault": { FAULT_OBSERVABLE: [0], ALARM_ACTIVE: [1], MANUAL_WAIT: [2, 3], RECOVERY: [4] },
+    "channel-fault": { FAULT_OBSERVABLE: [0], ALARM_ACTIVE: [1], MANUAL_WAIT: [2, 3], RECOVERY: [4] },
+    "flow-abnormal": { FAULT_OBSERVABLE: [0], ALARM_ACTIVE: [1], MANUAL_WAIT: [2], RECOVERY: [3, 4] },
+    temperature: { FAULT_OBSERVABLE: [0], ALARM_ACTIVE: [1], MANUAL_WAIT: [2], RECOVERY: [3, 4] }
+  };
+  for (const [name, stages] of Object.entries(expectedNarrationStages)) {
+    const config = narrationContract[name];
+    assert.ok(config, `${name}必须有首批原声讲解配置`);
+    assert.equal(config.tracks.length, 5, `${name}必须配置5段原声`);
+    assert.equal(config.captions, 5, `${name}必须配置5段同步字幕`);
+    assert.deepEqual(config.stages, stages, `${name}讲解必须按可观察、报警、人工处理和恢复观察分阶段`);
+    config.tracks.forEach((track) => {
+      assert.ok(existsSync(resolve(appDir, track.replace(/^\.\//, ""))), `${name}讲解音频缺失：${track}`);
+    });
+  }
+
+  const narrationPhaseGate = await evaluate(`(() => {
+    setScenario("camera-fault");
+    const rows = [PHASE.FAULT_OBSERVABLE, PHASE.ALARM_ACTIVE, PHASE.RECOVERY].map((phase) => {
+      state.playing = true;
+      state.awaitingManual = false;
+      state.phase = phase;
+      state.phaseTick = phaseDuration(phase) - 1;
+      state.narrationStage = phase;
+      state.narrationStageComplete = false;
+      if (phase === PHASE.RECOVERY) {
+        beginRecoveryValidation();
+        state.recoveryValidation.cameraChanges[targetCameraIndex()] = 2;
+      }
+      advanceScenarioPhase();
+      return {
+        requested: phase,
+        actual: state.phase,
+        awaitingManual: state.awaitingManual
+      };
+    });
+    stopNarration();
+    setScenario("normal");
+    return rows;
+  })()`);
+  narrationPhaseGate.forEach(({ requested, actual, awaitingManual }) => {
+    assert.equal(actual, requested, `${requested}讲解未结束时不得提前切换阶段`);
+    assert.equal(awaitingManual, false, `${requested}讲解未结束时不得提前进入人工处理`);
+  });
+
   const snapshotContract = await evaluate("JSON.parse(JSON.stringify(evidenceSnapshots))");
   assert.deepEqual(Object.keys(snapshotContract), ["endpoint-1-1", "endpoint-1-2", "endpoint-2-2"], "2026-08-02多机台快照对象只能按三个已确认端点拆分");
   assert.deepEqual(snapshotContract["endpoint-1-1"].available, ["main", "valve", "flow", "spirit", "history", "triggers"], "端点1-1证据页面范围不得扩张");
@@ -408,6 +459,7 @@ try {
     const inspect = (name) => {
       setScenario(name);
       state.phase = PHASE.ALARM_ACTIVE;
+      if (name === "flow-abnormal") state.flowAlarm = true;
       updateSettingsMonitors();
       return Array.from(document.querySelectorAll("[data-monitor].training-alert"), (node) => node.dataset.monitor);
     };
@@ -432,6 +484,50 @@ try {
     camera485: ["camera485"],
     snapshot: []
   }, "培训场景只联动对应监控项；实机只读快照不得叠加培训报警");
+
+  const flowThresholdContract = await evaluate(`(() => {
+    setScenario("flow-abnormal");
+    state.playing = false;
+    state.phase = PHASE.FAULT_OBSERVABLE;
+    resetFlowAlarm();
+    state.liveFlow = 12.6;
+    const abnormal = [];
+    for (let index = 0; index < 3; index += 1) {
+      sampleFlowAlarm();
+      abnormal.push({ count: state.flowAbnormalCount, alarm: state.flowAlarm });
+    }
+    state.phase = PHASE.RECOVERY;
+    beginRecoveryValidation();
+    state.liveFlow = 10.2;
+    const recovery = [];
+    for (let index = 0; index < 3; index += 1) {
+      sampleFlowAlarm();
+      recovery.push({ count: state.flowRecoveryInRangeCount, ready: recoveryReady() });
+    }
+    renderReading();
+    const result = {
+      abnormal,
+      recovery,
+      alarmStillRecorded: state.flowAlarm,
+      boundary: document.querySelector("#scene-screen").textContent,
+      boundaryLogged: state.logEvents.some((event) => event.text.includes("不代表实机已自动清警"))
+    };
+    setScenario("normal");
+    return result;
+  })()`);
+  assert.deepEqual(flowThresholdContract.abnormal, [
+    { count: 1, alarm: false },
+    { count: 2, alarm: false },
+    { count: 3, alarm: true }
+  ], "流速连续越界前2次只计数，第3次才进入培训报警态");
+  assert.deepEqual(flowThresholdContract.recovery, [
+    { count: 1, ready: false },
+    { count: 2, ready: false },
+    { count: 3, ready: true }
+  ], "恢复观察必须连续3次回到8.00至12.00范围才完成培训判定");
+  assert.equal(flowThresholdContract.alarmStillRecorded, true, "3次范围内培训观察不得冒充实机自动清警");
+  assert.match(flowThresholdContract.boundary, /培训恢复观察.*3\/3.*不代表实机自动清警/, "流速恢复文案必须明示只是培训判定");
+  assert.equal(flowThresholdContract.boundaryLogged, true, "流速恢复日志必须保留不代表实机自动清警的边界");
 
   const triggerEvidenceFilled = await evaluate(`(() => {
     state.triggerEvents = Array.from({ length: 3 }, (_, index) => ({
@@ -497,6 +593,34 @@ try {
   })`);
   assert.match(waitingReadout.runState, /正在开车/, "等待人工处理不应伪装成实机停机");
   assert.equal(waitingReadout.phaseLabel, "等待人工处理", "培训阶段应单独标记等待人工处理");
+
+  const channelFreezeContract = await evaluate(`(() => {
+    setScenario("channel-fault");
+    state.phase = PHASE.ALARM_ACTIVE;
+    renderAll();
+    const frozen = frozenCameraIndexes();
+    state.cameraCursor = frozen[0];
+    const moving = (frozen[1] + 1) % 16;
+    const before = {
+      frozen: frozen.map((index) => state.cameraPhases[index]),
+      moving: state.cameraPhases[moving]
+    };
+    tickCameraFrames();
+    const result = {
+      frozen,
+      before,
+      after: {
+        frozen: frozen.map((index) => state.cameraPhases[index]),
+        moving: state.cameraPhases[moving]
+      }
+    };
+    setScenario("normal");
+    return result;
+  })()`);
+  assert.equal(channelFreezeContract.frozen.length, 2, "通道通讯故障必须锁定同通道两幅画面");
+  assert.equal(channelFreezeContract.frozen[1], channelFreezeContract.frozen[0] + 1, "通道通讯故障必须冻结成对相机");
+  assert.deepEqual(channelFreezeContract.after.frozen, channelFreezeContract.before.frozen, "同通道两幅画面的帧相位必须同时保持不变");
+  assert.notEqual(channelFreezeContract.after.moving, channelFreezeContract.before.moving, "通道故障时其他主检测画面应继续刷新");
 
   const smallHangAfter = await evaluate(`(() => {
     setScenario("hang-small");
@@ -680,6 +804,46 @@ try {
     flowAbnormalCount: 0
   }, "切换场景后必须清理上一场的运行标志和触发事件");
 
+  const screenFreezeEntry = await evaluate(`(() => {
+    setScenario("normal");
+    document.querySelector('[data-scenario="screen-freeze"]').click();
+    const selected = {
+      scenario: state.scenario,
+      active: document.querySelector('[data-scenario="screen-freeze"]').classList.contains("active")
+    };
+    document.querySelector("#play-scenario").click();
+    const started = {
+      phase: state.phase,
+      playing: state.playing,
+      frozen: hmiDisplayFrozen()
+    };
+    state.phaseTick = phaseDuration(PHASE.RUN_BASELINE) - 1;
+    advanceScenarioPhase();
+    const forming = { phase: state.phase, frozen: hmiDisplayFrozen() };
+    state.phaseTick = phaseDuration(PHASE.FAULT_FORMING) - 1;
+    advanceScenarioPhase();
+    renderAll();
+    const observable = {
+      phase: state.phase,
+      frozen: hmiDisplayFrozen(),
+      frozenCameras: frozenCameraIndexes().length,
+      runButton: document.querySelector("#run-toggle").textContent.replace(/\\s+/g, "")
+    };
+    cancelScenarioPlayback();
+    stopNarration();
+    setScenario("normal");
+    return { selected, started, forming, observable };
+  })()`);
+  assert.deepEqual(screenFreezeEntry.selected, { scenario: "screen-freeze", active: true }, "整屏卡住必须能通过真实场景按钮入口选中");
+  assert.deepEqual(screenFreezeEntry.started, { phase: "RUN_BASELINE", playing: true, frozen: false }, "点击播放后应先从未冻结的实时基线开始");
+  assert.deepEqual(screenFreezeEntry.forming, { phase: "FAULT_FORMING", frozen: false }, "整屏卡住在异常形成阶段不得抢跑冻结");
+  assert.deepEqual(screenFreezeEntry.observable, {
+    phase: "FAULT_OBSERVABLE",
+    frozen: true,
+    frozenCameras: 20,
+    runButton: "关车"
+  }, "整屏卡住只能在进入可观察阶段时冻结20幅画面并保留入口前按钮画面");
+
   const frozenStart = await evaluate(`(() => {
     setScenario("screen-freeze");
     state.phase = PHASE.ALARM_ACTIVE;
@@ -706,7 +870,7 @@ try {
   assert.deepEqual(frozenAfter, frozenStart, "整屏卡住时界面时间、统计和20幅画面都应保持不变");
   assert.equal(frozenAfter.runButton, "关车", "整屏卡住时应保留卡住前的关车动作按钮画面");
 
-  console.log("HMI回归通过：19场景入口、触发页32槽/3空槽基线、只读边界、72阶段物理文案、堵花不绑定精准阀位、风机过载保留最后值、切换场景不串数且计时不倒退");
+  console.log("HMI回归通过：四类原声讲解、讲解阶段闸门、流速3次报警/3次恢复培训判定、通道双画面冻结、整屏卡住实际入口、19场景入口、只读边界和切换场景不串数");
 } finally {
   client?.close();
   const waitForExit = (process) => process && process.exitCode === null
