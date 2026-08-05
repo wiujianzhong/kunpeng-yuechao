@@ -48,6 +48,7 @@ const evidenceSnapshots = {
     selectedChannel: 10,
     actionButton: "关车",
     available: ["main", "valve", "flow", "spirit", "history", "triggers"],
+    historyEvidence: { calendarOpen: true, selectedDay: 1, queryResultCaptured: false },
     hourlySpray: [3113,3159,3146,3203,3242,3117,3339,3293,3314,3166,1874,3343,3346,3283,3457,3197,1746,null,null,null,null,null,null,null,null],
     frontValves: [462,839,1200,1281,1142,1038,982,875,757,788,748,693,672,809,880,914,977,964,972,967,946,1014,1073,1025,983,1051,1304,1354,1369,1365,1025,473],
     rearValves: [408,786,1113,1129,1033,1013,1083,1031,942,924,1009,954,881,901,932,919,978,994,1001,954,870,855,920,970,1039,1156,1310,1277,1260,1317,1003,472],
@@ -70,6 +71,7 @@ const evidenceSnapshots = {
     selectedChannel: 10,
     actionButton: "关车",
     available: ["valve"],
+    hourlySpray: [3700,3728,3790,3265,2862,1986,1070,1845,2147,3279,54,null,2452,4007,1585,4200,3963,4045,3726,4133,4186,3712,1449,null,null],
     frontValves: [706,1153,1552,1548,1225,1023,1046,1120,1091,1205,1249,1243,1058,954,856,995,1069,912,953,1130,1070,872,803,894,881,806,941,1097,1158,1102,920,514],
     rearValves: [852,1393,1865,1872,1464,1127,1106,1084,1003,962,1052,1318,1609,1761,1694,1670,1639,1512,1556,1622,1492,1297,1252,1374,1418,1445,1641,1747,1812,1780,1459,821]
   },
@@ -821,7 +823,7 @@ function renderStats() {
   renderValveStats();
   renderFlowStats();
   renderSpiritStats();
-  renderCalendar(snapshot?.available.includes("history") ? 2 : 1);
+  renderCalendar(snapshot?.historyEvidence?.selectedDay ?? 1);
 }
 
 function triggerCameraLabel(source) {
@@ -946,8 +948,11 @@ function renderBaselineProfile() {
 function renderSnapshotControl() {
   const snapshot = activeEvidenceSnapshot();
   document.querySelector("#snapshot-select").value = state.snapshot;
+  const historyBoundary = snapshot?.historyEvidence?.calendarOpen && !snapshot.historyEvidence.queryResultCaptured
+    ? "；历史截图仅证明日历弹窗已打开并选中2026-08-01，选择后的查询结果未取证。"
+    : "";
   document.querySelector("#snapshot-detail").textContent = snapshot
-    ? `${snapshot.label} · ${snapshot.capturedAt} · 只读证据快照；未取证页不补造。`
+    ? `${snapshot.label} · ${snapshot.capturedAt} · 只读证据快照；未取证页不补造${historyBoundary}`
     : "动态培训模拟；不连接生产设备。";
   document.querySelector(".training-panel").classList.toggle("snapshot-readonly", Boolean(snapshot));
   document.querySelector(".hmi-window").classList.toggle("evidence-snapshot", Boolean(snapshot));
@@ -1592,8 +1597,9 @@ function setScreen(name) {
 function setStat(name) {
   state.stat = name;
   document.querySelectorAll("[data-stat]").forEach((button) => button.classList.toggle("active", button.dataset.stat === name));
+  const evidenceHistory = name === "history" && Boolean(activeEvidenceSnapshot());
   ["valve", "flow", "spirit"].forEach((panel) => {
-    document.querySelector(`#stat-${panel}`).hidden = name === "history" ? panel !== "spirit" : panel !== name;
+    document.querySelector(`#stat-${panel}`).hidden = evidenceHistory || (name === "history" ? panel !== "spirit" : panel !== name);
   });
   document.querySelector("#stat-history").hidden = name !== "history";
   renderEvidenceAvailability();

@@ -19,8 +19,10 @@ assert.doesNotMatch(script, /\b(fetch|XMLHttpRequest|WebSocket|sendBeacon)\b/, "
 const scenarioButtons = [...html.matchAll(/data-scenario="([^"]+)"/g)].map((match) => match[1]);
 assert.equal(new Set(scenarioButtons).size, 19, "HMI场景按钮应为19个且不能重名");
 const snapshotOptions = [...html.matchAll(/<option value="(training|endpoint-[^"]+)"/g)].map((match) => match[1]);
-assert.deepEqual(snapshotOptions, ["training", "endpoint-1-1", "endpoint-1-2", "endpoint-2-2"], "实机只读快照只能包含训练合成和三个已取证端点");
+assert.deepEqual(snapshotOptions, ["training", "endpoint-1-1", "endpoint-1-2", "endpoint-2-2"], "2026-08-02多机台快照选择器只能包含训练合成和三个已取证端点");
 assert.doesNotMatch(`${html}\n${script}`, /\b(fetch|XMLHttpRequest|WebSocket|sendBeacon)\b/, "HMI页面与脚本不得连接或写入生产设备");
+assert.match(html, /2026-05-15 · 端点3-2 · 只读/, "系统设置必须标明实际取证时间与端点");
+assert.doesNotMatch(html, /来源于2026-07-22实机参数截图/, "不得把资料整理日误写为设置截图时间");
 
 function freePort() {
   return new Promise((resolvePort, reject) => {
@@ -119,7 +121,7 @@ try {
   await waitFor(async () => evaluate("readyCameraFrames.size >= 36"), "相机训练帧预载", 15_000);
 
   const snapshotContract = await evaluate("JSON.parse(JSON.stringify(evidenceSnapshots))");
-  assert.deepEqual(Object.keys(snapshotContract), ["endpoint-1-1", "endpoint-1-2", "endpoint-2-2"], "只读证据只能按三个已确认端点拆分");
+  assert.deepEqual(Object.keys(snapshotContract), ["endpoint-1-1", "endpoint-1-2", "endpoint-2-2"], "2026-08-02多机台快照对象只能按三个已确认端点拆分");
   assert.deepEqual(snapshotContract["endpoint-1-1"].available, ["main", "valve", "flow", "spirit", "history", "triggers"], "端点1-1证据页面范围不得扩张");
   assert.deepEqual(snapshotContract["endpoint-1-2"].available, ["valve"], "端点1-2只能展示喷阀统计证据");
   assert.deepEqual(snapshotContract["endpoint-2-2"].available, ["main"], "端点2-2只能展示主界面证据");
@@ -139,6 +141,7 @@ try {
     actionButton: "关车"
   }, "端点1-1元数据必须与截图04时刻一致");
   assert.deepEqual(snapshotContract["endpoint-1-1"].flowSteps, [[0,10.5],[9.95,10.5],[10.1,0],[10.35,0],[10.45,10.5],[16.85,10.5],[17,0],[24,0]], "端点1-1流速必须使用显式取证阶梯点");
+  assert.deepEqual(snapshotContract["endpoint-1-1"].historyEvidence, { calendarOpen: true, selectedDay: 1, queryResultCaptured: false }, "端点1-1历史证据只能表示日历弹窗与选中日");
   assert.deepEqual(snapshotContract["endpoint-1-1"].frontValves, [462,839,1200,1281,1142,1038,982,875,757,788,748,693,672,809,880,914,977,964,972,967,946,1014,1073,1025,983,1051,1304,1354,1369,1365,1025,473], "端点1-1前视32阀值不得串入其他机台");
   assert.deepEqual(snapshotContract["endpoint-1-1"].rearValves, [408,786,1113,1129,1033,1013,1083,1031,942,924,1009,954,881,901,932,919,978,994,1001,954,870,855,920,970,1039,1156,1310,1277,1260,1317,1003,472], "端点1-1后视32阀值不得串入其他机台");
   assert.deepEqual({
@@ -160,6 +163,8 @@ try {
     selectedChannel: 10,
     actionButton: "关车"
   }, "端点1-2元数据必须独立来自截图08");
+  assert.deepEqual(snapshotContract["endpoint-1-2"].hourlySpray, [3700,3728,3790,3265,2862,1986,1070,1845,2147,3279,54,null,2452,4007,1585,4200,3963,4045,3726,4133,4186,3712,1449,null,null], "端点1-2小时喷次必须与截图08逐时对齐");
+  assert.equal(snapshotContract["endpoint-1-2"].hourlySpray.filter(Number.isFinite).reduce((sum, value) => sum + value, 0), 65184, "端点1-2逐时喷次之和必须与页头日总数一致");
   assert.deepEqual(snapshotContract["endpoint-1-2"].frontValves, [706,1153,1552,1548,1225,1023,1046,1120,1091,1205,1249,1243,1058,954,856,995,1069,912,953,1130,1070,872,803,894,881,806,941,1097,1158,1102,920,514], "端点1-2前视32阀值不得串入其他机台");
   assert.deepEqual(snapshotContract["endpoint-1-2"].rearValves, [852,1393,1865,1872,1464,1127,1106,1084,1003,962,1052,1318,1609,1761,1694,1670,1639,1512,1556,1622,1492,1297,1252,1374,1418,1445,1641,1747,1812,1780,1459,821], "端点1-2后视32阀值不得串入其他机台");
   assert.deepEqual({
@@ -234,6 +239,13 @@ try {
       secondLines: flowCharts[1]?.querySelectorAll(".flow-line").length ?? -1,
       missingVisible: !document.querySelector("#screen-stats .evidence-page-message").hidden
     };
+    setStat("history");
+    const oneOneHistory = {
+      activeDays: Array.from(document.querySelectorAll("#calendar-grid .active"), (item) => item.textContent),
+      headerDate: document.querySelector("#stats-date").textContent,
+      resultChartsVisible: Array.from(document.querySelectorAll(".stat-content"), (panel) => !panel.hidden).filter(Boolean).length,
+      detail: document.querySelector("#snapshot-detail").textContent
+    };
     setScreen("triggers");
     const oneOneTriggers = {
       slots: document.querySelector("#trigger-grid").children.length,
@@ -248,6 +260,7 @@ try {
       selectedChannel: document.querySelector(".channel-chip.selected")?.textContent || "",
       charts: document.querySelectorAll("#stat-valve .chart-block").length,
       gap: document.querySelector("#stat-valve .evidence-gap-chart")?.textContent || "",
+      hourlyBars: document.querySelectorAll("#stat-valve .chart-block:first-child .bar").length,
       flowResidue: document.querySelectorAll("#stat-flow .flow-line").length
     };
     setScreen("main");
@@ -301,7 +314,7 @@ try {
     state.selectedTrigger = 9;
     state.selectedTriggerKey = null;
     renderTriggers();
-    return { trainingBefore, trainingAfter, frozenBefore, frozenAfter, oneOneMain, oneOneFlow, oneOneTriggers, oneTwoValve, oneTwoMissing, twoTwoMain, twoTwoMissing, twoTwoTriggerMissing, restoredControls, clockBeforeResume, runtimeBeforeResume, resumed };
+    return { trainingBefore, trainingAfter, frozenBefore, frozenAfter, oneOneMain, oneOneFlow, oneOneHistory, oneOneTriggers, oneTwoValve, oneTwoMissing, twoTwoMain, twoTwoMissing, twoTwoTriggerMissing, restoredControls, clockBeforeResume, runtimeBeforeResume, resumed };
   })()`);
   assert.equal(snapshotRoundTrip.frozenAfter, snapshotRoundTrip.frozenBefore, "实机只读快照中三类定时更新都必须停摆");
   assert.deepEqual(snapshotRoundTrip.oneOneMain, {
@@ -314,8 +327,12 @@ try {
   assert.equal(snapshotRoundTrip.oneOneFlow.firstLegend, true, "端点1-1总体流速应保留图例");
   assert.equal(snapshotRoundTrip.oneOneFlow.secondLines, 0, "端点1-1实时流速图必须只有坐标与网格，不得补造曲线");
   assert.equal(snapshotRoundTrip.oneOneFlow.missingVisible, false, "端点1-1流速是已取证页，不应显示缺证遮罩");
+  assert.deepEqual(snapshotRoundTrip.oneOneHistory.activeDays, ["1"], "端点1-1历史日历只能还原截图选中的8月1日");
+  assert.equal(snapshotRoundTrip.oneOneHistory.headerDate, "8月02", "历史弹窗不得把页头取证日期改成8月01");
+  assert.equal(snapshotRoundTrip.oneOneHistory.resultChartsVisible, 0, "历史日历证据不得补造日期查询结果图");
+  assert.match(snapshotRoundTrip.oneOneHistory.detail, /查询结果未取证/, "历史快照说明必须明示证据边界");
   assert.deepEqual(snapshotRoundTrip.oneOneTriggers, { slots: 32, empty: 3, records: 29 }, "端点1-1触发页必须保留32槽、3空槽和29条记录");
-  assert.deepEqual(snapshotRoundTrip.oneTwoValve, { total: "65184", selectedChannel: "精灵Eye2", charts: 3, gap: "小时分布未转录；仅保留页头总数", flowResidue: 0 }, "端点1-2只显示独立喷阀证据且不得残留1-1流速");
+  assert.deepEqual(snapshotRoundTrip.oneTwoValve, { total: "65184", selectedChannel: "精灵Eye2", charts: 3, gap: "", hourlyBars: 25, flowResidue: 0 }, "端点1-2只显示独立喷阀证据且不得残留1-1流速");
   assert.deepEqual(snapshotRoundTrip.oneTwoMissing, { visible: true, cards: 0, leakedLogs: "" }, "端点1-2未取证主界面不得残留其他端点画面或日志");
   assert.equal(snapshotRoundTrip.twoTwoMain.images, 20, "端点2-2主界面应显示20幅本端点取证画面");
   assert.equal(snapshotRoundTrip.twoTwoMain.darkCards, 0, "端点2-2不得残留端点1-1灰暗重构格");
