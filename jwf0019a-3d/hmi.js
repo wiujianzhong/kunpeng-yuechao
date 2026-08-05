@@ -104,7 +104,7 @@ const scenarios = {
     screen: "10个算力通道状态正常；前16幅相邻刷新帧中的棉流位置连续变化，精灵眼正常运行形态待补充取证。",
     diagnosis: "正常基线要看画面是否持续更新，而不是看有没有移动线条。",
     handling: "无需处置；持续对照画面刷新、流速和局部喷次基线。",
-    machineLogs: ["通道5吹阀保护开", "通道3吹阀保护开", "通道1吹阀保护开"]
+    machineLogs: ["开车"]
   },
   "high-spray": {
     phenomenon: "某个局部反复识别，附近电磁阀喷次持续高于相邻阀位。",
@@ -121,11 +121,11 @@ const scenarios = {
     machineLogs: ["前视局部画面持续刷新", "实时流速仍在8.00至12.00范围", "局部吹阀计数无持续升高"]
   },
   "hang-large": {
-    phenomenon: "玻璃下缘约10厘米挂花沾上脏花，附近棉流从两侧绕行。",
-    screen: "局部流速凹陷，同一相机出现反复扭曲触发图，对应局部2至3个阀位会误喷白棉。",
-    diagnosis: "异常应集中在挂花附近，不会让远处所有阀位同时异常。",
-    handling: "按安全规程停止检测，清除脏花并用湿布擦拭通道玻璃；恢复后核对原区域画面和喷次。",
-    machineLogs: ["前视局部棉流画面偏移", "同一相机触发频率升高", "对应局部吹阀计数连续增加"]
+    phenomenon: "玻璃下缘形成局部挂花；约1厘米时影响较小，扩大到5至10厘米或沾上脏花后，邻近棉流会绕行。",
+    screen: "影响集中在挂花附近：对应相机可能出现扭曲触发图，附近阀位喷次升高并误喷白棉，远端阀位通常不受影响。",
+    diagnosis: "局部喷次升高是可观察现象，挂花是常见原因之一；应结合重复触发图和玻璃实物检查确认。",
+    handling: "按安全规程停止检测，清除挂花并用湿布擦拭通道玻璃；恢复后核对原区域画面和喷次。",
+    machineLogs: []
   },
   blockage: {
     phenomenon: "1.6米通道中约30厘米宽度被一大团棉花局部占据。",
@@ -431,6 +431,11 @@ const state = {
   narrationMessage: ""
 };
 
+const PUBLIC_SCENARIOS = new Set([
+  "normal", "hang-large", "flow-abnormal", "lamp-brightness",
+  "channel-fault", "camera-fault", "temperature", "camera-485"
+]);
+
 let trainingStateBeforeSnapshot = null;
 let trainingPlayButtonBeforeSnapshot = null;
 const narrationPlayer = new Audio();
@@ -438,6 +443,11 @@ narrationPlayer.preload = "auto";
 let narrationToken = 0;
 const activeEvidenceSnapshot = () => evidenceSnapshots[state.snapshot] || null;
 const isEvidenceSnapshot = () => Boolean(activeEvidenceSnapshot());
+let simulatedSerialOpen = true;
+let simulatedOrientation = "normal";
+let valveAutoTestTimer = null;
+let valveAutoTestIndex = 0;
+const FLOW_TRAINING_BASELINE = Array.from({ length: 32 }, (_, index) => Number((10 + ((index % 9) - 4) * .04).toFixed(2)));
 
 function cloneTrainingState() {
   return JSON.parse(JSON.stringify(state));
@@ -449,7 +459,7 @@ const startupScreen = startupParams.get("screen");
 const startupStat = startupParams.get("stat");
 const startupAccountOpen = startupScreen === "account";
 const startupBaseline = startupParams.get("baseline");
-if (scenarios[startupScenario]) {
+if (PUBLIC_SCENARIOS.has(startupScenario)) {
   state.scenario = startupScenario;
   state.phase = PHASE.RUN_BASELINE;
 }
@@ -474,7 +484,65 @@ const cameraSource = (index, phase) => `${ASSET_BASE}/cameras/cam-${pad2(index +
 const readyCameraFrames = new Set();
 const trainingText = (text) => text.startsWith("培训模拟：") ? text : `培训模拟：${text}`;
 const trainingLogText = (text) => text.startsWith("【培训提示】") ? text : `【培训提示】${text}`;
-const NORMAL_MACHINE_EVENTS = ["通道1吹阀保护开", "通道3吹阀保护开", "通道5吹阀保护开", "阀保护计数正常"];
+const NORMAL_MACHINE_EVENTS = ["开车"];
+const MACHINE_ALARM_LOGS = {
+  "flow-abnormal": "棉流监控报警",
+  "lamp-brightness": "灯管亮度异常",
+  "channel-fault": "通道异常",
+  "camera-fault": "相机异常",
+  temperature: "高温报警",
+  "camera-485": "相机485通讯异常"
+};
+const MACHINE_ALARM_BUTTONS = {
+  "flow-abnormal": "棉流<br>报警",
+  "lamp-brightness": "亮度<br>异常",
+  "channel-fault": "通道<br>异常",
+  "camera-fault": "相机<br>异常",
+  temperature: "高温<br>报警",
+  "camera-485": "485<br>异常"
+};
+const TRAINING_PIN = "0019";
+const PARAMETER_HELP = {
+  "选择串口": "选择系统与设备通讯时使用的串口名称。本页只模拟选择，不连接任何真实串口。",
+  "串口开关": "模拟打开或关闭当前串口。这里的状态只用于培训，不会向生产设备发送指令。",
+  "刷新串口": "模拟重新扫描可用串口。页面会显示模拟结果，不读取本机或生产设备的真实端口。",
+  "安装方向": "用于模拟设备正装与倒装方向：↑为正装，↓为倒装。切换只改变培训显示状态。",
+  "系统设置": "查看系统、光源、相机触发和气阀的离线培训参数。修改不写入生产设备。",
+  "通道流速监测": "模拟查看32个阀位对应的局部流速值，用于训练判断偏流与越界。模拟值不是实机测量值。",
+  "光源参数": "用于认识四组光源的触发延迟和脉宽。当前数字为说明书培训示例，不代表当前机台值。",
+  "相机触发参数": "用于认识相机触发模式、频率及前后视分组延迟补偿。未经标定不应用培训数字代替现场参数。",
+  "气阀参数": "用于认识识别位置到阀板的延迟、扩阀和吹气时间。本页测阀不会驱动真实电磁阀。",
+  "系统类型": "设备幅宽类型；当前取证值 1 表示宽幅。",
+  "像素精度": "用于把图像像素换算为实际尺寸，未经标定不建议修改。",
+  "亮度基准值": "灯板亮度监测的基准中心值。",
+  "亮度范围阈值": "亮度允许的偏差范围；越界时由灯管亮度监控提示。",
+  "流速基准": "棉流监控的基准值，不是风机速度设定值。",
+  "范围阈值": "棉流围绕基准值允许的正负波动范围。",
+  "连续异常报警": "棉流连续越界达到该次数后，才进入报警状态。",
+  "高温报警": "算力通道温度的报警阈值，当前取证值为 60℃。",
+  "吹阀延迟": "主检测区识别异纤后，根据飞行距离与流速补偿到阀板的时序。",
+  "扩阀模式": "决定命中阀位时是否联动左右相邻阀位。",
+  "吹气时间": "主检测电磁阀的单次吹气时间，界面单位为 0.05ms。",
+  "精灵吹阀延迟": "精灵眼检测后到阀板的时序补偿。",
+  "精灵扩阀模式": "精灵眼命中时的相邻阀位联动方式。",
+  "精灵吹气时间": "精灵眼检测对应的单次吹气时间，界面单位为 0.05ms。",
+  "开阀时间": "电磁阀驱动时序参数；属于厂家控制参数，未经授权不要修改。",
+  "停止充电时间": "阀驱动电路时序参数；未经授权不要修改。",
+  "续充电时间": "阀驱动电路时序参数；未经授权不要修改。",
+  "棉流监控": "监测通道棉流是否超出基准与范围阈值。",
+  "灯管亮度监控": "监测灯板亮度是否超出允许范围。",
+  "通道异常监控": "监测算力通道状态；整个通道的两幅相机画面可同时停止刷新。",
+  "相机异常监控": "监测单台相机是否停止刷新。",
+  "高温报警监控": "监测算力通道温度是否超过高温阈值。",
+  "相机485通讯监控": "监测相机 485 通讯状态，异常时可表现为对应相机画面不刷新。",
+  "阀保护开关": "开启后对单位时间内的吹阀次数进行保护监控。",
+  "吹阀保护次数/分钟": "单位时间允许的吹阀保护阈值；超出时由系统执行保护。",
+  "自动延迟开关": "开启后系统根据棉流与距离进行喷阀延迟补偿。",
+  "吹阀距离": "主检测位置到吹阀位置的时序计算距离。",
+  "自动延迟": "主检测自动补偿的延迟值。",
+  "精灵吹阀距离": "精灵眼检测位置到吹阀位置的时序计算距离。",
+  "精灵自动延迟": "精灵眼检测使用的自动补偿延迟值。"
+};
 const TARGET_VIEW_SCENARIOS = new Set([
   "high-spray", "hang-small", "hang-large", "camera-fault",
   "recognized-no-eject", "lamp-brightness", "valve-weak-blow", "camera-485"
@@ -975,35 +1043,19 @@ function eventTimeText(timestamp) {
   return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())} ${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`;
 }
 
-function scenarioLogLines() {
-  if (!state.running) return ["设备已停止检测", "画面刷新、流速采样与喷次累计均已暂停"].map(trainingLogText);
-  if (state.phase === PHASE.RUN_BASELINE || state.scenario === "normal") return scenarios.normal.machineLogs;
-  if (state.scenario === "waste-bag-full" && state.phase === PHASE.FAULT_FORMING) {
-    return [`废料满袋光电遮挡计时 ${Math.min(10, state.phaseTick)}/10秒`, "喷次与触发记录不作为满袋判据", "等待进入报警培训态"].map(trainingLogText);
-  }
-  if (state.phase === PHASE.FAULT_FORMING) return ["主检测画面持续刷新", "监控采样连续记录中", `当前流速 ${state.liveFlow.toFixed(2)}`].map(trainingLogText);
-  if (state.phase === PHASE.RECOVERY) return ["已进入处理后观察培训推演", "是否真实恢复需由现场继续确认", `当前流速 ${state.liveFlow.toFixed(2)}`].map(trainingLogText);
-  if (state.scenario !== "flow-abnormal" && !["blockage", "duct-blockage"].includes(state.scenario)) return scenarios[state.scenario].machineLogs.map(targetViewText).map(trainingLogText);
-  if (state.flowAlarm) return ["连续3次流速越界", "通道流速监控状态异常", `当前流速 ${state.liveFlow.toFixed(2)}`].map(trainingLogText);
-  if (state.flowAbnormalCount > 0) return [`流速越界采样 ${state.flowAbnormalCount}/3`, "前2次只记录计数，尚未触发报警"].map(trainingLogText);
-  return scenarios[state.scenario].machineLogs.map(targetViewText).map(trainingLogText);
-}
-
 function renderLogs() {
   const snapshot = activeEvidenceSnapshot();
   if (snapshot) {
     document.querySelector("#runtime-log-list").innerHTML = (snapshot.mainLogs || []).map((item) => `<div class="log-line">${item.atText}: ${item.text}</div>`).join("");
     return;
   }
-  const base = scenarioLogLines();
-  const normal = NORMAL_MACHINE_EVENTS;
-  const entries = Array.from({ length: 28 }, (_, index) => {
-    if (state.logEvents[index]) return state.logEvents[index];
-    const text = index < base.length ? base[index] : normal[index % normal.length];
-    return { text, warn: phaseIsObservable() && state.scenario !== "normal" && index < base.length, at: state.logClock - index * 3000 };
-  });
-  document.querySelector("#runtime-log-list").innerHTML = entries.map((item, index) => {
-    const timestamp = item.at ? eventTimeText(item.at) : timeText(index * 3);
+  const entries = [{ text: state.running ? "开车" : "关车", warn: false, at: EVIDENCE_CAPTURE_AT }];
+  const alarmText = MACHINE_ALARM_LOGS[state.scenario];
+  if (state.phase === PHASE.ALARM_ACTIVE && alarmText) {
+    entries.unshift({ text: alarmText, warn: true, at: state.logClock || state.simClockAt });
+  }
+  document.querySelector("#runtime-log-list").innerHTML = entries.map((item) => {
+    const timestamp = eventTimeText(item.at);
     return `<div class="log-line${item.warn ? " warn" : ""}">${timestamp}: ${item.text}</div>`;
   }).join("");
 }
@@ -1353,6 +1405,16 @@ function renderEvidenceAvailability() {
 function syncSnapshotControls() {
   const readonly = isEvidenceSnapshot();
   document.querySelectorAll("[data-scenario]").forEach((button) => { button.disabled = readonly; });
+  document.querySelectorAll([
+    "#screen-settings [data-sim-control]",
+    "#screen-settings [data-delta]",
+    "#screen-settings [data-settings-view]",
+    "#screen-settings [data-settings-tab]",
+    "#screen-settings [data-valve-tab]",
+    "#screen-settings [data-valve-test]"
+  ].join(",")).forEach((control) => { control.disabled = readonly; });
+  document.querySelector("#screen-settings")?.classList.toggle("simulation-readonly", readonly);
+  if (readonly) stopAutomaticValveTest();
   document.querySelector("#play-scenario").disabled = readonly
     || (state.awaitingManual && narrationStagePending(NARRATION_STAGE.MANUAL_WAIT));
   document.querySelector("#account-button").disabled = readonly;
@@ -1653,8 +1715,6 @@ function updateTemperature() {
 
 function updateSettingsMonitors() {
   const scenarioMonitor = {
-    blockage: "flow",
-    "duct-blockage": "flow",
     "flow-abnormal": "flow",
     "lamp-brightness": "brightness",
     "channel-fault": "channel",
@@ -1662,13 +1722,14 @@ function updateSettingsMonitors() {
     temperature: "temperature",
     "camera-485": "camera485"
   };
-  const monitorObservable = [PHASE.FAULT_OBSERVABLE, PHASE.ALARM_ACTIVE].includes(state.phase);
+  const monitorObservable = state.phase === PHASE.ALARM_ACTIVE;
   const flowConfirmed = state.scenario !== "flow-abnormal" || state.flowAlarm;
   const activeMonitor = !isEvidenceSnapshot() && monitorObservable && flowConfirmed
     ? scenarioMonitor[state.scenario]
     : null;
   document.querySelectorAll("[data-monitor]").forEach((monitor) => {
-    monitor.classList.toggle("training-alert", monitor.dataset.monitor === activeMonitor);
+    const enabled = monitor.querySelector('[data-sim-checkbox]')?.checked !== false;
+    monitor.classList.toggle("training-alert", enabled && monitor.dataset.monitor === activeMonitor);
   });
 }
 
@@ -1944,40 +2005,30 @@ function renderAll() {
 }
 
 function setAccountDialog(open) {
-  const dialog = document.querySelector("#account-failure-dialog");
+  const dialog = document.querySelector("#account-training-dialog");
   const accountButton = document.querySelector("#account-button");
   dialog.hidden = !open;
   accountButton.classList.toggle("active", open);
+  if (!open) return;
+  document.querySelector("#account-login-form").hidden = false;
+  document.querySelector("#account-training-home").hidden = true;
+  document.querySelector("#system-auth-form").hidden = true;
+  document.querySelector("#training-account-pin").value = "";
+  document.querySelector("#system-training-pin").value = "";
+  document.querySelector("#account-login-feedback").textContent = "";
+  document.querySelector("#system-auth-feedback").textContent = "";
 }
 
 function updateRunToggleButton() {
   const button = document.querySelector("#run-toggle");
   const machineHeader = document.querySelector(".machine-header");
-  button.hidden = false;
-  machineHeader.classList.remove("no-action-button");
   const settingsView = state.screen === "settings";
-  const alarmLabels = {
-    "high-spray": "喷次<br>异常",
-    "hang-small": "挂花<br>观察",
-    "hang-large": "挂花<br>异常",
-    blockage: "通道<br>堵花",
-    "duct-blockage": "风道<br>堵塞",
-    "flow-abnormal": "流速<br>异常",
-    "camera-fault": "相机<br>故障",
-    "channel-fault": "通讯<br>故障",
-    "screen-freeze": "画面<br>卡住",
-    "recognized-no-eject": "喷射<br>异常",
-    temperature: "高温<br>报警",
-    "lamp-brightness": "亮度<br>异常",
-    "air-pressure-low": "气压<br>不足",
-    "waste-bag-full": "废料<br>满袋",
-    "fan-overload": "风机<br>过载",
-    "valve-long-blow": "气阀<br>长喷",
-    "valve-weak-blow": "气阀<br>弱喷",
-    "camera-485": "485<br>故障"
-  };
+  button.hidden = true;
+  button.innerHTML = "";
+  button.title = "";
+  machineHeader.classList.add("no-action-button");
   button.disabled = true;
-  document.querySelector(".machine-header").classList.toggle("settings-mode", settingsView);
+  machineHeader.classList.toggle("settings-mode", settingsView);
   button.classList.toggle("settings-readonly", settingsView && !isEvidenceSnapshot());
   button.classList.remove("start", "recovering");
   if (isEvidenceSnapshot()) {
@@ -1990,39 +2041,23 @@ function updateRunToggleButton() {
     return;
   }
   if (settingsView) {
+    button.hidden = false;
+    machineHeader.classList.remove("no-action-button");
     button.innerHTML = "关闭<br>工控阀";
     button.title = "当前系统参数快照只读；培训模拟不操作工控阀";
     return;
   }
-  if (!state.running || state.phase === PHASE.STOPPED) {
-    button.innerHTML = "停止<br>检测";
-    button.title = "当前已停止检测";
-    return;
-  }
-  if (hmiDisplayFrozen()) {
-    button.innerHTML = "关<br>车";
-    button.title = "上位机画面冻结，此处保留卡住前显示";
-    return;
-  }
-  if (state.phase === PHASE.RECOVERY) {
-    button.classList.add("recovering");
-    button.innerHTML = "恢复<br>观察";
-    button.title = "当前正在进行处理后观察";
-    return;
-  }
-  if (phaseIsObservable() && state.scenario !== "normal") {
-    button.innerHTML = alarmLabels[state.scenario] || "异常<br>观察";
-    button.title = `${scenarios[state.scenario].phenomenon}（培训模拟）`;
-    return;
-  }
-  button.innerHTML = "关<br>车";
-  button.title = "当前正在开车；点击该动作按钮应关车";
+  if (state.phase !== PHASE.ALARM_ACTIVE || !MACHINE_ALARM_BUTTONS[state.scenario]) return;
+  button.hidden = false;
+  machineHeader.classList.remove("no-action-button");
+  button.innerHTML = MACHINE_ALARM_BUTTONS[state.scenario];
+  button.title = MACHINE_ALARM_LOGS[state.scenario];
 }
 
 function setScreen(name) {
   if (name === "account") {
     if (isEvidenceSnapshot()) return;
-    setAccountDialog(document.querySelector("#account-failure-dialog").hidden);
+    setAccountDialog(document.querySelector("#account-training-dialog").hidden);
     return;
   }
   setAccountDialog(false);
@@ -2106,10 +2141,305 @@ function setRunning(running) {
   renderAll();
 }
 
+function simulationHelp(title, text) {
+  showParameterHelp(title, `${text} 本页仅作离线培训模拟，不连接设备、不保存生产参数。`);
+}
+
+function decimalPlaces(step) {
+  const text = String(step);
+  return text.includes(".") ? text.split(".")[1].length : 0;
+}
+
+function clampSimulationInput(input, fallbackValue = 0) {
+  const minimum = Number(input.min || input.closest("[data-min]")?.dataset.min);
+  const maximum = Number(input.max || input.closest("[data-max]")?.dataset.max);
+  const step = Number(input.step || input.closest("[data-step]")?.dataset.step || 1);
+  const fallback = Number(input.dataset.lastValid ?? fallbackValue);
+  let value = Number(input.value);
+  if (!Number.isFinite(value)) value = Number.isFinite(fallback) ? fallback : 0;
+  if (Number.isFinite(minimum)) value = Math.max(minimum, value);
+  if (Number.isFinite(maximum)) value = Math.min(maximum, value);
+  if (Number.isFinite(step) && step > 0) {
+    const origin = Number.isFinite(minimum) ? minimum : 0;
+    value = origin + Math.round((value - origin) / step) * step;
+  }
+  const precision = decimalPlaces(Number.isFinite(step) ? step : 1);
+  input.value = precision ? value.toFixed(precision) : String(Math.round(value));
+  input.dataset.lastValid = input.value;
+  return input.value;
+}
+
+function parameterTitle(entry) {
+  return entry?.dataset.help || entry?.querySelector("dt")?.childNodes[0]?.textContent.trim() || "模拟参数";
+}
+
+function initializeSimulationParameters() {
+  document.querySelectorAll("#screen-settings [data-parameter]").forEach((entry) => {
+    const input = entry.querySelector('input[type="number"]');
+    if (!input) return;
+    input.dataset.lastValid = input.value;
+    input.dataset.simControl = "";
+    entry.querySelectorAll("[data-delta]").forEach((button) => {
+      button.dataset.simControl = "";
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        if (isEvidenceSnapshot()) return;
+        const step = Number(entry.dataset.step || input.step || 1);
+        const delta = Number(button.dataset.delta || 0);
+        input.value = String(Number(input.value || input.dataset.lastValid || 0) + delta * step);
+        const value = clampSimulationInput(input);
+        simulationHelp(parameterTitle(entry), `当前模拟值：${value}。`);
+      });
+    });
+    input.addEventListener("change", () => {
+      if (isEvidenceSnapshot()) return;
+      const value = clampSimulationInput(input);
+      simulationHelp(parameterTitle(entry), `当前模拟值：${value}。`);
+    });
+  });
+
+  document.querySelectorAll('#screen-settings input[type="number"][data-sim-control]').forEach((input) => {
+    if (input.closest("[data-parameter]") || input.closest("#flow-channel-grid")) return;
+    input.dataset.lastValid = input.value;
+    input.addEventListener("change", () => {
+      if (isEvidenceSnapshot()) return;
+      const value = clampSimulationInput(input);
+      const title = input.closest("[data-help]")?.dataset.help || "模拟参数";
+      simulationHelp(title, `当前模拟值：${value}。`);
+    });
+  });
+}
+
+function initializeSimulationCheckboxes() {
+  document.querySelectorAll("#screen-settings [data-sim-checkbox]").forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      if (isEvidenceSnapshot()) return;
+      const title = checkbox.closest("[data-help]")?.dataset.help || "模拟开关";
+      simulationHelp(title, `当前模拟状态：${checkbox.checked ? "已勾选" : "未勾选"}。`);
+      if (checkbox.closest("[data-monitor]")) updateSettingsMonitors();
+    });
+  });
+}
+
+function activateSettingsView(name) {
+  document.querySelectorAll("#screen-settings [data-settings-view]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.settingsView === name);
+  });
+  document.querySelectorAll("#screen-settings [data-settings-panel]").forEach((panel) => {
+    panel.hidden = panel.dataset.settingsPanel !== name;
+  });
+  showParameterHelp(name === "flow" ? "通道流速监测" : "系统设置");
+}
+
+function activateSettingsTab(name) {
+  document.querySelectorAll("#screen-settings [data-settings-tab]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.settingsTab === name);
+  });
+  document.querySelectorAll("#screen-settings [data-settings-tab-panel]").forEach((panel) => {
+    panel.hidden = panel.dataset.settingsTabPanel !== name;
+  });
+  const titles = { light: "光源参数", camera: "相机触发参数", valve: "气阀参数" };
+  showParameterHelp(titles[name] || "参数说明");
+}
+
+function activateValveTab(name) {
+  document.querySelectorAll("#screen-settings [data-valve-tab]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.valveTab === name);
+  });
+  document.querySelectorAll("#screen-settings [data-valve-panel]").forEach((panel) => {
+    panel.hidden = panel.dataset.valvePanel !== name;
+  });
+  showParameterHelp(name === "test" ? "自动测阀" : "气阀参数");
+}
+
+function initializeSettingsNavigation() {
+  document.querySelectorAll("#screen-settings [data-settings-view]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!isEvidenceSnapshot()) activateSettingsView(button.dataset.settingsView);
+    });
+  });
+  document.querySelectorAll("#screen-settings [data-settings-tab]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!isEvidenceSnapshot()) activateSettingsTab(button.dataset.settingsTab);
+    });
+  });
+  document.querySelectorAll("#screen-settings [data-valve-tab]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!isEvidenceSnapshot()) activateValveTab(button.dataset.valveTab);
+    });
+  });
+}
+
+function initializeSerialTraining() {
+  const select = document.querySelector("#serial-port-select");
+  const toggle = document.querySelector("#serial-toggle");
+  const refresh = document.querySelector("#serial-refresh");
+  const status = document.querySelector("#serial-status");
+  if (!select || !toggle || !refresh || !status) return;
+  select.addEventListener("change", () => {
+    if (isEvidenceSnapshot()) return;
+    status.textContent = simulatedSerialOpen ? `离线模拟已连接 ${select.value}` : `已选择 ${select.value}，串口模拟已关闭`;
+    showParameterHelp("选择串口");
+  });
+  toggle.addEventListener("click", () => {
+    if (isEvidenceSnapshot()) return;
+    simulatedSerialOpen = !simulatedSerialOpen;
+    toggle.textContent = simulatedSerialOpen ? "关闭串口" : "打开串口";
+    status.textContent = simulatedSerialOpen ? `离线模拟已连接 ${select.value}` : "离线串口模拟已关闭";
+    simulationHelp("串口开关", `当前模拟状态：${simulatedSerialOpen ? "打开" : "关闭"}。`);
+  });
+  refresh.addEventListener("click", () => {
+    if (isEvidenceSnapshot()) return;
+    refresh.disabled = true;
+    status.textContent = "正在模拟扫描串口…";
+    window.setTimeout(() => {
+      status.textContent = `模拟刷新完成：已发现 ttyS0、ttyS1、ttyS2；当前 ${select.value}`;
+      refresh.disabled = isEvidenceSnapshot();
+    }, 280);
+    showParameterHelp("刷新串口");
+  });
+}
+
+function initializeOrientationTraining() {
+  const button = document.querySelector("#orientation-toggle");
+  if (!button) return;
+  button.addEventListener("click", () => {
+    if (isEvidenceSnapshot()) return;
+    simulatedOrientation = simulatedOrientation === "normal" ? "inverted" : "normal";
+    const normal = simulatedOrientation === "normal";
+    button.textContent = normal ? "↑ 正装" : "↓ 倒装";
+    button.dataset.orientation = simulatedOrientation;
+    simulationHelp("安装方向", `当前模拟为${normal ? "正装" : "倒装"}。`);
+  });
+}
+
+function createFlowTrainingControls() {
+  const grid = document.querySelector("#flow-channel-grid");
+  if (!grid || grid.children.length) return;
+  FLOW_TRAINING_BASELINE.forEach((value, index) => {
+    const label = document.createElement("label");
+    label.dataset.help = `阀位${index + 1}流速`;
+    label.innerHTML = `<span>${index + 1}</span><input type="number" min="0" max="30" step="0.01" value="${value.toFixed(2)}" data-sim-control aria-label="阀位${index + 1}模拟流速"><i>m/s</i>`;
+    const input = label.querySelector("input");
+    input.dataset.lastValid = input.value;
+    input.addEventListener("change", () => {
+      if (isEvidenceSnapshot()) return;
+      const current = clampSimulationInput(input, value);
+      simulationHelp(`阀位${index + 1}流速`, `当前模拟值 ${current} m/s；用于练习观察该局部与基准值的偏差。`);
+    });
+    label.addEventListener("click", () => simulationHelp(`阀位${index + 1}流速`, "表示该阀位对应局部的流速培训值。"));
+    grid.append(label);
+  });
+  document.querySelector("#flow-reset")?.addEventListener("click", () => {
+    if (isEvidenceSnapshot()) return;
+    grid.querySelectorAll('input[type="number"]').forEach((input, index) => {
+      input.value = FLOW_TRAINING_BASELINE[index].toFixed(2);
+      input.dataset.lastValid = input.value;
+    });
+    simulationHelp("通道流速监测", "已恢复32个阀位的模拟基准值。");
+  });
+}
+
+function pulseValveTraining(number, automatic = false) {
+  if (isEvidenceSnapshot()) return;
+  const grid = document.querySelector("#valve-test-grid");
+  const status = document.querySelector("#valve-test-status");
+  grid?.querySelectorAll("[data-valve-test]").forEach((button) => button.classList.toggle("active", Number(button.dataset.valveTest) === number));
+  if (status) status.textContent = `${automatic ? "自动" : "手动"}模拟：第${number}号电磁阀测试脉冲（未连接设备）`;
+  simulationHelp(`第${number}号电磁阀`, "模拟单阀测试脉冲；界面只显示选中效果，不产生物理吹气。");
+}
+
+function stopAutomaticValveTest() {
+  if (valveAutoTestTimer) window.clearInterval(valveAutoTestTimer);
+  valveAutoTestTimer = null;
+  document.querySelector("#valve-test-grid")?.querySelectorAll("[data-valve-test]").forEach((button) => button.classList.remove("active"));
+}
+
+function startAutomaticValveTest() {
+  stopAutomaticValveTest();
+  valveAutoTestIndex = 0;
+  pulseValveTraining(1, true);
+  valveAutoTestTimer = window.setInterval(() => {
+    if (isEvidenceSnapshot() || !document.querySelector("#auto-valve-test")?.checked) {
+      stopAutomaticValveTest();
+      return;
+    }
+    valveAutoTestIndex = (valveAutoTestIndex + 1) % 32;
+    pulseValveTraining(valveAutoTestIndex + 1, true);
+  }, 420);
+}
+
+function createValveTrainingControls() {
+  const grid = document.querySelector("#valve-test-grid");
+  if (grid && !grid.children.length) {
+    for (let number = 1; number <= 32; number += 1) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = String(number);
+      button.dataset.valveTest = String(number);
+      button.dataset.simControl = "";
+      button.setAttribute("aria-label", `模拟测试第${number}号电磁阀`);
+      button.addEventListener("click", () => pulseValveTraining(number));
+      grid.append(button);
+    }
+  }
+  const automatic = document.querySelector("#auto-valve-test");
+  automatic?.addEventListener("change", () => {
+    if (isEvidenceSnapshot()) return;
+    if (automatic.checked) startAutomaticValveTest();
+    else {
+      stopAutomaticValveTest();
+      const status = document.querySelector("#valve-test-status");
+      if (status) status.textContent = "自动测阀模拟已停止";
+      showParameterHelp("自动测阀");
+    }
+  });
+}
+
+function initializeSettingsSimulation() {
+  initializeSettingsNavigation();
+  initializeSerialTraining();
+  initializeOrientationTraining();
+  createFlowTrainingControls();
+  createValveTrainingControls();
+  initializeSimulationParameters();
+  initializeSimulationCheckboxes();
+}
+
 document.querySelectorAll("[data-screen]").forEach((button) => button.addEventListener("click", () => setScreen(button.dataset.screen)));
 document.querySelector("#account-button").addEventListener("click", () => setScreen("account"));
-document.querySelector("#account-failure-confirm").addEventListener("click", () => setAccountDialog(false));
-document.querySelector("#account-failure-close").addEventListener("click", () => setAccountDialog(false));
+document.querySelector("#account-training-close").addEventListener("click", () => setAccountDialog(false));
+document.querySelector("#account-training-cancel").addEventListener("click", () => setAccountDialog(false));
+document.querySelector("#account-login-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const pin = document.querySelector("#training-account-pin").value;
+  const feedback = document.querySelector("#account-login-feedback");
+  if (pin !== TRAINING_PIN) {
+    feedback.textContent = "培训口令不正确。";
+    return;
+  }
+  const role = document.querySelector("#training-account").value;
+  document.querySelector("#account-login-form").hidden = true;
+  document.querySelector("#account-training-home").hidden = false;
+  document.querySelector("#account-role-label").textContent = role === "admin" ? "admin · 管理员培训视图" : "jwfj · 参数培训视图";
+  feedback.textContent = "";
+});
+document.querySelector("#open-system-auth").addEventListener("click", () => {
+  document.querySelector("#account-training-home").hidden = true;
+  document.querySelector("#system-auth-form").hidden = false;
+  document.querySelector("#system-training-pin").focus();
+});
+document.querySelector("#system-auth-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const feedback = document.querySelector("#system-auth-feedback");
+  if (document.querySelector("#system-training-pin").value !== TRAINING_PIN) {
+    feedback.textContent = "培训口令不正确。";
+    return;
+  }
+  feedback.textContent = "";
+  setAccountDialog(false);
+  setScreen("settings");
+});
 document.querySelectorAll("[data-stat]").forEach((button) => button.addEventListener("click", () => setStat(button.dataset.stat)));
 document.querySelectorAll("[data-scenario]").forEach((button) => button.addEventListener("click", () => setScenario(button.dataset.scenario)));
 document.querySelector("#position-slider").addEventListener("input", (event) => {
@@ -2187,8 +2517,55 @@ document.querySelector("#narration-retry").addEventListener("click", retryNarrat
 });
 Array.from({ length: 32 }, (_, index) => `${ASSET_BASE}/triggers/trigger-${pad2(index + 1)}.png`).forEach((src) => { const image = new Image(); image.src = src; });
 
+function parameterHelpText(title) {
+  if (PARAMETER_HELP[title]) return PARAMETER_HELP[title];
+  if (/^光源[1-4]延迟$/.test(title)) return "该组光源相对相机触发的时序延迟。当前为说明书培训示例值，具体含义与单位需按当前软件版本和厂家标定确认。";
+  if (/^光源[1-4]脉宽$/.test(title)) return "该组光源单次触发的发光脉宽。当前为说明书培训示例值，不代表当前机台参数。";
+  if (title === "触发模式") return "决定相机采集使用的触发方式。数值与模式的完整对应关系尚需当前版本厂家资料确认。";
+  if (title === "触发频率") return "相机触发采集的频率参数。设定必须与光源时序和设备速度配合；当前数字只是培训示例。";
+  if (/^[前后]视触发延迟[1-8-]+$/.test(title)) return "用于补偿指定前视或后视相机分组的触发时序差。未经标定不应照搬培训数字。";
+  if (title === "侧方相机触发补偿") return "侧方相机的独立参数口径尚未完成实机取证；本页仅保留可编辑的培训占位，不替厂家下定义。";
+  if (/^阀位\d+流速$/.test(title)) return "表示该阀位对应局部的流速培训值，用于练习对比基准值与正负范围阈值。";
+  if (/^第\d+号电磁阀$/.test(title)) return "选中该阀号后只演示测阀高亮，不连接阀板，不产生真实吹气。";
+  if (title === "自动测阀") return "勾选后在页面上依次模拟1至32号阀的测试高亮；不会发送真实阀命令。";
+  return "该项仅供离线培训识别；当前含义尚需结合对应软件版本和厂家资料确认。";
+}
+
+function showParameterHelp(title, explicitText = null) {
+  const helpTitle = document.querySelector("#parameter-help-title");
+  const helpText = document.querySelector("#parameter-help-text");
+  if (!helpTitle || !helpText || !title) return;
+  helpTitle.textContent = title;
+  helpText.textContent = explicitText || parameterHelpText(title);
+}
+
+function initializeParameterHelp() {
+  const entries = [
+    ...document.querySelectorAll("#screen-settings [data-help]"),
+    ...document.querySelectorAll("#screen-settings [data-parameter]")
+  ];
+  [...new Set(entries)].forEach((entry) => {
+    const title = entry.dataset.help || (entry.matches("[data-monitor]")
+      ? entry.textContent.replace(/^[✓☑]\s*/, "").trim()
+      : entry.querySelector("dt")?.childNodes[0]?.textContent.trim());
+    if (!title) return;
+    if (!["BUTTON", "INPUT", "SELECT", "LABEL"].includes(entry.tagName)) {
+      entry.tabIndex = 0;
+      entry.setAttribute("role", "button");
+    }
+    entry.addEventListener("click", () => showParameterHelp(title));
+    entry.addEventListener("keydown", (event) => {
+      if (!["Enter", " "].includes(event.key)) return;
+      event.preventDefault();
+      showParameterHelp(title);
+    });
+  });
+}
+
 initializeHistories();
 initializeTriggerRecords();
+initializeSettingsSimulation();
+initializeParameterHelp();
 updateClock();
 document.querySelectorAll("[data-scenario]").forEach((button) => button.classList.toggle("active", button.dataset.scenario === state.scenario));
 renderAll();

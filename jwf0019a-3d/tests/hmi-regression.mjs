@@ -16,12 +16,35 @@ assert.ok(existsSync(chromePath), "未找到 Google Chrome");
 assert.doesNotMatch(script, /trainingTimelinePaused/, "等待人工状态不能冻结整套HMI");
 assert.doesNotMatch(script, /\b(fetch|XMLHttpRequest|WebSocket|sendBeacon)\b/, "HMI培训页不得连接或写入生产设备");
 
-const scenarioButtons = [...html.matchAll(/data-scenario="([^"]+)"/g)].map((match) => match[1]);
-assert.equal(new Set(scenarioButtons).size, 19, "HMI场景按钮应为19个且不能重名");
+const scenarioButtonRecords = [...html.matchAll(/<button\b([^>]*)\bdata-scenario="([^"]+)"([^>]*)>([\s\S]*?)<\/button>/g)].map((match) => ({
+  key: match[2],
+  label: match[4].replace(/<[^>]+>/g, "").trim(),
+  hidden: /\bhidden\b/.test(`${match[1]} ${match[3]}`)
+}));
+const scenarioButtons = scenarioButtonRecords.map(({ key }) => key);
+assert.equal(new Set(scenarioButtons).size, 19, "HMI内部场景应为19个且不能重名");
+assert.deepEqual(scenarioButtonRecords.filter(({ hidden }) => !hidden).map(({ key, label }) => ({ key, label })), [
+  { key: "normal", label: "正常运行" },
+  { key: "hang-large", label: "挂花" },
+  { key: "flow-abnormal", label: "棉流监控" },
+  { key: "lamp-brightness", label: "灯管亮度监控" },
+  { key: "channel-fault", label: "通道异常监控" },
+  { key: "camera-fault", label: "相机异常监控" },
+  { key: "temperature", label: "高温报警监控" },
+  { key: "camera-485", label: "相机485通讯监控" }
+], "公开培训场景必须只显示正常、挂花和六个系统监控报警");
+
+const accountTrainingMarkup = html.match(/<aside id="account-training-dialog"[\s\S]*?<\/aside>/)?.[0] || "";
+assert.match(accountTrainingMarkup, /value="admin"/, "账户培训必须包含 admin 角色");
+assert.match(accountTrainingMarkup, /value="jwfj"/, "账户培训必须包含 jwfj 角色");
+assert.match(accountTrainingMarkup, /公开培训统一口令：0019/, "账户与系统设置必须使用公开培训口令0019");
+assert.match(script, /const TRAINING_PIN = "0019";/, "公开培训口令必须在脚本中统一为0019");
+const accountAuthSource = script.slice(script.indexOf('document.querySelector("#account-login-form")'), script.indexOf('document.querySelectorAll("[data-stat]")'));
+assert.deepEqual([...new Set([...accountAuthSource.matchAll(/["'](\d{3,})["']/g)].map((match) => match[1]))], [], "账户验证逻辑不得再硬编任何现场口令");
 const snapshotOptions = [...html.matchAll(/<option value="(training|endpoint-[^"]+)"/g)].map((match) => match[1]);
 assert.deepEqual(snapshotOptions, ["training", "endpoint-1-1", "endpoint-1-2", "endpoint-2-2"], "2026-08-02多机台快照选择器只能包含训练合成和三个已取证端点");
 assert.doesNotMatch(`${html}\n${script}`, /\b(fetch|XMLHttpRequest|WebSocket|sendBeacon)\b/, "HMI页面与脚本不得连接或写入生产设备");
-assert.match(html, /2026-05-15 · 端点3-2 · 只读/, "系统设置必须标明实际取证时间与端点");
+assert.match(html, /2026-05-15 · 端点3-2 · 离线模拟/, "系统设置必须标明实际取证时间、端点与离线模拟边界");
 assert.doesNotMatch(html, /来源于2026-07-22实机参数截图/, "不得把资料整理日误写为设置截图时间");
 
 function freePort() {
@@ -119,6 +142,405 @@ try {
 
   await waitFor(async () => evaluate("document.readyState === 'complete' && document.querySelectorAll('.camera-card').length === 20"), "HMI页面加载");
   await waitFor(async () => evaluate("readyCameraFrames.size >= 36"), "相机训练帧预载", 15_000);
+
+  const publicInterfaceContract = await evaluate(`(() => {
+    const readLogs = () => Array.from(document.querySelectorAll("#runtime-log-list .log-line"), (node) => node.textContent.split(": ").slice(1).join(": "));
+    const readHeader = () => {
+      const button = document.querySelector("#run-toggle");
+      return {
+        hidden: button.hidden,
+        text: button.textContent.replace(/\\s+/g, ""),
+        noAction: document.querySelector(".machine-header").classList.contains("no-action-button")
+      };
+    };
+    const readMonitors = () => Array.from(document.querySelectorAll("[data-monitor].training-alert"), (node) => node.dataset.monitor);
+    const inspectAlarm = (name) => {
+      setScenario(name);
+      state.phase = PHASE.ALARM_ACTIVE;
+      state.flowAlarm = name === "flow-abnormal";
+      renderAll();
+      return { header: readHeader(), logs: readLogs(), monitors: readMonitors() };
+    };
+
+    setSnapshot("training");
+    setScreen("main");
+    setRunning(true);
+    setScenario("normal");
+    renderAll();
+    const normal = { header: readHeader(), logs: readLogs(), monitors: readMonitors() };
+    setRunning(false);
+    const stopped = { header: readHeader(), logs: readLogs(), monitors: readMonitors() };
+    setRunning(true);
+    const alarms = Object.fromEntries([
+      "flow-abnormal", "lamp-brightness", "channel-fault",
+      "camera-fault", "temperature", "camera-485"
+    ].map((name) => [name, inspectAlarm(name)]));
+    const hang = inspectAlarm("hang-large");
+    const hiddenInternal = inspectAlarm("blockage");
+    setScenario("normal");
+    return { normal, stopped, alarms, hang, hiddenInternal };
+  })()`);
+  assert.deepEqual(publicInterfaceContract.normal, {
+    header: { hidden: true, text: "", noAction: true },
+    logs: ["开车"],
+    monitors: []
+  }, "默认正常开车时顶部不得显示动作或报警按钮，日志只保留开车");
+  assert.deepEqual(publicInterfaceContract.stopped, {
+    header: { hidden: true, text: "", noAction: true },
+    logs: ["关车"],
+    monitors: []
+  }, "培训关车时日志只保留关车");
+  const expectedPublicAlarms = {
+    "flow-abnormal": { button: "棉流报警", log: "棉流监控报警", monitor: "flow" },
+    "lamp-brightness": { button: "亮度异常", log: "灯管亮度异常", monitor: "brightness" },
+    "channel-fault": { button: "通道异常", log: "通道异常", monitor: "channel" },
+    "camera-fault": { button: "相机异常", log: "相机异常", monitor: "camera" },
+    temperature: { button: "高温报警", log: "高温报警", monitor: "temperature" },
+    "camera-485": { button: "485异常", log: "相机485通讯异常", monitor: "camera485" }
+  };
+  for (const [name, expected] of Object.entries(expectedPublicAlarms)) {
+    const actual = publicInterfaceContract.alarms[name];
+    assert.deepEqual(actual.header, { hidden: false, text: expected.button, noAction: false }, `${name}报警时顶部必须显示对应报警按钮`);
+    assert.deepEqual(actual.logs, [expected.log, "开车"], `${name}日志必须只包含对应报警和开车基础信息`);
+    assert.deepEqual(actual.monitors, [expected.monitor], `${name}必须只点亮对应系统监控项`);
+  }
+  assert.deepEqual(publicInterfaceContract.hang, {
+    header: { hidden: true, text: "", noAction: true },
+    logs: ["开车"],
+    monitors: []
+  }, "挂花是现象演示，不得伪装成系统报警");
+  assert.deepEqual(publicInterfaceContract.hiddenInternal, {
+    header: { hidden: true, text: "", noAction: true },
+    logs: ["开车"],
+    monitors: []
+  }, "隐藏的旧场景不得冒充六个系统监控报警");
+
+  const accountTrainingContract = await evaluate(`(() => {
+    const submit = (form) => form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    setSnapshot("training");
+    setScreen("main");
+    document.querySelector("#account-button").click();
+    const dialog = document.querySelector("#account-training-dialog");
+    const loginForm = document.querySelector("#account-login-form");
+    const accountHome = document.querySelector("#account-training-home");
+    const loginPin = document.querySelector("#training-account-pin");
+    const loginFeedback = document.querySelector("#account-login-feedback");
+    const roles = Array.from(document.querySelectorAll("#training-account option"), (option) => option.value);
+    loginPin.value = "9999";
+    submit(loginForm);
+    const wrongAccountPin = { loginVisible: !loginForm.hidden, homeHidden: accountHome.hidden, feedback: loginFeedback.textContent };
+    loginPin.value = "0019";
+    submit(loginForm);
+    const acceptedAccountPin = { loginHidden: loginForm.hidden, homeVisible: !accountHome.hidden, role: document.querySelector("#account-role-label").textContent };
+    document.querySelector("#open-system-auth").click();
+    const systemForm = document.querySelector("#system-auth-form");
+    const systemPin = document.querySelector("#system-training-pin");
+    const systemFeedback = document.querySelector("#system-auth-feedback");
+    systemPin.value = "9999";
+    submit(systemForm);
+    const wrongSystemPin = { dialogVisible: !dialog.hidden, formVisible: !systemForm.hidden, screen: state.screen, feedback: systemFeedback.textContent };
+    systemPin.value = "0019";
+    submit(systemForm);
+    const acceptedSystemPin = { dialogHidden: dialog.hidden, screen: state.screen, settingsVisible: !document.querySelector("#screen-settings").hidden };
+    const initialHelp = {
+      title: document.querySelector("#parameter-help-title").textContent,
+      text: document.querySelector("#parameter-help-text").textContent
+    };
+    document.querySelector(".system-parameters dl > div").click();
+    const parameterHelp = {
+      title: document.querySelector("#parameter-help-title").textContent,
+      text: document.querySelector("#parameter-help-text").textContent
+    };
+    document.querySelector('[data-monitor="flow"]').click();
+    const monitorHelp = {
+      title: document.querySelector("#parameter-help-title").textContent,
+      text: document.querySelector("#parameter-help-text").textContent
+    };
+    document.querySelector('[data-monitor="flow"]').click();
+    setScreen("main");
+    return { roles, wrongAccountPin, acceptedAccountPin, wrongSystemPin, acceptedSystemPin, initialHelp, parameterHelp, monitorHelp };
+  })()`);
+  assert.deepEqual(accountTrainingContract.roles, ["admin", "jwfj"], "账户培训只应包含 admin 和 jwfj 两个角色");
+  assert.deepEqual(accountTrainingContract.wrongAccountPin, {
+    loginVisible: true, homeHidden: true, feedback: "培训口令不正确。"
+  }, "错误公开口令不得进入账户培训");
+  assert.deepEqual(accountTrainingContract.acceptedAccountPin, {
+    loginHidden: true, homeVisible: true, role: "admin · 管理员培训视图"
+  }, "0019必须可进入 admin 账户培训视图");
+  assert.deepEqual(accountTrainingContract.wrongSystemPin, {
+    dialogVisible: true, formVisible: true, screen: "main", feedback: "培训口令不正确。"
+  }, "错误公开口令不得进入系统设置");
+  assert.deepEqual(accountTrainingContract.acceptedSystemPin, {
+    dialogHidden: true, screen: "settings", settingsVisible: true
+  }, "0019必须可进入只读系统设置");
+  assert.deepEqual(accountTrainingContract.initialHelp, {
+    title: "参数说明", text: "点击任一参数、开关、串口或阀号，查看它在检测与报警中的作用。"
+  }, "系统设置应先给出参数点击提示");
+  assert.deepEqual(accountTrainingContract.parameterHelp, {
+    title: "系统类型", text: "设备幅宽类型；当前取证值 1 表示宽幅。"
+  }, "系统参数必须可点击并显示用途说明");
+  assert.deepEqual(accountTrainingContract.monitorHelp, {
+    title: "棉流监控", text: "当前模拟状态：未勾选。 本页仅作离线培训模拟，不连接设备、不保存生产参数。"
+  }, "六个监控项必须可点击切换并显示离线状态说明");
+
+  const settingsSimulationContract = await evaluate(`(async () => {
+    const change = (element) => element.dispatchEvent(new Event("change", { bubbles: true }));
+    const help = () => ({
+      title: document.querySelector("#parameter-help-title").textContent,
+      text: document.querySelector("#parameter-help-text").textContent
+    });
+    const activeKey = (selector, key) => document.querySelector(selector + ".active")?.dataset[key] || null;
+    const visibleKey = (selector, key) => Array.from(document.querySelectorAll(selector)).find((element) => !element.hidden)?.dataset[key] || null;
+
+    setSnapshot("training");
+    setScreen("settings");
+
+    const serialSelect = document.querySelector("#serial-port-select");
+    const serialToggle = document.querySelector("#serial-toggle");
+    const serialRefresh = document.querySelector("#serial-refresh");
+    const serialStatus = document.querySelector("#serial-status");
+    const serialInitial = { port: serialSelect.value, toggle: serialToggle.textContent, status: serialStatus.textContent };
+    serialSelect.value = "ttyS1";
+    change(serialSelect);
+    const serialSelected = serialStatus.textContent;
+    serialToggle.click();
+    const serialClosed = { toggle: serialToggle.textContent, status: serialStatus.textContent };
+    serialToggle.click();
+    const serialOpened = { toggle: serialToggle.textContent, status: serialStatus.textContent };
+    serialRefresh.click();
+    const serialScanning = { disabled: serialRefresh.disabled, status: serialStatus.textContent };
+    await new Promise((resolveWait) => setTimeout(resolveWait, 340));
+    const serialRefreshed = { disabled: serialRefresh.disabled, status: serialStatus.textContent };
+
+    const orientation = document.querySelector("#orientation-toggle");
+    const orientationInitial = orientation.textContent;
+    orientation.click();
+    const orientationInverted = { text: orientation.textContent, value: orientation.dataset.orientation, help: help() };
+    orientation.click();
+    const orientationRestored = { text: orientation.textContent, value: orientation.dataset.orientation };
+
+    const precisionEntry = document.querySelector('[data-parameter="pixel-precision"]');
+    const precisionInput = precisionEntry.querySelector('input[type="number"]');
+    const precisionInitial = precisionInput.value;
+    precisionEntry.querySelector('[data-delta="1"]').click();
+    const precisionPlus = precisionInput.value;
+    precisionEntry.querySelector('[data-delta="-1"]').click();
+    const precisionMinus = precisionInput.value;
+    precisionInput.value = "9";
+    change(precisionInput);
+    const precisionMaximum = precisionInput.value;
+    precisionInput.value = "-2";
+    change(precisionInput);
+    const precisionMinimum = precisionInput.value;
+    precisionInput.value = "0.146";
+    change(precisionInput);
+    const precisionRounded = { value: precisionInput.value, help: help() };
+    precisionInput.value = precisionInitial;
+    change(precisionInput);
+
+    const flowMonitor = document.querySelector('[data-monitor="flow"] input[data-sim-checkbox]');
+    flowMonitor.checked = false;
+    change(flowMonitor);
+    const monitorUnchecked = { checked: flowMonitor.checked, help: help() };
+    flowMonitor.checked = true;
+    change(flowMonitor);
+    const monitorChecked = { checked: flowMonitor.checked, help: help() };
+
+    const viewStates = {};
+    for (const name of ["flow", "system"]) {
+      document.querySelector('[data-settings-view="' + name + '"]').click();
+      viewStates[name] = {
+        active: activeKey("[data-settings-view]", "settingsView"),
+        visible: visibleKey("[data-settings-panel]", "settingsPanel")
+      };
+    }
+
+    document.querySelector('[data-settings-view="flow"]').click();
+    const flowInputs = Array.from(document.querySelectorAll('#flow-channel-grid input[type="number"]'));
+    const flowLabels = flowInputs.map((input) => input.getAttribute("aria-label"));
+    const flowBaseline = flowInputs.map((input) => input.value);
+    flowInputs[0].value = "99";
+    change(flowInputs[0]);
+    const flowClamped = { value: flowInputs[0].value, help: help() };
+    document.querySelector("#flow-reset").click();
+    const flowReset = flowInputs.map((input) => input.value);
+    document.querySelector('[data-settings-view="system"]').click();
+
+    const tabStates = {};
+    for (const name of ["light", "camera", "valve"]) {
+      document.querySelector('[data-settings-tab="' + name + '"]').click();
+      tabStates[name] = {
+        active: activeKey("[data-settings-tab]", "settingsTab"),
+        visible: visibleKey("[data-settings-tab-panel]", "settingsTabPanel")
+      };
+    }
+
+    document.querySelector('[data-valve-tab="test"]').click();
+    const valveTestTab = {
+      active: activeKey("[data-valve-tab]", "valveTab"),
+      visible: visibleKey("[data-valve-panel]", "valvePanel")
+    };
+    const valveButtons = Array.from(document.querySelectorAll("#valve-test-grid [data-valve-test]"));
+    const valveNumbers = valveButtons.map((button) => Number(button.dataset.valveTest));
+    valveButtons[16].click();
+    const manualValve = {
+      active: Number(document.querySelector("#valve-test-grid [data-valve-test].active")?.dataset.valveTest),
+      status: document.querySelector("#valve-test-status").textContent,
+      help: help()
+    };
+    const autoValve = document.querySelector("#auto-valve-test");
+    autoValve.checked = true;
+    change(autoValve);
+    const autoValveStarted = {
+      active: Number(document.querySelector("#valve-test-grid [data-valve-test].active")?.dataset.valveTest),
+      status: document.querySelector("#valve-test-status").textContent
+    };
+    await new Promise((resolveWait) => setTimeout(resolveWait, 950));
+    const autoValveAdvanced = {
+      active: Number(document.querySelector("#valve-test-grid [data-valve-test].active")?.dataset.valveTest),
+      status: document.querySelector("#valve-test-status").textContent
+    };
+    autoValve.checked = false;
+    change(autoValve);
+    const autoValveStopped = {
+      activeCount: document.querySelectorAll("#valve-test-grid [data-valve-test].active").length,
+      status: document.querySelector("#valve-test-status").textContent
+    };
+    document.querySelector('[data-valve-tab="settings"]').click();
+
+    const helpEntry = document.querySelector('[data-parameter="valve-delay"]');
+    helpEntry.click();
+    const clickedParameterHelp = help();
+
+    setSnapshot("endpoint-1-1");
+    setScreen("settings");
+    syncSnapshotControls();
+    const simulatedControls = Array.from(document.querySelectorAll("#screen-settings [data-sim-control]"));
+    const auxiliaryControls = Array.from(document.querySelectorAll([
+      "#screen-settings [data-delta]",
+      "#screen-settings [data-settings-view]",
+      "#screen-settings [data-settings-tab]",
+      "#screen-settings [data-valve-tab]",
+      "#screen-settings [data-valve-test]"
+    ].join(",")));
+    const snapshotReadonly = {
+      classApplied: document.querySelector("#screen-settings").classList.contains("simulation-readonly"),
+      simulatedControlCount: simulatedControls.length,
+      simulatedControlsDisabled: simulatedControls.every((control) => control.disabled),
+      auxiliaryControlCount: auxiliaryControls.length,
+      auxiliaryControlsDisabled: auxiliaryControls.every((control) => control.disabled)
+    };
+
+    setSnapshot("training");
+    setScreen("main");
+    return {
+      serialInitial, serialSelected, serialClosed, serialOpened, serialScanning, serialRefreshed,
+      orientationInitial, orientationInverted, orientationRestored,
+      precisionInitial, precisionPlus, precisionMinus, precisionMaximum, precisionMinimum, precisionRounded,
+      monitorUnchecked, monitorChecked, viewStates,
+      flowCount: flowInputs.length, flowLabels, flowBaseline, flowClamped, flowReset,
+      tabStates, valveTestTab, valveCount: valveButtons.length, valveNumbers,
+      manualValve, autoValveStarted, autoValveAdvanced, autoValveStopped,
+      clickedParameterHelp, snapshotReadonly
+    };
+  })()`);
+  assert.deepEqual(settingsSimulationContract.serialInitial, {
+    port: "ttyS2", toggle: "关闭串口", status: "离线模拟已连接"
+  }, "离线串口模拟必须默认选择ttyS2并保持连接状态");
+  assert.equal(settingsSimulationContract.serialSelected, "离线模拟已连接 ttyS1", "切换串口必须更新离线连接状态");
+  assert.deepEqual(settingsSimulationContract.serialClosed, {
+    toggle: "打开串口", status: "离线串口模拟已关闭"
+  }, "关闭串口必须同步更新按钮和状态");
+  assert.deepEqual(settingsSimulationContract.serialOpened, {
+    toggle: "关闭串口", status: "离线模拟已连接 ttyS1"
+  }, "重新打开串口必须恢复当前串口的离线连接状态");
+  assert.deepEqual(settingsSimulationContract.serialScanning, {
+    disabled: true, status: "正在模拟扫描串口…"
+  }, "刷新串口期间必须显示扫描状态并临时禁用按钮");
+  assert.deepEqual(settingsSimulationContract.serialRefreshed, {
+    disabled: false, status: "模拟刷新完成：已发现 ttyS0、ttyS1、ttyS2；当前 ttyS1"
+  }, "刷新串口完成后必须列出三个模拟串口并恢复按钮");
+
+  assert.equal(settingsSimulationContract.orientationInitial, "↑ 正装", "安装方向必须默认正装");
+  assert.deepEqual(settingsSimulationContract.orientationInverted, {
+    text: "↓ 倒装",
+    value: "inverted",
+    help: {
+      title: "安装方向",
+      text: "用于模拟设备正装与倒装方向：↑为正装，↓为倒装。切换只改变培训显示状态。"
+    }
+  }, "安装方向必须可切换为倒装并显示用途说明");
+  assert.deepEqual(settingsSimulationContract.orientationRestored, {
+    text: "↑ 正装", value: "normal"
+  }, "安装方向必须可切回正装");
+
+  assert.deepEqual({
+    initial: settingsSimulationContract.precisionInitial,
+    plus: settingsSimulationContract.precisionPlus,
+    minus: settingsSimulationContract.precisionMinus,
+    maximum: settingsSimulationContract.precisionMaximum,
+    minimum: settingsSimulationContract.precisionMinimum,
+    rounded: settingsSimulationContract.precisionRounded.value
+  }, {
+    initial: "0.15", plus: "0.16", minus: "0.15", maximum: "1.00", minimum: "0.01", rounded: "0.15"
+  }, "数值参数必须支持加减、直接修改、步进取整及上下限约束");
+  assert.equal(settingsSimulationContract.precisionRounded.help.title, "像素精度", "直接修改参数后必须显示对应参数说明");
+  assert.match(settingsSimulationContract.precisionRounded.help.text, /当前模拟值：0\.15。.*离线培训模拟/, "直接修改参数后必须说明模拟值与离线边界");
+  assert.deepEqual(settingsSimulationContract.monitorUnchecked, {
+    checked: false,
+    help: { title: "棉流监控", text: "当前模拟状态：未勾选。 本页仅作离线培训模拟，不连接设备、不保存生产参数。" }
+  }, "监控开关必须可取消勾选并显示状态说明");
+  assert.deepEqual(settingsSimulationContract.monitorChecked, {
+    checked: true,
+    help: { title: "棉流监控", text: "当前模拟状态：已勾选。 本页仅作离线培训模拟，不连接设备、不保存生产参数。" }
+  }, "监控开关必须可重新勾选并显示状态说明");
+
+  assert.deepEqual(settingsSimulationContract.viewStates, {
+    flow: { active: "flow", visible: "flow" },
+    system: { active: "system", visible: "system" }
+  }, "系统设置与通道流速两个主视图必须可互相切换");
+  assert.equal(settingsSimulationContract.flowCount, 32, "通道流速监测必须生成32个阀位输入框");
+  assert.deepEqual(settingsSimulationContract.flowLabels, Array.from({ length: 32 }, (_, index) => `阀位${index + 1}模拟流速`), "32个流速输入框必须按阀位1至32编号");
+  assert.deepEqual(settingsSimulationContract.flowClamped, {
+    value: "30.00",
+    help: {
+      title: "阀位1流速",
+      text: "当前模拟值 30.00 m/s；用于练习观察该局部与基准值的偏差。 本页仅作离线培训模拟，不连接设备、不保存生产参数。"
+    }
+  }, "单通道流速必须限制在0至30并显示局部说明");
+  assert.deepEqual(settingsSimulationContract.flowReset, settingsSimulationContract.flowBaseline, "恢复模拟基准必须一次还原全部32路流速");
+
+  assert.deepEqual(settingsSimulationContract.tabStates, {
+    light: { active: "light", visible: "light" },
+    camera: { active: "camera", visible: "camera" },
+    valve: { active: "valve", visible: "valve" }
+  }, "光源、相机触发与气阀三个设置页签必须独立切换");
+  assert.deepEqual(settingsSimulationContract.valveTestTab, { active: "test", visible: "test" }, "气阀参数必须可切换到测阀页");
+  assert.equal(settingsSimulationContract.valveCount, 32, "测阀页必须生成32个阀号");
+  assert.deepEqual(settingsSimulationContract.valveNumbers, Array.from({ length: 32 }, (_, index) => index + 1), "测阀按钮必须连续编号1至32");
+  assert.deepEqual(settingsSimulationContract.manualValve, {
+    active: 17,
+    status: "手动模拟：第17号电磁阀测试脉冲（未连接设备）",
+    help: {
+      title: "第17号电磁阀",
+      text: "模拟单阀测试脉冲；界面只显示选中效果，不产生物理吹气。 本页仅作离线培训模拟，不连接设备、不保存生产参数。"
+    }
+  }, "点击单阀必须只高亮对应阀号并说明不会产生物理吹气");
+  assert.equal(settingsSimulationContract.autoValveStarted.active, 1, "自动测阀必须从1号阀开始");
+  assert.match(settingsSimulationContract.autoValveStarted.status, /^自动模拟：第1号电磁阀/, "自动测阀开始时必须显示1号阀状态");
+  assert.ok(settingsSimulationContract.autoValveAdvanced.active >= 2 && settingsSimulationContract.autoValveAdvanced.active <= 4, "自动测阀必须按顺序推进阀号");
+  assert.match(settingsSimulationContract.autoValveAdvanced.status, /^自动模拟：第[2-4]号电磁阀/, "自动测阀推进时必须同步更新状态");
+  assert.deepEqual(settingsSimulationContract.autoValveStopped, {
+    activeCount: 0, status: "自动测阀模拟已停止"
+  }, "取消自动测阀必须清除高亮并显示停止状态");
+  assert.deepEqual(settingsSimulationContract.clickedParameterHelp, {
+    title: "吹阀延迟", text: "主检测区识别异纤后，根据飞行距离与流速补偿到阀板的时序。"
+  }, "点击参数项必须在底部显示对应说明");
+  assert.equal(settingsSimulationContract.snapshotReadonly.classApplied, true, "证据快照下系统设置必须显示只读状态");
+  assert.ok(settingsSimulationContract.snapshotReadonly.simulatedControlCount >= 70, "证据快照必须覆盖全部离线模拟控件");
+  assert.equal(settingsSimulationContract.snapshotReadonly.simulatedControlsDisabled, true, "证据快照下所有data-sim-control必须禁用");
+  assert.ok(settingsSimulationContract.snapshotReadonly.auxiliaryControlCount >= 70, "证据快照必须覆盖加减、页签和测阀辅助控件");
+  assert.equal(settingsSimulationContract.snapshotReadonly.auxiliaryControlsDisabled, true, "证据快照下全部辅助交互也必须禁用");
 
   const narrationContract = await evaluate(`Object.fromEntries(Object.entries(SCENARIO_NARRATION).map(([name, config]) => [name, {
     tracks: config.tracks,
@@ -400,6 +822,7 @@ try {
   assert.ok(snapshotRoundTrip.resumed.runtime > snapshotRoundTrip.runtimeBeforeResume, "退出快照后培训运行时长应继续增长");
 
   const triggerEvidenceBaseline = await evaluate(`(() => {
+    state.triggerEvents = [];
     renderTriggers();
     return {
       slots: document.querySelector("#trigger-grid").children.length,
@@ -769,6 +1192,7 @@ try {
     const beforePhase = state.cameraPhases[target];
     readyCameraFrames.add(cameraSource(target, beforePhase ? 0 : 1));
     tickCameraFrames();
+    state.phase = PHASE.ALARM_ACTIVE;
     updateSettingsMonitors();
     const result = {
       target,
@@ -788,7 +1212,7 @@ try {
   assert.equal(brightnessRuntimeContract.abnormalCount, 1, "灯板亮度偏离只能标记目标相机");
   assert.equal(brightnessRuntimeContract.abnormalIndex, brightnessRuntimeContract.target, "亮度偏离标记必须落在目标相机");
   assert.notEqual(brightnessRuntimeContract.afterPhase, brightnessRuntimeContract.beforePhase, "灯板亮度偏离时目标相机必须继续刷新");
-  assert.deepEqual(brightnessRuntimeContract.activeMonitors, ["brightness"], "灯板亮度偏离只能联动亮度监控项");
+  assert.deepEqual(brightnessRuntimeContract.activeMonitors, ["brightness"], "灯板亮度进入报警阶段后只能联动亮度监控项");
   assert.equal(brightnessRuntimeContract.abnormalFilter, brightnessRuntimeContract.normalFilter, "亮度异常方向未取证时不得固定画成变暗");
 
   const fanLifecycleContract = await evaluate(`(() => {
@@ -1037,7 +1461,8 @@ try {
       phase: state.phase,
       frozen: hmiDisplayFrozen(),
       frozenCameras: frozenCameraIndexes().length,
-      runButton: document.querySelector("#run-toggle").textContent.replace(/\\s+/g, "")
+      runButton: document.querySelector("#run-toggle").textContent.replace(/\\s+/g, ""),
+      runButtonHidden: document.querySelector("#run-toggle").hidden
     };
     cancelScenarioPlayback();
     stopNarration();
@@ -1051,8 +1476,9 @@ try {
     phase: "FAULT_OBSERVABLE",
     frozen: true,
     frozenCameras: 20,
-    runButton: "关车"
-  }, "整屏卡住只能在进入可观察阶段时冻结20幅画面并保留入口前按钮画面");
+    runButton: "",
+    runButtonHidden: true
+  }, "隐藏的整屏卡住内部场景只能冻结20幅画面，不得恢复旧关车按钮");
 
   const frozenStart = await evaluate(`(() => {
     setScenario("screen-freeze");
@@ -1066,7 +1492,8 @@ try {
       runtime: state.runtimeSeconds,
       phases: state.cameraPhases.slice(),
       sources: Array.from(document.querySelectorAll(".camera-card img"), (image) => image.src),
-      runButton: document.querySelector("#run-toggle").textContent.replace(/\s+/g, "")
+      runButton: document.querySelector("#run-toggle").textContent.replace(/\s+/g, ""),
+      runButtonHidden: document.querySelector("#run-toggle").hidden
     };
   })()`);
   await new Promise((resolveWait) => setTimeout(resolveWait, 1_250));
@@ -1075,12 +1502,13 @@ try {
     runtime: state.runtimeSeconds,
     phases: state.cameraPhases.slice(),
     sources: Array.from(document.querySelectorAll(".camera-card img"), (image) => image.src),
-    runButton: document.querySelector("#run-toggle").textContent.replace(/\s+/g, "")
+    runButton: document.querySelector("#run-toggle").textContent.replace(/\s+/g, ""),
+    runButtonHidden: document.querySelector("#run-toggle").hidden
   })`);
   assert.deepEqual(frozenAfter, frozenStart, "整屏卡住时界面时间、统计和20幅画面都应保持不变");
-  assert.equal(frozenAfter.runButton, "关车", "整屏卡住时应保留卡住前的关车动作按钮画面");
+  assert.deepEqual({ text: frozenAfter.runButton, hidden: frozenAfter.runButtonHidden }, { text: "", hidden: true }, "隐藏的整屏卡住场景不得显示旧关车按钮");
 
-  console.log("HMI回归通过：四类原声讲解、讲解阶段闸门、流速3次报警/3次恢复培训判定、通道双画面冻结、整屏卡住实际入口、19场景入口、只读边界和切换场景不串数");
+  console.log("HMI回归通过：默认开车与精简日志、8个公开场景/19个内部场景、六个监控报警、0019账户培训、可点击参数说明、四类原声讲解、只读取证边界和切换场景不串数");
 } finally {
   client?.close();
   const waitForExit = (process) => process && process.exitCode === null

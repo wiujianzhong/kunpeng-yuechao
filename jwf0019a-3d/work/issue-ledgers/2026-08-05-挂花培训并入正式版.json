@@ -1,0 +1,75 @@
+{
+  "project": "JWF0019A设备超级知识平台",
+  "baseline": {
+    "official_entry": "https://jwf19.xiaowustudio.cn/",
+    "source_directory": "/Users/xiaowu/Projects/01-游戏工坊/小伍工坊-当前站点/明早惊艳项目",
+    "main_file": "jwf0019a-3d/3d.html",
+    "branch_or_checkpoint": "main / 18f4703",
+    "commit_or_hash": "3d.html=d7b551b1de059883c1a582b2e8330788dea60b6e; app.js=2d24de22fc7f6364c80f6ebd1bf48c3756d4c638; styles.css=f0a49045d006b7c740b373a594c6706d5305d7a2; model=e5e75993c606865f8ae93d8cb327fcfce4f1d697013a6e57260dba9dcf678670",
+    "captured_at": "2026-08-05 18:30"
+  },
+  "declared_issue_count": 1,
+  "issues": [
+    {
+      "id": "I-01",
+      "original_request": "差不多了，可以发布。还有我们那个挂花的模拟培训那个版本在哪？把这两个一块儿给我打包进去发布",
+      "target_parts": [
+        "当前正式3D工作台中的毛笔头挂花培训",
+        "主通道局部偏流与误喷白棉演示",
+        "排杂风道堵花演示",
+        "最新版HMI参数设置模拟入口"
+      ],
+      "allowed_changes": [
+        "jwf0019a-3d/3d.html中的挂花培训控制入口和HMI链接缓存标识",
+        "jwf0019a-3d/app.js中的挂花培训专属状态、模型与动画逻辑",
+        "jwf0019a-3d/styles.css中的挂花培训控件样式"
+      ],
+      "forbidden_changes": [
+        "主体GLB与当前外形",
+        "工作原理、拆解、校准和整线布局既有行为",
+        "根目录README及其他项目"
+      ],
+      "acceptance_views": [
+        "正面",
+        "背面",
+        "左侧",
+        "右侧",
+        "左前45度",
+        "右前45度",
+        "俯视",
+        "实体/X光/拆解/工作原理/挂花培训/HMI入口"
+      ],
+      "status": "verified",
+      "change_summary": "将2026-07-27已校对的挂花培训逻辑手术式并入当前正式3D工作台，并保留当前新模型与其他功能；最新版HMI参数培训入口同步指向带缓存版本号的正式页面。",
+      "evidence_before": [
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/修改前-正式3D工作台.png",
+        "/Users/xiaowu/Projects/JWF0019A-3D结构模型/work/validation/2026-07-27-毛笔头挂花修正/"
+      ],
+      "evidence_after": [
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/00_原始整机.png",
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/01_前玻璃下边缘1厘米.png",
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/02_前玻璃下边缘5厘米.png",
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/03_前玻璃下边缘10厘米.png",
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/04_后玻璃上边缘10厘米.png",
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/05_排杂风道30厘米单团堵花.png",
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/06_原阀位误喷白棉.png",
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/07_原有工作原理未受影响.png",
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/08_手机端堵花控制.png",
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/HMI设置模拟-发布前.png",
+        "jwf0019a-3d/work/validation/2026-08-05-挂花培训合并/result.json"
+      ],
+      "regression_checks": [
+        {"name": "app.js语法检查", "result": "pass"},
+        {"name": "hmi.js语法检查", "result": "pass"},
+        {"name": "HMI完整回归", "result": "pass"},
+        {"name": "挂花培训前后玻璃、上下边缘及1/5/10厘米状态", "result": "pass"},
+        {"name": "排杂风道30厘米单团堵花", "result": "pass"},
+        {"name": "原阀位误喷白棉状态捕获", "result": "pass"},
+        {"name": "原有工作原理播放不受影响", "result": "pass"},
+        {"name": "手机视口可操作", "result": "pass"},
+        {"name": "浏览器控制台与页面运行错误为0", "result": "pass"},
+        {"name": "主体GLB哈希未变且未引入旧模型", "result": "pass"}
+      ]
+    }
+  ]
+}

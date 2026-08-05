@@ -6,7 +6,7 @@
   <title>JWF0019A 实机界面培训模拟</title>
   <meta name="description" content="依据真实JWF0019A运行界面、相机画面和触发记录制作的培训模拟。">
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./hmi.css?v=20260805g">
+  <link rel="stylesheet" href="./hmi.css?v=settings-sim-20260805">
 </head>
 <body>
   <header class="page-head">
@@ -29,7 +29,7 @@
       <header class="machine-header">
         <div class="scheme">当前方案: <b id="scheme-value">912</b></div>
         <div id="channel-status" class="channel-status"></div>
-        <button id="run-toggle" class="stop-button" type="button" aria-label="当前运行与报警状态" title="当前正在开车；点击该动作按钮应关车" disabled>关<br>车</button>
+        <button id="run-toggle" class="stop-button" type="button" aria-label="当前运行与报警状态" disabled hidden></button>
         <div class="machine-info">
           <strong id="machine-date"></strong>
           <span>灯管寿命　<b id="lamp-life">2483/30000</b></span>
@@ -89,57 +89,150 @@
         <div class="evidence-page-message" hidden><strong>该端点本页未取证</strong><span>不借用其他端点触发记录。</span></div>
       </section>
 
-      <aside id="account-failure-dialog" class="account-failure-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="account-failure-title">
-        <header><span>▦</span><b id="account-failure-title">登录失败</b><button id="account-failure-close" type="button" aria-label="关闭">×</button></header>
-        <div class="account-failure-body">
-          <strong aria-hidden="true">×</strong>
-          <p>无法登录系统!错误原因可能是:<br>1.账号密码不匹配!<br>数据库文件丢失!</p>
+      <aside id="account-training-dialog" class="account-failure-dialog account-training-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="account-training-title">
+        <header><span>▦</span><b id="account-training-title">账户登录（培训模拟）</b><button id="account-training-close" type="button" aria-label="关闭">×</button></header>
+        <div class="account-training-body">
+          <p class="account-safe-note">离线培训页面，不连接生产设备，不保存现场口令。</p>
+          <form id="account-login-form">
+            <label>账户角色
+              <select id="training-account" autocomplete="username">
+                <option value="admin">admin（管理员角色）</option>
+                <option value="jwfj">jwfj（参数角色）</option>
+              </select>
+            </label>
+            <label>培训口令
+              <input id="training-account-pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8">
+            </label>
+            <small>公开培训统一口令：0019</small>
+            <p id="account-login-feedback" class="account-feedback" aria-live="polite"></p>
+            <button type="submit">登录培训界面</button>
+          </form>
+          <section id="account-training-home" hidden>
+            <strong id="account-role-label"></strong>
+            <p>该角色仅用于认识实机界面；参数可在本页模拟调整，但不会写入设备。</p>
+            <button id="open-system-auth" type="button">进入系统设置</button>
+          </section>
+          <form id="system-auth-form" hidden>
+            <label>系统设置培训口令
+              <input id="system-training-pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8">
+            </label>
+            <small>公开培训统一口令：0019</small>
+            <p id="system-auth-feedback" class="account-feedback" aria-live="polite"></p>
+            <button type="submit">打开模拟系统设置</button>
+          </form>
         </div>
-        <footer><button id="account-failure-confirm" type="button"><span>✓</span> 确定</button></footer>
+        <footer><button id="account-training-cancel" type="button">关闭</button></footer>
       </aside>
 
       <section id="screen-settings" class="machine-screen settings-screen" hidden>
         <div class="settings-serial">
-          <span>选择串口：</span><button type="button" disabled>ttyS2</button><button type="button" disabled>关闭串口</button><button type="button" disabled>刷新串口</button>
-          <button class="settings-home" data-screen="main" type="button" aria-label="返回主界面">⬆</button>
+          <label for="serial-port-select">选择串口：</label>
+          <select id="serial-port-select" data-sim-control data-help="选择串口"><option>ttyS0</option><option>ttyS1</option><option selected>ttyS2</option></select>
+          <button id="serial-toggle" type="button" data-sim-control data-help="串口开关">关闭串口</button>
+          <button id="serial-refresh" type="button" data-sim-control data-help="刷新串口">刷新串口</button>
+          <span id="serial-status">离线模拟已连接</span>
+          <button id="orientation-toggle" class="orientation-toggle" type="button" data-sim-control data-help="安装方向">↑ 正装</button>
+          <button class="settings-return" data-screen="main" type="button" aria-label="返回主界面">返回主界面</button>
         </div>
         <div class="monitor-row">
-          <span data-monitor="flow">✓ 棉流监控</span><span data-monitor="brightness">✓ 灯管亮度监控</span><span data-monitor="channel">✓ 通道异常监控</span>
-          <span data-monitor="camera">✓ 相机异常监控</span><span data-monitor="temperature">✓ 高温报警监控</span><span data-monitor="camera485">✓ 相机485通讯监控</span>
+          <label data-monitor="flow" data-help="棉流监控"><input type="checkbox" data-sim-checkbox data-sim-control checked>棉流监控</label>
+          <label data-monitor="brightness" data-help="灯管亮度监控"><input type="checkbox" data-sim-checkbox data-sim-control checked>灯管亮度监控</label>
+          <label data-monitor="channel" data-help="通道异常监控"><input type="checkbox" data-sim-checkbox data-sim-control checked>通道异常监控</label>
+          <label data-monitor="camera" data-help="相机异常监控"><input type="checkbox" data-sim-checkbox data-sim-control checked>相机异常监控</label>
+          <label data-monitor="temperature" data-help="高温报警监控"><input type="checkbox" data-sim-checkbox data-sim-control checked>高温报警监控</label>
+          <label data-monitor="camera485" data-help="相机485通讯监控"><input type="checkbox" data-sim-checkbox data-sim-control checked>相机485通讯监控</label>
         </div>
         <div class="settings-head">
-          <button class="active" type="button" disabled>系统设置</button>
-          <button type="button" disabled>通道流速监测</button>
-          <span>取证：2026-05-15 · 端点3-2 · 只读</span>
+          <button class="active" type="button" data-settings-view="system">系统设置</button>
+          <button type="button" data-settings-view="flow">通道流速监测</button>
+          <span>依据：2026-05-15 · 端点3-2 · 离线模拟</span>
         </div>
         <div class="settings-grid">
-          <article class="system-parameters" aria-label="系统参数"><dl>
-            <div data-icon="n123"><dt>系统类型<small>0=窄幅，1=宽幅</small></dt><dd><span>1</span></dd></div><div data-icon="half"><dt>像素精度<small>单位毫米</small></dt><dd><span>0.15</span></dd></div>
-            <div data-icon="n123"><dt>亮度基准值<small>0-255</small></dt><dd><span>120</span></dd></div><div data-icon="n123"><dt>亮度范围阈值<small>1-200</small></dt><dd><span>20</span></dd></div>
-            <div data-icon="half"><dt>流速基准<small>当前流速的基准值</small></dt><dd><span>10.00</span></dd></div><div data-icon="half"><dt>范围阈值<small>流速正负波动范围</small></dt><dd><span>2.00</span></dd></div>
-            <div data-icon="n123"><dt>连续异常报警<small>连续异常报警次数</small></dt><dd><span>3</span></dd></div><div data-icon="half"><dt>高温报警<small>高温报警阈值</small></dt><dd><span>60.00</span></dd></div>
-          </dl></article>
-          <div class="settings-subtabs" aria-label="实机设置页签（只读）">
-            <button type="button" disabled>光源参数</button>
-            <button type="button" disabled>相机触发参数</button>
-            <button class="active" type="button" disabled>气阀参数</button>
-          </div>
-          <article class="valve-parameters" aria-label="气阀参数"><dl>
-            <div data-icon="n123"><dt>吹阀延迟<small>范围1-500</small></dt><dd><span>6</span></dd></div><div data-icon="n123"><dt>扩阀模式<small>0不扩阀，1左右扩一，2左右扩二</small></dt><dd><span>0</span></dd></div><div data-icon="n123"><dt>吹气时间<small>单位0.05ms</small></dt><dd><span>350</span></dd></div>
-            <div data-icon="n123"><dt>精灵吹阀延迟<small>范围1-500</small></dt><dd><span>16</span></dd></div><div data-icon="n123"><dt>精灵扩阀模式<small>0不扩阀，1左右扩一，2左右扩二</small></dt><dd><span>0</span></dd></div><div data-icon="n123"><dt>精灵吹气时间<small>单位0.05ms</small></dt><dd><span>300</span></dd></div>
-            <div data-icon="n123"><dt>开阀时间<small>单位0.05ms</small></dt><dd><span>220</span></dd></div><div data-icon="n123"><dt>停止充电时间<small>单位0.05ms</small></dt><dd><span>50</span></dd></div><div data-icon="n123"><dt>续充电时间<small>单位0.05ms</small></dt><dd><span>20</span></dd></div>
-          </dl></article>
-          <div class="valve-tabs" aria-label="气阀设置页签（只读）"><button class="active" type="button" disabled>吹阀设置</button><button type="button" disabled>测阀</button></div>
-          <div class="valve-options" aria-label="气阀保护与自动延迟参数（只读）">
-            <span>☑ 阀保护开关</span><label>吹阀保护次数/分钟 <output>400</output></label>
-            <span>☑ 自动延迟开关</span><label>吹阀距离 <output>300</output></label><label>自动延迟 <output>6</output></label>
-            <label>精灵吹阀距离 <output>580</output></label><label>精灵自动延迟 <output>17</output></label>
-          </div>
+          <section id="settings-system-view" class="settings-view" data-settings-panel="system">
+            <article class="system-parameters" aria-label="系统参数"><dl>
+              <div data-icon="n123" data-parameter="system-type" data-help="系统类型" data-min="0" data-max="1" data-step="1"><dt>系统类型<small>0=窄幅，1=宽幅</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="1" min="0" max="1" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="half" data-parameter="pixel-precision" data-help="像素精度" data-min="0.01" data-max="1" data-step="0.01"><dt>像素精度<small>单位毫米</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="0.15" min="0.01" max="1" step="0.01" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="brightness-base" data-help="亮度基准值" data-min="0" data-max="255" data-step="1"><dt>亮度基准值<small>0-255</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="120" min="0" max="255" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="brightness-range" data-help="亮度范围阈值" data-min="1" data-max="200" data-step="1"><dt>亮度范围阈值<small>1-200</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="20" min="1" max="200" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="half" data-parameter="flow-base" data-help="流速基准" data-min="0" data-max="30" data-step="0.1"><dt>流速基准<small>当前流速的基准值</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="10.00" min="0" max="30" step="0.1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="half" data-parameter="flow-range" data-help="范围阈值" data-min="0" data-max="10" data-step="0.1"><dt>范围阈值<small>流速正负波动范围</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="2.00" min="0" max="10" step="0.1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="continuous-alarm" data-help="连续异常报警" data-min="1" data-max="20" data-step="1"><dt>连续异常报警<small>连续异常报警次数</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="3" min="1" max="20" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="half" data-parameter="temperature-alarm" data-help="高温报警" data-min="30" data-max="100" data-step="1"><dt>高温报警<small>高温报警阈值℃</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="60.00" min="30" max="100" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+            </dl></article>
+
+            <div class="settings-subtabs" aria-label="系统设置页签">
+              <button type="button" data-settings-tab="light">光源参数</button>
+              <button type="button" data-settings-tab="camera">相机触发参数</button>
+              <button class="active" type="button" data-settings-tab="valve">气阀参数</button>
+            </div>
+
+            <article class="settings-parameter-panel light-parameters" data-settings-tab-panel="light" aria-label="光源参数" hidden><h2>光源参数 <small>说明书培训示例值</small></h2><dl>
+              <div data-icon="n123" data-parameter="light-delay-1" data-help="光源1延迟" data-min="0" data-max="2000" data-step="1"><dt>光源1延迟<small>说明书示例值</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="895" min="0" max="2000" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="light-delay-2" data-help="光源2延迟" data-min="0" data-max="2000" data-step="1"><dt>光源2延迟<small>说明书示例值</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="895" min="0" max="2000" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="light-delay-3" data-help="光源3延迟" data-min="0" data-max="2000" data-step="1"><dt>光源3延迟<small>说明书示例值</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="895" min="0" max="2000" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="light-delay-4" data-help="光源4延迟" data-min="0" data-max="2000" data-step="1"><dt>光源4延迟<small>说明书示例值</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="895" min="0" max="2000" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="light-width-1" data-help="光源1脉宽" data-min="1" data-max="500" data-step="1"><dt>光源1脉宽<small>说明书示例值</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="50" min="1" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="light-width-2" data-help="光源2脉宽" data-min="1" data-max="500" data-step="1"><dt>光源2脉宽<small>说明书示例值</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="50" min="1" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="light-width-3" data-help="光源3脉宽" data-min="1" data-max="500" data-step="1"><dt>光源3脉宽<small>说明书示例值</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="50" min="1" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="light-width-4" data-help="光源4脉宽" data-min="1" data-max="500" data-step="1"><dt>光源4脉宽<small>说明书示例值</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="50" min="1" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+            </dl></article>
+
+            <article class="settings-parameter-panel camera-parameters" data-settings-tab-panel="camera" aria-label="相机触发参数" hidden><h2>相机触发参数 <small>前、后视分组</small></h2><dl>
+              <div data-icon="n123" data-parameter="trigger-mode" data-help="触发模式" data-min="0" data-max="2" data-step="1"><dt>触发模式<small>说明书示例值</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="1" min="0" max="2" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="trigger-frequency" data-help="触发频率" data-min="1" data-max="1000" data-step="1"><dt>触发频率<small>说明书示例值</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="380" min="1" max="1000" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="front-delay-1-4" data-help="前视触发延迟1-4" data-min="-500" data-max="500" data-step="1"><dt>前视延迟1-4<small>前视1至4号相机</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="0" min="-500" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="rear-delay-1-4" data-help="后视触发延迟1-4" data-min="-500" data-max="500" data-step="1"><dt>后视延迟1-4<small>后视1至4号相机</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="0" min="-500" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="front-delay-5-8" data-help="前视触发延迟5-8" data-min="-500" data-max="500" data-step="1"><dt>前视延迟5-8<small>前视5至8号相机</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="0" min="-500" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="rear-delay-5-8" data-help="后视触发延迟5-8" data-min="-500" data-max="500" data-step="1"><dt>后视延迟5-8<small>后视5至8号相机</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="0" min="-500" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+              <div data-icon="n123" data-parameter="side-camera-delay" data-help="侧方相机触发补偿" data-min="-500" data-max="500" data-step="1"><dt>侧方相机触发补偿<small>培训占位，待现场确认</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="0" min="-500" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+            </dl></article>
+
+            <section class="settings-parameter-panel valve-panel" data-settings-tab-panel="valve">
+              <div class="valve-tabs" aria-label="气阀设置页签"><button class="active" type="button" data-valve-tab="settings">吹阀设置</button><button type="button" data-valve-tab="test">测阀</button></div>
+              <div data-valve-panel="settings">
+                <article class="valve-parameters" aria-label="气阀参数"><dl>
+                  <div data-icon="n123" data-parameter="valve-delay" data-help="吹阀延迟" data-min="1" data-max="500" data-step="1"><dt>吹阀延迟<small>范围1-500</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="6" min="1" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+                  <div data-icon="n123" data-parameter="valve-expand" data-help="扩阀模式" data-min="0" data-max="2" data-step="1"><dt>扩阀模式<small>0不扩阀，1左右扩一，2左右扩二</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="0" min="0" max="2" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+                  <div data-icon="n123" data-parameter="valve-blow-time" data-help="吹气时间" data-min="1" data-max="1000" data-step="1"><dt>吹气时间<small>单位0.05ms</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="350" min="1" max="1000" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+                  <div data-icon="n123" data-parameter="spirit-valve-delay" data-help="精灵吹阀延迟" data-min="1" data-max="500" data-step="1"><dt>精灵吹阀延迟<small>范围1-500</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="16" min="1" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+                  <div data-icon="n123" data-parameter="spirit-valve-expand" data-help="精灵扩阀模式" data-min="0" data-max="2" data-step="1"><dt>精灵扩阀模式<small>0不扩阀，1左右扩一，2左右扩二</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="0" min="0" max="2" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+                  <div data-icon="n123" data-parameter="spirit-blow-time" data-help="精灵吹气时间" data-min="1" data-max="1000" data-step="1"><dt>精灵吹气时间<small>单位0.05ms</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="300" min="1" max="1000" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+                  <div data-icon="n123" data-parameter="valve-open-time" data-help="开阀时间" data-min="1" data-max="1000" data-step="1"><dt>开阀时间<small>单位0.05ms</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="220" min="1" max="1000" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+                  <div data-icon="n123" data-parameter="charge-stop" data-help="停止充电时间" data-min="0" data-max="500" data-step="1"><dt>停止充电时间<small>单位0.05ms</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="50" min="0" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+                  <div data-icon="n123" data-parameter="charge-continue" data-help="续充电时间" data-min="0" data-max="500" data-step="1"><dt>续充电时间<small>单位0.05ms</small></dt><dd><button type="button" data-delta="-1">−</button><input type="number" value="20" min="0" max="500" step="1" data-sim-control><button type="button" data-delta="1">+</button></dd></div>
+                </dl></article>
+                <div class="valve-options" aria-label="气阀保护与自动延迟模拟参数">
+                  <label data-help="阀保护开关"><input type="checkbox" data-sim-checkbox data-sim-control checked>阀保护开关</label>
+                  <label data-help="吹阀保护次数/分钟">吹阀保护次数/分钟 <input type="number" value="400" min="1" max="2000" step="1" data-sim-control></label>
+                  <label data-help="自动延迟开关"><input type="checkbox" data-sim-checkbox data-sim-control checked>自动延迟开关</label>
+                  <label data-help="吹阀距离">吹阀距离 <input type="number" value="300" min="0" max="2000" step="1" data-sim-control></label>
+                  <label data-help="自动延迟">自动延迟 <input type="number" value="6" min="0" max="500" step="1" data-sim-control></label>
+                  <label data-help="精灵吹阀距离">精灵吹阀距离 <input type="number" value="580" min="0" max="2000" step="1" data-sim-control></label>
+                  <label data-help="精灵自动延迟">精灵自动延迟 <input type="number" value="17" min="0" max="500" step="1" data-sim-control></label>
+                </div>
+              </div>
+              <div class="valve-test-panel" data-valve-panel="test" hidden>
+                <div class="valve-test-toolbar"><label data-help="自动测阀"><input id="auto-valve-test" type="checkbox" data-sim-checkbox data-sim-control>自动测试1—32号电磁阀</label><span id="valve-test-status">请选择阀号进行离线模拟</span></div>
+                <div id="valve-test-grid" class="valve-test-grid" aria-label="1至32号电磁阀模拟测试"></div>
+              </div>
+            </section>
+          </section>
+
+          <section id="settings-flow-view" class="settings-view flow-monitor-view" data-settings-panel="flow" hidden>
+            <header><div><h2>通道流速监测</h2><p>32个阀位对应的流速训练值；修改只保留在本页。</p></div><button id="flow-reset" type="button" data-sim-control>恢复模拟基准</button></header>
+            <div id="flow-channel-grid" class="flow-channel-grid" aria-label="32通道流速模拟值"></div>
+            <p class="unverified-note">侧方相机的独立流速或触发口径尚无完整实机取证，培训页不替厂家定义。</p>
+          </section>
+
+          <aside id="parameter-help" class="parameter-help" aria-live="polite">
+            <b id="parameter-help-title">参数说明</b>
+            <p id="parameter-help-text">点击任一参数、开关、串口或阀号，查看它在检测与报警中的作用。</p>
+          </aside>
         </div>
-        <footer class="settings-bottom-nav" aria-label="现行版底部导航（只读）">
+        <footer class="settings-bottom-nav" aria-label="现行版底部导航">
           <button type="button" disabled><span>▦</span><b>账户</b></button><button type="button" disabled><span>▣</span><b>保存方案</b></button><button type="button" disabled><span>AI</span><b>AI模型</b></button>
           <button type="button" disabled><span>⌬</span><b>自学习</b></button><button type="button" disabled><span>▦</span><b>图像采集</b></button>
-          <button type="button" disabled><span>▣</span><b>主界面</b></button><button class="active" type="button" disabled><span>⌁</span><b>系统设置</b></button>
+          <button type="button" data-screen="main"><span>▣</span><b>主界面</b></button><button class="active" type="button" disabled><span>⌁</span><b>系统设置</b></button>
           <button type="button" disabled><span>⌁</span><b>统计</b></button><button type="button" disabled><span>▦</span><b>触发图像</b></button>
         </footer>
         <div class="evidence-page-message" hidden><strong>该端点本页未取证</strong><span>设置参数不从其他端点补齐。</span></div>
@@ -198,24 +291,24 @@
 
       <div id="scenario-list" class="scenario-list">
         <button class="active" data-scenario="normal">正常运行</button>
-        <button data-scenario="high-spray">局部喷次升高</button>
-        <button data-scenario="hang-small">玻璃下缘挂花 1cm</button>
-        <button data-scenario="hang-large">玻璃下缘脏花 10cm</button>
-        <button data-scenario="blockage">通道局部堵花 30cm</button>
-        <button data-scenario="duct-blockage">排杂风道局部堵塞</button>
-        <button data-scenario="flow-abnormal">流速异常</button>
-        <button data-scenario="camera-fault">单相机不刷新</button>
-        <button data-scenario="channel-fault">通道通讯故障</button>
-        <button data-scenario="screen-freeze">上位机画面卡住</button>
-        <button data-scenario="recognized-no-eject">识别后未喷出</button>
-        <button data-scenario="temperature">算力通道高温</button>
-        <button data-scenario="lamp-brightness">灯管亮度异常</button>
-        <button data-scenario="air-pressure-low">气源压力不足</button>
-        <button data-scenario="waste-bag-full">废料满袋</button>
-        <button data-scenario="fan-overload">风机热过载</button>
-        <button data-scenario="valve-long-blow">电磁阀长喷／漏气</button>
-        <button data-scenario="valve-weak-blow">电磁阀弱喷</button>
-        <button data-scenario="camera-485">相机485通讯异常</button>
+        <button data-scenario="hang-large">挂花</button>
+        <button data-scenario="flow-abnormal">棉流监控</button>
+        <button data-scenario="lamp-brightness">灯管亮度监控</button>
+        <button data-scenario="channel-fault">通道异常监控</button>
+        <button data-scenario="camera-fault">相机异常监控</button>
+        <button data-scenario="temperature">高温报警监控</button>
+        <button data-scenario="camera-485">相机485通讯监控</button>
+        <button data-scenario="high-spray" hidden>局部喷次升高</button>
+        <button data-scenario="hang-small" hidden>玻璃下缘挂花 1cm</button>
+        <button data-scenario="blockage" hidden>通道局部堵花 30cm</button>
+        <button data-scenario="duct-blockage" hidden>排杂风道局部堵塞</button>
+        <button data-scenario="screen-freeze" hidden>上位机画面卡住</button>
+        <button data-scenario="recognized-no-eject" hidden>识别后未喷出</button>
+        <button data-scenario="air-pressure-low" hidden>气源压力不足</button>
+        <button data-scenario="waste-bag-full" hidden>废料满袋</button>
+        <button data-scenario="fan-overload" hidden>风机热过载</button>
+        <button data-scenario="valve-long-blow" hidden>电磁阀长喷／漏气</button>
+        <button data-scenario="valve-weak-blow" hidden>电磁阀弱喷</button>
       </div>
 
       <button class="read-settings" data-screen="settings" type="button" title="来源：2026-05-15端点3-2只读截图；不代表训练合成机台或2026-08-02其他端点当时参数">查看系统参数快照（2026-05-15 端点3-2，只读）</button>
@@ -258,6 +351,6 @@
     </aside>
   </main>
 
-  <script src="./hmi.js?v=20260805g"></script>
+  <script src="./hmi.js?v=settings-sim-20260805"></script>
 </body>
 </html>

@@ -130,6 +130,17 @@ h1 { margin: 0; color: var(--ink); font-size: 22px; line-height: 1.2; }
   box-shadow: 0 12px 26px rgba(47,101,57,.18);
 }
 .primary-demo-button:hover { border-color: #244f2d; background: #244f2d; }
+.demo-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 13px; }
+.demo-buttons .primary-demo-button { margin-top: 0; }
+.fault-demo-button {
+  padding: 9px 8px;
+  border-color: #d6b88c;
+  background: #fff8ed;
+  color: #7b5a2f;
+  font-weight: 700;
+}
+.fault-demo-button:hover,
+.fault-demo-button.active { border-color: #c28c45; background: #f6e2c3; color: #684418; }
 .platform-switch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 11px; }
 .platform-switch a {
   padding: 8px 10px;
@@ -166,6 +177,21 @@ h2 { margin: 0 0 8px; color: var(--ink); font-size: 13px; }
 .process-speed > span { flex: 0 0 auto; }
 .speed-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; flex: 1; }
 .speed-options button { padding: 6px 4px; font-size: 12px; }
+.fault-controls { background: rgba(255,248,237,.52); }
+.fault-controls .range-head output { color: #9b6728; }
+.fault-type-options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 8px 0 7px; }
+.fault-type-options button { padding: 7px 4px; font-size: 11px; }
+.fault-type-options button.active { border-color: #c28c45; background: #f6e2c3; color: #684418; }
+.fault-attach-controls { margin-top: 4px; }
+.fault-attach-options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 5px 0 3px; }
+.fault-attach-options button { padding: 6px 4px; font-size: 10px; }
+.fault-attach-options button.active { border-color: #c28c45; background: #f6e2c3; color: #684418; }
+.fault-attach-controls.disabled { opacity: .38; pointer-events: none; }
+.fault-range-label { display: flex; justify-content: space-between; padding: 4px 1px 0; font-size: 11px; }
+.fault-range-label output { color: #7b5a2f; }
+.fault-range { margin: 6px 0 2px; }
+.fault-range:disabled { opacity: .36; }
+.fault-help { margin: 7px 0 0; color: #826a4d; font-size: 10px; line-height: 1.5; }
 button {
   padding: 6px 5px;
   border: 1px solid var(--line);

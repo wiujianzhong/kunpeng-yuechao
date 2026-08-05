@@ -15,7 +15,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xe8eee8);
-scene.fog = new THREE.Fog(0xe8eee8, 8, 15);
+scene.fog = new THREE.Fog(0xe8eee8, 12, 26);
 
 const camera = new THREE.OrthographicCamera(-2.5, 2.5, 2.5, -2.5, 0.1, 100);
 camera.position.set(0, 1.85, 7.2);
@@ -26,7 +26,7 @@ controls.target.set(0.1, 1.7, 0);
 controls.enableDamping = true;
 controls.minDistance = 3.4;
 controls.maxDistance = 11;
-controls.minZoom = 0.62;
+controls.minZoom = 0.36;
 controls.maxZoom = 2.8;
 
 scene.add(new THREE.HemisphereLight(0xe5f4fb, 0x29312d, 2.15));
@@ -34,17 +34,17 @@ const keyLight = new THREE.DirectionalLight(0xffffff, 3.4);
 keyLight.position.set(4.5, 7, 5.5);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(2048, 2048);
-keyLight.shadow.camera.left = -5;
-keyLight.shadow.camera.right = 5;
-keyLight.shadow.camera.top = 5;
-keyLight.shadow.camera.bottom = -5;
+keyLight.shadow.camera.left = -8;
+keyLight.shadow.camera.right = 8;
+keyLight.shadow.camera.top = 7;
+keyLight.shadow.camera.bottom = -7;
 scene.add(keyLight);
 const rimLight = new THREE.DirectionalLight(0x9cc8df, 1.25);
 rimLight.position.set(-4, 4, -5);
 scene.add(rimLight);
 
 const floor = new THREE.Mesh(
-  new THREE.CircleGeometry(5.5, 96),
+  new THREE.CircleGeometry(7.5, 96),
   new THREE.MeshStandardMaterial({ color: 0xd9e1da, roughness: 0.94 })
 );
 floor.rotation.x = -Math.PI / 2;
@@ -292,6 +292,57 @@ function sweptWideDuctGeometry(points, width, thickness, segments = 40, normalOf
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
   return geometry;
+}
+
+function tubeBetweenPoints(parent, points, radius, material, name, detail, tubularSegments = 48) {
+  const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
+  const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, tubularSegments, radius, 18, false), material);
+  registerMesh(mesh, name, detail, 'shell');
+  parent.add(mesh);
+  return { mesh, curve };
+}
+
+function rectanglePerimeterPoint(width, height, progress) {
+  const perimeter = 2 * (width + height);
+  let distance = ((progress % 1) + 1) % 1 * perimeter;
+  if (distance <= width) return new THREE.Vector2(-width / 2 + distance, -height / 2);
+  distance -= width;
+  if (distance <= height) return new THREE.Vector2(width / 2, -height / 2 + distance);
+  distance -= height;
+  if (distance <= width) return new THREE.Vector2(width / 2 - distance, height / 2);
+  distance -= width;
+  return new THREE.Vector2(-width / 2, height / 2 - distance);
+}
+
+function rectToRoundTransition(parent, start, end, width, height, diameter, material, name, detail) {
+  const sectionCount = 32;
+  const positions = [];
+  const indices = [];
+  for (let index = 0; index < sectionCount; index += 1) {
+    const progress = index / sectionCount;
+    const rectangle = rectanglePerimeterPoint(width, height, progress);
+    const angle = progress * Math.PI * 2 - Math.PI / 2;
+    positions.push(rectangle.x, rectangle.y, 0);
+    positions.push(Math.cos(angle) * diameter / 2, Math.sin(angle) * diameter / 2, start.distanceTo(end));
+  }
+  for (let index = 0; index < sectionCount; index += 1) {
+    const next = (index + 1) % sectionCount;
+    const a = index * 2;
+    const b = next * 2;
+    const c = next * 2 + 1;
+    const d = index * 2 + 1;
+    indices.push(a, b, c, a, c, d);
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.copy(start);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), end.clone().sub(start).normalize());
+  registerMesh(mesh, name, detail, 'shell');
+  parent.add(mesh);
+  return mesh;
 }
 
 function voluteGeometry(length) {
@@ -2240,6 +2291,7 @@ function selectCalibrationPart(id) {
 }
 
 function setCalibrationEnabled(enabled) {
+  if (enabled && faultDemoPlaying) setFaultDemo(false);
   calibrationEnabled = enabled;
   updateCalibrationPartVisibility(enabled ? 'all' : 'external');
   calibrationModeButton.classList.toggle('active', enabled);
@@ -2267,7 +2319,10 @@ function setCalibrationEnabled(enabled) {
   updateCalibrationFields();
 }
 
-calibrationModeButton.addEventListener('click', () => setCalibrationEnabled(!calibrationEnabled));
+calibrationModeButton.addEventListener('click', () => {
+  if (!calibrationEnabled && lineLayoutEnabled) setLineLayoutEnabled(false);
+  setCalibrationEnabled(!calibrationEnabled);
+});
 calibrationPartSelect.addEventListener('change', () => selectCalibrationPart(calibrationPartSelect.value));
 calibrationTransformButtons.forEach((button) => {
   button.addEventListener('click', () => {
@@ -2612,9 +2667,27 @@ cottonFlow.visible = false;
 machine.add(cottonFlow);
 const processStatus = document.querySelector('#process-status');
 const processPlay = document.querySelector('#process-play');
+const faultPlay = document.querySelector('#fault-play');
+const faultXInput = document.querySelector('#fault-x');
+const faultSizeInput = document.querySelector('#fault-size');
+const faultXValue = document.querySelector('#fault-x-value');
+const faultSizeValue = document.querySelector('#fault-size-value');
+const faultLevelOutput = document.querySelector('#fault-level');
+const faultHelp = document.querySelector('#fault-help');
+const faultAttachControls = document.querySelector('#fault-attach-controls');
+const faultSurfaceValue = document.querySelector('#fault-surface-value');
+const faultEdgeValue = document.querySelector('#fault-edge-value');
 let processDemoPlaying = false;
+let faultDemoPlaying = false;
 let processPlaybackRate = 1;
 let processTimelineMs = 0;
+const faultSettings = {
+  type: 'channel',
+  surface: 'front',
+  edge: 'lower',
+  xCm: 0,
+  sizeCm: 10
+};
 
 const processVoice = {
   intake: new Audio('./assets/audio/step-intake.mp3'),
@@ -2769,6 +2842,65 @@ impurityEvents.forEach((event, eventIndex) => {
   });
 });
 
+const faultObstructionMaterial = new THREE.MeshStandardMaterial({
+  color: 0xe6e0d2,
+  roughness: 1,
+  transparent: true,
+  opacity: 0.94
+});
+const faultObstructionShadowMaterial = new THREE.MeshStandardMaterial({
+  color: 0xb9b09d,
+  roughness: 1,
+  transparent: true,
+  opacity: 0.78
+});
+const faultObstruction = new THREE.Group();
+faultObstruction.name = '可调挂花与堵花';
+faultObstruction.visible = false;
+
+const channelBrushObstruction = new THREE.Group();
+channelBrushObstruction.name = '主通道毛笔头挂花';
+const brushProfile = [
+  { x: -0.25, y: 0.04, scale: 3.7 },
+  { x: 0.02, y: 0.08, scale: 4.1 },
+  { x: 0.25, y: 0.05, scale: 3.5 },
+  { x: -0.16, y: 0.32, scale: 3.2 },
+  { x: 0.13, y: 0.36, scale: 3.0 },
+  { x: -0.08, y: 0.58, scale: 2.5 },
+  { x: 0.07, y: 0.70, scale: 2.2 },
+  { x: 0.00, y: 0.88, scale: 1.55 }
+];
+brushProfile.forEach((profile, index) => {
+  const tuft = makeFluffyTuft(
+    1200 + index,
+    index % 3 === 0 ? faultObstructionShadowMaterial : faultObstructionMaterial
+  );
+  tuft.position.set(profile.x, profile.y, (index % 2 ? 0.04 : -0.025));
+  tuft.scale.setScalar(profile.scale);
+  channelBrushObstruction.add(tuft);
+});
+faultObstruction.add(channelBrushObstruction);
+
+const ductClumpObstruction = makeFluffyTuft(1650, faultObstructionMaterial);
+ductClumpObstruction.name = '排杂风道单团堵花';
+ductClumpObstruction.scale.set(6.3, 5.2, 5.8);
+faultObstruction.add(ductClumpObstruction);
+cottonFlow.add(faultObstruction);
+
+const faultImpurity = makeFluffyTuft(1701, redImpurityMaterial, true);
+faultImpurity.name = '堵花偏流演示异纤';
+faultImpurity.visible = false;
+
+const faultSprayCotton = Array.from({ length: 7 }, (_, index) => {
+  const tuft = makeFluffyTuft(1750 + index);
+  tuft.name = `故障演示喷出白棉${index + 1}`;
+  tuft.visible = false;
+  tuft.userData.routeDelay = index * 0.035;
+  tuft.userData.routeSide = (index - 3) * 0.014;
+  tuft.userData.baseScale = 0.72 + seededUnit(1800 + index) * 0.26;
+  return tuft;
+});
+
 const valvePulse = new THREE.Group();
 const valvePulseMaterial = new THREE.MeshStandardMaterial({
   color: 0xffffff,
@@ -2879,6 +3011,513 @@ function currentFlowCurve() {
   return new THREE.CatmullRomCurve3(points, false, 'centripetal');
 }
 
+// 正式JWF0019A主体按3.62米展示高度归一化；整线新增设备按厂家3200毫米标称高度同比例换算。
+const factoryDisplayScale = 3.62 / 3.20;
+const factoryMetric = (meters) => meters * factoryDisplayScale;
+
+const factoryLine = new THREE.Group();
+factoryLine.name = 'JWF1124C-JWF0019A-FA151开清棉整线';
+machine.add(factoryLine);
+
+const factoryPaint = new THREE.MeshStandardMaterial({ color: 0xd4dcda, roughness: 0.62, metalness: 0.16 });
+const factoryPanel = new THREE.MeshStandardMaterial({ color: 0xaeb9b7, roughness: 0.58, metalness: 0.22 });
+const factoryAccent = new THREE.MeshStandardMaterial({ color: 0x2d8091, roughness: 0.46, metalness: 0.16 });
+const factoryDuct = new THREE.MeshPhysicalMaterial({
+  color: 0xbed2d4,
+  transparent: true,
+  opacity: 0.46,
+  roughness: 0.28,
+  metalness: 0.42,
+  transmission: 0.12,
+  side: THREE.DoubleSide,
+  depthWrite: false
+});
+const factoryDuctEdge = new THREE.MeshStandardMaterial({ color: 0x879696, roughness: 0.34, metalness: 0.62 });
+
+function addPanelSeams(parent, width, height, z, count) {
+  for (let index = 1; index < count; index += 1) {
+    box(
+      parent,
+      [0.012, height, 0.016],
+      [-width / 2 + width * index / count, height / 2, z],
+      factoryPanel,
+      '',
+      '',
+      'shell'
+    );
+  }
+}
+
+function factoryLocalPoint(group, localPoint) {
+  return localPoint.clone().multiply(group.scale).applyEuler(group.rotation).add(group.position);
+}
+
+function buildJwf1124Outline() {
+  const group = new THREE.Group();
+  group.name = 'JWF1124C-160开棉机轮廓';
+  group.rotation.y = -Math.PI / 2;
+  group.scale.setScalar(factoryDisplayScale);
+  factoryLine.add(group);
+
+  roundedBox(group, [1.664, 1.42, 2.64], [0, 0.75, 0], factoryPaint, 'JWF1124C-160开棉机', '依据2015年经纬说明书建立的轮廓级外壳：机幅1600毫米、外壳宽1664毫米、总深2640毫米、总高2080毫米。', 0.055);
+  const leftRoof = roundedBox(group, [1.56, 0.055, 1.15], [0, 1.49, -0.60], factoryPanel, '', '', 0.018);
+  leftRoof.rotation.x = -THREE.MathUtils.degToRad(4.5);
+  const rightRoof = roundedBox(group, [1.56, 0.055, 1.15], [0, 1.49, 0.60], factoryPanel, '', '', 0.018);
+  rightRoof.rotation.x = THREE.MathUtils.degToRad(4.5);
+  roundedBox(group, [1.48, 0.44, 0.52], [0, 1.86, -0.54], factoryPanel, 'JWF1124C顶部出棉罩', '说明书附图所示顶部出棉罩，接口按Ø300毫米表达。', 0.045);
+  cylinder(group, 0.15, 0.28, [0.972, 1.74, -0.54], [0, 0, Math.PI / 2], factoryDuctEdge, 'JWF1124C Ø300出棉口', '说明书明确标注的Ø300毫米出棉接口。');
+  addPanelSeams(group, 1.664, 1.24, 1.249, 3);
+  for (let row = 0; row < 3; row += 1) {
+    for (let column = 0; column < 5; column += 1) {
+      box(group, [0.12, 0.018, 0.012], [-0.48 + column * 0.24, 0.25 + row * 0.08, 1.258], materials.dark, '', '', 'decal');
+    }
+  }
+  textPlate(group, 'JWF1124C-160 开棉机', 1.40, 0.20, [0, 1.13, 1.258], 46, '#3d4b49');
+  return {
+    group,
+    outletLocal: new THREE.Vector3(1.112, 1.74, -0.54),
+    outlet: new THREE.Vector3()
+  };
+}
+
+let relayFanRotor = null;
+
+function buildFa151Outline() {
+  const group = new THREE.Group();
+  group.name = 'FA151除微尘机轮廓';
+  group.scale.setScalar(factoryDisplayScale);
+  factoryLine.add(group);
+
+  roundedBox(group, [1.864, 2.55, 2.182], [0, 1.31, 0], factoryPaint, 'FA151除微尘机', '依据FA151说明书建立的轮廓级外壳：总宽1864毫米、总深2182毫米、总高2650毫米，进棉、出棉和排尘接口均为Ø300毫米。', 0.055);
+  roundedBox(group, [1.70, 0.10, 1.98], [0, 2.59, 0], factoryPanel, '', '', 0.025);
+  box(group, [1.70, 1.92, 0.018], [0, 1.66, 1.100], factoryAccent, 'FA151前检修罩', '除微尘机前侧检修罩轮廓。');
+  addPanelSeams(group, 1.70, 1.92, 1.112, 2);
+  cylinder(group, 0.15, 0.28, [0, 0.96, -1.231], [Math.PI / 2, 0, 0], factoryDuctEdge, 'FA151 Ø300进棉口', '说明书明确标注的Ø300毫米进棉接口；布置在整线后侧并与JWF0019A出棉方向同轴。');
+  cylinder(group, 0.15, 0.28, [1.072, 2.15, -0.35], [0, 0, Math.PI / 2], factoryDuctEdge, 'FA151 Ø300出棉口', '说明书明确标注的Ø300毫米出棉接口。');
+  const inletFanRing = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.024, 10, 36), factoryDuctEdge);
+  inletFanRing.position.set(0, 0.96, -1.376);
+  registerMesh(inletFanRing, 'FA151进棉风机入口', 'FA151内部进棉风机即本整线的接力风机，入口与JWF0019A的Ø300向下60度斜管同轴连接。', 'shell');
+  group.add(inletFanRing);
+  const inletFanMount = new THREE.Group();
+  inletFanMount.position.set(0, 0.96, -1.380);
+  group.add(inletFanMount);
+  relayFanRotor = new THREE.Group();
+  for (let index = 0; index < 7; index += 1) {
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.052, 0.17, 0.018), factoryAccent);
+    blade.position.set(Math.cos(index / 7 * Math.PI * 2) * 0.072, Math.sin(index / 7 * Math.PI * 2) * 0.072, 0);
+    blade.rotation.z = index / 7 * Math.PI * 2 + 0.28;
+    registerMesh(blade, '', '', 'internal', false);
+    relayFanRotor.add(blade);
+  }
+  inletFanMount.add(relayFanRotor);
+  const sideFan = new THREE.Group();
+  sideFan.position.set(0.42, 0.38, -1.17);
+  group.add(sideFan);
+  const fanShell = new THREE.Mesh(voluteGeometry(0.34), factoryPanel);
+  registerMesh(fanShell, 'FA151排尘风机轮廓', '说明书附图2、附图3所示外置风机总成；叶轮细节未作尺寸级复原。', 'shell');
+  sideFan.add(fanShell);
+  cylinder(sideFan, 0.13, 0.36, [0.46, 0, 0], [0, 0, Math.PI / 2], factoryAccent, 'FA151风机电机', '说明书所示外置风机电机包络。');
+  textPlate(group, 'FA151 除微尘机', 1.45, 0.20, [0, 2.18, 1.112], 50, '#ffffff');
+  textPlate(group, '进棉风机 = 接力风机', 1.35, 0.16, [0, 0.64, 1.112], 42, '#ffffff');
+  return {
+    group,
+    inletLocal: new THREE.Vector3(0, 0.96, -1.380),
+    outletLocal: new THREE.Vector3(1.212, 2.15, -0.35),
+    inlet: new THREE.Vector3(),
+    outlet: new THREE.Vector3()
+  };
+}
+
+const jwf1124Outline = buildJwf1124Outline();
+const fa151Outline = buildFa151Outline();
+const mainFlowCurve = currentFlowCurve();
+const mainInletPoint = mainFlowCurve.getPoint(0);
+const mainOutletPoint = mainFlowCurve.getPoint(1);
+const mainInletTangent = mainFlowCurve.getTangent(0).normalize();
+const mainOutletTangent = mainFlowCurve.getTangent(1).normalize();
+const upstreamHorizontal = new THREE.Vector3(mainInletTangent.x, 0, mainInletTangent.z).normalize();
+const downstreamHorizontal = new THREE.Vector3(mainOutletTangent.x, 0, mainOutletTangent.z).normalize();
+if (upstreamHorizontal.lengthSq() < 0.001) upstreamHorizontal.set(0, 0, 1);
+if (downstreamHorizontal.lengthSq() < 0.001) downstreamHorizontal.set(0, 0, 1);
+
+const factoryConnectionLayer = new THREE.Group();
+factoryConnectionLayer.name = '整线自动连接管路';
+factoryLine.add(factoryConnectionLayer);
+
+const factoryLayoutStorageKey = 'jwf0019a-factory-line-layout-v1';
+const lineLayoutParams = {
+  mainWidthMm: 1600,
+  ductDiameterMm: 300,
+  straightLengthMm: 1000,
+  slopeAngleDeg: 60
+};
+jwf1124Outline.group.userData.lineLayoutId = 'jwf1124';
+jwf1124Outline.group.userData.nominalDimensions = new THREE.Vector3(1.664, 2.080, 2.640);
+fa151Outline.group.userData.lineLayoutId = 'fa151';
+fa151Outline.group.userData.nominalDimensions = new THREE.Vector3(1.864, 2.650, 2.182);
+
+function factoryTransformSnapshot(group) {
+  return {
+    position: group.position.toArray().map((value) => Number(value.toFixed(5))),
+    rotationDegrees: [group.rotation.x, group.rotation.y, group.rotation.z]
+      .map((value) => Number(THREE.MathUtils.radToDeg(value).toFixed(3))),
+    scale: group.scale.toArray().map((value) => Number(value.toFixed(6)))
+  };
+}
+
+function applyFactoryTransform(group, data) {
+  if (!data) return;
+  if (Array.isArray(data.position)) group.position.fromArray(data.position);
+  if (Array.isArray(data.rotationDegrees)) {
+    group.rotation.set(...data.rotationDegrees.map(THREE.MathUtils.degToRad));
+  }
+  if (Array.isArray(data.scale)) group.scale.fromArray(data.scale);
+}
+
+function initialPlaceFactoryMachines() {
+  const mainRoundInletPoint = mainInletPoint.clone().addScaledVector(mainInletTangent, -factoryMetric(0.40));
+  const jwfOutletTarget = mainRoundInletPoint.clone().addScaledVector(upstreamHorizontal, -factoryMetric(0.50));
+  jwfOutletTarget.y = factoryMetric(1.74);
+  jwf1124Outline.group.position.set(0, 0, 0);
+  const jwfOutletOffset = factoryLocalPoint(jwf1124Outline.group, jwf1124Outline.outletLocal);
+  jwf1124Outline.group.position.copy(jwfOutletTarget).sub(jwfOutletOffset);
+
+  const downstreamTransitionEnd = mainOutletPoint.clone().addScaledVector(downstreamHorizontal, factoryMetric(0.58));
+  const downstreamStraightEnd = downstreamTransitionEnd.clone()
+    .addScaledVector(downstreamHorizontal, factoryMetric(lineLayoutParams.straightLengthMm / 1000));
+  const slopeRadians = THREE.MathUtils.degToRad(lineLayoutParams.slopeAngleDeg);
+  const downstreamSlopeDirection = downstreamHorizontal.clone()
+    .multiplyScalar(Math.cos(slopeRadians))
+    .add(new THREE.Vector3(0, -Math.sin(slopeRadians), 0))
+    .normalize();
+  fa151Outline.group.position.set(0, 0, 0);
+  const fa151InletOffset = factoryLocalPoint(fa151Outline.group, fa151Outline.inletLocal);
+  const downstreamSlopeLength = (downstreamStraightEnd.y - fa151InletOffset.y) / Math.sin(slopeRadians);
+  const relayFanInlet = downstreamStraightEnd.clone()
+    .add(downstreamSlopeDirection.multiplyScalar(downstreamSlopeLength));
+  fa151Outline.group.position.copy(relayFanInlet).sub(fa151InletOffset);
+}
+
+initialPlaceFactoryMachines();
+const factoryLayoutDefaults = {
+  jwf1124: factoryTransformSnapshot(jwf1124Outline.group),
+  fa151: factoryTransformSnapshot(fa151Outline.group),
+  params: { ...lineLayoutParams }
+};
+
+function restoreFactoryLineLayout() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(factoryLayoutStorageKey) || 'null');
+    if (!saved) return;
+    applyFactoryTransform(jwf1124Outline.group, saved.jwf1124);
+    applyFactoryTransform(fa151Outline.group, saved.fa151);
+    Object.keys(lineLayoutParams).forEach((key) => {
+      if (Number.isFinite(Number(saved.params?.[key]))) lineLayoutParams[key] = Number(saved.params[key]);
+    });
+  } catch (error) {
+    console.warn('整线布局恢复失败，已使用默认位置', error);
+  }
+}
+restoreFactoryLineLayout();
+
+let upstreamProcessCurve = null;
+let downstreamProcessCurve = null;
+let factoryLineAudit = null;
+
+function clearFactoryConnectionGeometry() {
+  factoryConnectionLayer.traverse((object) => {
+    const selectableIndex = selectable.indexOf(object);
+    if (selectableIndex >= 0) selectable.splice(selectableIndex, 1);
+    object.geometry?.dispose();
+    if (object.material && object.material !== factoryDuct && object.material !== factoryDuctEdge) {
+      object.material.map?.dispose();
+      object.material.dispose?.();
+    }
+  });
+  factoryConnectionLayer.clear();
+}
+
+function rebuildFactoryConnections(syncSlopeFromLayout = true) {
+  clearFactoryConnectionGeometry();
+  jwf1124Outline.outlet.copy(factoryLocalPoint(jwf1124Outline.group, jwf1124Outline.outletLocal));
+  fa151Outline.inlet.copy(factoryLocalPoint(fa151Outline.group, fa151Outline.inletLocal));
+  fa151Outline.outlet.copy(factoryLocalPoint(fa151Outline.group, fa151Outline.outletLocal));
+
+  const mainRoundInletPoint = mainInletPoint.clone().addScaledVector(mainInletTangent, -factoryMetric(0.40));
+  const jwfOutletDirection = new THREE.Vector3(1, 0, 0)
+    .applyEuler(jwf1124Outline.group.rotation)
+    .normalize();
+  const jwfToMainPoints = [
+    jwf1124Outline.outlet.clone(),
+    jwf1124Outline.outlet.clone().addScaledVector(jwfOutletDirection, factoryMetric(0.22)),
+    mainRoundInletPoint.clone().addScaledVector(mainInletTangent, -factoryMetric(0.08)),
+    mainRoundInletPoint
+  ];
+  const ductRadius = factoryMetric(lineLayoutParams.ductDiameterMm / 2000);
+  const ductDiameter = ductRadius * 2;
+  const mainWidth = factoryMetric(lineLayoutParams.mainWidthMm / 1000);
+  tubeBetweenPoints(factoryConnectionLayer, jwfToMainPoints, ductRadius, factoryDuct, 'JWF1124C至JWF0019A短进棉管', '设备移动或旋转后自动跟随两端接口。', 40);
+  rectToRoundTransition(factoryConnectionLayer, mainInletPoint, mainRoundInletPoint, mainWidth, factoryMetric(0.07), ductDiameter, factoryDuct, 'JWF0019A前端圆转宽扁过渡', '由可调圆管过渡到可调宽口。');
+
+  const downstreamTransitionEnd = mainOutletPoint.clone().addScaledVector(downstreamHorizontal, factoryMetric(0.58));
+  const downstreamStraightEnd = downstreamTransitionEnd.clone()
+    .addScaledVector(downstreamHorizontal, factoryMetric(lineLayoutParams.straightLengthMm / 1000));
+  const relayFanInlet = fa151Outline.inlet.clone();
+  rectToRoundTransition(factoryConnectionLayer, mainOutletPoint, downstreamTransitionEnd, mainWidth, factoryMetric(0.07), ductDiameter, factoryDuct, 'JWF0019A方变圆过渡', '宽口、圆管直径可在整线布局面板调整。');
+  tubeBetweenPoints(factoryConnectionLayer, [downstreamTransitionEnd, downstreamStraightEnd], ductRadius, factoryDuct, '可调Ø圆管直段', '直段长度可在整线布局面板调整。', 24);
+  tubeBetweenPoints(factoryConnectionLayer, [downstreamStraightEnd, relayFanInlet], ductRadius, factoryDuct, 'FA151接力风机连接斜管', 'FA151移动后自动连接到机内进棉风机口。', 44);
+
+  const downstreamSlopeVector = relayFanInlet.clone().sub(downstreamStraightEnd);
+  const actualSlopeDegrees = Number(THREE.MathUtils.radToDeg(Math.atan2(
+    Math.abs(downstreamSlopeVector.y),
+    Math.hypot(downstreamSlopeVector.x, downstreamSlopeVector.z)
+  )).toFixed(2));
+  if (syncSlopeFromLayout && Number.isFinite(actualSlopeDegrees)) {
+    lineLayoutParams.slopeAngleDeg = actualSlopeDegrees;
+  }
+  textPlate(factoryConnectionLayer, `Ø${Math.round(lineLayoutParams.ductDiameterMm)} · 直段${Math.round(lineLayoutParams.straightLengthMm)}mm`, 1.38, 0.18, [downstreamStraightEnd.x, mainOutletPoint.y + 0.26, (downstreamTransitionEnd.z + downstreamStraightEnd.z) / 2], 38, '#315c61');
+  textPlate(factoryConnectionLayer, `下倾${actualSlopeDegrees}° · 接FA151进棉风机`, 1.72, 0.18, [relayFanInlet.x, (downstreamStraightEnd.y + relayFanInlet.y) / 2 + 0.30, (downstreamStraightEnd.z + relayFanInlet.z) / 2], 36, '#315c61');
+
+  upstreamProcessCurve = new THREE.CatmullRomCurve3([
+    jwf1124Outline.outlet,
+    ...jwfToMainPoints.slice(1),
+    mainInletPoint
+  ], false, 'centripetal');
+  downstreamProcessCurve = new THREE.CatmullRomCurve3([
+    mainOutletPoint,
+    downstreamTransitionEnd,
+    downstreamStraightEnd,
+    relayFanInlet
+  ], false, 'centripetal');
+
+  factoryLineAudit = {
+    order: ['JWF1124C-160', 'JWF0019A', 'FA151'],
+    layoutAxis: 'JWF0019A固定；JWF1124与FA151可自由移动、旋转、缩放',
+    displayScale: Number(factoryDisplayScale.toFixed(6)),
+    nominalMachineDimensionsMm: {
+      jwf1124: [1664, 2640, 2080],
+      jwf0019a: [1500, 2500, 3200],
+      fa151: [1864, 2182, 2650]
+    },
+    mainOutletWidthMm: Math.round(lineLayoutParams.mainWidthMm),
+    roundDuctDiameterMm: Math.round(lineLayoutParams.ductDiameterMm),
+    straightLengthMm: Math.round(lineLayoutParams.straightLengthMm),
+    slopeDegrees: actualSlopeDegrees,
+    fa151InletGapMm: 0,
+    jwf0019InletDirection: mainInletTangent.toArray().map((value) => Number(value.toFixed(3))),
+    jwf0019OutletDirection: mainOutletTangent.toArray().map((value) => Number(value.toFixed(3))),
+    relayFanInlet: relayFanInlet.toArray().map((value) => Number(value.toFixed(3))),
+    fa151Inlet: fa151Outline.inlet.toArray().map((value) => Number(value.toFixed(3))),
+    relayFanIdentity: 'FA151内部进棉风机',
+    adjustable: true,
+    transforms: {
+      jwf1124: factoryTransformSnapshot(jwf1124Outline.group),
+      fa151: factoryTransformSnapshot(fa151Outline.group)
+    }
+  };
+  window.__factoryLineAudit = factoryLineAudit;
+  document.documentElement.dataset.factoryLineAudit = JSON.stringify(factoryLineAudit);
+}
+rebuildFactoryConnections(false);
+
+const upstreamCottonTufts = Array.from({ length: 34 }, (_, index) => {
+  const tuft = makeFluffyTuft(900 + index);
+  tuft.userData.lineOffset = index / 34;
+  tuft.userData.baseScale = 0.54 + seededUnit(950 + index) * 0.26;
+  return tuft;
+});
+const downstreamCottonTufts = Array.from({ length: 22 }, (_, index) => {
+  const tuft = makeFluffyTuft(1000 + index);
+  tuft.userData.lineOffset = index / 22;
+  tuft.userData.baseScale = 0.56 + seededUnit(1050 + index) * 0.24;
+  return tuft;
+});
+
+const lineLayoutModeButton = document.querySelector('#line-layout-mode');
+const lineLayoutStatus = document.querySelector('#line-layout-status');
+const lineLayoutPartSelect = document.querySelector('#line-layout-part');
+const lineLayoutTransformButtons = [...document.querySelectorAll('[data-line-transform]')];
+const lineLayoutAxisInputs = [...document.querySelectorAll('[data-line-axis]')];
+const lineLayoutDimensionInputs = [...document.querySelectorAll('[data-line-dimension]')];
+const lineLayoutPipeInputs = [...document.querySelectorAll('[data-line-pipe]')];
+const lineLayoutSave = document.querySelector('#line-layout-save');
+const lineLayoutExport = document.querySelector('#line-layout-export');
+const lineLayoutReset = document.querySelector('#line-layout-reset');
+const lineLayoutParts = new Map([
+  ['jwf1124', jwf1124Outline.group],
+  ['fa151', fa151Outline.group]
+]);
+let lineLayoutEnabled = false;
+let selectedLineLayoutPart = jwf1124Outline.group;
+let factoryRebuildFrame = 0;
+let factoryRebuildSyncSlope = true;
+
+const lineLayoutTransformControls = new TransformControls(camera, renderer.domElement);
+lineLayoutTransformControls.setSize(0.78);
+scene.add(lineLayoutTransformControls.getHelper());
+lineLayoutTransformControls.getHelper().visible = false;
+lineLayoutTransformControls.addEventListener('dragging-changed', (event) => {
+  controls.enabled = !event.value;
+});
+
+function updateLineLayoutFields() {
+  const group = selectedLineLayoutPart;
+  lineLayoutAxisInputs.forEach((input) => {
+    const axis = input.dataset.lineAxis;
+    if (axis === 'scale') input.value = (group.scale.x / factoryDisplayScale).toFixed(3);
+    else if (axis.startsWith('position.')) input.value = group.position[axis.split('.')[1]].toFixed(3);
+    else input.value = THREE.MathUtils.radToDeg(group.rotation[axis.split('.')[1]]).toFixed(1);
+  });
+  const nominal = group.userData.nominalDimensions;
+  lineLayoutDimensionInputs.forEach((input) => {
+    const axis = input.dataset.lineDimension;
+    input.value = (nominal[axis] * group.scale[axis] / factoryDisplayScale).toFixed(3);
+  });
+  lineLayoutPipeInputs.forEach((input) => {
+    const key = input.dataset.linePipe;
+    input.value = Number(lineLayoutParams[key]).toFixed(key === 'slopeAngleDeg' ? 1 : 0);
+  });
+}
+
+function scheduleFactoryConnectionRebuild(syncSlopeFromLayout = true) {
+  factoryRebuildSyncSlope = factoryRebuildSyncSlope && syncSlopeFromLayout;
+  if (factoryRebuildFrame) return;
+  factoryRebuildFrame = requestAnimationFrame(() => {
+    factoryRebuildFrame = 0;
+    rebuildFactoryConnections(factoryRebuildSyncSlope);
+    factoryRebuildSyncSlope = true;
+    updateLineLayoutFields();
+  });
+}
+
+function selectLineLayoutPart(id) {
+  selectedLineLayoutPart = lineLayoutParts.get(id) || jwf1124Outline.group;
+  lineLayoutPartSelect.value = selectedLineLayoutPart.userData.lineLayoutId;
+  if (lineLayoutEnabled) {
+    lineLayoutTransformControls.attach(selectedLineLayoutPart);
+    lineLayoutTransformControls.getHelper().visible = true;
+  }
+  updateLineLayoutFields();
+}
+
+function setLineLayoutEnabled(enabled) {
+  lineLayoutEnabled = enabled;
+  lineLayoutModeButton.classList.toggle('active', enabled);
+  lineLayoutModeButton.textContent = enabled ? '关闭整线布局调整' : '开启整线布局调整';
+  lineLayoutPartSelect.disabled = !enabled;
+  [...lineLayoutTransformButtons, ...lineLayoutAxisInputs, ...lineLayoutDimensionInputs, ...lineLayoutPipeInputs, lineLayoutSave, lineLayoutExport, lineLayoutReset]
+    .forEach((element) => { element.disabled = !enabled; });
+  if (enabled) {
+    if (calibrationEnabled) setCalibrationEnabled(false);
+    document.querySelector('[data-view="line"]')?.click();
+    selectLineLayoutPart(lineLayoutPartSelect.value);
+    lineLayoutStatus.textContent = '拖动三轴或输入数值，管路自动跟随';
+  } else {
+    lineLayoutTransformControls.detach();
+    lineLayoutTransformControls.getHelper().visible = false;
+    lineLayoutStatus.textContent = 'JWF0019A固定为基准';
+  }
+}
+
+function currentFactoryLayoutData() {
+  return {
+    version: 1,
+    coordinateSystem: { x: '左右', y: '上下', z: '前后' },
+    fixedReference: 'JWF0019A',
+    jwf1124: factoryTransformSnapshot(jwf1124Outline.group),
+    fa151: factoryTransformSnapshot(fa151Outline.group),
+    params: { ...lineLayoutParams }
+  };
+}
+
+function alignFa151ToSlopeAngle() {
+  const downstreamTransitionEnd = mainOutletPoint.clone().addScaledVector(downstreamHorizontal, factoryMetric(0.58));
+  const downstreamStraightEnd = downstreamTransitionEnd.clone()
+    .addScaledVector(downstreamHorizontal, factoryMetric(lineLayoutParams.straightLengthMm / 1000));
+  const currentInlet = factoryLocalPoint(fa151Outline.group, fa151Outline.inletLocal);
+  const angle = THREE.MathUtils.degToRad(THREE.MathUtils.clamp(lineLayoutParams.slopeAngleDeg, 5, 85));
+  const verticalDrop = Math.max(0.10, downstreamStraightEnd.y - currentInlet.y);
+  const slopeLength = verticalDrop / Math.sin(angle);
+  const desiredInlet = downstreamStraightEnd.clone()
+    .addScaledVector(downstreamHorizontal, Math.cos(angle) * slopeLength)
+    .add(new THREE.Vector3(0, -verticalDrop, 0));
+  fa151Outline.group.position.add(desiredInlet.sub(currentInlet));
+}
+
+lineLayoutModeButton.addEventListener('click', () => setLineLayoutEnabled(!lineLayoutEnabled));
+lineLayoutPartSelect.addEventListener('change', () => selectLineLayoutPart(lineLayoutPartSelect.value));
+lineLayoutTransformButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    lineLayoutTransformButtons.forEach((item) => item.classList.remove('active'));
+    button.classList.add('active');
+    lineLayoutTransformControls.setMode(button.dataset.lineTransform);
+  });
+});
+lineLayoutAxisInputs.forEach((input) => {
+  input.addEventListener('input', () => {
+    const value = Number(input.value);
+    if (!Number.isFinite(value)) return;
+    const axis = input.dataset.lineAxis;
+    if (axis === 'scale') {
+      selectedLineLayoutPart.scale.setScalar(Math.max(0.05, value) * factoryDisplayScale);
+    } else if (axis.startsWith('position.')) {
+      selectedLineLayoutPart.position[axis.split('.')[1]] = value;
+    } else {
+      selectedLineLayoutPart.rotation[axis.split('.')[1]] = THREE.MathUtils.degToRad(value);
+    }
+    scheduleFactoryConnectionRebuild(true);
+  });
+});
+lineLayoutDimensionInputs.forEach((input) => {
+  input.addEventListener('input', () => {
+    const value = Number(input.value);
+    if (!Number.isFinite(value) || value <= 0) return;
+    const axis = input.dataset.lineDimension;
+    const nominal = selectedLineLayoutPart.userData.nominalDimensions[axis];
+    selectedLineLayoutPart.scale[axis] = value / nominal * factoryDisplayScale;
+    scheduleFactoryConnectionRebuild(true);
+  });
+});
+lineLayoutPipeInputs.forEach((input) => {
+  input.addEventListener('input', () => {
+    const value = Number(input.value);
+    if (!Number.isFinite(value)) return;
+    const key = input.dataset.linePipe;
+    lineLayoutParams[key] = value;
+    if (key === 'slopeAngleDeg') {
+      alignFa151ToSlopeAngle();
+      scheduleFactoryConnectionRebuild(false);
+    } else {
+      scheduleFactoryConnectionRebuild(true);
+    }
+  });
+});
+lineLayoutTransformControls.addEventListener('objectChange', () => {
+  scheduleFactoryConnectionRebuild(true);
+});
+lineLayoutSave.addEventListener('click', () => {
+  localStorage.setItem(factoryLayoutStorageKey, JSON.stringify(currentFactoryLayoutData()));
+  lineLayoutStatus.textContent = '布局已保存到本机';
+});
+lineLayoutExport.addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(currentFactoryLayoutData(), null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = 'JWF1124-JWF0019A-FA151-整线布局.json';
+  anchor.click();
+  URL.revokeObjectURL(url);
+  lineLayoutStatus.textContent = '布局JSON已导出';
+});
+lineLayoutReset.addEventListener('click', () => {
+  const id = selectedLineLayoutPart.userData.lineLayoutId;
+  applyFactoryTransform(selectedLineLayoutPart, factoryLayoutDefaults[id]);
+  scheduleFactoryConnectionRebuild(true);
+  lineLayoutStatus.textContent = `${id === 'jwf1124' ? 'JWF1124' : 'FA151'}已复位`;
+});
+selectLineLayoutPart('jwf1124');
+factoryLine.visible = false;
+
 function flowChannelWallPoint(part, progress, side = 'rear') {
   const dimensions = part.userData.config.dimensions;
   const localCurve = new THREE.CatmullRomCurve3(flowChannelPathPoints(dimensions), false, 'centripetal');
@@ -2894,6 +3533,96 @@ function lanePoint(curve, progress, lane, width) {
   const point = curve.getPoint(THREE.MathUtils.clamp(progress, 0, 1));
   point.x += lane * width * 0.5;
   return point;
+}
+
+function channelFaultLevel(sizeCm = faultSettings.sizeCm) {
+  if (sizeCm <= 2) {
+    return { label: '基本不影响', driftMeters: 0.002, reachMeters: 0.018, clearanceMeters: 0.002, influenceAfter: 0.09 };
+  }
+  if (sizeCm <= 5) {
+    return { label: '轻度', driftMeters: 0.025, reachMeters: 0.055, clearanceMeters: 0.010, influenceAfter: 0.12 };
+  }
+  if (sizeCm <= 10) {
+    return { label: '中度', driftMeters: 0.065, reachMeters: 0.11, clearanceMeters: 0.020, influenceAfter: 0.16 };
+  }
+  return { label: '重度', driftMeters: 0.135, reachMeters: 0.16, clearanceMeters: 0.035, influenceAfter: 0.22 };
+}
+
+function faultField(width) {
+  const centerLane = THREE.MathUtils.clamp((faultSettings.xCm / 100) / Math.max(width * 0.5, 0.01), -0.86, 0.86);
+  const sizeMeters = faultSettings.sizeCm / 100;
+  if (faultSettings.type === 'duct') {
+    return {
+      centerLane,
+      sizeMeters,
+      progress: 0.69,
+      driftMeters: 0.285,
+      reachMeters: 0.18,
+      clearanceMeters: 0.045,
+      influenceBefore: 0.24,
+      influenceAfter: 0.40,
+      label: '局部严重'
+    };
+  }
+  const level = channelFaultLevel();
+  return {
+    centerLane,
+    sizeMeters,
+    progress: faultSettings.edge === 'upper' ? 0.335 : 0.265,
+    driftMeters: level.driftMeters,
+    reachMeters: level.reachMeters,
+    clearanceMeters: level.clearanceMeters,
+    influenceBefore: 0.075,
+    influenceAfter: level.influenceAfter,
+    label: level.label
+  };
+}
+
+function faultLaneOffset(lane, progress, width, seed = 0) {
+  const field = faultField(width);
+  const delta = progress - field.progress;
+  if (delta < -field.influenceBefore || delta > field.influenceAfter) return 0;
+  const envelope = delta <= 0
+    ? THREE.MathUtils.smoothstep(delta, -field.influenceBefore, 0)
+    : 1 - THREE.MathUtils.smoothstep(delta, 0, field.influenceAfter);
+  const lateralMeters = Math.abs(lane - field.centerLane) * width * 0.5;
+  const radius = field.sizeMeters * 0.5;
+  const reach = radius + field.reachMeters;
+  if (lateralMeters >= reach) return 0;
+  const lateralFalloff = 1 - THREE.MathUtils.smoothstep(lateralMeters, radius * 0.55, reach);
+  const clearancePush = Math.max(0, radius + field.clearanceMeters - lateralMeters);
+  let direction = Math.sign(lane - field.centerLane);
+  if (!direction) direction = seededUnit(seed + 177) > 0.5 ? 1 : -1;
+  const offsetMeters = direction * (clearancePush + field.driftMeters * lateralFalloff) * envelope;
+  return offsetMeters / Math.max(width * 0.5, 0.01);
+}
+
+function faultAffectedLane(lane, progress, width, seed = 0) {
+  return THREE.MathUtils.clamp(lane + faultLaneOffset(lane, progress, width, seed), -0.96, 0.96);
+}
+
+function updateFaultObstruction(curve, width) {
+  const field = faultField(width);
+  const channelPart = calibrationParts.get('flow-channel-1');
+  const isDuct = faultSettings.type === 'duct';
+  const position = isDuct
+    ? valvePosition(field.centerLane).position.add(new THREE.Vector3(0, -0.10, 0.10))
+    : flowChannelWallPoint(channelPart, field.progress, faultSettings.surface);
+  if (!isDuct) position.x += field.centerLane * width * 0.5;
+  faultObstruction.position.copy(position);
+  channelBrushObstruction.visible = !isDuct;
+  ductClumpObstruction.visible = isDuct;
+  if (isDuct) {
+    faultObstruction.quaternion.identity();
+    faultObstruction.rotation.z = -0.08;
+    faultObstruction.scale.set(field.sizeMeters, field.sizeMeters * 0.82, field.sizeMeters * 0.72);
+  } else {
+    const tangent = curve.getTangent(field.progress).normalize();
+    faultObstruction.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
+    const visualSize = Math.max(field.sizeMeters, 0.022);
+    faultObstruction.scale.set(visualSize, visualSize * 2.35, visualSize * 0.72);
+  }
+  faultObstruction.visible = faultDemoPlaying;
 }
 
 function cameraLensPoint(row, index, count, direction) {
@@ -3159,23 +3888,178 @@ function updateProcessStatus(text) {
   processStatus.textContent = text;
 }
 
+function hideNormalImpurityEvents() {
+  impurityEvents.forEach((event) => {
+    event.tuft.visible = false;
+    event.sprayCotton.forEach((tuft) => { tuft.visible = false; });
+  });
+}
+
+function hideFaultSprayCotton() {
+  faultSprayCotton.forEach((tuft) => { tuft.visible = false; });
+}
+
+function updateFaultSprayCotton(routePoints, progress) {
+  faultSprayCotton.forEach((tuft) => {
+    const delayed = progress - tuft.userData.routeDelay;
+    if (delayed <= 0 || delayed >= 1) {
+      tuft.visible = false;
+      return;
+    }
+    const routeProgress = delayed / (1 - tuft.userData.routeDelay);
+    tuft.visible = true;
+    tuft.position.copy(pointAlongRoute(routePoints, routeProgress));
+    tuft.position.z += tuft.userData.routeSide;
+    const fade = Math.min(routeProgress / 0.08, (1 - routeProgress) / 0.12, 1);
+    tuft.scale.setScalar(tuft.userData.baseScale * Math.max(0.04, fade));
+    tuft.rotation.y += 0.024;
+    tuft.rotation.z += 0.016;
+  });
+}
+
+function updateFaultProcess(time, curve, width) {
+  hideNormalImpurityEvents();
+  hideFaultSprayCotton();
+  updateFaultObstruction(curve, width);
+  valvePulse.visible = false;
+  airJet.visible = false;
+  setValveRowActive(true);
+
+  const field = faultField(width);
+  const cycleDuration = 7.0;
+  const cycleProgress = ((time / 1000) % cycleDuration) / cycleDuration;
+  const sourceLane = THREE.MathUtils.clamp(
+    field.centerLane + (field.centerLane > 0.72 ? -0.018 : 0.018),
+    -0.90,
+    0.90
+  );
+  const detectionProgress = 0.30;
+  const detectedLane = faultAffectedLane(sourceLane, detectionProgress, width, 1901);
+  const valve = valvePosition(detectedLane);
+  const valveChannelProgress = closestProgressOnFlowCurve(
+    curve,
+    valve.position,
+    detectedLane,
+    width,
+    detectionProgress,
+    0.95
+  );
+  const preBlowChannelProgress = Math.max(
+    detectionProgress + 0.01,
+    progressBeforeFlowDistance(curve, valveChannelProgress, 0.05)
+  );
+  const actualLaneAtValve = faultAffectedLane(sourceLane, valveChannelProgress, width, 1901);
+  const actualValveIndex = valvePosition(actualLaneAtValve).index;
+  const missCm = Math.round(Math.abs(actualLaneAtValve - detectedLane) * width * 50);
+  const hasMeaningfulDrift = faultSettings.type === 'duct' || faultSettings.sizeCm > 2;
+  const detectorIndex = cameraIndexForLane(detectedLane, 8);
+  const channelProgress = THREE.MathUtils.lerp(0.04, 0.995, cycleProgress);
+  const cameraFlash = THREE.MathUtils.smoothstep(channelProgress, 0.285, 0.30)
+    * (1 - THREE.MathUtils.smoothstep(channelProgress, 0.315, 0.335));
+  setOpticalPathState('process', {
+    type: 'front',
+    index: detectorIndex,
+    strength: cameraFlash
+  });
+
+  const preBlowCycle = THREE.MathUtils.clamp((preBlowChannelProgress - 0.04) / 0.955, 0, 1);
+  const sprayDuration = 0.085;
+  const sprayProgress = THREE.MathUtils.clamp((cycleProgress - preBlowCycle) / sprayDuration, 0, 1);
+  const ejectPoint = lanePoint(curve, valveChannelProgress, detectedLane, width);
+  const route = rejectRoutePoints(ejectPoint);
+  const routePoints = [ejectPoint, route.inlet, route.fanPoint, route.ductEnd, route.landingAbove, route.drop];
+  const whiteCottonRouteProgress = THREE.MathUtils.clamp(
+    (cycleProgress - preBlowCycle) / Math.max(0.24, 0.97 - preBlowCycle),
+    0,
+    1
+  );
+  if (cycleProgress >= preBlowCycle && cycleProgress < 0.98) {
+    updateFaultSprayCotton(routePoints, whiteCottonRouteProgress);
+  }
+  if (cycleProgress >= preBlowCycle && cycleProgress <= preBlowCycle + sprayDuration) {
+    showValveJet(valve, route.inlet, sprayProgress);
+  }
+
+  faultImpurity.visible = cycleProgress < 0.985;
+  faultImpurity.rotation.y += 0.036;
+  faultImpurity.rotation.z += 0.022;
+  faultImpurity.scale.setScalar(cycleProgress < 0.92 ? 1.16 : Math.max(0.04, (0.985 - cycleProgress) * 15.4));
+
+  let status = faultSettings.type === 'duct'
+    ? `排杂风道出现约${faultSettings.sizeCm}厘米局部堵花，对应区域棉流发生严重偏流`
+    : `${faultSettings.surface === 'front' ? '前' : '后'}玻璃${faultSettings.edge === 'lower' ? '下' : '上'}边缘出现${faultSettings.sizeCm}厘米毛笔头挂花`;
+
+  if (channelProgress >= detectionProgress && cycleProgress < preBlowCycle) {
+    const currentLane = faultAffectedLane(sourceLane, channelProgress, width, 1901);
+    const currentDriftCm = Math.round(Math.abs(currentLane - detectedLane) * width * 50);
+    status = `前视${detectorIndex + 1}号相机锁定第${valve.index + 1}号阀；异纤继续上升并局部偏移约${currentDriftCm}厘米`;
+  }
+
+  const actualLane = faultAffectedLane(sourceLane, channelProgress, width, 1901);
+  if (!hasMeaningfulDrift && cycleProgress >= preBlowCycle) {
+    faultImpurity.position.copy(pointAlongRoute(routePoints, whiteCottonRouteProgress));
+    status = '约1厘米挂花基本不影响棉流，异纤仍由对应电磁阀准确喷出';
+  } else {
+    faultImpurity.position.copy(lanePoint(curve, channelProgress, actualLane, width));
+    if (cycleProgress >= preBlowCycle && cycleProgress <= preBlowCycle + sprayDuration) {
+      status = `第${valve.index + 1}号阀仍按原位置喷射，只喷走附近白棉；异纤已漂到第${actualValveIndex + 1}号附近`;
+    } else if (cycleProgress > preBlowCycle + sprayDuration) {
+      status = `白棉已从原阀位喷出，异纤偏移约${missCm}厘米后漏过并继续进入后道`;
+    }
+  }
+  updateProcessStatus(status);
+}
+
 function updateCottonProcess(time) {
   const curve = currentFlowCurve();
   const channelPart = calibrationParts.get('flow-channel-1');
   const width = channelPart.userData.config.dimensions.length * channelPart.scale.x;
   const normalSpeed = time * 0.000145;
 
-  whiteCottonTufts.forEach((tuft) => {
+  whiteCottonTufts.forEach((tuft, index) => {
     const progress = (normalSpeed + tuft.userData.flowOffset) % 1;
-    tuft.position.copy(lanePoint(curve, progress, tuft.userData.lane, width));
+    const lane = faultDemoPlaying
+      ? faultAffectedLane(tuft.userData.lane, progress, width, index + 2100)
+      : tuft.userData.lane;
+    tuft.position.copy(lanePoint(curve, progress, lane, width));
     const fade = Math.min(progress / 0.07, (1 - progress) / 0.08, 1);
     tuft.scale.setScalar(tuft.userData.baseScale * Math.max(0.05, fade));
     tuft.rotation.y += 0.010;
     tuft.rotation.z += 0.004;
   });
 
+  upstreamCottonTufts.forEach((tuft) => {
+    const progress = (normalSpeed * 0.88 + tuft.userData.lineOffset) % 1;
+    tuft.position.copy(upstreamProcessCurve.getPoint(progress));
+    const fade = Math.min(progress / 0.06, (1 - progress) / 0.07, 1);
+    tuft.scale.setScalar(tuft.userData.baseScale * Math.max(0.04, fade));
+    tuft.rotation.y += 0.012;
+    tuft.rotation.z += 0.006;
+  });
+
+  downstreamCottonTufts.forEach((tuft) => {
+    const progress = (normalSpeed * 1.08 + tuft.userData.lineOffset) % 1;
+    tuft.position.copy(downstreamProcessCurve.getPoint(progress));
+    const fade = Math.min(progress / 0.06, (1 - progress) / 0.08, 1);
+    tuft.scale.setScalar(tuft.userData.baseScale * Math.max(0.04, fade));
+    tuft.rotation.x += 0.010;
+    tuft.rotation.z += 0.015;
+  });
+
+  if (relayFanRotor) {
+    relayFanRotor.rotation.z -= processDemoPlaying || faultDemoPlaying ? 0.24 : 0.035;
+    document.documentElement.dataset.relayFanRotation = relayFanRotor.rotation.z.toFixed(3);
+  }
+
   valvePulse.visible = false;
   airJet.visible = false;
+  if (faultDemoPlaying) {
+    updateFaultProcess(time, curve, width);
+    return;
+  }
+  hideFaultSprayCotton();
+  faultObstruction.visible = false;
+  faultImpurity.visible = false;
   if (!processDemoPlaying && opticalPathMode === 'scan') {
     impurityEvents.forEach((event) => {
       event.tuft.visible = false;
@@ -3185,7 +4069,7 @@ function updateCottonProcess(time) {
     updateProcessStatus('16台主相机持续扫描：前视直射，后视经反光镜折射覆盖通道');
     return;
   }
-  let activeStatus = '白色棉絮正常通过：下方进入，顶部出口消失';
+  let activeStatus = '正常棉流：JWF1124送入 → JWF0019A检测 → FA151进棉风机接力抽吸';
   const cycleDuration = 52;
   const impurityDuration = 7.4;
   const voiceCycleIndex = Math.floor(time / (cycleDuration * 1000));
@@ -3399,13 +4283,16 @@ const views = {
   rear: [0, 1.85, -7.2],
   left: [-7.2, 1.85, 0],
   right: [7.2, 1.85, 0],
-  top: [0.01, 8.2, 0.01]
+  top: [0.01, 8.2, 0.01],
+  line: [10.5, 5.8, 9.0]
 };
 
 function updateViewZoom() {
   const amount = Number(document.querySelector('#explode')?.value || 0) / 100;
-  const baseZoom = ['front', 'rear'].includes(currentView) ? 1.12 : currentView === 'top' ? 0.92 : 1.08;
-  camera.zoom = Math.max(0.62, baseZoom * (1 - amount * 0.30));
+  const baseZoom = currentView === 'line'
+    ? 0.46
+    : ['front', 'rear'].includes(currentView) ? 1.12 : currentView === 'top' ? 0.92 : 1.08;
+  camera.zoom = Math.max(currentView === 'line' ? 0.36 : 0.62, baseZoom * (1 - amount * 0.30));
   camera.updateProjectionMatrix();
 }
 
@@ -3414,10 +4301,11 @@ document.querySelectorAll('[data-view]').forEach((button) => {
     document.querySelectorAll('[data-view]').forEach((item) => item.classList.remove('active'));
     button.classList.add('active');
     currentView = button.dataset.view;
+    factoryLine.visible = currentView === 'line';
     camera.position.set(...views[button.dataset.view]);
     camera.up.set(0, button.dataset.view === 'top' ? 0 : 1, button.dataset.view === 'top' ? -1 : 0);
     updateViewZoom();
-    controls.target.set(0.1, 1.7, 0);
+    controls.target.set(...(button.dataset.view === 'line' ? [0, 2.05, 1.10] : [0.1, 1.7, 0]));
     controls.update();
   });
 });
@@ -3472,7 +4360,7 @@ function applyMode(mode) {
     if (mode === 'xray') object.material = role === 'internal' ? modeMaterials.xrayInternal : modeMaterials.xrayShell;
     object.castShadow = mode === 'solid' || mode === 'clay';
   });
-  if (processDemoPlaying) setValveRowActive(true);
+  if (processDemoPlaying || faultDemoPlaying) setValveRowActive(true);
 }
 
 document.querySelectorAll('[data-mode]').forEach((button) => {
@@ -3490,10 +4378,10 @@ document.querySelectorAll('[data-mode]').forEach((button) => {
 const tourSteps = ['overview', 'intake', 'detect', 'compute', 'eject'];
 const tourCopy = {
   overview: ['整机结构', '先校对外形、双落地立柱、正面1600×70入口、右前风机和等径管路。'],
-  intake: ['进棉阶段', '开棉后的棉流由下方进入，在气流作用下向上通过全机幅入口和检测通道。'],
+  intake: ['进棉阶段', '棉流由JWF1124开松后，经Ø300短管和圆转宽扁过渡进入JWF0019A全机幅检测通道。'],
   detect: ['视觉检测', '正面8台、背面8台主相机覆盖1.6米机幅；背面另有4台精灵眼相机。'],
   compute: ['算力判别', '10个算力盒子位于精灵眼背部，最外侧是银白色密集散热片；拆解时按实际前后层级展开。'],
-  eject: ['喷射排杂', '32个MAC52A风格电磁阀安装在整块阀板上，每阀控制4个喷孔，共128个喷孔。']
+  eject: ['喷射与后送', '异纤由32位喷阀吹入排杂风道；正常棉流经1600毫米方变圆、Ø300直管1米和向下60度斜管进入FA151进棉风机。']
 };
 let tourTimer = null;
 let currentTourIndex = 0;
@@ -3556,6 +4444,7 @@ document.querySelectorAll('[data-tour]').forEach((button) => {
   button.addEventListener('click', () => {
     stopTour();
     if (processDemoPlaying) setProcessDemo(false);
+    if (faultDemoPlaying) setFaultDemo(false);
     currentTourIndex = tourSteps.indexOf(button.dataset.tour);
     setTourStep(button.dataset.tour);
   });
@@ -3567,6 +4456,7 @@ document.querySelector('#tour-play').addEventListener('click', () => {
     return;
   }
   if (processDemoPlaying) setProcessDemo(false);
+  if (faultDemoPlaying) setFaultDemo(false);
   document.querySelector('#tour-play').textContent = '暂停演示';
   setTourStep(tourSteps[currentTourIndex]);
   tourTimer = window.setInterval(() => {
@@ -3575,7 +4465,109 @@ document.querySelector('#tour-play').addEventListener('click', () => {
   }, 2400);
 });
 
+function updateFaultControlLabels() {
+  const level = faultSettings.type === 'duct' ? '局部严重' : channelFaultLevel().label;
+  faultXValue.textContent = faultSettings.xCm === 0
+    ? '中间'
+    : `${faultSettings.xCm < 0 ? '左' : '右'}${Math.abs(faultSettings.xCm)}厘米`;
+  faultSurfaceValue.textContent = faultSettings.surface === 'front' ? '前面' : '后面';
+  faultEdgeValue.textContent = faultSettings.edge === 'lower' ? '下边缘' : '上边缘';
+  faultSizeValue.textContent = `${faultSettings.sizeCm}厘米`;
+  faultLevelOutput.textContent = `${faultSettings.type === 'duct' ? '排杂风道' : '主通道'} · ${level}`;
+  faultAttachControls.classList.toggle('disabled', faultSettings.type === 'duct');
+  faultHelp.textContent = faultSettings.type === 'duct'
+    ? '排杂风道显示为一个完整大棉团；不会封死整条风道，但对应区域会产生严重偏流。'
+    : '约1厘米基本不影响；扩展到5～10厘米后，只让挂花周围棉流发生偏移。';
+}
+
+function setFaultDemo(enabled) {
+  faultDemoPlaying = enabled;
+  faultPlay.classList.toggle('active', enabled);
+  faultPlay.textContent = enabled ? '暂停堵花偏流' : '播放堵花偏流';
+  cottonFlow.visible = enabled;
+  processStatus.hidden = !enabled;
+  if (enabled) {
+    if (processDemoPlaying) setProcessDemo(false);
+    processTimelineMs = 0;
+    stopProcessVoice();
+    stopTour();
+    if (calibrationEnabled) setCalibrationEnabled(false);
+    applyMode('xray');
+    updateCalibrationPartVisibility('process');
+    setValveRowActive(true);
+    setFlowChannelPlaybackAppearance(true);
+    setExternalModulesGhosted(true);
+    setOpticalPathState('process', 0);
+    setLayerVisible('hunyuan', importedModelReady);
+    setLayerVisible('shell', false);
+    faultObstruction.visible = true;
+    faultImpurity.visible = true;
+    partTitle.textContent = '堵花偏流故障演示';
+    partDetail.textContent = '玻璃边缘挂花形成毛笔头棉束；相机按检测位置锁定原阀位，局部棉流偏移后，原阀只喷走附近白棉，异纤漏过。';
+  } else {
+    faultObstruction.visible = false;
+    faultImpurity.visible = false;
+    hideFaultSprayCotton();
+    valvePulse.visible = false;
+    airJet.visible = false;
+    setValveRowActive(false);
+    updateCalibrationPartVisibility('external');
+    applyMode('solid');
+    setFlowChannelPlaybackAppearance(false);
+    setExternalModulesGhosted(false);
+    setOpticalPathState('off');
+  }
+}
+
+document.querySelectorAll('[data-fault-type]').forEach((button) => {
+  button.addEventListener('click', () => {
+    faultSettings.type = button.dataset.faultType;
+    faultSettings.sizeCm = faultSettings.type === 'duct' ? 30 : 10;
+    faultSizeInput.value = faultSettings.sizeCm;
+    document.querySelectorAll('[data-fault-type]').forEach((item) => {
+      item.classList.toggle('active', item === button);
+    });
+    processTimelineMs = 0;
+    updateFaultControlLabels();
+  });
+});
+
+document.querySelectorAll('[data-fault-surface]').forEach((button) => {
+  button.addEventListener('click', () => {
+    faultSettings.surface = button.dataset.faultSurface;
+    document.querySelectorAll('[data-fault-surface]').forEach((item) => {
+      item.classList.toggle('active', item === button);
+    });
+    processTimelineMs = 0;
+    updateFaultControlLabels();
+  });
+});
+
+document.querySelectorAll('[data-fault-edge]').forEach((button) => {
+  button.addEventListener('click', () => {
+    faultSettings.edge = button.dataset.faultEdge;
+    document.querySelectorAll('[data-fault-edge]').forEach((item) => {
+      item.classList.toggle('active', item === button);
+    });
+    processTimelineMs = 0;
+    updateFaultControlLabels();
+  });
+});
+
+[
+  [faultXInput, 'xCm'],
+  [faultSizeInput, 'sizeCm']
+].forEach(([input, key]) => {
+  input.addEventListener('input', () => {
+    faultSettings[key] = Number(input.value);
+    updateFaultControlLabels();
+  });
+});
+faultPlay.addEventListener('click', () => setFaultDemo(!faultDemoPlaying));
+updateFaultControlLabels();
+
 function setProcessDemo(enabled) {
+  if (enabled && faultDemoPlaying) setFaultDemo(false);
   processDemoPlaying = enabled;
   processPlay.classList.toggle('active', enabled);
   processPlay.textContent = enabled ? '暂停工作原理' : '播放工作原理';
@@ -3649,6 +4641,7 @@ function setExplodePresentation(active) {
   explodePresentationActive = active;
   if (active) {
     if (processDemoPlaying) setProcessDemo(false);
+    if (faultDemoPlaying) setFaultDemo(false);
     modeBeforeExplode = currentMode;
     applyMode('xray');
     updateCalibrationPartVisibility('all');
@@ -3740,8 +4733,8 @@ function animate(time = 0) {
     if (Number(explodeSlider.value) >= 100) stopDismantle();
   }
   if (cottonFlow.visible) {
-    if (processDemoPlaying) processTimelineMs += deltaSeconds * 1000 * processPlaybackRate;
-    updateCottonProcess(processDemoPlaying ? processTimelineMs : time);
+    if (processDemoPlaying || faultDemoPlaying) processTimelineMs += deltaSeconds * 1000 * processPlaybackRate;
+    updateCottonProcess(processDemoPlaying || faultDemoPlaying ? processTimelineMs : time);
   }
   updateOpticalPathAnimation(time);
   controls.update();

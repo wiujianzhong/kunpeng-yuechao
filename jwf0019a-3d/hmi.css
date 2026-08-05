@@ -175,13 +175,25 @@ button { cursor: pointer; }
 .account-failure-dialog > footer { padding: 9px; display: flex; justify-content: center; background: #d2d8d4; }
 .account-failure-dialog > footer button { min-width: 104px; min-height: 38px; border: 1px solid #b0b8b2; background: linear-gradient(#fff,#e3e7e4); font-size: 14px; }
 .account-failure-dialog > footer span { display: inline-grid; width: 28px; height: 28px; margin-right: 6px; place-items: center; color: #fff; border-radius: 50%; background: #3eb499; font-size: 21px; font-weight: 900; }
+.account-training-body { min-height: 250px; padding: 14px 18px; display: block; background: #eef0ef; }
+.account-training-body [hidden] { display: none !important; }
+.account-training-body form, .account-training-body section { display: grid; gap: 10px; }
+.account-training-body label { display: grid; gap: 4px; color: #34463a; font-size: 12px; font-weight: 700; }
+.account-training-body select, .account-training-body input { min-height: 36px; padding: 5px 8px; border: 1px solid #aab5ad; background: #fff; font-size: 13px; }
+.account-training-body button { min-height: 36px; border: 1px solid #5a8d63; color: #fff; background: #3f7e49; font-weight: 700; }
+.account-training-body small { color: #6e7d73; font-size: 10px; }
+.account-training-body .account-safe-note { margin: 0 0 12px; padding: 8px 9px; color: #66592f; border: 1px solid #ddcf9b; background: #fff9df; font-size: 10px; }
+.account-training-body .account-feedback { min-height: 20px; color: #b0372f; font-size: 11px; }
+.account-training-body section > strong { color: #2f713d; font-size: 15px; }
 
 .settings-screen { height: 692px; overflow: hidden; background: #edf0ed; }
 .settings-screen:not([hidden]) { display: flex; flex-direction: column; }
-.settings-serial { min-height: 34px; padding: 4px 8px; display: flex; align-items: center; gap: 5px; border-bottom: 1px solid #c2c9c3; background: #f5f6f4; font-size: 10px; }
-.settings-serial button { min-height: 24px; padding: 2px 8px; border: 1px solid #aab4ac; background: linear-gradient(#fff, #e1e6e2); font-size: 10px; }
+.settings-serial { min-height: 38px; padding: 4px 8px; display: flex; align-items: center; gap: 5px; border-bottom: 1px solid #c2c9c3; background: #f5f6f4; font-size: 10px; }
+.settings-serial button, .settings-serial select { min-height: 26px; padding: 2px 8px; border: 1px solid #aab4ac; background: linear-gradient(#fff, #e1e6e2); font-size: 10px; }
 .settings-serial button:disabled, .settings-head button:disabled, .settings-subtabs button:disabled, .valve-tabs button:disabled, .settings-bottom-nav button:disabled, .stats-actions button:disabled, .trigger-toolbar button:disabled, .trigger-tools button:disabled { cursor: not-allowed; color: #657168; opacity: 1; }
-.settings-serial .settings-home { width: 36px; margin-left: auto; color: #2589d0; font-size: 19px; }
+.settings-serial #serial-status { color: #4c8154; font-size: 9px; }
+.settings-serial .orientation-toggle { margin-left: auto; min-width: 65px; color: #237a31; font-weight: 700; }
+.settings-serial .settings-return { color: #2d6f9b; }
 .settings-head { min-height: 34px; padding: 4px 8px; display: flex; align-items: center; gap: 5px; border-bottom: 1px solid #c2c9c3; background: #e5e9e5; }
 .settings-head button { min-height: 26px; padding: 3px 12px; border: 1px solid #aab4ac; background: #f7f8f6; font-size: 11px; }
 .settings-head button.active { background: #d2dfd4; }
@@ -190,33 +202,59 @@ button { cursor: pointer; }
 .settings-subtabs button { min-height: 23px; padding: 2px 10px; border: 1px solid #aab4ac; background: linear-gradient(#fafbf9, #dde6de); font-size: 9px; }
 .settings-subtabs button.active { color: #314c37; background: #cddad0; opacity: 1; }
 .monitor-row { min-height: 32px; padding: 6px 8px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; border-bottom: 1px solid #cbd1cc; background: #f7f8f6; }
-.monitor-row span { min-width: 0; color: #49584e; font-size: 9px; white-space: nowrap; }
-.monitor-row span.training-alert { color: #bd3027; font-weight: 700; }
-.monitor-row span.training-alert::after { content: "（培训）"; margin-left: 2px; color: #a96b21; font-size: 7px; font-weight: 500; }
+.monitor-row label { min-width: 0; display: flex; align-items: center; gap: 3px; color: #49584e; font-size: 9px; white-space: nowrap; cursor: pointer; }
+.monitor-row input { width: 13px; height: 13px; margin: 0; accent-color: #3f913f; }
+.monitor-row label.training-alert { color: #bd3027; font-weight: 700; }
+.monitor-row label.training-alert::after { content: "（培训）"; margin-left: 2px; color: #a96b21; font-size: 7px; font-weight: 500; }
 .settings-grid { flex: 1; min-height: 0; overflow-y: auto; padding: 5px 7px; display: grid; grid-template-columns: 1fr; gap: 4px; }
+.settings-view { display: grid; gap: 4px; }
+.settings-view[hidden], [data-settings-tab-panel][hidden], [data-valve-panel][hidden] { display: none !important; }
 .settings-grid article { overflow: hidden; border: 1px solid #c4cbc5; background: #f8f9f7; }
 .settings-grid h2 { margin: 0; padding: 7px 10px; color: #354b3b; border-bottom: 1px solid #cbd1cc; background: #e5ece6; font-size: 12px; }
+.settings-grid h2 small { margin-left: 6px; color: #8a958d; font-size: 8px; font-weight: 500; }
 .settings-grid dl { margin: 0; display: grid; }
 .system-parameters dl { grid-template-columns: repeat(2, 1fr); }
 .valve-parameters dl { grid-template-columns: repeat(3, 1fr); }
 .settings-grid dl div { min-height: 45px; padding: 4px 6px; display: grid; grid-template-columns: 29px minmax(0, 1fr) auto; align-items: center; gap: 6px; border-right: 1px solid #d8ddd9; border-bottom: 1px solid #d8ddd9; }
+.settings-grid dl div[role="group"], .monitor-row label, .valve-options [data-help], .settings-serial [data-help] { cursor: help; }
+.settings-grid dl div:focus-within, .monitor-row label:hover, .valve-options [data-help]:hover { outline: 2px solid #5a9d5a; outline-offset: -2px; background: #edf7ee; }
 .settings-grid dl div::before { width: 27px; height: 27px; display: grid; place-items: center; color: #54a437; border: 2px solid #565d58; border-radius: 2px; background: #fff; box-shadow: inset 0 0 0 2px #dfe3df; font: 800 10px/1 Arial, sans-serif; }
 .settings-grid dl div[data-icon="n123"]::before { content: "N¹²³"; }
 .settings-grid dl div[data-icon="half"]::before { content: "½"; font-size: 20px; }
 .settings-grid dt { min-width: 0; color: #26342b; font-size: 11px; font-weight: 700; }
 .settings-grid dt small { display: block; overflow: hidden; max-width: 150px; margin-top: 1px; color: #8a958d; font-size: 7px; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; }
 .settings-grid dd { min-width: 112px; margin: 0; display: grid; grid-template-columns: 25px minmax(48px, 1fr) 25px; align-items: center; gap: 5px; color: #26342b; text-align: center; font-size: 12px; }
-.settings-grid dd::before, .settings-grid dd::after { width: 25px; height: 25px; display: grid; place-items: center; color: #4e5b52; border: 2px solid #5c665f; border-radius: 50%; background: #f7f8f6; font: 800 18px/1 Arial, sans-serif; }
-.settings-grid dd::before { content: "−"; }
-.settings-grid dd::after { content: "+"; color: #39a13d; }
-.settings-grid dd span { min-width: 48px; padding: 5px 6px; border: 1px solid #b4bdb6; background: #fff; }
+.settings-grid dd button { width: 25px; height: 25px; padding: 0; display: grid; place-items: center; color: #4e5b52; border: 2px solid #5c665f; border-radius: 50%; background: #f7f8f6; font: 800 17px/1 Arial, sans-serif; }
+.settings-grid dd button:last-child { color: #39a13d; }
+.settings-grid dd input { width: 64px; min-width: 48px; padding: 5px 3px; border: 1px solid #b4bdb6; color: #26342b; background: #fff; text-align: center; font: inherit; }
+.settings-grid dd input::-webkit-inner-spin-button { appearance: none; }
 .valve-tabs { min-height: 27px; display: flex; align-items: center; gap: 4px; }
 .valve-tabs button { min-height: 24px; padding: 2px 12px; border: 1px solid #aab4ac; background: linear-gradient(#fafbf9, #dde6de); font-size: 9px; }
 .valve-tabs button.active { color: #314c37; background: #cddad0; opacity: 1; }
 .valve-options { min-height: 46px; padding: 6px 8px; display: grid; grid-template-columns: auto 1.2fr auto 1fr 1fr 1fr 1fr; align-items: center; gap: 5px 8px; border: 1px solid #c4cbc5; background: #f8f9f7; color: #435248; font-size: 8px; }
-.valve-options span { color: #3c7f3b; font-weight: 700; white-space: nowrap; }
 .valve-options label { min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 4px; white-space: nowrap; }
-.valve-options output { min-width: 29px; padding: 2px 4px; border: 1px solid #bcc6be; background: #fff; text-align: center; }
+.valve-options label:has(input[type="checkbox"]) { color: #3c7f3b; font-weight: 700; }
+.valve-options input[type="checkbox"] { width: 13px; height: 13px; margin: 0 3px 0 0; accent-color: #3f913f; }
+.valve-options input[type="number"] { width: 43px; min-width: 0; padding: 2px 3px; border: 1px solid #bcc6be; background: #fff; text-align: center; font-size: 8px; }
+.valve-test-panel { padding: 7px; border: 1px solid #c4cbc5; background: #f8f9f7; }
+.valve-test-toolbar { min-height: 30px; display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #496050; font-size: 9px; }
+.valve-test-toolbar label { display: flex; align-items: center; gap: 4px; font-weight: 700; }
+.valve-test-toolbar input { accent-color: #3f913f; }
+.valve-test-grid { display: grid; grid-template-columns: repeat(16, 1fr); gap: 4px; }
+.valve-test-grid button { min-width: 0; height: 28px; padding: 0; border: 1px solid #b5c0b7; border-radius: 3px; color: #425248; background: #fff; font-size: 9px; }
+.valve-test-grid button.active { color: #fff; border-color: #31833a; background: #3e9848; box-shadow: 0 0 0 2px rgba(62,152,72,.16); }
+.flow-monitor-view { padding: 2px; }
+.flow-monitor-view > header { padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #c4cbc5; background: #f8f9f7; }
+.flow-monitor-view h2 { padding: 0; border: 0; background: transparent; }
+.flow-monitor-view p { margin: 3px 0 0; color: #758279; font-size: 8px; }
+.flow-monitor-view header button { min-height: 26px; padding: 3px 9px; border: 1px solid #aab4ac; background: linear-gradient(#fff, #e1e6e2); font-size: 9px; }
+.flow-channel-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; }
+.flow-channel-grid label { padding: 5px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px; border: 1px solid #c4cbc5; background: #f8f9f7; color: #526258; font-size: 8px; }
+.flow-channel-grid input { width: 58px; min-width: 0; padding: 4px 3px; border: 1px solid #b4bdb6; background: #fff; text-align: center; font-size: 9px; }
+.unverified-note { padding: 7px 9px; color: #7d652f !important; border: 1px solid #e2d3ac; background: #fff8e8; line-height: 1.5; }
+.parameter-help { min-height: 58px; padding: 9px 11px; border: 1px solid #b9cabc; background: #eef7ef; }
+.parameter-help b { color: #2f6f3a; font-size: 11px; }
+.parameter-help p { margin: 4px 0 0; color: #46594d; font-size: 9px; line-height: 1.5; }
 .settings-bottom-nav { height: 88px; flex: 0 0 88px; display: grid; grid-template-columns: repeat(5, 1fr) 72px repeat(4, 1fr); border-top: 1px solid #bcc4be; background: #e5e9e5; }
 .settings-bottom-nav button:nth-child(6) { grid-column: 7; }
 .settings-bottom-nav button { min-width: 0; padding: 3px 2px; border: 1px solid transparent; background: transparent; }
@@ -272,6 +310,7 @@ button { cursor: pointer; }
 .snapshot-readonly .phase-strip span { color: #a13d33; }
 .scenario-list { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .scenario-list button { min-height: 40px; padding: 6px; border: 1px solid #d2dad4; border-radius: 9px; color: #53645a; background: #f9faf8; font-size: 11px; }
+.scenario-list button[hidden] { display: none !important; }
 .scenario-list button.active { color: #fff; border-color: #4b8b3c; background: #4b8b3c; }
 .read-settings { width: 100%; min-height: 38px; margin-top: 8px; border: 1px solid #cbd5ce; border-radius: 9px; color: #47604f; background: #f8faf7; font-size: 11px; }
 .read-settings.active { color: #fff; border-color: #4b8b3c; background: #4b8b3c; }
