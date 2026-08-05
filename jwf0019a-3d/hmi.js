@@ -235,7 +235,7 @@ const state = {
   flowAlarm: false,
   logClock: EVIDENCE_CAPTURE_AT,
   temperature: 57,
-  selectedTrigger: 12,
+  selectedTrigger: 9,
   selectedTriggerKey: null,
   triggerSerial: 0,
   triggerRecords: [],
@@ -275,6 +275,7 @@ const cameraLabels = [
 ];
 const channelOrder = [1, 3, 5, 7, 9, 2, 4, 6, 8, 10];
 const triggerCameraSources = Array.from({ length: 32 }, (_, index) => index < 20 ? index + 1 : [1, 4, 7, 10, 13, 16, 17, 18, 19, 20, 5, 12][index - 20]);
+const EVIDENCE_TRIGGER_EMPTY_SLOTS = 3;
 
 const pad2 = (value) => String(value).padStart(2, "0");
 const targetChannel = () => Math.max(1, Math.min(8, Math.ceil(state.position / 4)));
@@ -372,9 +373,9 @@ function initializeHistories() {
 
 function initializeTriggerRecords() {
   const clock = state.simClockAt;
-  state.triggerRecords = triggerCameraSources.map((cameraSourceNumber, index) => ({
-    id: `evidence-${index + 1}`,
-    imageIndex: index + 1,
+  state.triggerRecords = triggerCameraSources.slice(EVIDENCE_TRIGGER_EMPTY_SLOTS).map((cameraSourceNumber, index) => ({
+    id: `evidence-${index + EVIDENCE_TRIGGER_EMPTY_SLOTS + 1}`,
+    imageIndex: index + EVIDENCE_TRIGGER_EMPTY_SLOTS + 1,
     cameraSourceNumber,
     at: clock - index * 850,
     repeated: false
@@ -669,13 +670,22 @@ function triggerCameraLabel(source) {
 function renderTriggers() {
   const grid = document.querySelector("#trigger-grid");
   grid.setAttribute("aria-label", "最近32条触发记录");
-  const records = [...state.triggerEvents, ...state.triggerRecords].slice(0, 32);
+  const liveRecords = state.triggerEvents.slice(0, 32);
+  const emptySlots = Array.from(
+    { length: Math.max(0, EVIDENCE_TRIGGER_EMPTY_SLOTS - liveRecords.length) },
+    (_, index) => ({ id: `empty-${index + 1}`, placeholder: true })
+  );
+  const records = [...liveRecords, ...emptySlots, ...state.triggerRecords].slice(0, 32);
+  const interactiveRecords = records.filter((record) => !record.placeholder);
   if (state.selectedTriggerKey) {
-    const stableIndex = records.findIndex((record) => record.id === state.selectedTriggerKey);
+    const stableIndex = interactiveRecords.findIndex((record) => record.id === state.selectedTriggerKey);
     if (stableIndex >= 0) state.selectedTrigger = stableIndex;
   }
-  state.selectedTrigger = Math.max(0, Math.min(records.length - 1, state.selectedTrigger));
-  grid.innerHTML = records.map((record, index) => {
+  state.selectedTrigger = Math.max(0, Math.min(interactiveRecords.length - 1, state.selectedTrigger));
+  let interactiveIndex = 0;
+  grid.innerHTML = records.map((record) => {
+    if (record.placeholder) return `<span class="trigger-thumb empty" aria-label="空槽"></span>`;
+    const index = interactiveIndex++;
     const imageIndex = record.imageIndex;
     const cameraSourceNumber = record.cameraSourceNumber;
     return `<button class="trigger-thumb${index === state.selectedTrigger ? " active" : ""}${record.repeated ? " repeated" : ""}" data-trigger="${index}" data-record-id="${record.id}" data-image="${imageIndex}" data-camera-source="${cameraSourceNumber}" data-trigger-time="${record.at}" data-repeated="${record.repeated ? "1" : "0"}" data-kind="${record.kind || ""}" type="button"><img src="${ASSET_BASE}/triggers/trigger-${pad2(imageIndex)}.png" alt="最近触发记录${index + 1}，来源${triggerCameraLabel(cameraSourceNumber)}"></button>`;
@@ -686,8 +696,9 @@ function renderTriggers() {
 
 function selectTrigger(index) {
   state.selectedTrigger = Math.max(0, Math.min(31, index));
-  document.querySelectorAll(".trigger-thumb").forEach((item, itemIndex) => item.classList.toggle("active", itemIndex === index));
-  const selected = document.querySelectorAll(".trigger-thumb")[index];
+  const triggerButtons = document.querySelectorAll("#trigger-grid button.trigger-thumb");
+  triggerButtons.forEach((item, itemIndex) => item.classList.toggle("active", itemIndex === index));
+  const selected = triggerButtons[index];
   state.selectedTriggerKey = selected?.dataset.recordId || null;
   const imageIndex = Number(selected?.dataset.image || index + 1);
   const cameraSourceNumber = Number(selected?.dataset.cameraSource || triggerCameraSources[index]);

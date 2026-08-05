@@ -131,6 +131,7 @@ button { cursor: pointer; }
 .trigger-toolbar { height: 27px; display: flex; justify-content: center; }
 .trigger-grid { height: 278px; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(4, 1fr); gap: 3px; }
 .trigger-thumb { min-width: 0; padding: 0; overflow: hidden; border: 1px solid #d8dcda; background: #777; }
+.trigger-thumb.empty { display: block; cursor: default; background: #777; }
 .trigger-thumb img { width: 100%; height: 100%; display: block; object-fit: contain; filter: contrast(.98); }
 .trigger-thumb.active { outline: 2px solid #da342b; outline-offset: -2px; }
 .trigger-thumb.repeated { box-shadow: inset 0 0 0 2px #f1a136; }

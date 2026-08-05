@@ -115,6 +115,49 @@ try {
   await waitFor(async () => evaluate("document.readyState === 'complete' && document.querySelectorAll('.camera-card').length === 20"), "HMI页面加载");
   await waitFor(async () => evaluate("readyCameraFrames.size >= 36"), "相机训练帧预载", 15_000);
 
+  const triggerEvidenceBaseline = await evaluate(`(() => {
+    renderTriggers();
+    return {
+      slots: document.querySelector("#trigger-grid").children.length,
+      emptySlots: document.querySelectorAll("#trigger-grid .trigger-thumb.empty").length,
+      records: document.querySelectorAll("#trigger-grid button.trigger-thumb").length,
+      detailNumber: document.querySelector("#trigger-number").textContent
+    };
+  })()`);
+  assert.deepEqual(triggerEvidenceBaseline, {
+    slots: 32,
+    emptySlots: 3,
+    records: 29,
+    detailNumber: "13"
+  }, "触发图实机基线应保留32个槽位、3个空槽和29条记录");
+
+  const triggerEvidenceFilled = await evaluate(`(() => {
+    state.triggerEvents = Array.from({ length: 3 }, (_, index) => ({
+      id: "training-fill-" + index,
+      imageIndex: 13,
+      cameraSourceNumber: index + 1,
+      at: state.simClockAt + index,
+      repeated: false,
+      kind: "training"
+    }));
+    renderTriggers();
+    const result = {
+      slots: document.querySelector("#trigger-grid").children.length,
+      emptySlots: document.querySelectorAll("#trigger-grid .trigger-thumb.empty").length,
+      records: document.querySelectorAll("#trigger-grid button.trigger-thumb").length
+    };
+    state.triggerEvents = [];
+    state.selectedTriggerKey = null;
+    state.selectedTrigger = 9;
+    renderTriggers();
+    return result;
+  })()`);
+  assert.deepEqual(triggerEvidenceFilled, {
+    slots: 32,
+    emptySlots: 0,
+    records: 32
+  }, "培训中新触发记录应依次占用3个空槽，且不改变32槽布局");
+
   const cameraStart = await evaluate(`(() => {
     setScenario("camera-fault");
     state.phase = PHASE.ALARM_ACTIVE;
@@ -361,7 +404,7 @@ try {
   assert.deepEqual(frozenAfter, frozenStart, "整屏卡住时界面时间、统计和20幅画面都应保持不变");
   assert.equal(frozenAfter.runButton, "开车", "整屏卡住时应保留卡住前的开车按钮画面");
 
-  console.log("HMI回归通过：19场景入口、只读边界、72阶段物理文案、堵花不绑定精准阀位、风机过载保留最后值、切换场景不串数且计时不倒退");
+  console.log("HMI回归通过：19场景入口、触发页32槽/3空槽基线、只读边界、72阶段物理文案、堵花不绑定精准阀位、风机过载保留最后值、切换场景不串数且计时不倒退");
 } finally {
   client?.close();
   const waitForExit = (process) => process && process.exitCode === null
