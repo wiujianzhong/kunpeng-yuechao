@@ -843,6 +843,8 @@ function renderCameras() {
       ? '<i class="blockage-mark"></i>'
       : isolatedFreeze
       ? `<i class="freeze-mark">${freezeLabel}</i>`
+      : classes.includes("brightness-abnormal")
+      ? '<i class="brightness-mark">亮度偏离<small>方向未取证</small></i>'
       : "";
     const frozenSource = previousSources.get(index);
     const shouldHoldFrame = classes.includes("freeze") || !state.running;
@@ -853,12 +855,12 @@ function renderCameras() {
       ${marker}<small>${label}</small>
     </div>`;
   }).join("");
-  const evidenceBoundaryText = faultPhaseActive() ? ({
+  const evidenceBoundaryText = phaseIsObservable() ? ({
     "camera-fault": "单幅画面冻结，其余主检测画面继续刷新",
     "channel-fault": "同通道两幅画面冻结；物理检测状态未知",
     "screen-freeze": "20幅画面与界面时间同时冻结；设备动作未知",
     "camera-485": "单幅冻结；仅凭画面不能与普通相机故障区分",
-    "fan-overload": "培训边界：保留故障前最后画面；过载后HMI刷新状态尚未取证"
+    "fan-overload": "培训边界：保留故障前最后画面；培训时钟不代表实机过载后的刷新状态"
   })[state.scenario] : "";
   const evidenceBoundary = evidenceBoundaryText
     ? `<p class="camera-evidence-boundary">${evidenceBoundaryText}</p>`
@@ -903,9 +905,9 @@ function tickCameraFrames() {
 }
 
 function recoveryCameraTargets() {
-  if (state.scenario === "camera-fault") return [targetCameraIndex()];
+  if (["camera-fault", "camera-485", "lamp-brightness"].includes(state.scenario)) return [targetCameraIndex()];
   if (state.scenario === "channel-fault") return [targetPairCameraIndex(), targetPairCameraIndex() + 1];
-  if (state.scenario === "screen-freeze") return Array.from({ length: 16 }, (_, index) => index);
+  if (["screen-freeze", "fan-overload"].includes(state.scenario)) return Array.from({ length: 16 }, (_, index) => index);
   return [];
 }
 
@@ -928,14 +930,14 @@ function recoveryReady() {
   if (state.scenario === "flow-abnormal") return state.flowRecoveryInRangeCount >= 3;
   const validation = state.recoveryValidation;
   if (!validation) return false;
-  if (state.scenario === "camera-fault") {
+  if (["camera-fault", "camera-485", "lamp-brightness"].includes(state.scenario)) {
     return validation.cameraChanges[targetCameraIndex()] >= 2;
   }
   if (state.scenario === "channel-fault") {
     return [targetPairCameraIndex(), targetPairCameraIndex() + 1]
       .every((index) => validation.cameraChanges[index] >= 2);
   }
-  if (state.scenario === "screen-freeze") {
+  if (["screen-freeze", "fan-overload"].includes(state.scenario)) {
     return validation.cameraTargets.every((index) => validation.cameraChanges[index] >= 2)
       && state.simClockAt > validation.startClock;
   }
@@ -946,17 +948,19 @@ function recoveryProgressText() {
   const validation = state.recoveryValidation;
   if (state.scenario === "flow-abnormal") return `培训观察：范围内采样 ${state.flowRecoveryInRangeCount}/3`;
   if (!validation) return "培训恢复观察";
-  if (state.scenario === "camera-fault") {
-    return `培训观察：目标画面刷新 ${validation.cameraChanges[targetCameraIndex()]}/2`;
+  if (["camera-fault", "camera-485", "lamp-brightness"].includes(state.scenario)) {
+    const suffix = state.scenario === "lamp-brightness" ? "且亮度标记解除" : "";
+    return `培训观察：目标画面刷新 ${validation.cameraChanges[targetCameraIndex()]}/2${suffix}`;
   }
   if (state.scenario === "channel-fault") {
     const indexes = [targetPairCameraIndex(), targetPairCameraIndex() + 1];
     return `培训观察：两幅画面刷新 ${validation.cameraChanges[indexes[0]]}/2、${validation.cameraChanges[indexes[1]]}/2`;
   }
-  if (state.scenario === "screen-freeze") {
+  if (["screen-freeze", "fan-overload"].includes(state.scenario)) {
     const recovered = validation.cameraTargets.filter((index) => validation.cameraChanges[index] >= 2).length;
     const clock = state.simClockAt > validation.startClock ? "时钟继续" : "等待时钟";
-    return `培训观察：前16主相机 ${recovered}/16 · ${clock}`;
+    const label = state.scenario === "fan-overload" ? "恢复后前16主相机" : "前16主相机";
+    return `培训观察：${label} ${recovered}/16 · ${clock}`;
   }
   return "培训恢复观察";
 }
@@ -1488,9 +1492,12 @@ function updateLiveIndicators() {
 }
 
 function renderPhysicalReadout() {
+  const pressureElement = document.querySelector("#air-pressure");
   if (isEvidenceSnapshot()) {
     const actionButton = activeEvidenceSnapshot().actionButton;
-    document.querySelector("#air-pressure").textContent = "本快照未取证";
+    pressureElement.textContent = "本快照未取证";
+    pressureElement.dataset.state = "unmeasured";
+    pressureElement.dataset.evidence = "snapshot-unmeasured";
     document.querySelector("#physical-action").textContent = actionButton
       ? `红色“${actionButton}”为实机动作按钮，不代表运行状态结论`
       : "本端点未显示动作按钮，不推断运行状态";
@@ -1498,6 +1505,7 @@ function renderPhysicalReadout() {
   }
   const active = faultPhaseActive();
   let pressure = "未接入真实压力值";
+  let pressureState = "unmeasured";
   let action = !state.running
     ? "已停止检测，无检测与喷射动作"
     : state.phase === PHASE.RECOVERY
@@ -1511,7 +1519,13 @@ function renderPhysicalReadout() {
   if (active && state.scenario === "lamp-brightness") action = `${cameraLabels[targetCameraIndex()]}仍刷新，局部亮度偏离`;
   if (active && state.scenario === "air-pressure-low") {
     pressure = "低于现场正常区间（培训推演）";
+    pressureState = "training-low";
     action = "低压报警已证实；喷气与界面联动待取证";
+  }
+  if (state.phase === PHASE.RECOVERY && state.scenario === "air-pressure-low") {
+    pressure = "已确认供气处理；真实压力仍未接入";
+    pressureState = "recovery-unverified";
+    action = "处理后继续现场确认实际压力与喷气；培训页不自动宣布恢复";
   }
   if (active && state.scenario === "waste-bag-full") {
     action = state.phase === PHASE.FAULT_FORMING
@@ -1524,7 +1538,9 @@ function renderPhysicalReadout() {
   if (active && state.scenario === "valve-long-blow") action = `第${state.position}号阀持续漏气；软件喷次不等同漏气时长`;
   if (active && state.scenario === "valve-weak-blow") action = `第${state.position}号阀有命令，实际喷气不足`;
   if (active && state.scenario === "camera-485") action = `${cameraLabels[targetCameraIndex()]}停止刷新且无新增触发`;
-  document.querySelector("#air-pressure").textContent = pressure;
+  pressureElement.textContent = pressure;
+  pressureElement.dataset.state = pressureState;
+  pressureElement.dataset.evidence = "training-only";
   document.querySelector("#physical-action").textContent = action;
 }
 
@@ -1566,7 +1582,9 @@ function liveEventText() {
     temperature: `通道${targetChannel()}当前温度 ${state.temperature.toFixed(1)}℃`,
     "lamp-brightness": `${cameraLabels[targetCameraIndex()]}仍刷新，但局部亮度偏离相邻画面`,
     "air-pressure-low": "气源压力不足报警培训态；实际喷气与界面联动待取证",
-    "waste-bag-full": "废料满袋光电遮挡计时达到约10秒",
+    "waste-bag-full": state.phase === PHASE.FAULT_FORMING
+      ? `废料满袋光电遮挡计时 ${Math.min(10, state.phaseTick)}/10秒`
+      : "光电遮挡达到约10秒，进入废料满袋报警培训态",
     "fan-overload": "风机热过载，接触器断开，当前无法检测",
     "valve-long-blow": `第${state.position}号阀持续漏气，软件喷次不强制抬高`,
     "valve-weak-blow": `第${state.position}号阀有命令计数，但实际喷气不足`,

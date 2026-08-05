@@ -468,6 +468,7 @@ try {
       channel: inspect("channel-fault"),
       camera: inspect("camera-fault"),
       temperature: inspect("temperature"),
+      brightness: inspect("lamp-brightness"),
       camera485: inspect("camera-485")
     };
     setSnapshot("endpoint-1-1");
@@ -481,6 +482,7 @@ try {
     channel: ["channel"],
     camera: ["camera"],
     temperature: ["temperature"],
+    brightness: ["brightness"],
     camera485: ["camera485"],
     snapshot: []
   }, "培训场景只联动对应监控项；实机只读快照不得叠加培训报警");
@@ -703,22 +705,97 @@ try {
   assert.match(physicalReadoutMatrix.normalAction, /物理检测和喷气未接入/, "正常培训基线不得冒充物理设备真实状态");
   assert.equal(physicalReadoutMatrix.ductTargeted, false, "风道堵塞不得伪造精准阀位故障喷次");
 
-  const brightnessBoundary = await evaluate(`(() => {
+  const stageBoundaryContract = await evaluate(`(() => {
+    const advanceTicks = (count) => {
+      const snapshots = [];
+      for (let tick = 0; tick < count; tick += 1) {
+        advanceScenarioPhase();
+        snapshots.push({ phase: state.phase, playing: state.playing, awaitingManual: state.awaitingManual });
+      }
+      return snapshots;
+    };
+    const timeline = (name, observableTicks, alarmTicks) => {
+      setScenario(name);
+      state.playing = true;
+      state.awaitingManual = false;
+      state.phase = PHASE.FAULT_OBSERVABLE;
+      state.phaseTick = 0;
+      const observable = advanceTicks(observableTicks);
+      const alarm = advanceTicks(alarmTicks);
+      return { observable, alarm };
+    };
+
+    setScenario("waste-bag-full");
+    state.playing = true;
+    state.awaitingManual = false;
+    state.phase = PHASE.FAULT_FORMING;
+    state.phaseTick = 0;
+    const waste = advanceTicks(10);
+    const result = {
+      waste,
+      fan: timeline("fan-overload", 4, 3),
+      brightness: timeline("lamp-brightness", 6, 4),
+      camera485: timeline("camera-485", 6, 4),
+      pressure: timeline("air-pressure-low", 6, 4)
+    };
+    setScenario("normal");
+    return result;
+  })()`);
+  assert.equal(stageBoundaryContract.waste[8].phase, "FAULT_FORMING", "废料满袋遮挡前9秒必须仍处于形成阶段");
+  assert.equal(stageBoundaryContract.waste[9].phase, "FAULT_OBSERVABLE", "废料满袋必须恰好计时10秒后进入可观察阶段");
+  const stageExpectations = [
+    ["fan", 4, 3, "风机过载"],
+    ["brightness", 6, 4, "灯板亮度"],
+    ["camera485", 6, 4, "相机485"],
+    ["pressure", 6, 4, "气压不足"]
+  ];
+  stageExpectations.forEach(([key, observableTicks, alarmTicks, label]) => {
+    const row = stageBoundaryContract[key];
+    assert.equal(row.observable[observableTicks - 2].phase, "FAULT_OBSERVABLE", `${label}可观察阶段不得提前跳转`);
+    assert.equal(row.observable[observableTicks - 1].phase, "ALARM_ACTIVE", `${label}必须按设定拍数进入报警阶段`);
+    assert.equal(row.alarm[alarmTicks - 2].awaitingManual, false, `${label}报警阶段不得提前进入人工确认`);
+    assert.deepEqual(row.alarm[alarmTicks - 1], { phase: "ALARM_ACTIVE", playing: false, awaitingManual: true }, `${label}报警阶段结束后必须停在人工确认`);
+  });
+
+  const brightnessRuntimeContract = await evaluate(`(() => {
     setScenario("lamp-brightness");
     state.phase = PHASE.FAULT_OBSERVABLE;
+    state.running = true;
+    const target = targetCameraIndex();
+    state.cameraCursor = target;
     renderAll();
     const abnormal = document.querySelector(".camera-card.brightness-abnormal img");
     const normal = document.querySelector(".camera-card:not(.brightness-abnormal) img");
-    return {
+    const beforePhase = state.cameraPhases[target];
+    readyCameraFrames.add(cameraSource(target, beforePhase ? 0 : 1));
+    tickCameraFrames();
+    updateSettingsMonitors();
+    const result = {
+      target,
+      frozen: frozenCameraIndexes(),
+      abnormalCount: document.querySelectorAll(".camera-card.brightness-abnormal").length,
+      abnormalIndex: Number(document.querySelector(".camera-card.brightness-abnormal")?.dataset.camera),
+      beforePhase,
+      afterPhase: state.cameraPhases[target],
+      activeMonitors: Array.from(document.querySelectorAll("[data-monitor].training-alert"), (node) => node.dataset.monitor),
       abnormalFilter: getComputedStyle(abnormal).filter,
       normalFilter: getComputedStyle(normal).filter
     };
+    setScenario("normal");
+    return result;
   })()`);
-  assert.equal(brightnessBoundary.abnormalFilter, brightnessBoundary.normalFilter, "亮度异常方向未取证时不得固定画成变暗");
+  assert.deepEqual(brightnessRuntimeContract.frozen, [], "灯板亮度偏离不得冻结目标相机");
+  assert.equal(brightnessRuntimeContract.abnormalCount, 1, "灯板亮度偏离只能标记目标相机");
+  assert.equal(brightnessRuntimeContract.abnormalIndex, brightnessRuntimeContract.target, "亮度偏离标记必须落在目标相机");
+  assert.notEqual(brightnessRuntimeContract.afterPhase, brightnessRuntimeContract.beforePhase, "灯板亮度偏离时目标相机必须继续刷新");
+  assert.deepEqual(brightnessRuntimeContract.activeMonitors, ["brightness"], "灯板亮度偏离只能联动亮度监控项");
+  assert.equal(brightnessRuntimeContract.abnormalFilter, brightnessRuntimeContract.normalFilter, "亮度异常方向未取证时不得固定画成变暗");
 
-  const fanBoundary = await evaluate(`(() => {
+  const fanLifecycleContract = await evaluate(`(() => {
     setScenario("fan-overload");
     state.phase = PHASE.FAULT_OBSERVABLE;
+    state.running = true;
+    state.playing = false;
     renderAll();
     const before = {
       runtime: state.runtimeSeconds,
@@ -727,26 +804,159 @@ try {
       dayTotal: state.dayTotal,
       frontValves: state.frontValves.slice(),
       rearValves: state.rearValves.slice(),
-      cameraPhases: state.cameraPhases.slice()
+      cameraPhases: state.cameraPhases.slice(),
+      triggerCount: state.triggerEvents.length
     };
+    const pausedFlags = {
+      detection: physicalDetectionPaused(),
+      events: detectionEventsSuppressed()
+    };
+    const boundary = document.querySelector(".camera-evidence-boundary")?.textContent || "";
     tickMachine();
     tickCameraFrames();
-    return {
-      boundary: document.querySelector(".camera-evidence-boundary")?.textContent || "",
+    const afterPause = {
+      runtime: state.runtimeSeconds,
+      flowLength: state.flowSamples.length,
+      hourlyFlow: state.hourlyFlow.slice(),
+      dayTotal: state.dayTotal,
+      frontValves: state.frontValves.slice(),
+      rearValves: state.rearValves.slice(),
+      cameraPhases: state.cameraPhases.slice(),
+      triggerCount: state.triggerEvents.length
+    };
+
+    enterPhase(PHASE.RECOVERY);
+    state.playing = true;
+    state.phaseTick = 0;
+    state.cameraCursor = 0;
+    for (let index = 0; index < 16; index += 1) {
+      readyCameraFrames.add(cameraSource(index, 0));
+      readyCameraFrames.add(cameraSource(index, 1));
+    }
+    renderAll();
+    const recoveryFlags = {
+      detection: physicalDetectionPaused(),
+      events: detectionEventsSuppressed()
+    };
+    const recoveryRuntimeBefore = state.runtimeSeconds;
+    tickMachine();
+    tickClock();
+    for (let index = 0; index < 8; index += 1) tickCameraFrames();
+    const result = {
+      boundary,
       before,
-      after: {
-        runtime: state.runtimeSeconds,
-        flowLength: state.flowSamples.length,
-        hourlyFlow: state.hourlyFlow.slice(),
-        dayTotal: state.dayTotal,
-        frontValves: state.frontValves.slice(),
-        rearValves: state.rearValves.slice(),
-        cameraPhases: state.cameraPhases.slice()
+      pausedFlags,
+      afterPause,
+      recoveryFlags,
+      recoveryRuntimeBefore,
+      recoveryRuntimeAfter: state.runtimeSeconds,
+      recoveredCameraCount: state.recoveryValidation.cameraTargets.filter((index) => state.recoveryValidation.cameraChanges[index] >= 2).length,
+      ready: recoveryReady(),
+      progress: recoveryProgressText()
+    };
+    setScenario("normal");
+    return result;
+  })()`);
+  assert.match(fanLifecycleContract.boundary, /保留故障前最后画面/, "风机过载动态区域必须显示证据边界");
+  assert.deepEqual(fanLifecycleContract.pausedFlags, { detection: true, events: true }, "风机过载可观察期必须停止新检测与新触发");
+  assert.deepEqual(fanLifecycleContract.afterPause, fanLifecycleContract.before, "风机过载可观察期不得继续伪造相机、流速、喷次和运行统计");
+  assert.deepEqual(fanLifecycleContract.recoveryFlags, { detection: false, events: false }, "风机过载进入恢复观察后应恢复培训动态");
+  assert.ok(fanLifecycleContract.recoveryRuntimeAfter > fanLifecycleContract.recoveryRuntimeBefore, "风机过载恢复观察后运行时长应继续");
+  assert.equal(fanLifecycleContract.recoveredCameraCount, 16, "风机过载恢复观察必须要求前16幅主检测画面各刷新2次");
+  assert.equal(fanLifecycleContract.ready, true, "风机过载只能在16幅画面及培训时钟继续后完成恢复观察");
+  assert.match(fanLifecycleContract.progress, /16\/16.*时钟继续/, "风机过载恢复进度必须显示16幅画面与时钟条件");
+
+  const camera485LifecycleContract = await evaluate(`(() => {
+    setScenario("camera-485");
+    state.phase = PHASE.FAULT_OBSERVABLE;
+    state.running = true;
+    const target = targetCameraIndex();
+    const neighbor = target === 15 ? 14 : target + 1;
+    state.cameraCursor = target;
+    renderAll();
+    readyCameraFrames.add(cameraSource(neighbor, state.cameraPhases[neighbor] ? 0 : 1));
+    const before = { target: state.cameraPhases[target], neighbor: state.cameraPhases[neighbor] };
+    tickCameraFrames();
+    const after = { target: state.cameraPhases[target], neighbor: state.cameraPhases[neighbor] };
+    const eventSources = [];
+    for (let tick = 0; tick < 48; tick += 1) {
+      state.tick = tick;
+      eventSources.push(currentDetectionEvent(false).cameraSourceNumber);
+    }
+
+    enterPhase(PHASE.RECOVERY);
+    state.playing = true;
+    renderAll();
+    for (let cycle = 0; cycle < 2; cycle += 1) {
+      state.cameraCursor = target;
+      readyCameraFrames.add(cameraSource(target, state.cameraPhases[target] ? 0 : 1));
+      tickCameraFrames();
+    }
+    const result = {
+      target,
+      frozen: [target + 1],
+      actualFrozen: (() => {
+        state.phase = PHASE.FAULT_OBSERVABLE;
+        const indexes = frozenCameraIndexes().map((index) => index + 1);
+        state.phase = PHASE.RECOVERY;
+        return indexes;
+      })(),
+      before,
+      after,
+      eventSources,
+      recoveryChanges: state.recoveryValidation.cameraChanges[target],
+      ready: recoveryReady(),
+      progress: recoveryProgressText()
+    };
+    setScenario("normal");
+    return result;
+  })()`);
+  assert.deepEqual(camera485LifecycleContract.actualFrozen, camera485LifecycleContract.frozen, "相机485异常只能冻结目标相机");
+  assert.equal(camera485LifecycleContract.after.target, camera485LifecycleContract.before.target, "相机485异常期目标画面必须停止刷新");
+  assert.notEqual(camera485LifecycleContract.after.neighbor, camera485LifecycleContract.before.neighbor, "相机485异常期相邻画面必须继续刷新");
+  assert.equal(camera485LifecycleContract.eventSources.includes(camera485LifecycleContract.target + 1), false, "相机485异常期不得生成来自目标相机的新触发");
+  assert.equal(camera485LifecycleContract.recoveryChanges, 2, "相机485恢复观察必须要求目标画面刷新2次");
+  assert.equal(camera485LifecycleContract.ready, true, "相机485目标画面刷新2次后才能完成培训恢复观察");
+  assert.match(camera485LifecycleContract.progress, /2\/2/, "相机485恢复进度必须显示目标画面的两次刷新");
+
+  const airPressureEvidenceContract = await evaluate(`(() => {
+    const inspect = (phase) => {
+      setScenario("air-pressure-low");
+      state.phase = phase;
+      renderPhysicalReadout();
+      const node = document.querySelector("#air-pressure");
+      return {
+        state: node.dataset.state,
+        evidence: node.dataset.evidence,
+        text: node.textContent,
+        hasNumber: /\\d/.test(node.textContent)
+      };
+    };
+    const active = inspect(PHASE.FAULT_OBSERVABLE);
+    const recovery = inspect(PHASE.RECOVERY);
+    setScenario("normal");
+    renderPhysicalReadout();
+    const normalNode = document.querySelector("#air-pressure");
+    return {
+      active,
+      recovery,
+      normal: {
+        state: normalNode.dataset.state,
+        evidence: normalNode.dataset.evidence,
+        text: normalNode.textContent,
+        hasNumber: /\\d/.test(normalNode.textContent)
       }
     };
   })()`);
-  assert.match(fanBoundary.boundary, /保留故障前最后画面/, "风机过载动态区域必须显示证据边界");
-  assert.deepEqual(fanBoundary.after, fanBoundary.before, "风机过载后不得继续伪造相机、流速、喷次和运行统计");
+  assert.deepEqual(airPressureEvidenceContract.active, {
+    state: "training-low", evidence: "training-only", text: "低于现场正常区间（培训推演）", hasNumber: false
+  }, "低气压只能显示培训推演状态，不得伪造实时压力数字");
+  assert.deepEqual(airPressureEvidenceContract.recovery, {
+    state: "recovery-unverified", evidence: "training-only", text: "已确认供气处理；真实压力仍未接入", hasNumber: false
+  }, "低气压恢复阶段必须明示真实压力未接入");
+  assert.deepEqual(airPressureEvidenceContract.normal, {
+    state: "unmeasured", evidence: "training-only", text: "未接入真实压力值", hasNumber: false
+  }, "正常培训基线也不得伪造实时压力数字");
 
   const scenarioIsolation = await evaluate(`(() => {
     setScenario("high-spray");

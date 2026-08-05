@@ -74,6 +74,8 @@ button { cursor: pointer; }
 .camera-card small { position: absolute; right: 3px; bottom: 1px; color: rgba(255,255,255,.76); font: 7px/1 ui-monospace, monospace; text-shadow: 0 1px #333; }
 .camera-card .hang-mark, .camera-card .blockage-mark { position: absolute; z-index: 2; pointer-events: none; }
 .camera-card .freeze-mark { position: absolute; left: 3px; top: 3px; z-index: 4; padding: 2px 4px; border: 1px solid rgba(255,236,187,.9); border-radius: 2px; color: #fff7df; background: rgba(103,72,28,.9); font-size: 6px; font-style: normal; line-height: 1.2; pointer-events: none; }
+.camera-card .brightness-mark { position: absolute; left: 3px; top: 3px; z-index: 4; padding: 2px 4px; border: 1px solid rgba(255,222,154,.9); border-radius: 2px; color: #fff8e7; background: rgba(118,79,21,.88); font-size: 6px; font-style: normal; line-height: 1.2; pointer-events: none; }
+.camera-card .brightness-mark small { position: static; display: block; margin-top: 1px; color: rgba(255,248,231,.78); font: 5px/1.2 sans-serif; text-shadow: none; }
 .camera-card .hang-mark { left: 47%; bottom: -7%; width: 4%; height: 64%; border-radius: 80% 36% 60% 30%; background: linear-gradient(#b9b4a9, #f5f2e8 45%, #dfdbcf); box-shadow: 0 0 4px rgba(255,255,255,.6); transform: rotate(-8deg); }
 .camera-card.large .hang-mark { width: 22%; left: 38%; height: 78%; }
 .camera-card .blockage-mark { left: 29%; top: 5%; width: 41%; height: 90%; border-radius: 48% 36% 54% 44%; background: radial-gradient(circle at 35% 25%, #f5f3eb, #c7c3b8 64%, #928d84); filter: blur(.5px); }
