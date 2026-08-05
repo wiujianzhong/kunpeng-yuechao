@@ -6,7 +6,7 @@
   <title>JWF0019A 实机界面培训模拟</title>
   <meta name="description" content="依据真实JWF0019A运行界面、相机画面和触发记录制作的培训模拟。">
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./hmi.css?v=20260805b">
+  <link rel="stylesheet" href="./hmi.css?v=20260805c">
 </head>
 <body>
   <header class="page-head">
@@ -27,14 +27,14 @@
       <div class="hmi-titlebar">KDistributionUIPlatform</div>
 
       <header class="machine-header">
-        <div class="scheme">当前方案: <b>912</b></div>
+        <div class="scheme">当前方案: <b id="scheme-value">912</b></div>
         <div id="channel-status" class="channel-status"></div>
-        <button id="run-toggle" class="stop-button start" type="button" aria-label="当前运行与报警状态" title="当前正在开车" disabled>开<br>车</button>
+        <button id="run-toggle" class="stop-button" type="button" aria-label="当前运行与报警状态" title="当前正在开车；点击该动作按钮应关车" disabled>关<br>车</button>
         <div class="machine-info">
           <strong id="machine-date"></strong>
-          <span>灯管寿命　2483/30000</span>
+          <span>灯管寿命　<b id="lamp-life">2483/30000</b></span>
           <span>运行　　　<b id="runtime-value">0154时13分43秒</b></span>
-          <span>版本　　　JLH_2026.01.10.0930</span>
+          <span>版本　　　<b id="version-value">JLH_2026.01.10.0930</b></span>
         </div>
       </header>
 
@@ -43,6 +43,7 @@
         <aside class="runtime-log">
           <div id="runtime-log-list"></div>
         </aside>
+        <div class="evidence-page-message" hidden><strong>该端点本页未取证</strong><span>不使用其他端点资料补齐。</span></div>
       </section>
 
       <section id="screen-stats" class="machine-screen stats-screen" hidden>
@@ -72,6 +73,7 @@
             <div id="calendar-grid" class="calendar-grid"></div>
           </div>
         </div>
+        <div class="evidence-page-message" hidden><strong>该端点本页未取证</strong><span>不生成或借用其他端点统计。</span></div>
       </section>
 
       <section id="screen-triggers" class="machine-screen trigger-screen" hidden>
@@ -84,6 +86,7 @@
           <b id="trigger-number">13</b>
           <p id="trigger-evidence" class="trigger-evidence" hidden></p>
         </div>
+        <div class="evidence-page-message" hidden><strong>该端点本页未取证</strong><span>不借用其他端点触发记录。</span></div>
       </section>
 
       <aside id="account-failure-dialog" class="account-failure-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="account-failure-title">
@@ -138,6 +141,7 @@
           <button type="button" disabled><span>▣</span><b>主界面</b></button><button class="active" type="button" disabled><span>⌁</span><b>系统设置</b></button>
           <button type="button" disabled><span>⌁</span><b>统计</b></button><button type="button" disabled><span>▦</span><b>触发图像</b></button>
         </footer>
+        <div class="evidence-page-message" hidden><strong>该端点本页未取证</strong><span>设置参数不从其他端点补齐。</span></div>
       </section>
 
       <footer class="machine-nav">
@@ -157,13 +161,24 @@
       <div class="training-live" aria-live="polite">
         <b id="run-state" class="run-state">● 正在开车（培训模拟）</b>
         <span>当前流速 <i id="live-flow">10.00</i> m/s</span>
-        <span>模拟日喷次 <i id="log-spray">69708</i></span>
+        <span><i id="spray-label">模拟日喷次</i> <i id="log-spray">69708</i></span>
       </div>
 
       <div class="physical-readout" aria-live="polite">
         <span>气压观察 <i id="air-pressure">未接入真实压力值</i></span>
         <span>物理动作 <i id="physical-action">检测与喷射动作正常（培训基线）</i></span>
       </div>
+
+      <label class="snapshot-control">
+        <span>实机证据快照（只读）</span>
+        <select id="snapshot-select">
+          <option value="training">训练合成（默认）</option>
+          <option value="endpoint-1-1">端点1-1（2026-08-02）</option>
+          <option value="endpoint-1-2">端点1-2</option>
+          <option value="endpoint-2-2">端点2-2</option>
+        </select>
+        <small id="snapshot-detail">动态培训模拟；不连接生产设备。</small>
+      </label>
 
       <label class="baseline-control">
         <span>人工日报参考资料（不参与模拟）</span>
@@ -233,6 +248,6 @@
     </aside>
   </main>
 
-  <script src="./hmi.js?v=20260805b"></script>
+  <script src="./hmi.js?v=20260805c"></script>
 </body>
 </html>

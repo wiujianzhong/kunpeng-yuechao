@@ -18,6 +18,9 @@ assert.doesNotMatch(script, /\b(fetch|XMLHttpRequest|WebSocket|sendBeacon)\b/, "
 
 const scenarioButtons = [...html.matchAll(/data-scenario="([^"]+)"/g)].map((match) => match[1]);
 assert.equal(new Set(scenarioButtons).size, 19, "HMI场景按钮应为19个且不能重名");
+const snapshotOptions = [...html.matchAll(/<option value="(training|endpoint-[^"]+)"/g)].map((match) => match[1]);
+assert.deepEqual(snapshotOptions, ["training", "endpoint-1-1", "endpoint-1-2", "endpoint-2-2"], "实机只读快照只能包含训练合成和三个已取证端点");
+assert.doesNotMatch(`${html}\n${script}`, /\b(fetch|XMLHttpRequest|WebSocket|sendBeacon)\b/, "HMI页面与脚本不得连接或写入生产设备");
 
 function freePort() {
   return new Promise((resolvePort, reject) => {
@@ -114,6 +117,219 @@ try {
 
   await waitFor(async () => evaluate("document.readyState === 'complete' && document.querySelectorAll('.camera-card').length === 20"), "HMI页面加载");
   await waitFor(async () => evaluate("readyCameraFrames.size >= 36"), "相机训练帧预载", 15_000);
+
+  const snapshotContract = await evaluate("JSON.parse(JSON.stringify(evidenceSnapshots))");
+  assert.deepEqual(Object.keys(snapshotContract), ["endpoint-1-1", "endpoint-1-2", "endpoint-2-2"], "只读证据只能按三个已确认端点拆分");
+  assert.deepEqual(snapshotContract["endpoint-1-1"].available, ["main", "valve", "flow", "spirit", "history", "triggers"], "端点1-1证据页面范围不得扩张");
+  assert.deepEqual(snapshotContract["endpoint-1-2"].available, ["valve"], "端点1-2只能展示喷阀统计证据");
+  assert.deepEqual(snapshotContract["endpoint-2-2"].available, ["main"], "端点2-2只能展示主界面证据");
+  assert.deepEqual({
+    capturedAt: snapshotContract["endpoint-1-1"].capturedAt,
+    lampLife: snapshotContract["endpoint-1-1"].lampLife,
+    runtime: snapshotContract["endpoint-1-1"].runtime,
+    dayTotal: snapshotContract["endpoint-1-1"].dayTotal,
+    selectedChannel: snapshotContract["endpoint-1-1"].selectedChannel,
+    actionButton: snapshotContract["endpoint-1-1"].actionButton
+  }, {
+    capturedAt: "2026-08-02 23:43:14",
+    lampLife: "3464/30000",
+    runtime: "0114:54:40",
+    dayTotal: 52338,
+    selectedChannel: 10,
+    actionButton: "关车"
+  }, "端点1-1元数据必须与截图04时刻一致");
+  assert.deepEqual(snapshotContract["endpoint-1-1"].flowSteps, [[0,10.5],[9.95,10.5],[10.1,0],[10.35,0],[10.45,10.5],[16.85,10.5],[17,0],[24,0]], "端点1-1流速必须使用显式取证阶梯点");
+  assert.deepEqual(snapshotContract["endpoint-1-1"].frontValves, [462,839,1200,1281,1142,1038,982,875,757,788,748,693,672,809,880,914,977,964,972,967,946,1014,1073,1025,983,1051,1304,1354,1369,1365,1025,473], "端点1-1前视32阀值不得串入其他机台");
+  assert.deepEqual(snapshotContract["endpoint-1-1"].rearValves, [408,786,1113,1129,1033,1013,1083,1031,942,924,1009,954,881,901,932,919,978,994,1001,954,870,855,920,970,1039,1156,1310,1277,1260,1317,1003,472], "端点1-1后视32阀值不得串入其他机台");
+  assert.deepEqual({
+    scheme: snapshotContract["endpoint-1-2"].scheme,
+    capturedAt: snapshotContract["endpoint-1-2"].capturedAt,
+    lampLife: snapshotContract["endpoint-1-2"].lampLife,
+    runtime: snapshotContract["endpoint-1-2"].runtime,
+    version: snapshotContract["endpoint-1-2"].version,
+    dayTotal: snapshotContract["endpoint-1-2"].dayTotal,
+    selectedChannel: snapshotContract["endpoint-1-2"].selectedChannel,
+    actionButton: snapshotContract["endpoint-1-2"].actionButton
+  }, {
+    scheme: "912",
+    capturedAt: "2026-08-02 23:42:12",
+    lampLife: "4186/30000",
+    runtime: "0116:03:46",
+    version: "JLH_2026.01.10.0930",
+    dayTotal: 65184,
+    selectedChannel: 10,
+    actionButton: "关车"
+  }, "端点1-2元数据必须独立来自截图08");
+  assert.deepEqual(snapshotContract["endpoint-1-2"].frontValves, [706,1153,1552,1548,1225,1023,1046,1120,1091,1205,1249,1243,1058,954,856,995,1069,912,953,1130,1070,872,803,894,881,806,941,1097,1158,1102,920,514], "端点1-2前视32阀值不得串入其他机台");
+  assert.deepEqual(snapshotContract["endpoint-1-2"].rearValves, [852,1393,1865,1872,1464,1127,1106,1084,1003,962,1052,1318,1609,1761,1694,1670,1639,1512,1556,1622,1492,1297,1252,1374,1418,1445,1641,1747,1812,1780,1459,821], "端点1-2后视32阀值不得串入其他机台");
+  assert.deepEqual({
+    capturedAt: snapshotContract["endpoint-2-2"].capturedAt,
+    lampLife: snapshotContract["endpoint-2-2"].lampLife,
+    runtime: snapshotContract["endpoint-2-2"].runtime,
+    selectedChannel: snapshotContract["endpoint-2-2"].selectedChannel,
+    dayTotal: snapshotContract["endpoint-2-2"].dayTotal,
+    actionButton: snapshotContract["endpoint-2-2"].actionButton
+  }, {
+    capturedAt: "2026-08-02 23:48:04",
+    lampLife: "4884/30000",
+    runtime: "0091:31:23",
+    selectedChannel: 1,
+    dayTotal: null,
+    actionButton: null
+  }, "端点2-2只保留主界面可直接读到的元数据");
+  assert.deepEqual(snapshotContract["endpoint-2-2"].mainLogs, [
+    { atText: "2026-08-02 11:49:09", text: "通道5吹阀保护开" },
+    { atText: "2026-08-02 11:49:36", text: "通道5吹阀保护开" },
+    { atText: "2026-08-02 11:49:58", text: "通道5吹阀保护开" },
+    { atText: "2026-08-02 11:50:17", text: "通道5吹阀保护开" },
+    { atText: "2026-08-02 12:25:00", text: "急停按钮按下" },
+    { atText: "2026-08-02 12:35:40", text: "急停按钮弹出" }
+  ], "端点2-2日志时间与顺序必须按截图09/10保留");
+
+  const snapshotRoundTrip = await evaluate(`(() => {
+    setScenario("high-spray");
+    state.position = 7;
+    state.targetView = "rear";
+    state.screen = "stats";
+    state.stat = "flow";
+    renderAll();
+    setScreen("stats");
+    setStat("flow");
+    const trainingBefore = JSON.stringify(state);
+
+    setSnapshot("endpoint-1-1");
+    setScreen("main");
+    const frozenBefore = JSON.stringify(state);
+    tickClock();
+    tickCameraFrames();
+    tickMachine();
+    const frozenAfter = JSON.stringify(state);
+    const oneOneMain = {
+      selected: document.querySelector("#snapshot-select").value,
+      scheme: document.querySelector("#scheme-value").textContent,
+      lamp: document.querySelector("#lamp-life").textContent,
+      runtime: document.querySelector("#runtime-value").textContent,
+      selectedChannel: document.querySelector(".channel-chip.selected")?.textContent || "",
+      cards: document.querySelectorAll("#camera-grid .camera-card.evidence-dark").length,
+      images: document.querySelectorAll("#camera-grid img").length,
+      scenarioLocked: Array.from(document.querySelectorAll("[data-scenario]"), (button) => button.disabled).every(Boolean),
+      playLocked: document.querySelector("#play-scenario").disabled,
+      positionLocked: document.querySelector("#position-slider").disabled,
+      viewLocked: document.querySelector("#target-view").disabled,
+      navEnabled: Array.from(document.querySelectorAll(".machine-nav [data-screen]"), (button) => !button.disabled).every(Boolean),
+      runButton: document.querySelector("#run-toggle").textContent.replace(/\\s+/g, ""),
+      sprayLabel: document.querySelector("#spray-label").textContent,
+      scenarioHidden: getComputedStyle(document.querySelector("#scenario-list")).display === "none",
+      baselineHidden: getComputedStyle(document.querySelector(".baseline-control")).display === "none",
+      positionHidden: getComputedStyle(document.querySelector(".position-control")).display === "none",
+      settingsHidden: getComputedStyle(document.querySelector(".read-settings")).display === "none"
+    };
+    setScreen("stats");
+    setStat("flow");
+    const flowCharts = document.querySelectorAll("#stat-flow .evidence-flow-chart");
+    const oneOneFlow = {
+      chartCount: flowCharts.length,
+      firstPath: flowCharts[0]?.querySelector(".evidence-step-line")?.getAttribute("d") || "",
+      firstLegend: flowCharts[0]?.textContent.includes("总体流速") || false,
+      secondLines: flowCharts[1]?.querySelectorAll(".flow-line").length ?? -1,
+      missingVisible: !document.querySelector("#screen-stats .evidence-page-message").hidden
+    };
+    setScreen("triggers");
+    const oneOneTriggers = {
+      slots: document.querySelector("#trigger-grid").children.length,
+      empty: document.querySelectorAll("#trigger-grid .trigger-thumb.empty").length,
+      records: document.querySelectorAll("#trigger-grid button.trigger-thumb").length
+    };
+
+    setSnapshot("endpoint-1-2");
+    setStat("valve");
+    const oneTwoValve = {
+      total: document.querySelector("#day-total").textContent,
+      selectedChannel: document.querySelector(".channel-chip.selected")?.textContent || "",
+      charts: document.querySelectorAll("#stat-valve .chart-block").length,
+      gap: document.querySelector("#stat-valve .evidence-gap-chart")?.textContent || "",
+      flowResidue: document.querySelectorAll("#stat-flow .flow-line").length
+    };
+    setScreen("main");
+    const oneTwoMissing = {
+      visible: !document.querySelector("#screen-main .evidence-page-message").hidden,
+      cards: document.querySelectorAll("#camera-grid .camera-card").length,
+      leakedLogs: document.querySelector("#runtime-log-list").textContent
+    };
+
+    setSnapshot("endpoint-2-2");
+    setScreen("main");
+    const twoTwoMain = {
+      images: document.querySelectorAll("#camera-grid img").length,
+      darkCards: document.querySelectorAll("#camera-grid .camera-card.evidence-dark").length,
+      selectedChannel: document.querySelector(".channel-chip.selected")?.textContent || "",
+      logs: Array.from(document.querySelectorAll("#runtime-log-list .log-line"), (line) => line.textContent),
+      actionButtonHidden: document.querySelector("#run-toggle").hidden,
+      noActionLayout: document.querySelector(".machine-header").classList.contains("no-action-button"),
+      physicalAction: document.querySelector("#physical-action").textContent
+    };
+    setScreen("stats");
+    setStat("valve");
+    const twoTwoMissing = {
+      visible: !document.querySelector("#screen-stats .evidence-page-message").hidden,
+      valveCharts: document.querySelectorAll("#stat-valve .chart-block").length
+    };
+    setScreen("triggers");
+    const twoTwoTriggerMissing = {
+      visible: !document.querySelector("#screen-triggers .evidence-page-message").hidden,
+      gridItems: document.querySelector("#trigger-grid").children.length,
+      detailHidden: document.querySelector(".trigger-detail").hidden
+    };
+
+    setSnapshot("training");
+    const trainingAfter = JSON.stringify(state);
+    const restoredControls = {
+      scenarioEnabled: Array.from(document.querySelectorAll("[data-scenario]"), (button) => !button.disabled).every(Boolean),
+      playEnabled: !document.querySelector("#play-scenario").disabled,
+      positionEnabled: !document.querySelector("#position-slider").disabled,
+      viewEnabled: !document.querySelector("#target-view").disabled,
+      missingOverlays: Array.from(document.querySelectorAll(".evidence-page-message"), (message) => !message.hidden).filter(Boolean).length
+    };
+    const clockBeforeResume = state.simClockAt;
+    const runtimeBeforeResume = state.runtimeSeconds;
+    tickClock();
+    tickMachine();
+    const resumed = { clock: state.simClockAt, runtime: state.runtimeSeconds };
+    setScenario("normal");
+    setScreen("main");
+    setStat("valve");
+    state.selectedTrigger = 9;
+    state.selectedTriggerKey = null;
+    renderTriggers();
+    return { trainingBefore, trainingAfter, frozenBefore, frozenAfter, oneOneMain, oneOneFlow, oneOneTriggers, oneTwoValve, oneTwoMissing, twoTwoMain, twoTwoMissing, twoTwoTriggerMissing, restoredControls, clockBeforeResume, runtimeBeforeResume, resumed };
+  })()`);
+  assert.equal(snapshotRoundTrip.frozenAfter, snapshotRoundTrip.frozenBefore, "实机只读快照中三类定时更新都必须停摆");
+  assert.deepEqual(snapshotRoundTrip.oneOneMain, {
+    selected: "endpoint-1-1", scheme: "912", lamp: "3464/30000", runtime: "0114:54:40", selectedChannel: "精灵Eye2",
+    cards: 20, images: 0, scenarioLocked: true, playLocked: true, positionLocked: true, viewLocked: true, navEnabled: true, runButton: "关车",
+    sprayLabel: "证据日喷次", scenarioHidden: true, baselineHidden: true, positionHidden: true, settingsHidden: true
+  }, "端点1-1主界面必须为独立灰暗20格并锁定训练控制");
+  assert.equal(snapshotRoundTrip.oneOneFlow.chartCount, 2, "端点1-1流速页应保留上下两张图");
+  assert.match(snapshotRoundTrip.oneOneFlow.firstPath, /^M .+(?: H .+ V .+)+$/, "端点1-1总体流速必须是无对角线的阶梯路径");
+  assert.equal(snapshotRoundTrip.oneOneFlow.firstLegend, true, "端点1-1总体流速应保留图例");
+  assert.equal(snapshotRoundTrip.oneOneFlow.secondLines, 0, "端点1-1实时流速图必须只有坐标与网格，不得补造曲线");
+  assert.equal(snapshotRoundTrip.oneOneFlow.missingVisible, false, "端点1-1流速是已取证页，不应显示缺证遮罩");
+  assert.deepEqual(snapshotRoundTrip.oneOneTriggers, { slots: 32, empty: 3, records: 29 }, "端点1-1触发页必须保留32槽、3空槽和29条记录");
+  assert.deepEqual(snapshotRoundTrip.oneTwoValve, { total: "65184", selectedChannel: "精灵Eye2", charts: 3, gap: "小时分布未转录；仅保留页头总数", flowResidue: 0 }, "端点1-2只显示独立喷阀证据且不得残留1-1流速");
+  assert.deepEqual(snapshotRoundTrip.oneTwoMissing, { visible: true, cards: 0, leakedLogs: "" }, "端点1-2未取证主界面不得残留其他端点画面或日志");
+  assert.equal(snapshotRoundTrip.twoTwoMain.images, 20, "端点2-2主界面应显示20幅本端点取证画面");
+  assert.equal(snapshotRoundTrip.twoTwoMain.darkCards, 0, "端点2-2不得残留端点1-1灰暗重构格");
+  assert.equal(snapshotRoundTrip.twoTwoMain.selectedChannel, "通道1", "端点2-2应保留截图中的通道1选中状态");
+  assert.equal(snapshotRoundTrip.twoTwoMain.actionButtonHidden, true, "端点2-2截图未出现动作按钮，不得借用其他端点的关车按钮");
+  assert.equal(snapshotRoundTrip.twoTwoMain.noActionLayout, true, "端点2-2隐藏按钮后，机器信息区必须紧接通道区");
+  assert.equal(snapshotRoundTrip.twoTwoMain.physicalAction, "本端点未显示动作按钮，不推断运行状态", "端点2-2右侧说明不得声称存在未取证按钮");
+  assert.deepEqual(snapshotRoundTrip.twoTwoMain.logs, snapshotContract["endpoint-2-2"].mainLogs.map((item) => `${item.atText}: ${item.text}`), "端点2-2日志不得串入1-1日志");
+  assert.deepEqual(snapshotRoundTrip.twoTwoMissing, { visible: true, valveCharts: 0 }, "端点2-2未取证统计页不得残留1-1或1-2柱图");
+  assert.deepEqual(snapshotRoundTrip.twoTwoTriggerMissing, { visible: true, gridItems: 0, detailHidden: true }, "端点2-2未取证触发页不得残留1-1触发详情");
+  assert.equal(snapshotRoundTrip.trainingAfter, snapshotRoundTrip.trainingBefore, "退出快照后必须完整恢复进入前的训练状态");
+  assert.deepEqual(snapshotRoundTrip.restoredControls, { scenarioEnabled: true, playEnabled: true, positionEnabled: true, viewEnabled: true, missingOverlays: 0 }, "退出快照后训练控制与画面必须恢复");
+  assert.ok(snapshotRoundTrip.resumed.clock > snapshotRoundTrip.clockBeforeResume, "退出快照后培训时钟应继续增长");
+  assert.ok(snapshotRoundTrip.resumed.runtime > snapshotRoundTrip.runtimeBeforeResume, "退出快照后培训运行时长应继续增长");
 
   const triggerEvidenceBaseline = await evaluate(`(() => {
     renderTriggers();
@@ -402,7 +618,7 @@ try {
     runButton: document.querySelector("#run-toggle").textContent.replace(/\s+/g, "")
   })`);
   assert.deepEqual(frozenAfter, frozenStart, "整屏卡住时界面时间、统计和20幅画面都应保持不变");
-  assert.equal(frozenAfter.runButton, "开车", "整屏卡住时应保留卡住前的开车按钮画面");
+  assert.equal(frozenAfter.runButton, "关车", "整屏卡住时应保留卡住前的关车动作按钮画面");
 
   console.log("HMI回归通过：19场景入口、触发页32槽/3空槽基线、只读边界、72阶段物理文案、堵花不绑定精准阀位、风机过载保留最后值、切换场景不串数且计时不倒退");
 } finally {

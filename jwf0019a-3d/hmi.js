@@ -29,6 +29,73 @@ const baselineProfiles = {
   }
 };
 
+const TRAINING_MACHINE_META = {
+  scheme: "912",
+  lampLife: "2483/30000",
+  version: "JLH_2026.01.10.0930"
+};
+
+const evidenceSnapshots = {
+  "endpoint-1-1": {
+    label: "端点1-1（2026-08-02）",
+    capturedAt: "2026-08-02 23:43:14",
+    scheme: "912",
+    lampLife: "3464/30000",
+    runtime: "0114:54:40",
+    version: "JLH_2026.01.10.0930",
+    dayTotal: 52338,
+    spiritTotal: 0,
+    selectedChannel: 10,
+    actionButton: "关车",
+    available: ["main", "valve", "flow", "spirit", "history", "triggers"],
+    hourlySpray: [3113,3159,3146,3203,3242,3117,3339,3293,3314,3166,1874,3343,3346,3283,3457,3197,1746,null,null,null,null,null,null,null,null],
+    frontValves: [462,839,1200,1281,1142,1038,982,875,757,788,748,693,672,809,880,914,977,964,972,967,946,1014,1073,1025,983,1051,1304,1354,1369,1365,1025,473],
+    rearValves: [408,786,1113,1129,1033,1013,1083,1031,942,924,1009,954,881,901,932,919,978,994,1001,954,870,855,920,970,1039,1156,1310,1277,1260,1317,1003,472],
+    flowSteps: [[0,10.5],[9.95,10.5],[10.1,0],[10.35,0],[10.45,10.5],[16.85,10.5],[17,0],[24,0]],
+    mainLogs: [
+      { atText: "截图记录", text: "模型加载" },
+      { atText: "截图记录", text: "系统启动" },
+      { atText: "截图记录", text: "通道1吹阀保护开" }
+    ]
+  },
+  "endpoint-1-2": {
+    label: "端点1-2",
+    capturedAt: "2026-08-02 23:42:12",
+    scheme: "912",
+    lampLife: "4186/30000",
+    runtime: "0116:03:46",
+    version: "JLH_2026.01.10.0930",
+    dayTotal: 65184,
+    spiritTotal: 0,
+    selectedChannel: 10,
+    actionButton: "关车",
+    available: ["valve"],
+    frontValves: [706,1153,1552,1548,1225,1023,1046,1120,1091,1205,1249,1243,1058,954,856,995,1069,912,953,1130,1070,872,803,894,881,806,941,1097,1158,1102,920,514],
+    rearValves: [852,1393,1865,1872,1464,1127,1106,1084,1003,962,1052,1318,1609,1761,1694,1670,1639,1512,1556,1622,1492,1297,1252,1374,1418,1445,1641,1747,1812,1780,1459,821]
+  },
+  "endpoint-2-2": {
+    label: "端点2-2",
+    capturedAt: "2026-08-02 23:48:04",
+    scheme: "912",
+    lampLife: "4884/30000",
+    runtime: "0091:31:23",
+    version: "JLH_2026.01.10.0930",
+    dayTotal: null,
+    spiritTotal: null,
+    selectedChannel: 1,
+    actionButton: null,
+    available: ["main"],
+    mainLogs: [
+      { atText: "2026-08-02 11:49:09", text: "通道5吹阀保护开" },
+      { atText: "2026-08-02 11:49:36", text: "通道5吹阀保护开" },
+      { atText: "2026-08-02 11:49:58", text: "通道5吹阀保护开" },
+      { atText: "2026-08-02 11:50:17", text: "通道5吹阀保护开" },
+      { atText: "2026-08-02 12:25:00", text: "急停按钮按下" },
+      { atText: "2026-08-02 12:35:40", text: "急停按钮弹出" }
+    ]
+  }
+};
+
 const scenarios = {
   normal: {
     phenomenon: "前16幅错峰持续刷新，刷新周期以实机为准；本次取证末4幅精灵眼素材为黑帧，不能作为正常标准。",
@@ -211,6 +278,7 @@ const MANUAL_RECOVERY_SCENARIOS = new Set([
 const OBSERVATION_ONLY_SCENARIOS = new Set(["hang-small"]);
 
 const state = {
+  snapshot: "training",
   scenario: "normal",
   position: 18,
   targetView: "front",
@@ -253,6 +321,15 @@ const state = {
   normalLogCursor: 0,
   simClockAt: EVIDENCE_CAPTURE_AT
 };
+
+let trainingStateBeforeSnapshot = null;
+let trainingPlayButtonBeforeSnapshot = null;
+const activeEvidenceSnapshot = () => evidenceSnapshots[state.snapshot] || null;
+const isEvidenceSnapshot = () => Boolean(activeEvidenceSnapshot());
+
+function cloneTrainingState() {
+  return JSON.parse(JSON.stringify(state));
+}
 
 const startupParams = new URLSearchParams(window.location.search);
 const startupScenario = startupParams.get("scenario");
@@ -383,6 +460,17 @@ function initializeTriggerRecords() {
 }
 
 function updateClock() {
+  const snapshot = activeEvidenceSnapshot();
+  document.querySelector("#scheme-value").textContent = snapshot ? snapshot.scheme || "未取证" : TRAINING_MACHINE_META.scheme;
+  document.querySelector("#lamp-life").textContent = snapshot ? snapshot.lampLife : TRAINING_MACHINE_META.lampLife;
+  document.querySelector("#version-value").textContent = snapshot
+    ? snapshot.version || "未取证"
+    : TRAINING_MACHINE_META.version;
+  if (snapshot) {
+    document.querySelector("#machine-date").textContent = `星期日 ${snapshot.capturedAt}`;
+    document.querySelector("#runtime-value").textContent = snapshot.runtime;
+    return;
+  }
   const now = trainingNow();
   const date = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
   const time = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())}`;
@@ -394,6 +482,7 @@ function updateClock() {
 }
 
 function tickClock() {
+  if (isEvidenceSnapshot()) return;
   if (hmiDisplayFrozen()) return;
   state.simClockAt += 1000;
   updateClock();
@@ -401,10 +490,11 @@ function tickClock() {
 
 function renderChannels() {
   const root = document.querySelector("#channel-status");
+  const selectedChannel = activeEvidenceSnapshot()?.selectedChannel ?? (isEvidenceSnapshot() ? null : state.selectedChannel);
   root.innerHTML = channelOrder.map((channel) => {
     const label = channel <= 8 ? `通道${channel}` : `精灵Eye${channel - 8}`;
     const classes = ["channel-chip"];
-    if (channel === state.selectedChannel) classes.push("selected");
+    if (channel === selectedChannel) classes.push("selected");
     return `<button class="${classes.join(" ")}" data-channel="${channel}" type="button" disabled title="通道切换行为尚无完整实机取证">${label}</button>`;
   }).join("");
 }
@@ -434,6 +524,19 @@ function ductDriftCameraIndexes() {
 
 function renderCameras() {
   const root = document.querySelector("#camera-grid");
+  if (isEvidenceSnapshot()) {
+    if (state.snapshot === "endpoint-1-1") {
+      const cards = cameraLabels.map((label, index) => `<div class="camera-card evidence-dark" data-camera="${index}"><small>${label}</small></div>`).join("");
+      root.innerHTML = `${cards}<p class="camera-evidence-boundary endpoint-note">按端点1-1截图02重构灰暗20格；未混用端点2-2棉流帧</p>`;
+      return;
+    }
+    if (state.snapshot === "endpoint-2-2") {
+      root.innerHTML = cameraLabels.map((label, index) => `<div class="camera-card" data-camera="${index}"><img src="${cameraSource(index, 1)}" alt="" aria-label="${label}相机取证画面"><small>${label}</small></div>`).join("");
+      return;
+    }
+    root.innerHTML = "";
+    return;
+  }
   const previousSources = new Map(Array.from(root.querySelectorAll(".camera-card")).map((card) => [Number(card.dataset.camera), card.querySelector("img")?.src]));
   const cards = cameraLabels.map((label, index) => {
     const classes = cameraClasses(index);
@@ -470,6 +573,7 @@ function renderCameras() {
 }
 
 function tickCameraFrames() {
+  if (isEvidenceSnapshot()) return;
   if (!state.running || physicalDetectionPaused() || hmiDisplayFrozen()) return;
   const cards = document.querySelectorAll(".camera-card");
   for (let offset = 0; offset < 4; offset += 1) {
@@ -512,6 +616,11 @@ function scenarioLogLines() {
 }
 
 function renderLogs() {
+  const snapshot = activeEvidenceSnapshot();
+  if (snapshot) {
+    document.querySelector("#runtime-log-list").innerHTML = (snapshot.mainLogs || []).map((item) => `<div class="log-line">${item.atText}: ${item.text}</div>`).join("");
+    return;
+  }
   const base = scenarioLogLines();
   const normal = NORMAL_MACHINE_EVENTS;
   const entries = Array.from({ length: 28 }, (_, index) => {
@@ -554,6 +663,22 @@ function chartBlock(title, values, labels, hot = [], cold = []) {
 }
 
 function renderValveStats() {
+  const snapshot = activeEvidenceSnapshot();
+  if (snapshot) {
+    if (!snapshot.available.includes("valve")) {
+      document.querySelector("#stat-valve").innerHTML = "";
+      return;
+    }
+    const hourly = snapshot.hourlySpray
+      ? chartBlock("JLEye总数统计", snapshot.hourlySpray, Array.from({ length: 25 }, (_, index) => index))
+      : '<article class="chart-block"><h2>JLEye总数统计</h2><div class="evidence-gap-chart">小时分布未转录；仅保留页头总数</div></article>';
+    document.querySelector("#stat-valve").innerHTML = [
+      hourly,
+      chartBlock("前视统计", snapshot.frontValves, Array.from({ length: 32 }, (_, index) => index + 1)),
+      chartBlock("后视统计", snapshot.rearValves, Array.from({ length: 32 }, (_, index) => index + 1))
+    ].join("");
+    return;
+  }
   const hot = [];
   if (faultPhaseActive() && ["high-spray", "hang-large"].includes(state.scenario)) hot.push(trainingHour());
   const affected = faultPhaseActive() && ["high-spray", "hang-large"].includes(state.scenario)
@@ -596,7 +721,37 @@ function lineChart(title, values, danger = [], labels = [], xAxisTitle = "") {
   return `<article class="chart-block"><h2>${title}</h2><svg class="line-chart" viewBox="0 0 760 205" preserveAspectRatio="none">${grid}<text class="flow-axis-label" x="4" y="33">20</text><text class="flow-axis-label" x="4" y="70">15</text><text class="flow-axis-label" x="4" y="107">10</text><text class="flow-axis-label" x="8" y="144">5</text><text class="flow-axis-label" x="8" y="181">0</text><text class="flow-axis-title" x="8" y="112" text-anchor="middle" transform="rotate(-90 8 112)">流速(m/s)</text><polyline class="flow-line" points="${points}"/>${marker}${xLabels}<text class="flow-axis-title" x="380" y="204" text-anchor="middle">${xAxisTitle}</text></svg></article>`;
 }
 
+function evidenceFlowChart(title, points = null, xAxisTitle = "", xMax = 24) {
+  const x = (value) => 20 + value / xMax * 720;
+  const y = (value) => 180 - value / 20 * 150;
+  const horizontalGrid = [0, 5, 10, 15, 20].map((value) => `<line class="grid-line" x1="20" y1="${y(value)}" x2="740" y2="${y(value)}"/>`).join("");
+  const verticalGrid = Array.from({ length: xMax + 1 }, (_, value) => `<line class="grid-line" x1="${x(value)}" y1="30" x2="${x(value)}" y2="180"/>`).join("");
+  const yLabels = [20, 15, 10, 5, 0].map((value) => `<text class="flow-axis-label" x="13" y="${y(value) + 2}" text-anchor="end">${value}</text>`).join("");
+  const xLabels = Array.from({ length: xMax + 1 }, (_, value) => `<text class="flow-axis-label" x="${x(value)}" y="193" text-anchor="middle">${value}</text>`).join("");
+  let curve = "";
+  let legend = "";
+  if (points?.length) {
+    const path = points.reduce((result, point, index) => index === 0
+      ? `M ${x(point[0])} ${y(point[1])}`
+      : `${result} H ${x(point[0])} V ${y(point[1])}`, "");
+    curve = `<path class="flow-line evidence-step-line" d="${path}"/>`;
+    legend = '<g aria-label="图例：总体流速"><line class="flow-legend-line" x1="650" y1="19" x2="680" y2="19"/><text class="flow-legend-text" x="686" y="22">总体流速</text></g>';
+  }
+  const pointData = points ? ` data-evidence-points='${JSON.stringify(points)}'` : "";
+  return `<article class="chart-block evidence-flow-chart"${pointData}><h2>${title}</h2><svg class="line-chart" viewBox="0 0 760 205" preserveAspectRatio="none">${horizontalGrid}${verticalGrid}<line class="flow-axis" x1="20" y1="30" x2="20" y2="180"/><line class="flow-axis" x1="20" y1="180" x2="740" y2="180"/>${yLabels}<text class="flow-axis-title" x="8" y="112" text-anchor="middle" transform="rotate(-90 8 112)">流速(m/s)</text>${curve}${legend}${xLabels}<text class="flow-axis-title" x="380" y="204" text-anchor="middle">${xAxisTitle}</text></svg></article>`;
+}
+
 function renderFlowStats() {
+  const snapshot = activeEvidenceSnapshot();
+  if (snapshot) {
+    document.querySelector("#stat-flow").innerHTML = snapshot.available.includes("flow")
+      ? [
+        evidenceFlowChart("总体流速统计", snapshot.flowSteps, "时间(h)"),
+        evidenceFlowChart("实时流速统计", null, "气阀编号", 32)
+      ].join("")
+      : "";
+    return;
+  }
   const time = [...state.hourlyFlow];
   const positions = Array.from({ length: 32 }, (_, index) => 10.2 + Math.sin(index * .72) * .3);
   let danger = [];
@@ -626,6 +781,11 @@ function renderFlowStats() {
 }
 
 function renderSpiritStats() {
+  const snapshot = activeEvidenceSnapshot();
+  if (snapshot && !snapshot.available.includes("spirit")) {
+    document.querySelector("#stat-spirit").innerHTML = "";
+    return;
+  }
   const hours = Array(24).fill(0);
   const positions = Array(32).fill(0);
   document.querySelector("#stat-spirit").innerHTML = [
@@ -634,7 +794,7 @@ function renderSpiritStats() {
   ].join("");
 }
 
-function renderCalendar() {
+function renderCalendar(activeDay = 1) {
   const rows = [
     [31, 26, 27, 28, 29, 30, 31, 1],
     [32, 2, 3, 4, 5, 6, 7, 8],
@@ -648,18 +808,20 @@ function renderCalendar() {
     if (columnIndex === 0) classes.push("week-number");
     if (columnIndex === 1 || columnIndex === 7) classes.push("weekend");
     if ((rowIndex === 0 && columnIndex >= 1 && columnIndex <= 6) || (rowIndex === 5 && columnIndex >= 3)) classes.push("outside-month");
-    if (rowIndex === 0 && columnIndex === 7) classes.push("active");
+    if ((activeDay === 1 && rowIndex === 0 && columnIndex === 7) || (activeDay === 2 && rowIndex === 1 && columnIndex === 1)) classes.push("active");
     return `<span class="${classes.join(" ")}">${day}</span>`;
   })).join("");
 }
 
 function renderStats() {
-  document.querySelector("#day-total").textContent = state.dayTotal;
-  document.querySelector("#spirit-total").textContent = state.spiritTotal;
+  const snapshot = activeEvidenceSnapshot();
+  document.querySelector("#stats-date").textContent = snapshot ? "8月02" : "8月02";
+  document.querySelector("#day-total").textContent = snapshot ? snapshot.dayTotal ?? "未取证" : state.dayTotal;
+  document.querySelector("#spirit-total").textContent = snapshot ? snapshot.spiritTotal ?? "未取证" : state.spiritTotal;
   renderValveStats();
   renderFlowStats();
   renderSpiritStats();
-  renderCalendar();
+  renderCalendar(snapshot?.available.includes("history") ? 2 : 1);
 }
 
 function triggerCameraLabel(source) {
@@ -669,13 +831,32 @@ function triggerCameraLabel(source) {
 
 function renderTriggers() {
   const grid = document.querySelector("#trigger-grid");
+  const detail = document.querySelector(".trigger-detail");
+  const snapshot = activeEvidenceSnapshot();
+  if (snapshot && !snapshot.available.includes("triggers")) {
+    grid.innerHTML = "";
+    document.querySelector("#trigger-number").textContent = "—";
+    detail.hidden = true;
+    return;
+  }
+  detail.hidden = false;
   grid.setAttribute("aria-label", "最近32条触发记录");
-  const liveRecords = state.triggerEvents.slice(0, 32);
+  const liveRecords = snapshot ? [] : state.triggerEvents.slice(0, 32);
   const emptySlots = Array.from(
     { length: Math.max(0, EVIDENCE_TRIGGER_EMPTY_SLOTS - liveRecords.length) },
     (_, index) => ({ id: `empty-${index + 1}`, placeholder: true })
   );
-  const records = [...liveRecords, ...emptySlots, ...state.triggerRecords].slice(0, 32);
+  const capturedAt = snapshot ? Date.parse(snapshot.capturedAt.replace(" ", "T") + "+08:00") : 0;
+  const evidenceRecords = snapshot
+    ? triggerCameraSources.slice(EVIDENCE_TRIGGER_EMPTY_SLOTS).map((cameraSourceNumber, index) => ({
+      id: `snapshot-${index + EVIDENCE_TRIGGER_EMPTY_SLOTS + 1}`,
+      imageIndex: index + EVIDENCE_TRIGGER_EMPTY_SLOTS + 1,
+      cameraSourceNumber,
+      at: capturedAt - index * 850,
+      repeated: false
+    }))
+    : state.triggerRecords;
+  const records = [...liveRecords, ...emptySlots, ...evidenceRecords].slice(0, 32);
   const interactiveRecords = records.filter((record) => !record.placeholder);
   if (state.selectedTriggerKey) {
     const stableIndex = interactiveRecords.findIndex((record) => record.id === state.selectedTriggerKey);
@@ -733,6 +914,15 @@ function selectTrigger(index) {
 }
 
 function renderReading() {
+  const snapshot = activeEvidenceSnapshot();
+  if (snapshot) {
+    document.querySelector("#scene-phenomenon").textContent = `${snapshot.label}只读证据，不播放培训场景。`;
+    document.querySelector("#scene-screen").textContent = `可查看：${snapshot.available.map((page) => ({ main: "主界面", valve: "阀统计", flow: "流速", spirit: "精灵统计", history: "历史", triggers: "触发" })[page]).join("、")}。`;
+    document.querySelector("#scene-diagnosis").textContent = "未取证页不生成数据，也不借用其他端点资料。";
+    document.querySelector("#scene-handling").textContent = "仅供证据对照；不连接设备、不写设置。";
+    renderPhase();
+    return;
+  }
   const data = scenarios[state.scenario];
   const prefix = state.scenario === "normal" ? (text) => text : trainingText;
   document.querySelector("#scene-phenomenon").textContent = prefix(targetViewText(data.phenomenon));
@@ -753,10 +943,92 @@ function renderBaselineProfile() {
     : profile.detail;
 }
 
+function renderSnapshotControl() {
+  const snapshot = activeEvidenceSnapshot();
+  document.querySelector("#snapshot-select").value = state.snapshot;
+  document.querySelector("#snapshot-detail").textContent = snapshot
+    ? `${snapshot.label} · ${snapshot.capturedAt} · 只读证据快照；未取证页不补造。`
+    : "动态培训模拟；不连接生产设备。";
+  document.querySelector(".training-panel").classList.toggle("snapshot-readonly", Boolean(snapshot));
+  document.querySelector(".hmi-window").classList.toggle("evidence-snapshot", Boolean(snapshot));
+}
+
+function renderEvidenceAvailability() {
+  document.querySelectorAll(".evidence-page-message").forEach((message) => { message.hidden = true; });
+  const snapshot = activeEvidenceSnapshot();
+  if (!snapshot) return;
+  const page = state.screen === "stats" ? state.stat : state.screen;
+  if (snapshot.available.includes(page)) return;
+  const screen = document.querySelector(`#screen-${state.screen}`);
+  const message = screen?.querySelector(".evidence-page-message");
+  if (message) message.hidden = false;
+}
+
+function syncSnapshotControls() {
+  const readonly = isEvidenceSnapshot();
+  document.querySelectorAll("[data-scenario]").forEach((button) => { button.disabled = readonly; });
+  document.querySelector("#play-scenario").disabled = readonly;
+  document.querySelector("#account-button").disabled = readonly;
+  document.querySelector(".read-settings").disabled = readonly;
+  syncPositionLock();
+}
+
+function setSnapshot(name) {
+  if (name === "training") {
+    if (trainingStateBeforeSnapshot) Object.assign(state, trainingStateBeforeSnapshot);
+    else state.snapshot = "training";
+    trainingStateBeforeSnapshot = null;
+    renderAll();
+    setScreen(state.screen);
+    setStat(state.stat);
+    syncSnapshotControls();
+    const playButton = document.querySelector("#play-scenario");
+    if (trainingPlayButtonBeforeSnapshot) {
+      playButton.textContent = trainingPlayButtonBeforeSnapshot.text;
+      playButton.classList.toggle("playing", trainingPlayButtonBeforeSnapshot.playing);
+    } else {
+      playButton.textContent = "播放完整联动";
+      playButton.classList.remove("playing");
+    }
+    trainingPlayButtonBeforeSnapshot = null;
+    return;
+  }
+  if (!evidenceSnapshots[name]) return;
+  if (!isEvidenceSnapshot()) {
+    trainingStateBeforeSnapshot = cloneTrainingState();
+    const currentPlayButton = document.querySelector("#play-scenario");
+    trainingPlayButtonBeforeSnapshot = {
+      text: currentPlayButton.textContent,
+      playing: currentPlayButton.classList.contains("playing")
+    };
+  }
+  state.snapshot = name;
+  state.playing = false;
+  state.awaitingManual = false;
+  state.roundClockActive = false;
+  state.selectedTrigger = 9;
+  state.selectedTriggerKey = null;
+  const button = document.querySelector("#play-scenario");
+  button.classList.remove("playing");
+  button.textContent = "证据快照只读";
+  state.screen = name === "endpoint-1-2" ? "stats" : "main";
+  state.stat = "valve";
+  renderAll();
+  setScreen(state.screen);
+  setStat(state.stat);
+  syncSnapshotControls();
+}
+
 function renderPhase() {
   const label = document.querySelector("#phase-label");
   const progress = document.querySelector("#phase-progress");
   const strip = document.querySelector(".phase-strip");
+  if (isEvidenceSnapshot()) {
+    label.textContent = "只读证据快照";
+    progress.value = 0;
+    strip.classList.remove("warning", "observation");
+    return;
+  }
   const duration = phaseDuration();
   label.textContent = state.awaitingManual
     ? "等待人工处理"
@@ -792,8 +1064,22 @@ function scenarioFlowValue() {
 }
 
 function updateLiveIndicators() {
+  const snapshot = activeEvidenceSnapshot();
+  if (snapshot) {
+    document.querySelector("#live-flow").textContent = "—";
+    document.querySelector("#spray-label").textContent = "证据日喷次";
+    document.querySelector("#log-spray").textContent = snapshot.dayTotal ?? "未取证";
+    const indicator = document.querySelector("#run-state");
+    indicator.textContent = "● 只读证据快照";
+    indicator.classList.add("stopped");
+    document.querySelector(".training-live").classList.remove("alert", "observation");
+    renderPhysicalReadout();
+    renderBaselineProfile();
+    return;
+  }
   const flow = state.liveFlow.toFixed(2);
   document.querySelector("#live-flow").textContent = flow;
+  document.querySelector("#spray-label").textContent = "模拟日喷次";
   document.querySelector("#log-spray").textContent = state.dayTotal;
   const indicator = document.querySelector("#run-state");
   const paused = physicalDetectionPaused();
@@ -817,6 +1103,14 @@ function updateLiveIndicators() {
 }
 
 function renderPhysicalReadout() {
+  if (isEvidenceSnapshot()) {
+    const actionButton = activeEvidenceSnapshot().actionButton;
+    document.querySelector("#air-pressure").textContent = "本快照未取证";
+    document.querySelector("#physical-action").textContent = actionButton
+      ? `红色“${actionButton}”为实机动作按钮，不代表运行状态结论`
+      : "本端点未显示动作按钮，不推断运行状态";
+    return;
+  }
   const active = faultPhaseActive();
   let pressure = "未接入真实压力值";
   let action = !state.running
@@ -1051,11 +1345,13 @@ function syncPositionLock() {
   const slider = document.querySelector("#position-slider");
   const viewSelect = document.querySelector("#target-view");
   viewSelect.value = state.targetView;
-  slider.disabled = state.playing || state.awaitingManual;
-  slider.title = slider.disabled ? "联动播放或等待人工处理期间位置已锁定" : "";
-  const viewLocked = !TARGET_VIEW_SCENARIOS.has(state.scenario) || state.playing || state.awaitingManual;
+  slider.disabled = isEvidenceSnapshot() || state.playing || state.awaitingManual;
+  slider.title = isEvidenceSnapshot() ? "只读证据快照不调整位置" : slider.disabled ? "联动播放或等待人工处理期间位置已锁定" : "";
+  const viewLocked = isEvidenceSnapshot() || !TARGET_VIEW_SCENARIOS.has(state.scenario) || state.playing || state.awaitingManual;
   viewSelect.disabled = viewLocked;
-  viewSelect.title = !TARGET_VIEW_SCENARIOS.has(state.scenario)
+  viewSelect.title = isEvidenceSnapshot()
+    ? "只读证据快照不调整检测面"
+    : !TARGET_VIEW_SCENARIOS.has(state.scenario)
     ? "当前场景不区分前视与后视目标"
     : viewLocked ? "联动播放或等待人工处理期间检测面已锁定" : "";
 }
@@ -1144,6 +1440,7 @@ function advanceScenarioPhase() {
 }
 
 function tickMachine() {
+  if (isEvidenceSnapshot()) return;
   if (!state.running) return;
   const paused = physicalDetectionPaused();
   if (hmiDisplayFrozen()) {
@@ -1186,6 +1483,7 @@ function tickMachine() {
 }
 
 function renderAll() {
+  updateClock();
   renderChannels();
   renderCameras();
   renderLogs();
@@ -1195,6 +1493,9 @@ function renderAll() {
   updateLiveIndicators();
   updateSettingsMonitors();
   updateRunToggleButton();
+  renderSnapshotControl();
+  renderEvidenceAvailability();
+  syncSnapshotControls();
 }
 
 function setAccountDialog(open) {
@@ -1206,6 +1507,9 @@ function setAccountDialog(open) {
 
 function updateRunToggleButton() {
   const button = document.querySelector("#run-toggle");
+  const machineHeader = document.querySelector(".machine-header");
+  button.hidden = false;
+  machineHeader.classList.remove("no-action-button");
   const settingsView = state.screen === "settings";
   const alarmLabels = {
     "high-spray": "喷次<br>异常",
@@ -1229,8 +1533,17 @@ function updateRunToggleButton() {
   };
   button.disabled = true;
   document.querySelector(".machine-header").classList.toggle("settings-mode", settingsView);
-  button.classList.toggle("settings-readonly", settingsView);
+  button.classList.toggle("settings-readonly", settingsView && !isEvidenceSnapshot());
   button.classList.remove("start", "recovering");
+  if (isEvidenceSnapshot()) {
+    const actionButton = activeEvidenceSnapshot().actionButton;
+    button.hidden = !actionButton;
+    machineHeader.classList.toggle("no-action-button", !actionButton);
+    if (!actionButton) return;
+    button.innerHTML = `${actionButton.slice(0, 1)}<br>${actionButton.slice(1)}`;
+    button.title = "实机动作按钮的只读复刻，不代表设备运行状态结论";
+    return;
+  }
   if (settingsView) {
     button.innerHTML = "关闭<br>工控阀";
     button.title = "当前系统参数快照只读；培训模拟不操作工控阀";
@@ -1242,8 +1555,7 @@ function updateRunToggleButton() {
     return;
   }
   if (hmiDisplayFrozen()) {
-    button.classList.add("start");
-    button.innerHTML = "开<br>车";
+    button.innerHTML = "关<br>车";
     button.title = "上位机画面冻结，此处保留卡住前显示";
     return;
   }
@@ -1258,13 +1570,13 @@ function updateRunToggleButton() {
     button.title = `${scenarios[state.scenario].phenomenon}（培训模拟）`;
     return;
   }
-  button.classList.add("start");
-  button.innerHTML = "开<br>车";
-  button.title = "当前正在开车";
+  button.innerHTML = "关<br>车";
+  button.title = "当前正在开车；点击该动作按钮应关车";
 }
 
 function setScreen(name) {
   if (name === "account") {
+    if (isEvidenceSnapshot()) return;
     setAccountDialog(document.querySelector("#account-failure-dialog").hidden);
     return;
   }
@@ -1274,6 +1586,7 @@ function setScreen(name) {
   document.querySelectorAll("[data-screen]").forEach((button) => button.classList.toggle("active", button.dataset.screen === name));
   document.querySelector(".machine-nav").classList.toggle("is-hidden", name === "settings");
   updateRunToggleButton();
+  renderEvidenceAvailability();
 }
 
 function setStat(name) {
@@ -1283,6 +1596,7 @@ function setStat(name) {
     document.querySelector(`#stat-${panel}`).hidden = name === "history" ? panel !== "spirit" : panel !== name;
   });
   document.querySelector("#stat-history").hidden = name !== "history";
+  renderEvidenceAvailability();
 }
 
 function cancelScenarioPlayback() {
@@ -1298,6 +1612,7 @@ function cancelScenarioPlayback() {
 }
 
 function setScenario(name) {
+  if (isEvidenceSnapshot()) return;
   cancelScenarioPlayback();
   restorePlaybackBaseline();
   state.logEvents = [];
@@ -1320,6 +1635,7 @@ function setScenario(name) {
 }
 
 function setRunning(running) {
+  if (isEvidenceSnapshot()) return;
   cancelScenarioPlayback();
   restorePlaybackBaseline();
   state.playbackBaseline = null;
@@ -1350,6 +1666,7 @@ document.querySelector("#account-failure-close").addEventListener("click", () =>
 document.querySelectorAll("[data-stat]").forEach((button) => button.addEventListener("click", () => setStat(button.dataset.stat)));
 document.querySelectorAll("[data-scenario]").forEach((button) => button.addEventListener("click", () => setScenario(button.dataset.scenario)));
 document.querySelector("#position-slider").addEventListener("input", (event) => {
+  if (isEvidenceSnapshot()) return;
   if (!state.awaitingManual) {
     restorePlaybackBaseline();
     state.playbackBaseline = null;
@@ -1361,7 +1678,7 @@ document.querySelector("#position-slider").addEventListener("input", (event) => 
 });
 
 document.querySelector("#target-view").addEventListener("change", (event) => {
-  if (state.playing || state.awaitingManual) return;
+  if (isEvidenceSnapshot() || state.playing || state.awaitingManual) return;
   restorePlaybackBaseline();
   state.playbackBaseline = null;
   state.playbackClock = null;
@@ -1374,7 +1691,10 @@ document.querySelector("#baseline-select").addEventListener("change", (event) =>
   renderBaselineProfile();
 });
 
+document.querySelector("#snapshot-select").addEventListener("change", (event) => setSnapshot(event.target.value));
+
 document.querySelector("#play-scenario").addEventListener("click", () => {
+  if (isEvidenceSnapshot()) return;
   if (!state.playing && state.awaitingManual && MANUAL_RECOVERY_SCENARIOS.has(state.scenario)) {
     state.playing = true;
     enterPhase(PHASE.RECOVERY);
