@@ -3156,6 +3156,9 @@ machine.add(factoryLine);
 const factoryPaint = new THREE.MeshStandardMaterial({ color: 0xd4dcda, roughness: 0.62, metalness: 0.16 });
 const factoryPanel = new THREE.MeshStandardMaterial({ color: 0xaeb9b7, roughness: 0.58, metalness: 0.22 });
 const factoryAccent = new THREE.MeshStandardMaterial({ color: 0x2d8091, roughness: 0.46, metalness: 0.16 });
+const factoryDoorPaint = new THREE.MeshStandardMaterial({ color: 0xe8eeeb, roughness: 0.56, metalness: 0.14 });
+const factoryFrameDark = new THREE.MeshStandardMaterial({ color: 0x596361, roughness: 0.50, metalness: 0.28 });
+const factoryGreen = new THREE.MeshStandardMaterial({ color: 0x74c534, roughness: 0.48, metalness: 0.08 });
 const factoryDuct = new THREE.MeshPhysicalMaterial({
   color: 0xbed2d4,
   transparent: true,
@@ -3197,6 +3200,133 @@ const beaterParams = {
 let jwf1124BeaterGroup = null;
 let jwf1124BeaterCore = null;
 const jwf1124BeaterPaddles = [];
+let jwf1124DoorPivot = null;
+let jwf1124DoorOpen = false;
+let jwf1124DoorAngle = 0;
+
+function markJwf1124DoorAction(object) {
+  object.userData.toggleJwf1124Door = true;
+  return object;
+}
+
+function setJwf1124DoorOpen(open) {
+  jwf1124DoorOpen = Boolean(open);
+  document.documentElement.dataset.jwf1124Door = jwf1124DoorOpen ? 'open' : 'closed';
+}
+
+function buildJwf1124SideDoor(group) {
+  const doorWidth = 1.48;
+  const doorHeight = 1.72;
+  const hingeX = -doorWidth / 2;
+  const centerY = 1.06;
+  const surfaceZ = -1.337;
+
+  box(group, [doorWidth + 0.10, 0.035, 0.030], [0, centerY + doorHeight / 2 + 0.040, surfaceZ], factoryFrameDark, '', '');
+  box(group, [doorWidth + 0.10, 0.035, 0.030], [0, centerY - doorHeight / 2 - 0.040, surfaceZ], factoryFrameDark, '', '');
+  box(group, [0.035, doorHeight, 0.030], [hingeX - 0.040, centerY, surfaceZ], factoryFrameDark, '', '');
+  box(group, [0.035, doorHeight, 0.030], [-hingeX + 0.040, centerY, surfaceZ], factoryFrameDark, '', '');
+
+  jwf1124DoorPivot = new THREE.Group();
+  jwf1124DoorPivot.name = 'JWF1124侧面检修门铰链';
+  jwf1124DoorPivot.position.set(hingeX, centerY, surfaceZ - 0.018);
+  group.add(jwf1124DoorPivot);
+
+  const doorPanel = roundedBox(
+    jwf1124DoorPivot,
+    [doorWidth, doorHeight, 0.040],
+    [doorWidth / 2, 0, -0.020],
+    factoryDoorPaint,
+    'JWF1124侧面可开合检修门',
+    '点击门板或把手可开合；门体围绕左侧铰链向外打开。',
+    0.020
+  );
+  markJwf1124DoorAction(doorPanel);
+
+  const handle = roundedBox(
+    jwf1124DoorPivot,
+    [0.055, 0.28, 0.075],
+    [doorWidth - 0.105, 0.04, -0.070],
+    factoryFrameDark,
+    'JWF1124检修门把手',
+    '点击把手可开合JWF1124侧面检修门。',
+    0.016
+  );
+  markJwf1124DoorAction(handle);
+
+  box(
+    jwf1124DoorPivot,
+    [0.10, doorHeight - 0.08, 0.018],
+    [0.12, 0, -0.049],
+    factoryGreen,
+    '',
+    '',
+    'decal'
+  );
+  box(
+    jwf1124DoorPivot,
+    [doorWidth - 0.10, 0.16, 0.018],
+    [doorWidth / 2, doorHeight / 2 - 0.13, -0.049],
+    factoryGreen,
+    '',
+    '',
+    'decal'
+  );
+  textPlate(
+    jwf1124DoorPivot,
+    'JWF1124C 开棉机',
+    1.18,
+    0.19,
+    [doorWidth / 2, 0.42, -0.060],
+    54,
+    '#46514f',
+    [0, Math.PI, 0]
+  );
+  textPlate(
+    jwf1124DoorPivot,
+    'JINGWEI',
+    0.72,
+    0.13,
+    [doorWidth / 2, 0.17, -0.061],
+    46,
+    '#62aa2a',
+    [0, Math.PI, 0]
+  );
+  box(
+    jwf1124DoorPivot,
+    [0.64, 0.27, 0.018],
+    [doorWidth * 0.52, -0.57, -0.050],
+    factoryFrameDark,
+    '',
+    '',
+    'decal'
+  );
+  for (let row = 0; row < 5; row += 1) {
+    box(
+      jwf1124DoorPivot,
+      [0.56, 0.018, 0.010],
+      [doorWidth * 0.52, -0.65 + row * 0.040, -0.061],
+      factoryDoorPaint,
+      '',
+      '',
+      'decal'
+    );
+  }
+
+  [-0.55, 0.55].forEach((offsetY) => {
+    cylinder(
+      group,
+      0.034,
+      0.18,
+      [hingeX, centerY + offsetY, surfaceZ - 0.070],
+      [0, 0, 0],
+      factoryFrameDark,
+      '',
+      ''
+    );
+  });
+  setJwf1124DoorOpen(false);
+  return doorPanel;
+}
 
 function updateJwf1124Beater() {
   if (!jwf1124BeaterGroup || !jwf1124BeaterCore) return;
@@ -3223,8 +3353,10 @@ function buildJwf1124Outline() {
   group.scale.setScalar(factoryDisplayScale);
   factoryLine.add(group);
 
-  roundedBox(group, [1.664, 2.08, 2.64], [0, 1.04, 0], factoryPaint, 'JWF1124简化方箱主体', '按现场沟通改为单一主体长方箱，不再保留顶部罩壳、屋面和额外长方体。', 0.035);
+  const jwf1124Body = roundedBox(group, [1.664, 2.08, 2.64], [0, 1.04, 0], factoryPaint, 'JWF1124简化方箱主体', '单一主体长方箱；点击侧面区域也可开合检修门。', 0.035);
+  markJwf1124DoorAction(jwf1124Body);
   textPlate(group, 'JWF1124 开棉机', 1.40, 0.20, [0, 1.55, 1.326], 46, '#3d4b49');
+  buildJwf1124SideDoor(group);
 
   jwf1124BeaterGroup = new THREE.Group();
   jwf1124BeaterGroup.name = 'JWF1124内部可调打手罗拉';
@@ -3278,8 +3410,13 @@ function buildFa151Outline() {
 
   roundedBox(group, [1.864, 2.55, 2.182], [0, 1.31, 0], factoryPaint, 'FA151除微尘机', '按现场沟通保留长方箱主体和进棉接口，删除其余外露圆柱与侧面风机。', 0.055);
   roundedBox(group, [1.70, 0.10, 1.98], [0, 2.59, 0], factoryPanel, '', '', 0.025);
-  box(group, [1.70, 1.92, 0.018], [0, 1.66, 1.100], factoryAccent, 'FA151前检修罩', '除微尘机前侧检修罩轮廓。');
-  addPanelSeams(group, 1.70, 1.92, 1.112, 2);
+  box(group, [1.70, 1.92, 0.018], [0, 1.66, 1.100], factoryDoorPaint, 'FA151平整白色外观面板', '侧面保持平整无门，不增加门缝、铰链和把手。');
+  box(group, [1.70, 0.16, 0.026], [0, 2.38, 1.116], factoryGreen, '', '', 'decal');
+  box(group, [0.12, 1.72, 0.026], [-0.77, 1.48, 1.116], factoryGreen, '', '', 'decal');
+  box(group, [0.66, 0.30, 0.026], [0.28, 0.58, 1.116], factoryFrameDark, '', '', 'decal');
+  for (let row = 0; row < 6; row += 1) {
+    box(group, [0.58, 0.016, 0.010], [0.28, 0.48 + row * 0.040, 1.132], factoryDoorPaint, '', '', 'decal');
+  }
   const inletFanMount = new THREE.Group();
   inletFanMount.position.set(0, 1.26, -1.105);
   group.add(inletFanMount);
@@ -3297,8 +3434,9 @@ function buildFa151Outline() {
     relayFanRotor.add(blade);
   }
   inletFanMount.add(relayFanRotor);
-  textPlate(group, 'FA151 除微尘机', 1.45, 0.20, [0, 2.18, 1.112], 50, '#ffffff');
-  textPlate(group, '进棉风机 = 接力风机', 1.35, 0.16, [0, 0.64, 1.112], 42, '#ffffff');
+  textPlate(group, 'FA151 除微尘机', 1.30, 0.19, [0.08, 2.13, 1.132], 52, '#46514f');
+  textPlate(group, 'JINGWEI', 0.72, 0.13, [0.08, 1.91, 1.132], 44, '#62aa2a');
+  textPlate(group, '进棉风机 = 接力风机', 1.18, 0.14, [0.12, 0.90, 1.132], 37, '#53635f');
   return {
     group,
     inletLocal: new THREE.Vector3(0, 1.26, -1.091),
@@ -4748,6 +4886,9 @@ function pickAt(event) {
     selectCalibrationPart(hit.object.userData.calibrationId);
     return;
   }
+  if (hit.object.userData.toggleJwf1124Door) {
+    setJwf1124DoorOpen(!jwf1124DoorOpen);
+  }
   if (!hit.object.userData.name) return;
   partTitle.textContent = hit.object.userData.name;
   partDetail.textContent = hit.object.userData.detail;
@@ -5203,6 +5344,14 @@ resize();
 function animate(time = 0) {
   const deltaSeconds = lastAnimationTime ? Math.min((time - lastAnimationTime) / 1000, 0.05) : 0;
   lastAnimationTime = time;
+  if (jwf1124DoorPivot) {
+    const targetDoorAngle = jwf1124DoorOpen ? THREE.MathUtils.degToRad(105) : 0;
+    const doorBlend = Math.min(1, deltaSeconds * 7.5);
+    jwf1124DoorAngle = THREE.MathUtils.lerp(jwf1124DoorAngle, targetDoorAngle, doorBlend);
+    if (Math.abs(jwf1124DoorAngle - targetDoorAngle) < 0.0005) jwf1124DoorAngle = targetDoorAngle;
+    jwf1124DoorPivot.rotation.y = jwf1124DoorAngle;
+    document.documentElement.dataset.jwf1124DoorAngle = THREE.MathUtils.radToDeg(jwf1124DoorAngle).toFixed(1);
+  }
   if (dismantlePlaying) {
     if (modelAnimationMixer && modelAnimationActions.length) {
       modelAnimationMixer.update(deltaSeconds);
