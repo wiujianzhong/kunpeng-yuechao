@@ -18,7 +18,7 @@
 </head>
 <body>
   <main>
-    <section class="stage" aria-label="JWF0019A三维模型">
+    <section class="stage" aria-label="JWF1124-JWF0019A-FA151整线三维模型">
       <canvas id="scene"></canvas>
       <div id="model-load-status" class="status" hidden aria-live="polite"><span class="dot warning"></span>模型加载中</div>
       <div id="process-status" class="process-status" hidden>白色棉絮正常通过</div>
@@ -43,14 +43,14 @@
       <section class="view-presets">
         <h2>固定视角</h2>
         <div class="views">
-          <button data-view="front" class="active">正面</button>
+          <button data-view="front">正面</button>
           <button data-view="rear">背面</button>
           <button data-view="left">左面</button>
           <button data-view="right">右面</button>
           <button data-view="isoLeft">左前45°</button>
           <button data-view="isoRight">右前45°</button>
           <button data-view="top">俯视</button>
-          <button data-view="line">整线</button>
+          <button data-view="line" class="active">整线</button>
         </div>
       </section>
 
@@ -77,9 +77,9 @@
           <div class="process-speed" aria-label="动画播放速度">
             <span>动画速度</span>
             <div class="speed-options" role="group" aria-label="动画播放速度">
-              <button type="button" data-process-speed="0.5">慢速 0.5×</button>
-              <button type="button" data-process-speed="1" class="active">标准 1×</button>
-              <button type="button" data-process-speed="1.5">快速 1.5×</button>
+              <button type="button" data-process-speed="0.5" data-process-rate="0.75">慢速 0.5×</button>
+              <button type="button" data-process-speed="1" data-process-rate="1.5" class="active">标准 1×</button>
+              <button type="button" data-process-speed="2" data-process-rate="3">快速 2×</button>
             </div>
           </div>
         </section>
@@ -94,11 +94,6 @@
             <span>左右位置</span><output id="fault-x-value">中间</output>
           </label>
           <input id="fault-x" class="range fault-range" type="range" min="-65" max="65" step="5" value="0">
-          <label class="fault-range-label" for="fault-size">
-            <span>堵花宽度</span><output id="fault-size-value">20厘米</output>
-          </label>
-          <input id="fault-size" class="range fault-range" type="range" min="1" max="50" step="1" value="20">
-          <p id="fault-help" class="fault-help">主通道固定在前玻璃上边缘；默认居中20厘米，左右位置和宽度可调。</p>
         </section>
       </div>
 
@@ -284,7 +279,7 @@
     </div>
   </dialog>
 
-  <script type="module" src="./app.js?v=72-1124-door-white-green-decals-20260806"></script>
+  <script type="module" src="./app.js?v=76-line-default-fixed-fault-multidoor-speed-20260806"></script>
   <script type="module" src="./knowledge-app.js?v=4-customer-copy"></script>
   <script src="./ui-access.js?v=1-calibration-lock"></script>
 </body>

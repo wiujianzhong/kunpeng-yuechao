@@ -19,15 +19,15 @@ scene.background = new THREE.Color(0xe8eee8);
 scene.fog = new THREE.Fog(0xe8eee8, 12, 26);
 
 const camera = new THREE.OrthographicCamera(-2.5, 2.5, 2.5, -2.5, 0.1, 100);
-camera.position.set(0, 1.85, 7.2);
-camera.zoom = 1.12;
+camera.position.set(10.5, 5.8, 9.0);
+camera.zoom = 0.46;
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0.1, 1.7, 0);
+controls.target.set(0, 2.05, 1.10);
 controls.enableDamping = true;
 controls.minDistance = 3.4;
 controls.maxDistance = 11;
-controls.minZoom = 0.36;
+controls.minZoom = 0.17;
 controls.maxZoom = 2.8;
 
 scene.add(new THREE.HemisphereLight(0xe5f4fb, 0x29312d, 2.15));
@@ -122,7 +122,7 @@ const machine = new THREE.Group();
 machine.position.y = 0.035;
 scene.add(machine);
 let currentMode = 'solid';
-let currentView = 'front';
+let currentView = 'line';
 let importedModelReady = false;
 let importedRootModel = null;
 let shellSurfacePaints = [];
@@ -2752,14 +2752,11 @@ const processStatus = document.querySelector('#process-status');
 const processPlay = document.querySelector('#process-play');
 const faultPlay = document.querySelector('#fault-play');
 const faultXInput = document.querySelector('#fault-x');
-const faultSizeInput = document.querySelector('#fault-size');
 const faultXValue = document.querySelector('#fault-x-value');
-const faultSizeValue = document.querySelector('#fault-size-value');
 const faultLevelOutput = document.querySelector('#fault-level');
-const faultHelp = document.querySelector('#fault-help');
 let processDemoPlaying = false;
 let faultDemoPlaying = false;
-let processPlaybackRate = 1;
+let processPlaybackRate = 1.5;
 let processTimelineMs = 0;
 const faultSettings = {
   type: 'channel',
@@ -2768,6 +2765,9 @@ const faultSettings = {
   xCm: 0,
   sizeCm: 20
 };
+document.documentElement.dataset.activeProcessSpeed = '1';
+document.documentElement.dataset.activeProcessPlaybackRate = String(processPlaybackRate);
+document.documentElement.dataset.faultWidthCm = String(faultSettings.sizeCm);
 
 const processVoice = {
   intake: new Audio('./assets/audio/step-intake.mp3'),
@@ -3200,132 +3200,189 @@ const beaterParams = {
 let jwf1124BeaterGroup = null;
 let jwf1124BeaterCore = null;
 const jwf1124BeaterPaddles = [];
-let jwf1124DoorPivot = null;
-let jwf1124DoorOpen = false;
-let jwf1124DoorAngle = 0;
+const factoryDoorActions = new Map();
 
-function markJwf1124DoorAction(object) {
-  object.userData.toggleJwf1124Door = true;
+function updateFactoryDoorDatasets() {
+  const states = {};
+  factoryDoorActions.forEach((action, id) => {
+    states[id] = action.open ? 'open' : 'closed';
+  });
+  document.documentElement.dataset.factoryDoors = JSON.stringify(states);
+}
+
+function createFactoryDoorAction(id, label) {
+  const action = { id, label, open: false, pivots: [] };
+  factoryDoorActions.set(id, action);
+  updateFactoryDoorDatasets();
+  return action;
+}
+
+function markFactoryDoorAction(object, actionId) {
+  object.userData.factoryDoorAction = actionId;
   return object;
 }
 
-function setJwf1124DoorOpen(open) {
-  jwf1124DoorOpen = Boolean(open);
-  document.documentElement.dataset.jwf1124Door = jwf1124DoorOpen ? 'open' : 'closed';
+function addFactoryDoorPivot(action, pivot, openAngleDeg) {
+  action.pivots.push({ pivot, openAngle: THREE.MathUtils.degToRad(openAngleDeg), angle: 0 });
 }
 
-function buildJwf1124SideDoor(group) {
-  const doorWidth = 1.48;
+function setFactoryDoorOpen(actionId, open) {
+  const action = factoryDoorActions.get(actionId);
+  if (!action) return;
+  action.open = Boolean(open);
+  updateFactoryDoorDatasets();
+}
+
+function toggleFactoryDoor(actionId) {
+  const action = factoryDoorActions.get(actionId);
+  if (action) setFactoryDoorOpen(actionId, !action.open);
+}
+
+function addDoorHinges(parent, positions) {
+  positions.forEach((position) => {
+    cylinder(parent, 0.030, 0.18, position, [0, 0, 0], factoryFrameDark, '', '');
+  });
+}
+
+function buildJwf1124OpposingDoors(group) {
+  const action = createFactoryDoorAction('jwf1124-opposing', 'JWF1124侧面对开门');
+  const totalWidth = 1.48;
+  const gap = 0.028;
+  const leafWidth = (totalWidth - gap) / 2;
   const doorHeight = 1.72;
-  const hingeX = -doorWidth / 2;
   const centerY = 1.06;
   const surfaceZ = -1.337;
+  const leftHingeX = -totalWidth / 2;
+  const rightHingeX = totalWidth / 2;
 
-  box(group, [doorWidth + 0.10, 0.035, 0.030], [0, centerY + doorHeight / 2 + 0.040, surfaceZ], factoryFrameDark, '', '');
-  box(group, [doorWidth + 0.10, 0.035, 0.030], [0, centerY - doorHeight / 2 - 0.040, surfaceZ], factoryFrameDark, '', '');
-  box(group, [0.035, doorHeight, 0.030], [hingeX - 0.040, centerY, surfaceZ], factoryFrameDark, '', '');
-  box(group, [0.035, doorHeight, 0.030], [-hingeX + 0.040, centerY, surfaceZ], factoryFrameDark, '', '');
+  box(group, [totalWidth + 0.10, 0.035, 0.030], [0, centerY + doorHeight / 2 + 0.040, surfaceZ], factoryFrameDark, '', '');
+  box(group, [totalWidth + 0.10, 0.035, 0.030], [0, centerY - doorHeight / 2 - 0.040, surfaceZ], factoryFrameDark, '', '');
+  box(group, [0.035, doorHeight, 0.030], [leftHingeX - 0.040, centerY, surfaceZ], factoryFrameDark, '', '');
+  box(group, [0.035, doorHeight, 0.030], [rightHingeX + 0.040, centerY, surfaceZ], factoryFrameDark, '', '');
+  box(group, [gap, doorHeight, 0.032], [0, centerY, surfaceZ - 0.002], factoryFrameDark, '', '');
 
-  jwf1124DoorPivot = new THREE.Group();
-  jwf1124DoorPivot.name = 'JWF1124侧面检修门铰链';
-  jwf1124DoorPivot.position.set(hingeX, centerY, surfaceZ - 0.018);
-  group.add(jwf1124DoorPivot);
-
-  const doorPanel = roundedBox(
-    jwf1124DoorPivot,
-    [doorWidth, doorHeight, 0.040],
-    [doorWidth / 2, 0, -0.020],
-    factoryDoorPaint,
-    'JWF1124侧面可开合检修门',
-    '点击门板或把手可开合；门体围绕左侧铰链向外打开。',
-    0.020
-  );
-  markJwf1124DoorAction(doorPanel);
-
-  const handle = roundedBox(
-    jwf1124DoorPivot,
-    [0.055, 0.28, 0.075],
-    [doorWidth - 0.105, 0.04, -0.070],
-    factoryFrameDark,
-    'JWF1124检修门把手',
-    '点击把手可开合JWF1124侧面检修门。',
-    0.016
-  );
-  markJwf1124DoorAction(handle);
-
-  box(
-    jwf1124DoorPivot,
-    [0.10, doorHeight - 0.08, 0.018],
-    [0.12, 0, -0.049],
-    factoryGreen,
-    '',
-    '',
-    'decal'
-  );
-  box(
-    jwf1124DoorPivot,
-    [doorWidth - 0.10, 0.16, 0.018],
-    [doorWidth / 2, doorHeight / 2 - 0.13, -0.049],
-    factoryGreen,
-    '',
-    '',
-    'decal'
-  );
-  textPlate(
-    jwf1124DoorPivot,
-    'JWF1124C 开棉机',
-    1.18,
-    0.19,
-    [doorWidth / 2, 0.42, -0.060],
-    54,
-    '#46514f',
-    [0, Math.PI, 0]
-  );
-  textPlate(
-    jwf1124DoorPivot,
-    'JINGWEI',
-    0.72,
-    0.13,
-    [doorWidth / 2, 0.17, -0.061],
-    46,
-    '#62aa2a',
-    [0, Math.PI, 0]
-  );
-  box(
-    jwf1124DoorPivot,
-    [0.64, 0.27, 0.018],
-    [doorWidth * 0.52, -0.57, -0.050],
-    factoryFrameDark,
-    '',
-    '',
-    'decal'
-  );
-  for (let row = 0; row < 5; row += 1) {
-    box(
-      jwf1124DoorPivot,
-      [0.56, 0.018, 0.010],
-      [doorWidth * 0.52, -0.65 + row * 0.040, -0.061],
+  [
+    { side: '左', hingeX: leftHingeX, direction: 1, openAngle: 105 },
+    { side: '右', hingeX: rightHingeX, direction: -1, openAngle: -105 }
+  ].forEach(({ side, hingeX, direction, openAngle }) => {
+    const pivot = new THREE.Group();
+    pivot.name = `JWF1124侧面${side}门铰链`;
+    pivot.position.set(hingeX, centerY, surfaceZ - 0.018);
+    group.add(pivot);
+    const panelCenterX = direction * leafWidth / 2;
+    const panel = roundedBox(
+      pivot,
+      [leafWidth, doorHeight, 0.040],
+      [panelCenterX, 0, -0.020],
       factoryDoorPaint,
-      '',
-      '',
-      'decal'
+      `JWF1124侧面${side}开检修门`,
+      '两扇门从中缝向左右相反方向打开。',
+      0.018
     );
-  }
-
-  [-0.55, 0.55].forEach((offsetY) => {
-    cylinder(
-      group,
-      0.034,
-      0.18,
-      [hingeX, centerY + offsetY, surfaceZ - 0.070],
-      [0, 0, 0],
+    markFactoryDoorAction(panel, action.id);
+    const handle = roundedBox(
+      pivot,
+      [0.050, 0.26, 0.075],
+      [direction * (leafWidth - 0.090), 0.02, -0.070],
       factoryFrameDark,
-      '',
-      ''
+      `JWF1124侧面${side}门把手`,
+      '点击门板或把手可同时开合两扇对开门。',
+      0.014
     );
+    markFactoryDoorAction(handle, action.id);
+    box(pivot, [leafWidth - 0.08, 0.14, 0.018], [panelCenterX, doorHeight / 2 - 0.12, -0.049], factoryGreen, '', '', 'decal');
+    textPlate(
+      pivot,
+      side === '左' ? 'JWF1124C' : 'JINGWEI',
+      leafWidth - 0.10,
+      0.15,
+      [panelCenterX, 0.36, -0.060],
+      46,
+      side === '左' ? '#46514f' : '#62aa2a',
+      [0, Math.PI, 0]
+    );
+    addFactoryDoorPivot(action, pivot, openAngle);
+    addDoorHinges(group, [
+      [hingeX, centerY - 0.55, surfaceZ - 0.070],
+      [hingeX, centerY + 0.55, surfaceZ - 0.070]
+    ]);
   });
-  setJwf1124DoorOpen(false);
-  return doorPanel;
+  setFactoryDoorOpen(action.id, false);
+}
+
+function buildYzFaceDoor(group, config) {
+  const {
+    actionId,
+    label,
+    surfaceX,
+    outwardSign,
+    centerY,
+    centerZ,
+    doorWidth,
+    doorHeight,
+    hingeSide,
+    openAngle
+  } = config;
+  const action = createFactoryDoorAction(actionId, label);
+  const hingeZ = centerZ + (hingeSide === 'max' ? doorWidth / 2 : -doorWidth / 2);
+  const panelDirection = hingeSide === 'max' ? -1 : 1;
+  const pivot = new THREE.Group();
+  pivot.name = `${label}铰链`;
+  pivot.position.set(surfaceX + outwardSign * 0.018, centerY, hingeZ);
+  group.add(pivot);
+
+  box(group, [0.035, 0.035, doorWidth + 0.10], [surfaceX, centerY + doorHeight / 2 + 0.040, centerZ], factoryFrameDark, '', '');
+  box(group, [0.035, 0.035, doorWidth + 0.10], [surfaceX, centerY - doorHeight / 2 - 0.040, centerZ], factoryFrameDark, '', '');
+  box(group, [0.035, doorHeight, 0.035], [surfaceX, centerY, centerZ - doorWidth / 2 - 0.040], factoryFrameDark, '', '');
+  box(group, [0.035, doorHeight, 0.035], [surfaceX, centerY, centerZ + doorWidth / 2 + 0.040], factoryFrameDark, '', '');
+
+  const panelCenterZ = panelDirection * doorWidth / 2;
+  const panel = roundedBox(
+    pivot,
+    [0.040, doorHeight, doorWidth],
+    [outwardSign * 0.020, 0, panelCenterZ],
+    factoryDoorPaint,
+    label,
+    '点击门板或把手可独立开合。',
+    0.018
+  );
+  markFactoryDoorAction(panel, action.id);
+  const handle = roundedBox(
+    pivot,
+    [0.075, 0.27, 0.055],
+    [outwardSign * 0.070, 0.02, panelDirection * (doorWidth - 0.10)],
+    factoryFrameDark,
+    `${label}把手`,
+    '点击把手可开合检修门。',
+    0.014
+  );
+  markFactoryDoorAction(handle, action.id);
+  box(
+    pivot,
+    [0.018, 0.14, doorWidth - 0.08],
+    [outwardSign * 0.049, doorHeight / 2 - 0.12, panelCenterZ],
+    factoryGreen,
+    '',
+    '',
+    'decal'
+  );
+  textPlate(
+    pivot,
+    label.replace('检修门', ''),
+    doorWidth - 0.18,
+    0.14,
+    [outwardSign * 0.060, 0.36, panelCenterZ],
+    38,
+    '#46514f',
+    [0, outwardSign * Math.PI / 2, 0]
+  );
+  addDoorHinges(group, [
+    [surfaceX + outwardSign * 0.070, centerY - 0.55, hingeZ],
+    [surfaceX + outwardSign * 0.070, centerY + 0.55, hingeZ]
+  ]);
+  addFactoryDoorPivot(action, pivot, openAngle);
+  setFactoryDoorOpen(action.id, false);
+  return panel;
 }
 
 function updateJwf1124Beater() {
@@ -3353,10 +3410,22 @@ function buildJwf1124Outline() {
   group.scale.setScalar(factoryDisplayScale);
   factoryLine.add(group);
 
-  const jwf1124Body = roundedBox(group, [1.664, 2.08, 2.64], [0, 1.04, 0], factoryPaint, 'JWF1124简化方箱主体', '单一主体长方箱；点击侧面区域也可开合检修门。', 0.035);
-  markJwf1124DoorAction(jwf1124Body);
+  const jwf1124Body = roundedBox(group, [1.664, 2.08, 2.64], [0, 1.04, 0], factoryPaint, 'JWF1124简化方箱主体', '单一主体长方箱；侧面设左右对开门，朝向FA151的宽面另设检修门。', 0.035);
+  jwf1124Body.userData.factoryDoorActions = ['jwf1124-opposing', 'jwf1124-fa151-face'];
   textPlate(group, 'JWF1124 开棉机', 1.40, 0.20, [0, 1.55, 1.326], 46, '#3d4b49');
-  buildJwf1124SideDoor(group);
+  buildJwf1124OpposingDoors(group);
+  buildYzFaceDoor(group, {
+    actionId: 'jwf1124-fa151-face',
+    label: 'JWF1124朝向FA151宽面检修门',
+    surfaceX: 0.842,
+    outwardSign: 1,
+    centerY: 1.06,
+    centerZ: 0,
+    doorWidth: 2.30,
+    doorHeight: 1.72,
+    hingeSide: 'min',
+    openAngle: -95
+  });
 
   jwf1124BeaterGroup = new THREE.Group();
   jwf1124BeaterGroup.name = 'JWF1124内部可调打手罗拉';
@@ -3410,7 +3479,7 @@ function buildFa151Outline() {
 
   roundedBox(group, [1.864, 2.55, 2.182], [0, 1.31, 0], factoryPaint, 'FA151除微尘机', '按现场沟通保留长方箱主体和进棉接口，删除其余外露圆柱与侧面风机。', 0.055);
   roundedBox(group, [1.70, 0.10, 1.98], [0, 2.59, 0], factoryPanel, '', '', 0.025);
-  box(group, [1.70, 1.92, 0.018], [0, 1.66, 1.100], factoryDoorPaint, 'FA151平整白色外观面板', '侧面保持平整无门，不增加门缝、铰链和把手。');
+  box(group, [1.70, 1.92, 0.018], [0, 1.66, 1.100], factoryDoorPaint, 'FA151平整白色外观面板', '正面保持平整；进棉口左右两个侧面分别设置检修门。');
   box(group, [1.70, 0.16, 0.026], [0, 2.38, 1.116], factoryGreen, '', '', 'decal');
   box(group, [0.12, 1.72, 0.026], [-0.77, 1.48, 1.116], factoryGreen, '', '', 'decal');
   box(group, [0.66, 0.30, 0.026], [0.28, 0.58, 1.116], factoryFrameDark, '', '', 'decal');
@@ -3437,6 +3506,30 @@ function buildFa151Outline() {
   textPlate(group, 'FA151 除微尘机', 1.30, 0.19, [0.08, 2.13, 1.132], 52, '#46514f');
   textPlate(group, 'JINGWEI', 0.72, 0.13, [0.08, 1.91, 1.132], 44, '#62aa2a');
   textPlate(group, '进棉风机 = 接力风机', 1.18, 0.14, [0.12, 0.90, 1.132], 37, '#53635f');
+  buildYzFaceDoor(group, {
+    actionId: 'fa151-inlet-left',
+    label: 'FA151进棉口左侧检修门',
+    surfaceX: -0.943,
+    outwardSign: -1,
+    centerY: 1.35,
+    centerZ: 0,
+    doorWidth: 1.82,
+    doorHeight: 1.78,
+    hingeSide: 'min',
+    openAngle: -95
+  });
+  buildYzFaceDoor(group, {
+    actionId: 'fa151-inlet-right',
+    label: 'FA151进棉口右侧检修门',
+    surfaceX: 0.943,
+    outwardSign: 1,
+    centerY: 1.35,
+    centerZ: 0,
+    doorWidth: 1.82,
+    doorHeight: 1.78,
+    hingeSide: 'max',
+    openAngle: -95
+  });
   return {
     group,
     inletLocal: new THREE.Vector3(0, 1.26, -1.091),
@@ -3704,6 +3797,18 @@ function rebuildFactoryConnections(syncSlopeFromLayout = true) {
 
   factoryLineAudit = {
     order: ['JWF1124C-160', 'JWF0019A', 'FA151'],
+    defaultView: 'line',
+    allFixedViewsUseFactoryLine: true,
+    allMaterialModesUseFactoryLine: true,
+    faultWidthCm: 20,
+    faultWidthAdjustable: false,
+    processSpeedUi: [0.5, 1, 2],
+    processSpeedRates: [0.75, 1.5, 3],
+    doorConfiguration: {
+      jwf1124OpposingLeafCount: 2,
+      jwf1124Fa151FacingDoorCount: 1,
+      fa151InletSideDoorCount: 2
+    },
     layoutAxis: 'JWF0019A固定；JWF1124与FA151可自由移动、旋转、缩放',
     displayScale: Number(factoryDisplayScale.toFixed(6)),
     nominalMachineDimensionsMm: {
@@ -3905,7 +4010,7 @@ function setLineLayoutEnabled(enabled) {
   } else {
     lineLayoutTransformControls.detach();
     lineLayoutTransformControls.getHelper().visible = false;
-    factoryLine.visible = currentView === 'line';
+    factoryLine.visible = true;
     lineLayoutStatus.textContent = 'JWF0019A固定为基准';
   }
 }
@@ -4063,7 +4168,9 @@ lineLayoutReset.addEventListener('click', () => {
   lineLayoutStatus.textContent = '已复位到用户JSON基线';
 });
 selectLineLayoutPart('jwf1124');
-factoryLine.visible = false;
+factoryLine.visible = true;
+document.documentElement.dataset.currentView = currentView;
+document.documentElement.dataset.factoryLineVisible = 'true';
 
 function flowChannelWallPoint(part, progress, side = 'rear') {
   const dimensions = part.userData.config.dimensions;
@@ -4886,8 +4993,9 @@ function pickAt(event) {
     selectCalibrationPart(hit.object.userData.calibrationId);
     return;
   }
-  if (hit.object.userData.toggleJwf1124Door) {
-    setJwf1124DoorOpen(!jwf1124DoorOpen);
+  if (hit.object.userData.factoryDoorAction) toggleFactoryDoor(hit.object.userData.factoryDoorAction);
+  if (hit.object.userData.factoryDoorActions) {
+    hit.object.userData.factoryDoorActions.forEach((actionId) => toggleFactoryDoor(actionId));
   }
   if (!hit.object.userData.name) return;
   partTitle.textContent = hit.object.userData.name;
@@ -4933,11 +5041,8 @@ const lineInspectionViews = {
 
 function updateViewZoom() {
   const amount = Number(document.querySelector('#explode')?.value || 0) / 100;
-  const lineInspection = currentView === 'line' || lineLayoutEnabled;
-  const baseZoom = lineInspection
-    ? 0.46
-    : ['front', 'rear'].includes(currentView) ? 1.12 : currentView === 'top' ? 0.92 : 1.08;
-  camera.zoom = Math.max(lineInspection ? 0.36 : 0.62, baseZoom * (1 - amount * 0.30));
+  const baseZoom = currentView === 'top' ? 0.24 : 0.46;
+  camera.zoom = Math.max(currentView === 'top' ? 0.17 : 0.36, baseZoom * (1 - amount * 0.30));
   camera.updateProjectionMatrix();
 }
 
@@ -4946,12 +5051,13 @@ document.querySelectorAll('[data-view]').forEach((button) => {
     document.querySelectorAll('[data-view]').forEach((item) => item.classList.remove('active'));
     button.classList.add('active');
     currentView = button.dataset.view;
-    const lineInspection = currentView === 'line' || lineLayoutEnabled;
-    factoryLine.visible = lineInspection;
-    camera.position.set(...(lineInspectionViews[button.dataset.view] || views[button.dataset.view]));
+    factoryLine.visible = true;
+    document.documentElement.dataset.currentView = currentView;
+    document.documentElement.dataset.factoryLineVisible = 'true';
+    camera.position.set(...lineInspectionViews[button.dataset.view]);
     camera.up.set(0, button.dataset.view === 'top' ? 0 : 1, button.dataset.view === 'top' ? -1 : 0);
     updateViewZoom();
-    controls.target.set(...(lineInspection ? [0, 2.05, 1.10] : [0.1, 1.7, 0]));
+    controls.target.set(0, 2.05, 1.10);
     controls.update();
   });
 });
@@ -4966,6 +5072,7 @@ document.querySelectorAll('[data-layer]').forEach((checkbox) => {
 
 function applyMode(mode) {
   currentMode = mode;
+  document.documentElement.dataset.currentMode = mode;
   document.querySelectorAll('[data-mode]').forEach((button) => {
     button.classList.toggle('active', button.dataset.mode === mode);
   });
@@ -5006,6 +5113,8 @@ function applyMode(mode) {
     if (mode === 'xray') object.material = role === 'internal' ? modeMaterials.xrayInternal : modeMaterials.xrayShell;
     object.castShadow = mode === 'solid' || mode === 'clay';
   });
+  factoryLine.visible = true;
+  document.documentElement.dataset.factoryLineVisible = 'true';
   if (processDemoPlaying || faultDemoPlaying) setValveRowActive(true);
 }
 
@@ -5116,11 +5225,7 @@ function updateFaultControlLabels() {
   faultXValue.textContent = faultSettings.xCm === 0
     ? '中间'
     : `${faultSettings.xCm < 0 ? '左' : '右'}${Math.abs(faultSettings.xCm)}厘米`;
-  faultSizeValue.textContent = `${faultSettings.sizeCm}厘米`;
   faultLevelOutput.textContent = `${faultSettings.type === 'duct' ? '排杂风道' : '主通道'} · ${level}`;
-  faultHelp.textContent = faultSettings.type === 'duct'
-    ? '排杂风道挂花；左右位置和堵花宽度可调。'
-    : '主通道固定在前玻璃上边缘；默认居中20厘米，左右位置和宽度可调。';
 }
 
 function setFaultDemo(enabled) {
@@ -5167,8 +5272,8 @@ function setFaultDemo(enabled) {
 document.querySelectorAll('[data-fault-type]').forEach((button) => {
   button.addEventListener('click', () => {
     faultSettings.type = button.dataset.faultType;
-    faultSettings.sizeCm = faultSettings.type === 'duct' ? 30 : 20;
-    faultSizeInput.value = faultSettings.sizeCm;
+    faultSettings.sizeCm = 20;
+    document.documentElement.dataset.faultWidthCm = '20';
     document.querySelectorAll('[data-fault-type]').forEach((item) => {
       item.classList.toggle('active', item === button);
     });
@@ -5177,14 +5282,9 @@ document.querySelectorAll('[data-fault-type]').forEach((button) => {
   });
 });
 
-[
-  [faultXInput, 'xCm'],
-  [faultSizeInput, 'sizeCm']
-].forEach(([input, key]) => {
-  input.addEventListener('input', () => {
-    faultSettings[key] = Number(input.value);
-    updateFaultControlLabels();
-  });
+faultXInput.addEventListener('input', () => {
+  faultSettings.xCm = Number(faultXInput.value);
+  updateFaultControlLabels();
 });
 faultPlay.addEventListener('click', () => setFaultDemo(!faultDemoPlaying));
 updateFaultControlLabels();
@@ -5233,7 +5333,9 @@ function setProcessDemo(enabled) {
 processPlay.addEventListener('click', () => setProcessDemo(!processDemoPlaying));
 document.querySelectorAll('[data-process-speed]').forEach((button) => {
   button.addEventListener('click', () => {
-    processPlaybackRate = Number(button.dataset.processSpeed) || 1;
+    processPlaybackRate = Number(button.dataset.processRate) || 1.5;
+    document.documentElement.dataset.activeProcessSpeed = button.dataset.processSpeed;
+    document.documentElement.dataset.activeProcessPlaybackRate = String(processPlaybackRate);
     document.querySelectorAll('[data-process-speed]').forEach((item) => {
       item.classList.toggle('active', item === button);
     });
@@ -5344,14 +5446,18 @@ resize();
 function animate(time = 0) {
   const deltaSeconds = lastAnimationTime ? Math.min((time - lastAnimationTime) / 1000, 0.05) : 0;
   lastAnimationTime = time;
-  if (jwf1124DoorPivot) {
-    const targetDoorAngle = jwf1124DoorOpen ? THREE.MathUtils.degToRad(105) : 0;
-    const doorBlend = Math.min(1, deltaSeconds * 7.5);
-    jwf1124DoorAngle = THREE.MathUtils.lerp(jwf1124DoorAngle, targetDoorAngle, doorBlend);
-    if (Math.abs(jwf1124DoorAngle - targetDoorAngle) < 0.0005) jwf1124DoorAngle = targetDoorAngle;
-    jwf1124DoorPivot.rotation.y = jwf1124DoorAngle;
-    document.documentElement.dataset.jwf1124DoorAngle = THREE.MathUtils.radToDeg(jwf1124DoorAngle).toFixed(1);
-  }
+  const factoryDoorAngles = {};
+  factoryDoorActions.forEach((action, actionId) => {
+    action.pivots.forEach((record, index) => {
+      const targetDoorAngle = action.open ? record.openAngle : 0;
+      const doorBlend = Math.min(1, deltaSeconds * 7.5);
+      record.angle = THREE.MathUtils.lerp(record.angle, targetDoorAngle, doorBlend);
+      if (Math.abs(record.angle - targetDoorAngle) < 0.0005) record.angle = targetDoorAngle;
+      record.pivot.rotation.y = record.angle;
+      factoryDoorAngles[`${actionId}-${index + 1}`] = Number(THREE.MathUtils.radToDeg(record.angle).toFixed(1));
+    });
+  });
+  document.documentElement.dataset.factoryDoorAngles = JSON.stringify(factoryDoorAngles);
   if (dismantlePlaying) {
     if (modelAnimationMixer && modelAnimationActions.length) {
       modelAnimationMixer.update(deltaSeconds);
