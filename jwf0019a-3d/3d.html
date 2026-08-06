@@ -6,7 +6,7 @@
   <title>JWF0019A 设备超级知识平台</title>
   <meta name="description" content="JWF0019A异纤机3D结构、工作原理、操作保养、故障诊断、参数质量与设备知识库。">
   <script defer src="https://xiaowustudio.cn/assets/analytics.js?v=20260710"></script>
-  <link rel="stylesheet" href="./styles.css?v=8-fault-training">
+  <link rel="stylesheet" href="./styles.css?v=9-simple-fault-collapsed-layout">
   <script type="importmap">
     {
       "imports": {
@@ -85,32 +85,20 @@
         </section>
 
         <section id="fault-controls" class="fault-controls">
-          <div class="range-head"><h2>堵花偏流演示</h2><output id="fault-level">主通道 · 中度</output></div>
+          <div class="range-head"><h2>堵花偏流演示</h2><output id="fault-level">主通道 · 重度</output></div>
           <div class="fault-type-options" role="group" aria-label="堵花位置">
             <button type="button" data-fault-type="channel" class="active">主通道挂花</button>
-            <button type="button" data-fault-type="duct">排杂风道堵花</button>
-          </div>
-          <div id="fault-attach-controls" class="fault-attach-controls">
-            <div class="fault-range-label"><span>附着玻璃面</span><output id="fault-surface-value">前面</output></div>
-            <div class="fault-attach-options" role="group" aria-label="挂花附着玻璃面">
-              <button type="button" data-fault-surface="front" class="active">前玻璃</button>
-              <button type="button" data-fault-surface="rear">后玻璃</button>
-            </div>
-            <div class="fault-range-label"><span>附着边缘</span><output id="fault-edge-value">下边缘</output></div>
-            <div class="fault-attach-options" role="group" aria-label="挂花附着边缘">
-              <button type="button" data-fault-edge="lower" class="active">下边缘</button>
-              <button type="button" data-fault-edge="upper">上边缘</button>
-            </div>
+            <button type="button" data-fault-type="duct">排杂风道挂花</button>
           </div>
           <label class="fault-range-label" for="fault-x">
             <span>左右位置</span><output id="fault-x-value">中间</output>
           </label>
           <input id="fault-x" class="range fault-range" type="range" min="-65" max="65" step="5" value="0">
           <label class="fault-range-label" for="fault-size">
-            <span>堵花宽度</span><output id="fault-size-value">10厘米</output>
+            <span>堵花宽度</span><output id="fault-size-value">20厘米</output>
           </label>
-          <input id="fault-size" class="range fault-range" type="range" min="1" max="50" step="1" value="10">
-          <p id="fault-help" class="fault-help">约1厘米基本不影响；扩展到5～10厘米后，只让挂花周围棉流发生偏移。</p>
+          <input id="fault-size" class="range fault-range" type="range" min="1" max="50" step="1" value="20">
+          <p id="fault-help" class="fault-help">主通道固定在前玻璃上边缘；默认居中20厘米，左右位置和宽度可调。</p>
         </section>
       </div>
 
@@ -126,9 +114,11 @@
       </section>
 
       <section id="line-layout-section" class="calibration-section">
-        <div class="range-head"><h2>整线布局调整</h2><output id="line-layout-status">JWF0019A固定为基准</output></div>
+        <div class="range-head"><h2>整线布局调整</h2><button id="line-layout-reveal" class="mini" type="button" aria-expanded="false">显示布局调整</button></div>
+        <div id="line-layout-content" hidden>
+        <output id="line-layout-status" class="line-layout-status">JWF0019A固定为基准</output>
         <button id="line-layout-mode" class="calibration-toggle" type="button">开启整线布局调整</button>
-        <p class="annotation-help">选择JWF1124或FA151后，可拖动三轴、旋转和缩放；连接管与棉流会自动跟随。X=左右，Y=上下，Z=前后，尺寸单位为米。</p>
+        <p class="annotation-help">先调设备位置与尺寸，再调1124斜管和打手罗拉；所有输入都会即时重建。连接端始终贴合。X=左右，Y=上下，Z=前后。</p>
         <label class="field-label" for="line-layout-part">当前设备</label>
         <select id="line-layout-part" disabled>
           <option value="jwf1124">JWF1124C-160</option>
@@ -152,15 +142,42 @@
           <label>机身宽X<input type="number" data-line-dimension="x" min="0.1" step="0.01" disabled></label>
           <label>机身高Y<input type="number" data-line-dimension="y" min="0.1" step="0.01" disabled></label>
           <label>机身深Z<input type="number" data-line-dimension="z" min="0.1" step="0.01" disabled></label>
-          <label>宽口mm<input type="number" data-line-pipe="mainWidthMm" min="100" step="10" disabled></label>
+        </div>
+        <h3 class="calibration-subhead">JWF1124斜管</h3>
+        <div class="calibration-dimensions">
+          <label>扁管宽mm<input type="number" data-line-pipe="mainWidthMm" min="300" step="10" disabled></label>
+          <label>扁管厚mm<input type="number" data-line-pipe="flatHeightMm" min="20" step="5" disabled></label>
+          <label>起点纵深mm<input type="number" data-line-pipe="upstreamOutletDepthMm" step="10" disabled></label>
+          <label>起点高度mm<input type="number" data-line-pipe="upstreamOutletHeightMm" min="100" step="10" disabled></label>
+          <label>起点横移mm<input type="number" data-line-pipe="upstreamOutletOffsetMm" step="10" disabled></label>
+          <label>出口斜角°<input type="number" data-line-pipe="upstreamSlopeAngleDeg" min="0" max="85" step="1" disabled></label>
+          <label>斜管引出mm<input type="number" data-line-pipe="upstreamLeadMm" min="50" step="10" disabled></label>
+          <label>入口顺直mm<input type="number" data-line-pipe="upstreamEntryLeadMm" min="50" step="10" disabled></label>
+        </div>
+        <h3 class="calibration-subhead">JWF1124打手罗拉</h3>
+        <div class="calibration-dimensions">
+          <label>打手直径mm<input type="number" data-beater="diameterMm" min="100" step="10" disabled></label>
+          <label>打手长度mm<input type="number" data-beater="lengthMm" min="200" step="10" disabled></label>
+          <label>打手X偏移mm<input type="number" data-beater="offsetXmm" step="10" disabled></label>
+          <label>打手Y偏移mm<input type="number" data-beater="offsetYmm" step="10" disabled></label>
+          <label>打手Z偏移mm<input type="number" data-beater="offsetZmm" step="10" disabled></label>
+          <label>打手转速rpm<input type="number" data-beater="speedRpm" min="0" step="10" disabled></label>
+        </div>
+        <h3 class="calibration-subhead">JWF0019A至FA151后段管</h3>
+        <div class="calibration-dimensions">
           <label>圆管Ømm<input type="number" data-line-pipe="ductDiameterMm" min="50" step="10" disabled></label>
-          <label>直段mm<input type="number" data-line-pipe="straightLengthMm" min="100" step="50" disabled></label>
+          <label>缓变mm<input type="number" data-line-pipe="transitionLengthMm" min="300" step="50" disabled></label>
+          <label>直段mm<input type="number" data-line-pipe="straightLengthMm" min="0" step="50" disabled></label>
           <label>下倾角°<input type="number" data-line-pipe="slopeAngleDeg" min="5" max="85" step="1" disabled></label>
         </div>
+        <p id="line-layout-live" class="line-layout-live" aria-live="polite"></p>
         <div class="calibration-actions calibration-edit-actions">
           <button id="line-layout-save" type="button" disabled>保存布局</button>
+          <button id="line-layout-import" type="button" disabled>导入JSON</button>
           <button id="line-layout-export" type="button" disabled>导出JSON</button>
-          <button id="line-layout-reset" type="button" disabled>复位当前</button>
+          <button id="line-layout-reset" type="button" disabled>复位全部</button>
+          <input id="line-layout-import-file" type="file" accept="application/json,.json" hidden>
+        </div>
         </div>
       </section>
 
@@ -267,7 +284,7 @@
     </div>
   </dialog>
 
-  <script type="module" src="./app.js?v=67-hang-training-settings-sim-20260805"></script>
+  <script type="module" src="./app.js?v=71-unified-cotton-simple-fault-performance-20260806"></script>
   <script type="module" src="./knowledge-app.js?v=4-customer-copy"></script>
   <script src="./ui-access.js?v=1-calibration-lock"></script>
 </body>
