@@ -3554,6 +3554,7 @@ const lineLayoutParams = {
   upstreamSlopeAngleDeg: 70,
   upstreamLeadMm: 70,
   upstreamEntryLeadMm: 80,
+  upstreamDuctWidthMm: 2091,
   ductDiameterMm: 300,
   transitionLengthMm: 1250,
   straightLengthMm: 450,
@@ -3736,9 +3737,10 @@ function rebuildFactoryConnections(syncSlopeFromLayout = true) {
   const channelWidthWorld = flowChannelPart
     ? flowChannelPart.userData.config.dimensions.length * flowChannelPart.scale.x
     : mainWidth;
+  const upstreamDuctWidth = factoryMetric(lineLayoutParams.upstreamDuctWidthMm / 1000);
   const upstreamSections = Array.from({ length: 41 }, (_, index) => ({
     point: upstreamProcessCurve.getPointAt(index / 40),
-    width: channelWidthWorld,
+    width: upstreamDuctWidth,
     height: flatHeight,
     diameter: ductDiameter,
     morph: 0
