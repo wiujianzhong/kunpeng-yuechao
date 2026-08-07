@@ -3159,7 +3159,7 @@ const factoryAccent = new THREE.MeshStandardMaterial({ color: 0x2d8091, roughnes
 const factoryDoorPaint = new THREE.MeshStandardMaterial({ color: 0xe8eeeb, roughness: 0.56, metalness: 0.14 });
 const factoryFrameDark = new THREE.MeshStandardMaterial({ color: 0x596361, roughness: 0.50, metalness: 0.28 });
 const factoryGreen = new THREE.MeshStandardMaterial({ color: 0x74c534, roughness: 0.48, metalness: 0.08 });
-const factoryDuct = new THREE.MeshStandardMaterial({ color: 0xd4dcda, roughness: 0.62, metalness: 0.16 });
+const factoryDuct = new THREE.MeshStandardMaterial({ color: 0xd9ddda, roughness: 0.52, metalness: 0.18 });
 const factoryDuctEdge = new THREE.MeshStandardMaterial({ color: 0x879696, roughness: 0.34, metalness: 0.62 });
 
 function addPanelSeams(parent, width, height, z, count) {
@@ -3677,7 +3677,7 @@ function rebuildFactoryConnections(syncSlopeFromLayout = true) {
   const upstreamStartInside = jwf1124Outline.outlet.clone()
     .addScaledVector(jwfOutletDirection, -factoryMetric(0.04));
   const upstreamEndInside = mainInletPoint.clone()
-    .addScaledVector(mainInletTangent, factoryMetric(0.04));
+    .addScaledVector(upstreamSlopeDirection, factoryMetric(0.04));
   // 折线路径：水平引出段 → 小圆弧拐角 → 直斜段 → 入口顺直段，贴合长方体直管外观
   const upstreamPolyline = (() => {
     const points = [];
@@ -3713,7 +3713,7 @@ function rebuildFactoryConnections(syncSlopeFromLayout = true) {
       arcCenter.z + cornerRadius * Math.sin(arcEndAngle)
     );
     const entryStart = mainInletPoint.clone()
-      .addScaledVector(mainInletTangent, -entryLead);
+      .addScaledVector(upstreamSlopeDirection, -entryLead);
     const slopeSteps = 6;
     for (let step = 1; step <= slopeSteps; step += 1) {
       points.push(elbowEnd.clone().lerp(entryStart, step / slopeSteps));
@@ -3738,7 +3738,7 @@ function rebuildFactoryConnections(syncSlopeFromLayout = true) {
     : mainWidth;
   const upstreamSections = Array.from({ length: 41 }, (_, index) => ({
     point: upstreamProcessCurve.getPointAt(index / 40),
-    width: THREE.MathUtils.lerp(upstreamStartWidth, channelWidthWorld, index / 40),
+    width: channelWidthWorld,
     height: flatHeight,
     diameter: ductDiameter,
     morph: 0
