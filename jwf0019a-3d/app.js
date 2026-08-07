@@ -3547,14 +3547,14 @@ factoryLine.add(factoryConnectionLayer);
 const factoryLayoutStorageKey = 'jwf0019a-factory-line-layout-v6';
 const lineLayoutParams = {
   mainWidthMm: 1910,
-  flatHeightMm: 70,
+  flatHeightMm: 155,
   upstreamOutletDepthMm: 460,
   upstreamOutletHeightMm: 1000,
   upstreamOutletOffsetMm: 0,
   upstreamSlopeAngleDeg: 70,
   upstreamLeadMm: 70,
   upstreamEntryLeadMm: 80,
-  upstreamDuctWidthMm: 2091,
+  upstreamDuctWidthMm: 1830,
   ductDiameterMm: 300,
   transitionLengthMm: 1250,
   straightLengthMm: 450,
