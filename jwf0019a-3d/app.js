@@ -3610,6 +3610,12 @@ const factoryLayoutDefaults = {
 
 function restoreFactoryLineLayout() {
   try {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('resetLayout')) {
+      localStorage.removeItem(factoryLayoutStorageKey);
+      console.log('已清除缓存的布局参数');
+      return;
+    }
     const saved = JSON.parse(localStorage.getItem(factoryLayoutStorageKey) || 'null');
     if (!saved) return;
     applyFactoryTransform(jwf1124Outline.group, saved.jwf1124);
