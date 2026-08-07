@@ -3159,7 +3159,16 @@ const factoryAccent = new THREE.MeshStandardMaterial({ color: 0x2d8091, roughnes
 const factoryDoorPaint = new THREE.MeshStandardMaterial({ color: 0xe8eeeb, roughness: 0.56, metalness: 0.14 });
 const factoryFrameDark = new THREE.MeshStandardMaterial({ color: 0x596361, roughness: 0.50, metalness: 0.28 });
 const factoryGreen = new THREE.MeshStandardMaterial({ color: 0x74c534, roughness: 0.48, metalness: 0.08 });
-const factoryDuct = new THREE.MeshStandardMaterial({ color: 0xd4dcda, roughness: 0.62, metalness: 0.16 });
+const factoryDuct = new THREE.MeshPhysicalMaterial({
+  color: 0xbed2d4,
+  transparent: true,
+  opacity: 0.46,
+  roughness: 0.28,
+  metalness: 0.42,
+  transmission: 0.12,
+  side: THREE.DoubleSide,
+  depthWrite: false
+});
 const factoryDuctEdge = new THREE.MeshStandardMaterial({ color: 0x879696, roughness: 0.34, metalness: 0.62 });
 
 function addPanelSeams(parent, width, height, z, count) {
@@ -3675,55 +3684,15 @@ function rebuildFactoryConnections(syncSlopeFromLayout = true) {
     .add(new THREE.Vector3(0, Math.sin(upstreamSlopeRadians), 0))
     .normalize();
   const upstreamStartInside = jwf1124Outline.outlet.clone()
-    .addScaledVector(jwfOutletDirection, -factoryMetric(0.04));
+    .addScaledVector(upstreamSlopeDirection, -factoryMetric(0.04));
   const upstreamEndInside = mainInletPoint.clone()
     .addScaledVector(mainInletTangent, factoryMetric(0.04));
-  // 折线路径：水平引出段 → 小圆弧拐角 → 直斜段 → 入口顺直段，贴合长方体直管外观
-  const upstreamPolyline = (() => {
-    const points = [];
-    const horizontalLead = factoryMetric(lineLayoutParams.upstreamLeadMm / 1000);
-    const entryLead = factoryMetric(lineLayoutParams.upstreamEntryLeadMm / 1000);
-    const start = upstreamStartInside.clone();
-    const elbowBase = jwf1124Outline.outlet.clone()
-      .addScaledVector(jwfOutletDirection, horizontalLead);
-    const cornerRadius = factoryMetric(0.10);
-    // 圆弧圆心：水平段末端沿+Y偏移r；在YZ平面从水平(+Z)转到斜向(70°)
-    const arcCenter = elbowBase.clone()
-      .addScaledVector(new THREE.Vector3(0, 1, 0), cornerRadius);
-    const arcStartAngle = 0;
-    const arcEndAngle = THREE.MathUtils.degToRad(THREE.MathUtils.clamp(lineLayoutParams.upstreamSlopeAngleDeg, 0, 85));
-    const arcSteps = 7;
-    // 水平段（含出口内侧缩进点）
-    for (let step = 0; step <= 3; step += 1) {
-      points.push(start.clone().lerp(elbowBase, step / 3));
-    }
-    // 圆弧拐角：从水平转到斜向（在YZ平面内绕arcCenter旋转）
-    for (let step = 1; step <= arcSteps; step += 1) {
-      const angle = arcStartAngle + (arcEndAngle - arcStartAngle) * (step / arcSteps);
-      points.push(new THREE.Vector3(
-        arcCenter.x,
-        arcCenter.y - cornerRadius * Math.cos(angle),
-        arcCenter.z + cornerRadius * Math.sin(angle)
-      ));
-    }
-    // 直斜段：从圆弧末端沿斜向延伸到入口顺直段起点
-    const elbowEnd = new THREE.Vector3(
-      arcCenter.x,
-      arcCenter.y - cornerRadius * Math.cos(arcEndAngle),
-      arcCenter.z + cornerRadius * Math.sin(arcEndAngle)
-    );
-    const entryStart = mainInletPoint.clone()
-      .addScaledVector(mainInletTangent, -entryLead);
-    const slopeSteps = 6;
-    for (let step = 1; step <= slopeSteps; step += 1) {
-      points.push(elbowEnd.clone().lerp(entryStart, step / slopeSteps));
-    }
-    // 入口顺直段
-    points.push(entryStart.clone().lerp(upstreamEndInside, 0.35));
-    points.push(upstreamEndInside);
-    return points;
-  })();
-  upstreamProcessCurve = new THREE.CatmullRomCurve3(upstreamPolyline, false, 'centripetal');
+  upstreamProcessCurve = new THREE.CatmullRomCurve3([
+    upstreamStartInside,
+    jwf1124Outline.outlet.clone().addScaledVector(upstreamSlopeDirection, factoryMetric(lineLayoutParams.upstreamLeadMm / 1000)),
+    mainInletPoint.clone().addScaledVector(mainInletTangent, -factoryMetric(lineLayoutParams.upstreamEntryLeadMm / 1000)),
+    upstreamEndInside
+  ], false, 'centripetal');
   upstreamProcessLength = upstreamProcessCurve.getLength();
   const upstreamEndpointVector = mainInletPoint.clone().sub(jwf1124Outline.outlet);
   const upstreamEndpointRun = Math.hypot(upstreamEndpointVector.x, upstreamEndpointVector.z);
@@ -3731,14 +3700,9 @@ function rebuildFactoryConnections(syncSlopeFromLayout = true) {
     upstreamEndpointVector.y,
     Math.max(upstreamEndpointRun, 0.001)
   )).toFixed(2));
-  const upstreamStartWidth = (jwf1124Outline.outletProfileMm[0] / 1000) * jwf1124Outline.group.scale.z;
-  const flowChannelPart = calibrationParts.get('flow-channel-1');
-  const channelWidthWorld = flowChannelPart
-    ? flowChannelPart.userData.config.dimensions.length * flowChannelPart.scale.x
-    : mainWidth;
   const upstreamSections = Array.from({ length: 41 }, (_, index) => ({
     point: upstreamProcessCurve.getPointAt(index / 40),
-    width: THREE.MathUtils.lerp(upstreamStartWidth, channelWidthWorld, index / 40),
+    width: mainWidth,
     height: flatHeight,
     diameter: ductDiameter,
     morph: 0
@@ -3765,8 +3729,8 @@ function rebuildFactoryConnections(syncSlopeFromLayout = true) {
     downstreamStraightEnd.clone().addScaledVector(downstreamHorizontal, -bendGuide),
     downstreamStraightEnd,
     downstreamStraightEnd.clone().addScaledVector(downstreamSlopeDirection, bendGuide),
-    relayFanInlet.clone().addScaledVector(downstreamHorizontal, -bendGuide),
-    relayFanInlet.clone().addScaledVector(downstreamHorizontal, factoryMetric(0.04))
+    relayFanInlet,
+    relayFanInlet.clone().addScaledVector(downstreamSlopeDirection, factoryMetric(0.04))
   ], false, 'centripetal');
   const downstreamSections = [];
   const transitionWidthAxis = new THREE.Vector3(1, 0, 0)
@@ -3781,7 +3745,7 @@ function rebuildFactoryConnections(syncSlopeFromLayout = true) {
       point: mainOutletPoint.clone()
         .addScaledVector(downstreamHorizontal, -factoryMetric(0.04))
         .lerp(downstreamTransitionEnd, progress),
-      width: THREE.MathUtils.lerp(channelWidthWorld, ductDiameter, shaping),
+      width: THREE.MathUtils.lerp(mainWidth, ductDiameter, shaping),
       height: THREE.MathUtils.lerp(flatHeight, ductDiameter, shaping),
       diameter: ductDiameter,
       morph: shaping,

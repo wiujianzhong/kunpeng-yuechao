@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JWF0019A 设备超级知识平台</title>
+  <meta name="description" content="JWF0019A异纤机3D结构、工作原理、操作保养、故障诊断、参数质量与设备知识库。">
+  <script defer src="https://xiaowustudio.cn/assets/analytics.js?v=20260710"></script>
+  <link rel="stylesheet" href="./styles.css?v=9-simple-fault-collapsed-layout">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three/core/three.module.js",
+        "three/addons/": "./vendor/three/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main>
+    <section class="stage" aria-label="JWF1124-JWF0019A-FA151整线三维模型">
+      <canvas id="scene"></canvas>
+      <div id="model-load-status" class="status" hidden aria-live="polite"><span class="dot warning"></span>模型加载中</div>
+      <div id="process-status" class="process-status" hidden>白色棉絮正常通过</div>
+      <div class="hint">拖动旋转 · 滚轮缩放 · 点击内部部件查看</div>
+    </section>
+
+    <aside class="panel">
+      <div>
+        <p class="eyebrow">JWF0019A</p>
+        <h1>异纤机数字讲解平台</h1>
+        <div class="demo-buttons">
+          <button id="process-play" class="primary-demo-button">播放工作原理</button>
+          <button id="fault-play" class="fault-demo-button">播放堵花偏流</button>
+        </div>
+        <div class="platform-switch" aria-label="平台区域导航">
+          <a href="#scene" class="active">3D工作台</a>
+          <a href="#knowledge-platform">设备知识</a>
+          <a href="./hmi.html?v=settings-sim-20260805">运行模拟</a>
+        </div>
+      </div>
+
+      <section class="view-presets">
+        <h2>固定视角</h2>
+        <div class="views">
+          <button data-view="front">正面</button>
+          <button data-view="rear">背面</button>
+          <button data-view="left">左面</button>
+          <button data-view="right">右面</button>
+          <button data-view="isoLeft">左前45°</button>
+          <button data-view="isoRight">右前45°</button>
+          <button data-view="top">俯视</button>
+          <button data-view="line" class="active">整线</button>
+        </div>
+      </section>
+
+      <div class="panel-tools panel-tools-open">
+        <section>
+          <h2>查看模式</h2>
+          <div class="modes">
+            <button data-mode="solid" class="active">实体</button>
+            <button data-mode="clay">素模</button>
+            <button data-mode="wireframe">网格</button>
+            <button data-mode="xray">X光</button>
+          </div>
+        </section>
+
+        <section>
+          <div class="range-head"><h2>分段讲解</h2><button id="tour-play" class="mini">自动演示</button></div>
+          <div class="tour">
+            <button data-tour="overview" class="active">整机</button>
+            <button data-tour="intake">进棉</button>
+            <button data-tour="detect">检测</button>
+            <button data-tour="compute">计算</button>
+            <button data-tour="eject">喷射</button>
+          </div>
+          <div class="process-speed" aria-label="动画播放速度">
+            <span>动画速度</span>
+            <div class="speed-options" role="group" aria-label="动画播放速度">
+              <button type="button" data-process-speed="0.5" data-process-rate="0.75">慢速 0.5×</button>
+              <button type="button" data-process-speed="1" data-process-rate="1.5" class="active">标准 1×</button>
+              <button type="button" data-process-speed="2" data-process-rate="3">快速 2×</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="fault-controls" class="fault-controls">
+          <div class="range-head"><h2>堵花偏流演示</h2><output id="fault-level">主通道 · 重度</output></div>
+          <div class="fault-type-options" role="group" aria-label="堵花位置">
+            <button type="button" data-fault-type="channel" class="active">主通道挂花</button>
+            <button type="button" data-fault-type="duct">排杂风道挂花</button>
+          </div>
+          <label class="fault-range-label" for="fault-x">
+            <span>左右位置</span><output id="fault-x-value">中间</output>
+          </label>
+          <input id="fault-x" class="range fault-range" type="range" min="-65" max="65" step="5" value="0">
+        </section>
+      </div>
+
+      <section>
+        <div class="range-head"><h2>分步拆解</h2><button id="dismantle-play" class="mini">播放拆解</button><output id="explode-value">0% · 整机</output></div>
+        <input id="explode" class="range" type="range" min="0" max="100" value="0">
+      </section>
+
+      <section hidden>
+        <h2>模型层</h2>
+        <label><input type="checkbox" data-layer="hunyuan" checked> 外形清理校正版</label>
+        <p class="annotation-help">当前显示31252三角面的完整母体；旧灯与疙瘩已清除，圆盘与管口已对中。</p>
+      </section>
+
+      <section id="line-layout-section" class="calibration-section">
+        <div class="range-head"><h2>整线布局调整</h2><button id="line-layout-reveal" class="mini" type="button" aria-expanded="false">显示布局调整</button></div>
+        <div id="line-layout-content" hidden>
+        <output id="line-layout-status" class="line-layout-status">JWF0019A固定为基准</output>
+        <button id="line-layout-mode" class="calibration-toggle" type="button">开启整线布局调整</button>
+        <p class="annotation-help">先调设备位置与尺寸，再调1124斜管和打手罗拉；所有输入都会即时重建。连接端始终贴合。X=左右，Y=上下，Z=前后。</p>
+        <label class="field-label" for="line-layout-part">当前设备</label>
+        <select id="line-layout-part" disabled>
+          <option value="jwf1124">JWF1124C-160</option>
+          <option value="fa151">FA151</option>
+        </select>
+        <div class="calibration-tools">
+          <button type="button" data-line-transform="translate" class="active" disabled>移动</button>
+          <button type="button" data-line-transform="rotate" disabled>旋转</button>
+          <button type="button" data-line-transform="scale" disabled>缩放</button>
+        </div>
+        <div class="calibration-values">
+          <label>X左右<input type="number" data-line-axis="position.x" step="0.01" disabled></label>
+          <label>Y上下<input type="number" data-line-axis="position.y" step="0.01" disabled></label>
+          <label>Z前后<input type="number" data-line-axis="position.z" step="0.01" disabled></label>
+          <label>绕X°<input type="number" data-line-axis="rotation.x" step="1" disabled></label>
+          <label>绕Y°<input type="number" data-line-axis="rotation.y" step="1" disabled></label>
+          <label>绕Z°<input type="number" data-line-axis="rotation.z" step="1" disabled></label>
+          <label>整体比例<input type="number" data-line-axis="scale" min="0.1" step="0.05" disabled></label>
+        </div>
+        <div class="calibration-dimensions">
+          <label>机身宽X<input type="number" data-line-dimension="x" min="0.1" step="0.01" disabled></label>
+          <label>机身高Y<input type="number" data-line-dimension="y" min="0.1" step="0.01" disabled></label>
+          <label>机身深Z<input type="number" data-line-dimension="z" min="0.1" step="0.01" disabled></label>
+        </div>
+        <h3 class="calibration-subhead">JWF1124斜管</h3>
+        <div class="calibration-dimensions">
+          <label>扁管宽mm<input type="number" data-line-pipe="mainWidthMm" min="300" step="10" disabled></label>
+          <label>扁管厚mm<input type="number" data-line-pipe="flatHeightMm" min="20" step="5" disabled></label>
+          <label>起点纵深mm<input type="number" data-line-pipe="upstreamOutletDepthMm" step="10" disabled></label>
+          <label>起点高度mm<input type="number" data-line-pipe="upstreamOutletHeightMm" min="100" step="10" disabled></label>
+          <label>起点横移mm<input type="number" data-line-pipe="upstreamOutletOffsetMm" step="10" disabled></label>
+          <label>出口斜角°<input type="number" data-line-pipe="upstreamSlopeAngleDeg" min="0" max="85" step="1" disabled></label>
+          <label>斜管引出mm<input type="number" data-line-pipe="upstreamLeadMm" min="50" step="10" disabled></label>
+          <label>入口顺直mm<input type="number" data-line-pipe="upstreamEntryLeadMm" min="50" step="10" disabled></label>
+        </div>
+        <h3 class="calibration-subhead">JWF1124打手罗拉</h3>
+        <div class="calibration-dimensions">
+          <label>打手直径mm<input type="number" data-beater="diameterMm" min="100" step="10" disabled></label>
+          <label>打手长度mm<input type="number" data-beater="lengthMm" min="200" step="10" disabled></label>
+          <label>打手X偏移mm<input type="number" data-beater="offsetXmm" step="10" disabled></label>
+          <label>打手Y偏移mm<input type="number" data-beater="offsetYmm" step="10" disabled></label>
+          <label>打手Z偏移mm<input type="number" data-beater="offsetZmm" step="10" disabled></label>
+          <label>打手转速rpm<input type="number" data-beater="speedRpm" min="0" step="10" disabled></label>
+        </div>
+        <h3 class="calibration-subhead">JWF0019A至FA151后段管</h3>
+        <div class="calibration-dimensions">
+          <label>圆管Ømm<input type="number" data-line-pipe="ductDiameterMm" min="50" step="10" disabled></label>
+          <label>缓变mm<input type="number" data-line-pipe="transitionLengthMm" min="300" step="50" disabled></label>
+          <label>直段mm<input type="number" data-line-pipe="straightLengthMm" min="0" step="50" disabled></label>
+          <label>下倾角°<input type="number" data-line-pipe="slopeAngleDeg" min="5" max="85" step="1" disabled></label>
+        </div>
+        <p id="line-layout-live" class="line-layout-live" aria-live="polite"></p>
+        <div class="calibration-actions calibration-edit-actions">
+          <button id="line-layout-save" type="button" disabled>保存布局</button>
+          <button id="line-layout-import" type="button" disabled>导入JSON</button>
+          <button id="line-layout-export" type="button" disabled>导出JSON</button>
+          <button id="line-layout-reset" type="button" disabled>复位全部</button>
+          <input id="line-layout-import-file" type="file" accept="application/json,.json" hidden>
+        </div>
+        </div>
+      </section>
+
+      <section id="calibration-private-section" class="calibration-section calibration-private-section">
+        <div id="calibration-lock-row" class="calibration-lock-row">
+          <strong>内部布局校准</strong>
+          <input id="calibration-password" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="内部布局校准密码" placeholder="输入密码">
+          <button id="calibration-unlock" type="button">解锁</button>
+          <output id="calibration-lock-status" aria-live="polite"></output>
+        </div>
+        <div id="calibration-private-content" hidden>
+        <div class="range-head"><h2>内部布局校准</h2><output id="calibration-status">基准v3已锁定</output></div>
+        <button id="calibration-mode" class="calibration-toggle">开启内部校准模式</button>
+        <p class="annotation-help">外壳会变半透明。先选部件，再拖动红、绿、蓝轴；X=左右，Y=上下，Z=前后。主通道可调整尺寸；反光镜、罩壳、散热片和灯板可复制。</p>
+        <label class="field-label" for="calibration-part">当前部件</label>
+        <select id="calibration-part" disabled>
+          <option value="">请选择内部部件</option>
+        </select>
+        <div class="calibration-tools">
+          <button type="button" data-transform="translate" class="active" disabled>移动</button>
+          <button type="button" data-transform="rotate" disabled>旋转</button>
+          <button type="button" data-transform="scale" disabled>缩放</button>
+        </div>
+        <div class="calibration-values">
+          <label>X左右<input type="number" data-axis="position.x" step="0.01" disabled></label>
+          <label>Y上下<input type="number" data-axis="position.y" step="0.01" disabled></label>
+          <label>Z前后<input type="number" data-axis="position.z" step="0.01" disabled></label>
+          <label>绕X°<input type="number" data-axis="rotation.x" step="1" disabled></label>
+          <label>绕Y°<input type="number" data-axis="rotation.y" step="1" disabled></label>
+          <label>绕Z°<input type="number" data-axis="rotation.z" step="1" disabled></label>
+          <label>整体比例<input type="number" data-axis="scale" min="0.1" step="0.05" disabled></label>
+        </div>
+        <div class="calibration-dimensions">
+          <label>长度X<input type="number" data-dimension="length" min="0.01" step="0.01" disabled></label>
+          <label>高度Y<input type="number" data-dimension="height" min="0.01" step="0.01" disabled></label>
+          <label>深度Z<input type="number" data-dimension="depth" min="0.01" step="0.01" disabled></label>
+          <label>板厚<input type="number" data-dimension="thickness" min="0.005" step="0.005" disabled></label>
+          <label>转向跨度Z<input type="number" data-dimension="offset" min="0.05" step="0.01" disabled></label>
+          <label>接口下探Y<input type="number" data-dimension="drop" min="0.05" step="0.01" disabled></label>
+        </div>
+        <div class="calibration-actions">
+          <button id="calibration-save" disabled>保存本机位置</button>
+          <button id="calibration-export" disabled>导出布局JSON</button>
+        </div>
+        <div class="calibration-actions calibration-edit-actions">
+          <button id="calibration-duplicate" disabled>复制当前部件</button>
+          <button id="calibration-reset" disabled>复位当前部件</button>
+          <button id="calibration-delete" disabled>删除当前副本</button>
+        </div>
+        </div>
+      </section>
+
+      <div class="workbench-hidden-status" hidden aria-hidden="true">
+        <span id="part-title">模型说明</span>
+        <span id="part-detail">点击内部部件查看结构说明。</span>
+        <span id="model-status-value">当前新模型与拟真内部加载中</span>
+      </div>
+    </aside>
+  </main>
+
+  <section id="knowledge-platform" class="knowledge-platform knowledge-platform-compact" aria-labelledby="knowledge-title">
+    <header class="knowledge-simple-head">
+      <p>JWF0019A</p>
+      <h2 id="knowledge-title">设备知识库</h2>
+    </header>
+
+    <nav id="knowledge-module-tabs" class="knowledge-flow" aria-label="知识模块"></nav>
+
+    <div class="knowledge-workbench knowledge-workbench-simple">
+      <div id="knowledge-content" class="knowledge-content">
+        <div class="knowledge-search-row">
+          <label class="knowledge-search">
+            <span>搜索设备知识</span>
+            <input id="knowledge-search" type="search" placeholder="例如：相机不刷新、电磁阀、高温、玻璃清洁" autocomplete="off">
+          </label>
+          <button id="knowledge-search-clear" type="button">清除</button>
+        </div>
+
+        <div class="knowledge-module-head">
+          <div>
+            <span id="knowledge-module-evidence">设备知识</span>
+            <h3 id="knowledge-module-title">认识设备</h3>
+            <p id="knowledge-module-description"></p>
+          </div>
+          <output id="knowledge-result-count">0项结果</output>
+        </div>
+
+        <div id="knowledge-card-grid" class="knowledge-card-grid" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <dialog id="knowledge-dialog" class="knowledge-dialog" aria-labelledby="knowledge-dialog-title">
+    <div class="knowledge-dialog-frame">
+      <header>
+        <div>
+          <p>JWF0019A · 设备知识卡</p>
+          <h2 id="knowledge-dialog-title"></h2>
+          <div id="knowledge-dialog-meta" class="knowledge-dialog-meta"></div>
+        </div>
+        <button id="knowledge-dialog-close" type="button" aria-label="关闭知识卡">关闭</button>
+      </header>
+      <div id="knowledge-dialog-body" class="knowledge-dialog-body"></div>
+    </div>
+  </dialog>
+
+  <script type="module" src="./app.js?v=76-line-default-fixed-fault-multidoor-speed-20260806"></script>
+  <script type="module" src="./knowledge-app.js?v=4-customer-copy"></script>
+  <script src="./ui-access.js?v=1-calibration-lock"></script>
+</body>
+</html>
