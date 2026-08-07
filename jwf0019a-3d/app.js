@@ -3235,14 +3235,18 @@ function addDoorHinges(parent, positions) {
   });
 }
 
-function buildJwf1124OpposingDoors(group) {
-  const action = createFactoryDoorAction('jwf1124-opposing', 'JWF1124侧面对开门');
+function buildJwf1124OpposingDoors(group, zSign = -1) {
+  const onBack = zSign === 1;
+  const action = createFactoryDoorAction(
+    onBack ? 'jwf1124-opposing-back' : 'jwf1124-opposing',
+    onBack ? 'JWF1124另一侧对开门' : 'JWF1124侧面对开门'
+  );
   const totalWidth = 1.48;
   const gap = 0.028;
   const leafWidth = (totalWidth - gap) / 2;
   const doorHeight = 1.72;
   const centerY = 1.06;
-  const surfaceZ = -1.337;
+  const surfaceZ = zSign * 1.337;
   const leftHingeX = -totalWidth / 2;
   const rightHingeX = totalWidth / 2;
 
@@ -3250,23 +3254,23 @@ function buildJwf1124OpposingDoors(group) {
   box(group, [totalWidth + 0.10, 0.035, 0.030], [0, centerY - doorHeight / 2 - 0.040, surfaceZ], factoryFrameDark, '', '');
   box(group, [0.035, doorHeight, 0.030], [leftHingeX - 0.040, centerY, surfaceZ], factoryFrameDark, '', '');
   box(group, [0.035, doorHeight, 0.030], [rightHingeX + 0.040, centerY, surfaceZ], factoryFrameDark, '', '');
-  box(group, [gap, doorHeight, 0.032], [0, centerY, surfaceZ - 0.002], factoryFrameDark, '', '');
+  box(group, [gap, doorHeight, 0.032], [0, centerY, surfaceZ + zSign * 0.002], factoryFrameDark, '', '');
 
   [
     { side: '左', hingeX: leftHingeX, direction: 1, openAngle: 105 },
     { side: '右', hingeX: rightHingeX, direction: -1, openAngle: -105 }
   ].forEach(({ side, hingeX, direction, openAngle }) => {
     const pivot = new THREE.Group();
-    pivot.name = `JWF1124侧面${side}门铰链`;
-    pivot.position.set(hingeX, centerY, surfaceZ - 0.018);
+    pivot.name = `JWF1124${onBack ? '另一侧' : '侧面'}${side}门铰链`;
+    pivot.position.set(hingeX, centerY, surfaceZ + zSign * 0.018);
     group.add(pivot);
     const panelCenterX = direction * leafWidth / 2;
     const panel = roundedBox(
       pivot,
       [leafWidth, doorHeight, 0.040],
-      [panelCenterX, 0, -0.020],
+      [panelCenterX, 0, zSign * 0.020],
       factoryDoorPaint,
-      `JWF1124侧面${side}开检修门`,
+      `JWF1124${onBack ? '另一侧' : '侧面'}${side}开检修门`,
       '两扇门从中缝向左右相反方向打开。',
       0.018
     );
@@ -3274,28 +3278,28 @@ function buildJwf1124OpposingDoors(group) {
     const handle = roundedBox(
       pivot,
       [0.050, 0.26, 0.075],
-      [direction * (leafWidth - 0.090), 0.02, -0.070],
+      [direction * (leafWidth - 0.090), 0.02, zSign * 0.070],
       factoryFrameDark,
-      `JWF1124侧面${side}门把手`,
+      `JWF1124${onBack ? '另一侧' : '侧面'}${side}门把手`,
       '点击门板或把手可同时开合两扇对开门。',
       0.014
     );
     markFactoryDoorAction(handle, action.id);
-    box(pivot, [leafWidth - 0.08, 0.14, 0.018], [panelCenterX, doorHeight / 2 - 0.12, -0.049], factoryGreen, '', '', 'decal');
+    box(pivot, [leafWidth - 0.08, 0.14, 0.018], [panelCenterX, doorHeight / 2 - 0.12, zSign * 0.049], factoryGreen, '', '', 'decal');
     textPlate(
       pivot,
       side === '左' ? 'JWF1124C' : 'JINGWEI',
       leafWidth - 0.10,
       0.15,
-      [panelCenterX, 0.36, -0.060],
+      [panelCenterX, 0.36, zSign * 0.060],
       46,
       side === '左' ? '#46514f' : '#62aa2a',
-      [0, Math.PI, 0]
+      onBack ? [0, 0, 0] : [0, Math.PI, 0]
     );
-    addFactoryDoorPivot(action, pivot, openAngle);
+    addFactoryDoorPivot(action, pivot, zSign === -1 ? openAngle : -openAngle);
     addDoorHinges(group, [
-      [hingeX, centerY - 0.55, surfaceZ - 0.070],
-      [hingeX, centerY + 0.55, surfaceZ - 0.070]
+      [hingeX, centerY - 0.55, surfaceZ + zSign * 0.070],
+      [hingeX, centerY + 0.55, surfaceZ + zSign * 0.070]
     ]);
   });
   setFactoryDoorOpen(action.id, false);
@@ -3376,6 +3380,84 @@ function buildYzFaceDoor(group, config) {
   return panel;
 }
 
+function buildYzOpposingDoors(group, config) {
+  const {
+    actionId,
+    label,
+    surfaceX,
+    outwardSign,
+    centerY,
+    centerZ,
+    doorWidth,
+    doorHeight,
+    openAngle = 105
+  } = config;
+  const action = createFactoryDoorAction(actionId, label);
+  const gap = 0.028;
+  const leafWidth = (doorWidth - gap) / 2;
+  const hingeZMin = centerZ - doorWidth / 2;
+  const hingeZMax = centerZ + doorWidth / 2;
+
+  box(group, [0.035, 0.035, doorWidth + 0.10], [surfaceX, centerY + doorHeight / 2 + 0.040, centerZ], factoryFrameDark, '', '');
+  box(group, [0.035, 0.035, doorWidth + 0.10], [surfaceX, centerY - doorHeight / 2 - 0.040, centerZ], factoryFrameDark, '', '');
+  box(group, [0.035, doorHeight, 0.035], [surfaceX, centerY, centerZ - doorWidth / 2 - 0.040], factoryFrameDark, '', '');
+  box(group, [0.035, doorHeight, 0.035], [surfaceX, centerY, centerZ + doorWidth / 2 + 0.040], factoryFrameDark, '', '');
+  box(group, [0.035, doorHeight, gap], [surfaceX, centerY, centerZ], factoryFrameDark, '', '');
+
+  [
+    { side: '左', hingeZ: hingeZMin, direction: 1 },
+    { side: '右', hingeZ: hingeZMax, direction: -1 }
+  ].forEach(({ side, hingeZ, direction }) => {
+    const pivot = new THREE.Group();
+    pivot.name = `${label}${side}铰链`;
+    pivot.position.set(surfaceX + outwardSign * 0.018, centerY, hingeZ);
+    group.add(pivot);
+    const panelCenterZ = direction * leafWidth / 2;
+    const panel = roundedBox(
+      pivot,
+      [0.040, doorHeight, leafWidth],
+      [outwardSign * 0.020, 0, panelCenterZ],
+      factoryDoorPaint,
+      `${label}${side}开检修门`,
+      '两扇门从中缝向两侧相反方向打开。',
+      0.018
+    );
+    markFactoryDoorAction(panel, action.id);
+    const handle = roundedBox(
+      pivot,
+      [0.075, 0.27, 0.055],
+      [outwardSign * 0.070, 0.02, direction * (leafWidth - 0.10)],
+      factoryFrameDark,
+      `${label}${side}门把手`,
+      '点击门板或把手可同时开合两扇对开门。',
+      0.014
+    );
+    markFactoryDoorAction(handle, action.id);
+    box(pivot, [0.018, 0.14, leafWidth - 0.08], [outwardSign * 0.049, doorHeight / 2 - 0.12, panelCenterZ], factoryGreen, '', '', 'decal');
+    textPlate(
+      pivot,
+      label.replace('检修门', ''),
+      leafWidth - 0.18,
+      0.14,
+      [outwardSign * 0.060, 0.36, panelCenterZ],
+      38,
+      '#46514f',
+      [0, outwardSign * Math.PI / 2, 0]
+    );
+    addDoorHinges(group, [
+      [surfaceX + outwardSign * 0.070, centerY - 0.55, hingeZ],
+      [surfaceX + outwardSign * 0.070, centerY + 0.55, hingeZ]
+    ]);
+    // YZ面对开门：每扇门从中缝向外展开
+    // outwardSign=1(右面): 左扇向+Z翻(+angle), 右扇向-Z翻(-angle)
+    // outwardSign=-1(左面): 左扇向-Z翻(-angle), 右扇向+Z翻(+angle)
+    const leafOpenAngle = outwardSign * direction * openAngle;
+    addFactoryDoorPivot(action, pivot, leafOpenAngle);
+  });
+  setFactoryDoorOpen(action.id, false);
+  return undefined;
+}
+
 function updateJwf1124Beater() {
   if (!jwf1124BeaterGroup || !jwf1124BeaterCore) return;
   const diameter = Math.max(0.10, beaterParams.diameterMm / 1000);
@@ -3401,22 +3483,14 @@ function buildJwf1124Outline() {
   group.scale.setScalar(factoryDisplayScale);
   factoryLine.add(group);
 
-  const jwf1124Body = roundedBox(group, [1.664, 2.08, 2.64], [0, 1.04, 0], factoryPaint, 'JWF1124简化方箱主体', '单一主体长方箱；侧面设左右对开门，朝向FA151的宽面另设检修门。', 0.035);
-  jwf1124Body.userData.factoryDoorActions = ['jwf1124-opposing', 'jwf1124-fa151-face'];
-  textPlate(group, 'JWF1124 开棉机', 1.40, 0.20, [0, 1.55, 1.326], 46, '#3d4b49');
-  buildJwf1124OpposingDoors(group);
-  buildYzFaceDoor(group, {
-    actionId: 'jwf1124-fa151-face',
-    label: 'JWF1124朝向FA151宽面检修门',
-    surfaceX: 0.842,
-    outwardSign: 1,
-    centerY: 1.06,
-    centerZ: 0,
-    doorWidth: 2.30,
-    doorHeight: 1.72,
-    hingeSide: 'min',
-    openAngle: -95
-  });
+  const jwf1124Body = roundedBox(group, [1.664, 2.08, 2.64], [0, 1.04, 0], factoryPaint, 'JWF1124简化方箱主体', '单一主体长方箱；两侧各设左右对开门，朝向FA151的宽面为固定罩壳贴图。', 0.035);
+  jwf1124Body.userData.factoryDoorActions = ['jwf1124-opposing', 'jwf1124-opposing-back'];
+  buildJwf1124OpposingDoors(group, -1);
+  buildJwf1124OpposingDoors(group, 1);
+  // 朝向FA151宽面：固定罩壳贴图，不是门。
+  box(group, [0.010, 0.16, 2.18], [0.845, 1.98, 0], factoryGreen, '', '', 'decal');
+  box(group, [0.010, 0.14, 2.18], [0.845, 0.28, 0], factoryGreen, '', '', 'decal');
+  textPlate(group, 'JWF1124 开棉机', 1.40, 0.20, [0.87, 1.10, 0], 46, '#3d4b49', [0, Math.PI / 2, 0]);
 
   jwf1124BeaterGroup = new THREE.Group();
   jwf1124BeaterGroup.name = 'JWF1124内部可调打手罗拉';
@@ -3497,7 +3571,7 @@ function buildFa151Outline() {
   textPlate(group, 'FA151 除微尘机', 1.30, 0.19, [0.08, 2.13, 1.132], 52, '#46514f');
   textPlate(group, 'JINGWEI', 0.72, 0.13, [0.08, 1.91, 1.132], 44, '#62aa2a');
   textPlate(group, '进棉风机 = 接力风机', 1.18, 0.14, [0.12, 0.90, 1.132], 37, '#53635f');
-  buildYzFaceDoor(group, {
+  buildYzOpposingDoors(group, {
     actionId: 'fa151-inlet-left',
     label: 'FA151进棉口左侧检修门',
     surfaceX: -0.943,
@@ -3506,10 +3580,9 @@ function buildFa151Outline() {
     centerZ: 0,
     doorWidth: 1.82,
     doorHeight: 1.78,
-    hingeSide: 'min',
-    openAngle: -95
+    openAngle: 95
   });
-  buildYzFaceDoor(group, {
+  buildYzOpposingDoors(group, {
     actionId: 'fa151-inlet-right',
     label: 'FA151进棉口右侧检修门',
     surfaceX: 0.943,
@@ -3518,8 +3591,7 @@ function buildFa151Outline() {
     centerZ: 0,
     doorWidth: 1.82,
     doorHeight: 1.78,
-    hingeSide: 'max',
-    openAngle: -95
+    openAngle: 95
   });
   return {
     group,
@@ -3823,10 +3895,6 @@ function rebuildFactoryConnections(syncSlopeFromLayout = true) {
   if (syncSlopeFromLayout && Number.isFinite(actualSlopeDegrees)) {
     lineLayoutParams.slopeAngleDeg = actualSlopeDegrees;
   }
-  textPlate(factoryConnectionLayer, `${Math.round(lineLayoutParams.mainWidthMm)}×${Math.round(lineLayoutParams.flatHeightMm)}缓变${Math.round(lineLayoutParams.transitionLengthMm)}mm → Ø${Math.round(lineLayoutParams.ductDiameterMm)}`, 1.82, 0.18, [downstreamTransitionEnd.x, mainOutletPoint.y + 0.26, downstreamTransitionEnd.z], 36, '#315c61');
-  textPlate(factoryConnectionLayer, `Ø${Math.round(lineLayoutParams.ductDiameterMm)} · 直段${Math.round(lineLayoutParams.straightLengthMm)}mm`, 1.38, 0.18, [downstreamStraightEnd.x, mainOutletPoint.y + 0.26, (downstreamTransitionEnd.z + downstreamStraightEnd.z) / 2], 38, '#315c61');
-  textPlate(factoryConnectionLayer, `下倾${actualSlopeDegrees}° · 接FA151进棉风机`, 1.72, 0.18, [relayFanInlet.x, (downstreamStraightEnd.y + relayFanInlet.y) / 2 + 0.30, (downstreamStraightEnd.z + relayFanInlet.z) / 2], 36, '#315c61');
-
   downstreamProcessCurve = new THREE.CatmullRomCurve3([
     mainOutletPoint,
     downstreamTransitionEnd,
