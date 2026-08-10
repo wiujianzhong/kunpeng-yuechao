@@ -3483,7 +3483,7 @@ function buildJwf1124Outline() {
   group.scale.setScalar(factoryDisplayScale);
   factoryLine.add(group);
 
-  const jwf1124Body = roundedBox(group, [1.664, 2.08, 2.64], [0, 1.04, 0], factoryPaint, 'JWF1124简化方箱主体', '单一主体长方箱；两侧各设左右对开门，朝向FA151的宽面为固定罩壳贴图。', 0.035);
+  const jwf1124Body = roundedBox(group, [1.664, 2.08, 2.42], [0, 1.04, 0], factoryPaint, 'JWF1124简化方箱主体', '单一主体长方箱；两侧各设左右对开门，朝向FA151的宽面为固定罩壳贴图。', 0.035);
   jwf1124Body.userData.factoryDoorActions = ['jwf1124-opposing', 'jwf1124-opposing-back'];
   buildJwf1124OpposingDoors(group, -1);
   buildJwf1124OpposingDoors(group, 1);
@@ -3645,7 +3645,7 @@ const userLayoutBaseline = {
   }
 };
 jwf1124Outline.group.userData.lineLayoutId = 'jwf1124';
-jwf1124Outline.group.userData.nominalDimensions = new THREE.Vector3(1.664, 2.080, 2.640);
+jwf1124Outline.group.userData.nominalDimensions = new THREE.Vector3(1.664, 2.080, 2.420);
 fa151Outline.group.userData.lineLayoutId = 'fa151';
 fa151Outline.group.userData.nominalDimensions = new THREE.Vector3(1.864, 2.650, 2.182);
 
