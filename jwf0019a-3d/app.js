@@ -3490,7 +3490,11 @@ function buildJwf1124Outline() {
   // 朝向FA151宽面：固定罩壳贴图，不是门。
   box(group, [0.010, 0.16, 2.18], [0.845, 1.98, 0], factoryGreen, '', '', 'decal');
   box(group, [0.010, 0.14, 2.18], [0.845, 0.28, 0], factoryGreen, '', '', 'decal');
-  textPlate(group, 'JWF1124 开棉机', 1.40, 0.20, [0.87, 1.10, 0], 46, '#3d4b49', [0, Math.PI / 2, 0]);
+  textPlate(group, 'JWF1124 开棉机', 1.58, 0.30, [0.872, 1.18, -0.12], 72, '#3d4b49', [0, Math.PI / 2, 0]);
+  textPlate(group, 'JINGWEI', 0.90, 0.18, [0.872, 0.90, -0.12], 60, '#62aa2a', [0, Math.PI / 2, 0]);
+  const jwf1124JingweiLogo = addLogo(group, [0.875, 0.90, 0.70]);
+  jwf1124JingweiLogo.rotation.y = Math.PI / 2;
+  jwf1124JingweiLogo.scale.setScalar(1.18);
 
   jwf1124BeaterGroup = new THREE.Group();
   jwf1124BeaterGroup.name = 'JWF1124内部可调打手罗拉';
@@ -3568,8 +3572,10 @@ function buildFa151Outline() {
     relayFanRotor.add(blade);
   }
   inletFanMount.add(relayFanRotor);
-  textPlate(group, 'FA151 除微尘机', 1.30, 0.19, [0.08, 2.13, 1.132], 52, '#46514f');
-  textPlate(group, 'JINGWEI', 0.72, 0.13, [0.08, 1.91, 1.132], 44, '#62aa2a');
+  textPlate(group, 'FA151 除微尘机', 1.48, 0.27, [-0.10, 2.16, 1.132], 72, '#46514f');
+  textPlate(group, 'JINGWEI', 0.88, 0.18, [-0.10, 1.88, 1.132], 60, '#62aa2a');
+  const fa151JingweiLogo = addLogo(group, [0.72, 1.88, 1.136]);
+  fa151JingweiLogo.scale.setScalar(1.18);
   textPlate(group, '进棉风机 = 接力风机', 1.18, 0.14, [0.12, 0.90, 1.132], 37, '#53635f');
   buildYzOpposingDoors(group, {
     actionId: 'fa151-inlet-left',
@@ -3641,7 +3647,7 @@ const userLayoutBaseline = {
   fa151: {
     position: [0, -0.13575, 5.84488],
     rotationDegrees: [0, 0, 0],
-    scale: [1.389787, 1.378844, 1.187242]
+    scale: [1.389787, 1.237972, 1.187242]
   }
 };
 jwf1124Outline.group.userData.lineLayoutId = 'jwf1124';
@@ -3704,6 +3710,16 @@ function restoreFactoryLineLayout() {
   }
 }
 restoreFactoryLineLayout();
+const fa151HeightMigrationKey = 'jwf0019a-fa151-height-20260810';
+if (!localStorage.getItem(fa151HeightMigrationKey)) {
+  fa151Outline.group.scale.y = userLayoutBaseline.fa151.scale[1];
+  const savedFactoryLayout = JSON.parse(localStorage.getItem(factoryLayoutStorageKey) || 'null');
+  if (savedFactoryLayout?.fa151?.scale) {
+    savedFactoryLayout.fa151.scale[1] = userLayoutBaseline.fa151.scale[1];
+    localStorage.setItem(factoryLayoutStorageKey, JSON.stringify(savedFactoryLayout));
+  }
+  localStorage.setItem(fa151HeightMigrationKey, '1');
+}
 
 let upstreamProcessCurve = null;
 let downstreamProcessCurve = null;
@@ -3928,7 +3944,7 @@ function rebuildFactoryConnections(syncSlopeFromLayout = true) {
       jwf0019a: [1500, 2500, 3200],
       fa151: [1864, 2182, 2650]
     },
-    baselineSource: '用户导出的JWF1124-JWF0019A-FA151-整线布局 (1).json',
+    baselineSource: '用户导出的JWF1124-JWF0019A-FA151-整线布局 (2).json',
     jwf1124OutletProfileMm: [Math.round(lineLayoutParams.mainWidthMm), Math.round(lineLayoutParams.flatHeightMm)],
     upstreamDuctProfileMm: [Math.round(lineLayoutParams.mainWidthMm), Math.round(lineLayoutParams.flatHeightMm)],
     upstreamSlopeAngleDeg: Number(lineLayoutParams.upstreamSlopeAngleDeg.toFixed(2)),
