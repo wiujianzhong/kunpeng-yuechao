@@ -3246,7 +3246,7 @@ function buildJwf1124OpposingDoors(group, zSign = -1) {
   const leafWidth = (totalWidth - gap) / 2;
   const doorHeight = 1.72;
   const centerY = 1.06;
-  const surfaceZ = zSign * 1.337;
+  const surfaceZ = zSign * 1.227;
   const leftHingeX = -totalWidth / 2;
   const rightHingeX = totalWidth / 2;
 
