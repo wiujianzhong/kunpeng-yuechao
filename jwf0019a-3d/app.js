@@ -28,7 +28,7 @@ controls.enableDamping = true;
 controls.minDistance = 3.4;
 controls.maxDistance = 11;
 controls.minZoom = 0.17;
-controls.maxZoom = 2.8;
+controls.maxZoom = 14;
 
 scene.add(new THREE.HemisphereLight(0xe5f4fb, 0x29312d, 2.15));
 const keyLight = new THREE.DirectionalLight(0xffffff, 3.4);
@@ -991,10 +991,229 @@ const calibrationLayer = makeLayer('calibration');
 calibrationLayer.visible = false;
 const calibrationParts = new Map();
 const cameraLensMeshes = [];
+const cameraNetworkPorts = new Map();
+const computeNetworkPorts = new Map();
+const networkPortInstances = [];
+const networkGreenLedInstances = [];
+const networkLedMeshes = new Set();
+const networkPortMeshes = new Set();
+const networkRoutes = [];
+const networkRouteMap = new Map();
+const networkUnitRecords = [];
+const networkCableLayer = new THREE.Group();
+networkCableLayer.name = '相机与算力盒低干扰网线';
+calibrationLayer.add(networkCableLayer);
+const networkHitTargetLayer = new THREE.Group();
+networkHitTargetLayer.name = '相机与算力盒点击热区';
+calibrationLayer.add(networkHitTargetLayer);
+const networkLocalExit = document.querySelector('#network-local-exit');
+const networkGeometry = {
+  cameraPort: new THREE.BoxGeometry(0.038, 0.012, 0.024),
+  computePort: new THREE.BoxGeometry(0.030, 0.012, 0.022),
+  led: new THREE.SphereGeometry(0.0062, 8, 6),
+  label: new THREE.PlaneGeometry(1, 1)
+};
+const networkPortMaterial = new THREE.MeshStandardMaterial({
+  color: 0xffffff,
+  vertexColors: true,
+  roughness: 0.38,
+  metalness: 0.48
+});
+const networkGreenLedMaterial = new THREE.MeshBasicMaterial({
+  color: 0x45ff70,
+  transparent: true,
+  opacity: 1,
+  depthWrite: false,
+  toneMapped: false
+});
+const networkYellowLedMaterial = new THREE.MeshBasicMaterial({
+  color: 0xffc83d,
+  depthWrite: false,
+  toneMapped: false
+});
+const networkHitTargetMaterial = new THREE.MeshBasicMaterial({
+  transparent: true,
+  opacity: 0,
+  depthWrite: false,
+  colorWrite: false
+});
+const networkCableMaterials = {
+  front: new THREE.LineBasicMaterial({ color: 0x168bd2, transparent: true, opacity: 0.18, depthWrite: false }),
+  rear: new THREE.LineBasicMaterial({ color: 0xe2762d, transparent: true, opacity: 0.18, depthWrite: false }),
+  spirit: new THREE.LineBasicMaterial({ color: 0x895fd1, transparent: true, opacity: 0.18, depthWrite: false }),
+  switch: new THREE.LineBasicMaterial({ color: 0x62787d, transparent: true, opacity: 0.12, depthWrite: false })
+};
+const networkCableActiveMaterials = Object.fromEntries(
+  Object.entries(networkCableMaterials).map(([routeType, material]) => [
+    routeType,
+    new THREE.MeshBasicMaterial({
+      color: material.color.clone(),
+      transparent: true,
+      opacity: 0.96,
+      depthWrite: false,
+      toneMapped: false
+    })
+  ])
+);
+const networkColors = {
+  port: new THREE.Color(0x1a2226),
+  cameraPort: new THREE.Color(0x8f9ba0),
+  switchPort: new THREE.Color(0x24404a),
+  portActive: new THREE.Color(0x88aeb7),
+  greenOn: new THREE.Color(0x45f06c),
+  greenOff: new THREE.Color(0x12351d),
+  greenActive: new THREE.Color(0xa7ffb6),
+  yellowOn: new THREE.Color(0xffbf35),
+  unused: new THREE.Color(0x1a1f21)
+};
+const networkLabelMaterialCache = new Map();
+const networkCableActiveLines = new Map();
+let selectedNetworkRouteId = null;
+let selectedNetworkUnitRouteIds = [];
+let activeNetworkRouteKey = '';
+let networkBlinkFrame = -1;
+let networkCablesDirty = false;
+let networkDetailMode = false;
+let networkReturnView = null;
 const calibrationStorageKey = 'jwf0019a-internal-layout-v8';
 let calibrationEnabled = false;
 let selectedCalibrationPart = null;
 let calibrationHelper = null;
+
+function networkLabelMaterial(text) {
+  if (networkLabelMaterialCache.has(text)) return networkLabelMaterialCache.get(text);
+  const labelCanvas = document.createElement('canvas');
+  labelCanvas.width = 384;
+  labelCanvas.height = 96;
+  const context = labelCanvas.getContext('2d');
+  context.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
+  context.textBaseline = 'middle';
+  const computePortMatch = text.match(/^enp(\d+)s0$/);
+  if (computePortMatch) {
+    const segments = [
+      { text: 'enp', font: '500 38px Arial, sans-serif', color: '#7e8b8e' },
+      { text: computePortMatch[1], font: '900 78px Arial, sans-serif', color: '#ffffff' },
+      { text: 's0', font: '500 38px Arial, sans-serif', color: '#7e8b8e' }
+    ];
+    const widths = segments.map((segment) => {
+      context.font = segment.font;
+      return context.measureText(segment.text).width;
+    });
+    let cursor = (labelCanvas.width - widths.reduce((sum, width) => sum + width, 0)) / 2;
+    context.textAlign = 'left';
+    segments.forEach((segment, index) => {
+      context.font = segment.font;
+      context.fillStyle = segment.color;
+      context.shadowColor = index === 1 ? 'rgba(255,255,255,.55)' : 'transparent';
+      context.shadowBlur = index === 1 ? 8 : 0;
+      context.fillText(segment.text, cursor, labelCanvas.height / 2);
+      cursor += widths[index];
+    });
+  } else {
+    context.fillStyle = '#f3f7f7';
+    const isCameraPortLabel = /^(前视|后视|精灵眼)\d+-[1-4]$/.test(text);
+    context.font = `900 ${/^\d$/.test(text) ? 82 : isCameraPortLabel ? 68 : 52}px Arial, "PingFang SC", sans-serif`;
+    context.textAlign = 'center';
+    context.shadowColor = 'rgba(0,0,0,.72)';
+    context.shadowBlur = 5;
+    context.fillText(text, labelCanvas.width / 2, labelCanvas.height / 2);
+  }
+  const texture = new THREE.CanvasTexture(labelCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    toneMapped: false
+  });
+  networkLabelMaterialCache.set(text, material);
+  return material;
+}
+
+function computeCameraLineLabel(computeNumber, portName) {
+  if (portName === 'enp0s0') return '交换机';
+  if (portName === 'enp1s0') return '预留';
+  const cameraPortNumber = {
+    enp5s0: 1,
+    enp6s0: 2,
+    enp3s0: 3,
+    enp4s0: 4,
+    enp10s0: 1,
+    enp9s0: 2,
+    enp12s0: 3,
+    enp11s0: 4
+  }[portName];
+  const firstCamera = ['enp5s0', 'enp6s0', 'enp3s0', 'enp4s0'].includes(portName);
+  if (computeNumber <= 8) {
+    return `${firstCamera ? '前视' : '后视'}${computeNumber}-${cameraPortNumber}`;
+  }
+  const spiritNumber = computeNumber === 9
+    ? (firstCamera ? 1 : 2)
+    : (firstCamera ? 3 : 4);
+  return `精灵眼${spiritNumber}-${cameraPortNumber}`;
+}
+
+function computeRouteLabelMaterial(computeNumber, portLayout) {
+  const cacheKey = `compute-route-${computeNumber}`;
+  if (networkLabelMaterialCache.has(cacheKey)) return networkLabelMaterialCache.get(cacheKey);
+  const labelCanvas = document.createElement('canvas');
+  labelCanvas.width = 1280;
+  labelCanvas.height = 512;
+  const context = labelCanvas.getContext('2d');
+  context.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  portLayout.forEach((portName, portIndex) => {
+    const label = computeCameraLineLabel(computeNumber, portName);
+    const column = 4 - (portIndex % 5);
+    const row = portIndex < 5 ? 0 : 1;
+    context.font = '900 58px Arial, "PingFang SC", sans-serif';
+    context.fillStyle = label.startsWith('前视')
+      ? '#77d6ff'
+      : label.startsWith('后视')
+        ? '#ffb36f'
+        : label.startsWith('精灵眼')
+          ? '#d8adff'
+          : '#dbe5e7';
+    context.shadowColor = 'rgba(0,0,0,.9)';
+    context.shadowBlur = 8;
+    context.fillText(
+      label,
+      (column + 0.5) * (labelCanvas.width / 5),
+      (row + 0.5) * (labelCanvas.height / 2)
+    );
+  });
+  const texture = new THREE.CanvasTexture(labelCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    toneMapped: false
+  });
+  networkLabelMaterialCache.set(cacheKey, material);
+  return material;
+}
+
+function createNetworkInstances(parent, geometry, material, count, calibrationId, name, detail, selectablePart = false) {
+  const mesh = new THREE.InstancedMesh(geometry, material, count);
+  mesh.userData.calibrationId = calibrationId;
+  mesh.userData.networkInstances = [];
+  registerMesh(mesh, selectablePart ? name : '', selectablePart ? detail : '', 'calibration', selectablePart);
+  parent.add(mesh);
+  return mesh;
+}
+
+function setNetworkInstanceTransform(mesh, instanceIndex, position, rotation = [0, 0, 0], scale = [1, 1, 1]) {
+  const helper = new THREE.Object3D();
+  helper.position.set(...position);
+  helper.rotation.set(...rotation);
+  helper.scale.set(...scale);
+  helper.updateMatrix();
+  mesh.setMatrixAt(instanceIndex, helper.matrix);
+}
 
 const transformControls = new TransformControls(camera, renderer.domElement);
 transformControls.setSize(0.72);
@@ -1055,6 +1274,22 @@ function addCameraRow(group, calibrationId, count, direction) {
       ? 'front'
       : 'rear';
   const numberPrefix = opticalType === 'front' ? '前' : opticalType === 'rear' ? '后' : '';
+  const cameraNamePrefix = opticalType === 'front' ? '前视' : opticalType === 'rear' ? '后视' : '精灵眼';
+  const portMesh = createNetworkInstances(
+    group,
+    networkGeometry.cameraPort,
+    networkPortMaterial,
+    count * 4,
+    calibrationId,
+    `${cameraNamePrefix}相机RJ45网口`,
+    '每台相机顶部4个RJ45网口；点击任一网口可查看对应算力盒端口并点亮网线。',
+    true
+  );
+  const greenLedMesh = createNetworkInstances(group, networkGeometry.led, networkGreenLedMaterial, count * 4, calibrationId, '', '', false);
+  const yellowLedMesh = createNetworkInstances(group, networkGeometry.led, networkYellowLedMaterial, count * 4, calibrationId, '', '', false);
+  networkPortMeshes.add(portMesh);
+  networkLedMeshes.add(greenLedMesh);
+  networkLedMeshes.add(yellowLedMesh);
   for (let index = 0; index < count; index += 1) {
     const unit = new THREE.Group();
     unit.position.x = (index - (count - 1) / 2) * spacing;
@@ -1065,6 +1300,17 @@ function addCameraRow(group, calibrationId, count, direction) {
       calibrationId
     );
     body.userData.name = `${group.userData.label}${index + 1}号`;
+    const unitRecord = {
+      kind: 'camera',
+      opticalType,
+      cameraNumber: index + 1,
+      name: `${cameraNamePrefix}${index + 1}`,
+      source: body,
+      routeIds: []
+    };
+    body.userData.networkUnit = unitRecord;
+    selectable.push(body);
+    networkUnitRecords.push(unitRecord);
     const frontPlate = addCalibrationMesh(
       unit,
       new THREE.CylinderGeometry(0.057, 0.057, 0.020, 20),
@@ -1086,27 +1332,13 @@ function addCameraRow(group, calibrationId, count, direction) {
     lensGlass.userData.opticalCameraType = opticalType;
     lensGlass.userData.opticalCameraIndex = index;
     cameraLensMeshes.push(lensGlass);
-    const rearConnector = addCalibrationMesh(
-      unit,
-      new THREE.CylinderGeometry(0.020, 0.020, 0.035, 12),
-      calibrationMaterials.connector,
-      calibrationId
-    );
-    const mount = addCalibrationMesh(
-      unit,
-      new THREE.BoxGeometry(0.15, 0.018, 0.055),
-      calibrationMaterials.cameraDark,
-      calibrationId
-    );
-    [frontPlate, lensBarrel, lensGlass, rearConnector, mount].forEach((part) => {
+    [frontPlate, lensBarrel, lensGlass].forEach((part) => {
       part.userData.name = `${group.userData.label}${index + 1}号`;
     });
-    mount.position.y = 0.082;
     if (direction === 'down') {
       frontPlate.position.y = -0.080;
       lensBarrel.position.y = -0.108;
       lensGlass.position.y = -0.136;
-      rearConnector.position.set(0.064, 0.083, 0);
       const numberLabel = componentNumberPlate(
         unit,
         `${numberPrefix}${index + 1}`,
@@ -1120,11 +1352,10 @@ function addCameraRow(group, calibrationId, count, direction) {
       numberLabel.userData.name = `${group.userData.label}${index + 1}号散热扇侧编号`;
     } else {
       const sign = direction === 'front' ? 1 : -1;
-      [frontPlate, lensBarrel, lensGlass, rearConnector].forEach((part) => { part.rotation.x = Math.PI / 2; });
+      [frontPlate, lensBarrel, lensGlass].forEach((part) => { part.rotation.x = Math.PI / 2; });
       frontPlate.position.z = sign * 0.082;
       lensBarrel.position.z = sign * 0.110;
       lensGlass.position.z = sign * 0.138;
-      rearConnector.position.set(0.064, 0.080, -sign * 0.055);
       const numberLabel = componentNumberPlate(
         unit,
         `${numberPrefix}${index + 1}`,
@@ -1137,29 +1368,154 @@ function addCameraRow(group, calibrationId, count, direction) {
       numberLabel.userData.calibrationId = calibrationId;
       numberLabel.userData.name = `${group.userData.label}${index + 1}号背面编号`;
     }
+    for (let portIndex = 0; portIndex < 4; portIndex += 1) {
+      const instanceIndex = index * 4 + portIndex;
+      const localX = (portIndex - 1.5) * 0.044;
+      const logicalPortNumber = opticalType === 'front' ? portIndex + 1 : 4 - portIndex;
+      const portName = `${cameraNamePrefix}${index + 1}-${logicalPortNumber}`;
+      const anchor = new THREE.Object3D();
+      anchor.position.set(localX, 0.081, 0.018);
+      anchor.name = `${portName}网线连接点`;
+      unit.add(anchor);
+      const record = {
+        kind: 'camera',
+        opticalType,
+        cameraIndex: index,
+        cameraNumber: index + 1,
+        portNumber: logicalPortNumber,
+        name: portName,
+        detail: opticalType === 'front'
+          ? `${portName}：左侧绿色工作灯快速闪烁，右侧黄色链路灯常亮。`
+          : `${portName}：左侧黄色链路灯常亮，右侧绿色工作灯快速闪烁。`,
+        routeId: null,
+        anchor,
+        portMesh,
+        portInstanceIndex: instanceIndex,
+        greenLedMesh,
+        greenLedInstanceIndex: instanceIndex,
+        normal: true
+      };
+      cameraNetworkPorts.set(`${opticalType}-${index + 1}-${logicalPortNumber}`, record);
+      networkPortInstances.push(record);
+      networkGreenLedInstances.push(record);
+      portMesh.userData.networkInstances[instanceIndex] = record;
+      setNetworkInstanceTransform(portMesh, instanceIndex, [unit.position.x + localX, 0.071, 0.018]);
+      const swapLedSides = opticalType !== 'front';
+      setNetworkInstanceTransform(greenLedMesh, instanceIndex, [unit.position.x + localX + (swapLedSides ? 0.012 : -0.012), 0.086, 0.033]);
+      setNetworkInstanceTransform(yellowLedMesh, instanceIndex, [unit.position.x + localX + (swapLedSides ? -0.012 : 0.012), 0.086, 0.033]);
+      portMesh.setColorAt(instanceIndex, networkColors.cameraPort);
+      const portLabel = new THREE.Mesh(networkGeometry.label, networkLabelMaterial(portName));
+      portLabel.position.set(localX, 0.081, opticalType === 'front' ? 0.002 : 0.007);
+      portLabel.rotation.set(-Math.PI / 2, 0, opticalType === 'front' ? 0 : Math.PI);
+      portLabel.scale.set(opticalType === 'front' ? 0.043 : 0.040, opticalType === 'front' ? 0.012 : 0.011, 1);
+      portLabel.renderOrder = 24;
+      portLabel.userData.calibrationId = calibrationId;
+      portLabel.userData.componentNumberLabel = true;
+      portLabel.userData.name = `${portName}网口编号`;
+      registerMesh(portLabel, '', '', 'decal', false);
+      unit.add(portLabel);
+    }
     group.add(unit);
   }
+  [portMesh, greenLedMesh, yellowLedMesh].forEach((mesh) => {
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  });
 }
 
 function addComputeRow(group, calibrationId, count) {
   const physicalNumbers = [1, 2, 3, 4, 9, 10, 5, 6, 7, 8];
+  const firstRow = ['enp0s0', 'enp6s0', 'enp4s0', 'enp9s0', 'enp11s0'];
+  const secondRow = ['enp1s0', 'enp5s0', 'enp3s0', 'enp10s0', 'enp12s0'];
+  const portLayout = [...firstRow, ...secondRow];
+  const portMesh = createNetworkInstances(
+    group,
+    networkGeometry.computePort,
+    networkPortMaterial,
+    count * portLayout.length,
+    calibrationId,
+    '算力盒两排RJ45网口',
+    '靠近JWF1124方向为第一排；所有算力盒使用相同的enpXs0端口编号。',
+    true
+  );
+  const greenLedMesh = createNetworkInstances(group, networkGeometry.led, networkGreenLedMaterial, count * portLayout.length, calibrationId, '', '', false);
+  const yellowLedMesh = createNetworkInstances(group, networkGeometry.led, networkYellowLedMaterial, count * portLayout.length, calibrationId, '', '', false);
+  networkPortMeshes.add(portMesh);
+  networkLedMeshes.add(greenLedMesh);
+  networkLedMeshes.add(yellowLedMesh);
   for (let index = 0; index < count; index += 1) {
     const physicalNumber = physicalNumbers[index] || index + 1;
     const unit = new THREE.Group();
     unit.position.x = (index - (count - 1) / 2) * 0.22;
     const body = addCalibrationMesh(unit, new RoundedBoxGeometry(0.19, 0.24, 0.10, 3, 0.012), calibrationMaterials.computeBody, calibrationId);
     body.userData.name = `算力盒子${physicalNumber}号`;
+    const unitRecord = {
+      kind: 'compute',
+      computeNumber: physicalNumber,
+      name: `算力盒${physicalNumber}`,
+      source: body,
+      routeIds: []
+    };
+    body.userData.networkUnit = unitRecord;
+    selectable.push(body);
+    networkUnitRecords.push(unitRecord);
+    const routeLabel = new THREE.Mesh(
+      networkGeometry.label,
+      computeRouteLabelMaterial(physicalNumber, portLayout)
+    );
+    routeLabel.position.set(0, 0.133, -0.010);
+    routeLabel.rotation.set(-Math.PI / 2, 0, Math.PI);
+    routeLabel.scale.set(0.170, 0.114, 1);
+    routeLabel.renderOrder = 24;
+    routeLabel.userData.calibrationId = calibrationId;
+    routeLabel.userData.componentNumberLabel = true;
+    routeLabel.userData.name = `算力盒${physicalNumber}相机线路编号`;
+    registerMesh(routeLabel, '', '', 'decal', false);
+    unit.add(routeLabel);
     for (let finIndex = 0; finIndex < 5; finIndex += 1) {
       const fin = addCalibrationMesh(unit, new THREE.BoxGeometry(0.018, 0.19, 0.018), calibrationMaterials.computeFin, calibrationId);
       fin.position.set((finIndex - 2) * 0.032, 0.012, 0.056);
       fin.userData.name = `算力盒子${physicalNumber}号散热鳍片`;
     }
-    const socket = addCalibrationMesh(unit, new THREE.BoxGeometry(0.048, 0.030, 0.022), calibrationMaterials.connector, calibrationId);
-    socket.position.set(-0.045, -0.094, 0.058);
-    socket.userData.name = `算力盒子${physicalNumber}号接口`;
-    const led = addCalibrationMesh(unit, new THREE.SphereGeometry(0.009, 10, 8), calibrationMaterials.statusLed, calibrationId);
-    led.position.set(0.060, -0.095, 0.061);
-    led.userData.name = `算力盒子${physicalNumber}号状态灯`;
+    portLayout.forEach((portName, portLayoutIndex) => {
+      const rowIndex = portLayoutIndex < 5 ? 0 : 1;
+      const columnIndex = portLayoutIndex % 5;
+      const instanceIndex = index * portLayout.length + portLayoutIndex;
+      const localX = (columnIndex - 2) * 0.034;
+      const localZ = rowIndex === 0 ? 0.028 : -0.028;
+      const normal = portName !== 'enp1s0';
+      const anchor = new THREE.Object3D();
+      anchor.position.set(localX, 0.136, localZ);
+      anchor.name = `算力盒${physicalNumber}${portName}网线连接点`;
+      unit.add(anchor);
+      const record = {
+        kind: 'compute',
+        computeNumber: physicalNumber,
+        portName,
+        name: `算力盒${physicalNumber} ${portName}`,
+        detail: portName === 'enp0s0'
+          ? `算力盒${physicalNumber} ${portName}：默认接机器侧面交换机。`
+          : portName === 'enp1s0'
+            ? `算力盒${physicalNumber} ${portName}：预留口，当前不插线。`
+            : `算力盒${physicalNumber} ${portName}：相机数据网口。`,
+        routeId: null,
+        anchor,
+        portMesh,
+        portInstanceIndex: instanceIndex,
+        greenLedMesh,
+        greenLedInstanceIndex: instanceIndex,
+        normal
+      };
+      computeNetworkPorts.set(`${physicalNumber}-${portName}`, record);
+      networkPortInstances.push(record);
+      networkGreenLedInstances.push(record);
+      portMesh.userData.networkInstances[instanceIndex] = record;
+      setNetworkInstanceTransform(portMesh, instanceIndex, [unit.position.x + localX, 0.126, localZ]);
+      const ledScale = normal ? [1, 1, 1] : [0.01, 0.01, 0.01];
+      setNetworkInstanceTransform(greenLedMesh, instanceIndex, [unit.position.x + localX + 0.012, 0.140, localZ + 0.008], [0, 0, 0], ledScale);
+      setNetworkInstanceTransform(yellowLedMesh, instanceIndex, [unit.position.x + localX - 0.012, 0.140, localZ + 0.008], [0, 0, 0], ledScale);
+      portMesh.setColorAt(instanceIndex, portName === 'enp0s0' ? new THREE.Color(0x24404a) : networkColors.port);
+    });
     const numberLabel = componentNumberPlate(
       unit,
       `${physicalNumber}`,
@@ -1172,6 +1528,366 @@ function addComputeRow(group, calibrationId, count) {
     numberLabel.userData.calibrationId = calibrationId;
     numberLabel.userData.name = `算力盒子${physicalNumber}号后面编号`;
     group.add(unit);
+  }
+  [portMesh, greenLedMesh, yellowLedMesh].forEach((mesh) => {
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  });
+}
+
+function addNetworkRoute(computeNumber, computePortName, cameraType, cameraNumber, cameraPortNumber) {
+  const computePort = computeNetworkPorts.get(`${computeNumber}-${computePortName}`);
+  const cameraPort = cameraType
+    ? cameraNetworkPorts.get(`${cameraType}-${cameraNumber}-${cameraPortNumber}`)
+    : null;
+  if (!computePort || (cameraType && !cameraPort)) return;
+  const cameraLabel = cameraPort?.name || '机器侧面交换机';
+  const routeType = cameraType || 'switch';
+  const routePrefix = routeType === 'front' ? 'F' : routeType === 'rear' ? 'R' : routeType === 'spirit' ? 'S' : 'SW';
+  const code = routeType === 'switch'
+    ? `${routePrefix}${String(computeNumber).padStart(2, '0')}`
+    : `${routePrefix}${String(cameraNumber).padStart(2, '0')}-${String(cameraPortNumber).padStart(2, '0')}`;
+  const id = `network-${computeNumber}-${computePortName}-${cameraType || 'switch'}-${cameraNumber || 0}-${cameraPortNumber || 0}`;
+  const route = {
+    id,
+    code,
+    routeType,
+    computeNumber,
+    computePortName,
+    computePort,
+    cameraPort,
+    name: `${code}｜${cameraLabel} ↔ 算力盒${computeNumber} ${computePortName}`,
+    detail: cameraPort
+      ? `算力盒${computeNumber}的${computePortName}连接${cameraLabel}；正常工作时绿灯快速闪烁、黄灯常亮。`
+      : `算力盒${computeNumber}的${computePortName}默认接机器侧面交换机。`,
+    points: []
+  };
+  computePort.routeId = id;
+  if (cameraPort) cameraPort.routeId = id;
+  networkRoutes.push(route);
+  networkRouteMap.set(id, route);
+}
+
+function buildNetworkRouteMap() {
+  const firstCameraPorts = [
+    ['enp5s0', 1],
+    ['enp6s0', 2],
+    ['enp3s0', 3],
+    ['enp4s0', 4]
+  ];
+  const secondCameraPorts = [
+    ['enp10s0', 1],
+    ['enp9s0', 2],
+    ['enp12s0', 3],
+    ['enp11s0', 4]
+  ];
+  for (let computeNumber = 1; computeNumber <= 8; computeNumber += 1) {
+    firstCameraPorts.forEach(([portName, cameraPort]) => {
+      addNetworkRoute(computeNumber, portName, 'front', computeNumber, cameraPort);
+    });
+    secondCameraPorts.forEach(([portName, cameraPort]) => {
+      addNetworkRoute(computeNumber, portName, 'rear', computeNumber, cameraPort);
+    });
+  }
+  firstCameraPorts.forEach(([portName, cameraPort]) => addNetworkRoute(9, portName, 'spirit', 1, cameraPort));
+  secondCameraPorts.forEach(([portName, cameraPort]) => addNetworkRoute(9, portName, 'spirit', 2, cameraPort));
+  firstCameraPorts.forEach(([portName, cameraPort]) => addNetworkRoute(10, portName, 'spirit', 3, cameraPort));
+  secondCameraPorts.forEach(([portName, cameraPort]) => addNetworkRoute(10, portName, 'spirit', 4, cameraPort));
+  for (let computeNumber = 1; computeNumber <= 10; computeNumber += 1) {
+    addNetworkRoute(computeNumber, 'enp0s0', null, 0, 0);
+  }
+  document.documentElement.dataset.networkDataRoutes = String(networkRoutes.filter((route) => route.cameraPort).length);
+  document.documentElement.dataset.networkSwitchRoutes = String(networkRoutes.filter((route) => !route.cameraPort).length);
+}
+
+function assignNetworkUnitRoutes() {
+  networkUnitRecords.forEach((record) => {
+    record.routeIds = networkRoutes
+      .filter((route) => record.kind === 'compute'
+        ? route.computeNumber === record.computeNumber && Boolean(route.cameraPort)
+        : route.cameraPort?.opticalType === record.opticalType
+          && route.cameraPort.cameraNumber === record.cameraNumber)
+      .map((route) => route.id);
+  });
+}
+
+function refreshNetworkHitTargets() {
+  calibrationLayer.updateMatrixWorld(true);
+  networkHitTargetLayer.children.forEach((target) => {
+    const source = target.userData.networkUnit?.source;
+    if (!source) return;
+    const worldPosition = source.getWorldPosition(new THREE.Vector3());
+    target.position.copy(calibrationLayer.worldToLocal(worldPosition));
+  });
+}
+
+function buildNetworkHitTargets() {
+  assignNetworkUnitRoutes();
+  networkUnitRecords.forEach((record) => {
+    const size = record.kind === 'compute' ? [0.22, 0.28, 0.18] : [0.23, 0.18, 0.20];
+    const target = new THREE.Mesh(new THREE.BoxGeometry(...size), networkHitTargetMaterial);
+    target.userData.networkUnit = record;
+    target.userData.name = `${record.name}局部放大热区`;
+    target.userData.detail = `点击进入${record.name}局部放大。`;
+    target.frustumCulled = false;
+    selectable.push(target);
+    networkHitTargetLayer.add(target);
+  });
+  refreshNetworkHitTargets();
+}
+
+function networkRoutePoints(route) {
+  const startWorld = route.computePort.anchor.getWorldPosition(new THREE.Vector3());
+  const start = calibrationLayer.worldToLocal(startWorld.clone());
+  if (!route.cameraPort) {
+    return [
+      start,
+      start.clone().add(new THREE.Vector3(0, 0.035, -0.055)),
+      start.clone().add(new THREE.Vector3(0, -0.10, -0.14))
+    ];
+  }
+  const endWorld = route.cameraPort.anchor.getWorldPosition(new THREE.Vector3());
+  const end = calibrationLayer.worldToLocal(endWorld.clone());
+  const portLane = (route.cameraPort.portNumber - 2.5) * 0.008;
+  const backZ = Math.min(start.z, end.z, -1.30) - 0.08 - Math.abs(portLane);
+  if (route.cameraPort.opticalType === 'front') {
+    const sideX = end.x < 0 ? -1.32 : 1.32;
+    return [
+      start,
+      new THREE.Vector3(start.x, start.y + 0.045, backZ),
+      new THREE.Vector3(sideX, start.y + 0.045 + portLane, backZ),
+      new THREE.Vector3(sideX, end.y + 0.11 + portLane, end.z - 0.16),
+      new THREE.Vector3(end.x, end.y + 0.09, end.z - 0.10),
+      end
+    ];
+  }
+  const railY = Math.min(start.y, end.y) - 0.04 + portLane;
+  return [
+    start,
+    new THREE.Vector3(start.x, railY, backZ),
+    new THREE.Vector3(end.x, railY, backZ),
+    new THREE.Vector3(end.x, end.y + 0.075, end.z - 0.07),
+    end
+  ];
+}
+
+function networkSegmentPositions(routes) {
+  const positions = [];
+  routes.forEach((route) => {
+    route.points = networkRoutePoints(route);
+    for (let index = 0; index < route.points.length - 1; index += 1) {
+      positions.push(...route.points[index].toArray(), ...route.points[index + 1].toArray());
+    }
+  });
+  return positions;
+}
+
+function replaceNetworkLineGeometry(line, routes) {
+  const routeGeometries = routes.map((route) => {
+    route.points = networkRoutePoints(route);
+    const path = new THREE.CurvePath();
+    for (let index = 0; index < route.points.length - 1; index += 1) {
+      path.add(new THREE.LineCurve3(route.points[index], route.points[index + 1]));
+    }
+    return new THREE.TubeGeometry(path, Math.max(18, (route.points.length - 1) * 8), 0.0025, 6, false);
+  });
+  line.geometry.dispose();
+  line.geometry = routeGeometries.length
+    ? mergeGeometries(routeGeometries, false)
+    : new THREE.BufferGeometry();
+  routeGeometries.forEach((geometry) => geometry.dispose());
+  line.geometry.computeBoundingSphere();
+}
+
+function activeNetworkRouteIds() {
+  if (!networkDetailMode) return [];
+  if (selectedNetworkRouteId && networkRouteMap.has(selectedNetworkRouteId)) return [selectedNetworkRouteId];
+  return selectedNetworkUnitRouteIds.filter((routeId) => networkRouteMap.has(routeId));
+}
+
+function refreshNetworkCableGeometry() {
+  if (!networkCableActiveLines.size) return;
+  calibrationLayer.updateMatrixWorld(true);
+  refreshNetworkHitTargets();
+  const activeRoutes = activeNetworkRouteIds().map((id) => networkRouteMap.get(id)).filter(Boolean);
+  networkCableActiveLines.forEach((line, routeType) => {
+    const typeRoutes = activeRoutes.filter((route) => route.routeType === routeType);
+    replaceNetworkLineGeometry(line, typeRoutes);
+    line.visible = typeRoutes.length > 0;
+  });
+  networkCablesDirty = false;
+}
+
+function markNetworkCablesDirty() {
+  networkCablesDirty = true;
+}
+
+function buildNetworkCables() {
+  buildNetworkRouteMap();
+  buildNetworkHitTargets();
+  Object.entries(networkCableActiveMaterials).forEach(([routeType, material]) => {
+    const line = new THREE.Mesh(new THREE.BufferGeometry(), material);
+    line.name = `${routeType}当前高亮网线`;
+    line.renderOrder = 18;
+    line.frustumCulled = false;
+    networkCableActiveLines.set(routeType, line);
+    networkCableLayer.add(line);
+  });
+  refreshNetworkCableGeometry();
+}
+
+function setNetworkRouteFocus(routeId) {
+  selectedNetworkRouteId = routeId && networkRouteMap.has(routeId) ? routeId : null;
+  selectedNetworkUnitRouteIds = [];
+  activeNetworkRouteKey = '';
+  document.documentElement.dataset.networkRouteFocus = selectedNetworkRouteId || 'none';
+  markNetworkCablesDirty();
+  const route = selectedNetworkRouteId ? networkRouteMap.get(selectedNetworkRouteId) : null;
+  if (route && networkDetailMode) {
+    partTitle.textContent = `${route.code}｜${route.cameraPort?.name || '机器侧面交换机'}`;
+    partDetail.textContent = `${route.cameraPort?.name || '机器侧面交换机'} → 算力盒${route.computeNumber} ${route.computePortName}；绿灯快闪，黄灯常亮。`;
+  }
+}
+
+function setNetworkUnitRouteFocus(routeIds) {
+  selectedNetworkRouteId = null;
+  selectedNetworkUnitRouteIds = routeIds.filter((routeId) => networkRouteMap.has(routeId));
+  activeNetworkRouteKey = '';
+  document.documentElement.dataset.networkRouteFocus = selectedNetworkUnitRouteIds.join(',') || 'none';
+  markNetworkCablesDirty();
+}
+
+function focusNetworkPoint(record) {
+  const anchor = record?.source;
+  if (!anchor) return;
+  calibrationLayer.updateMatrixWorld(true);
+  const unit = anchor.parent || anchor;
+  const bounds = new THREE.Box3().setFromObject(unit);
+  bounds.max.y += record.kind === 'compute' ? 0.022 : 0.018;
+  const target = bounds.getCenter(new THREE.Vector3());
+  const localOffset = record.kind === 'compute'
+    ? new THREE.Vector3(0.42, 0.62, -0.68)
+    : new THREE.Vector3(0.40, 0.56, record.opticalType === 'front' ? 0.70 : -0.70);
+  const worldQuaternion = unit.getWorldQuaternion(new THREE.Quaternion());
+  const offset = localOffset.applyQuaternion(worldQuaternion).normalize().multiplyScalar(4.2);
+  camera.position.copy(target).add(offset);
+  camera.up.set(0, 1, 0);
+  controls.target.copy(target);
+  controls.update();
+  const forward = camera.getWorldDirection(new THREE.Vector3());
+  const screenRight = forward.clone().cross(camera.up).normalize();
+  const screenUp = screenRight.clone().cross(forward).normalize();
+  const corners = [
+    new THREE.Vector3(bounds.min.x, bounds.min.y, bounds.min.z),
+    new THREE.Vector3(bounds.min.x, bounds.min.y, bounds.max.z),
+    new THREE.Vector3(bounds.min.x, bounds.max.y, bounds.min.z),
+    new THREE.Vector3(bounds.min.x, bounds.max.y, bounds.max.z),
+    new THREE.Vector3(bounds.max.x, bounds.min.y, bounds.min.z),
+    new THREE.Vector3(bounds.max.x, bounds.min.y, bounds.max.z),
+    new THREE.Vector3(bounds.max.x, bounds.max.y, bounds.min.z),
+    new THREE.Vector3(bounds.max.x, bounds.max.y, bounds.max.z)
+  ];
+  let projectedWidth = 0;
+  let projectedHeight = 0;
+  corners.forEach((corner) => {
+    const relative = corner.sub(target);
+    projectedWidth = Math.max(projectedWidth, Math.abs(relative.dot(screenRight)) * 2);
+    projectedHeight = Math.max(projectedHeight, Math.abs(relative.dot(screenUp)) * 2);
+  });
+  const fitZoom = Math.min(
+    (camera.right - camera.left) / Math.max(projectedWidth * 1.34, 0.01),
+    (camera.top - camera.bottom) / Math.max(projectedHeight * 1.34, 0.01)
+  );
+  camera.zoom = THREE.MathUtils.clamp(fitZoom, 6.5, 13.5);
+  camera.updateProjectionMatrix();
+}
+
+function enterNetworkLocalDetail(record) {
+  if (!record) return;
+  if (!networkDetailMode) {
+    networkReturnView = {
+      position: camera.position.clone(),
+      target: controls.target.clone(),
+      up: camera.up.clone(),
+      zoom: camera.zoom,
+      mode: currentMode
+    };
+    if (faultDemoPlaying) setFaultDemo(false);
+    if (calibrationEnabled) setCalibrationEnabled(false);
+  }
+  networkDetailMode = true;
+  networkLocalExit.hidden = false;
+  document.documentElement.dataset.networkDetailMode = 'active';
+  applyMode('xray');
+  updateCalibrationPartVisibility('process');
+  setFlowChannelPlaybackAppearance(true);
+  setExternalModulesGhosted(true);
+  setLayerVisible('hunyuan', importedModelReady);
+  setLayerVisible('shell', false);
+  setNetworkUnitRouteFocus(record.routeIds);
+  focusNetworkPoint(record);
+  partTitle.textContent = `${record.name}局部放大`;
+  partDetail.textContent = record.kind === 'compute'
+    ? `已点亮${record.name}对应的两个相机和8根网线；点击具体网口可单独查看该线，绿色工作灯快闪、黄色链路灯常亮。`
+    : `已点亮${record.name}的4根网线；点击具体网口可单独查看该线，绿色工作灯快闪、黄色链路灯常亮。`;
+}
+
+function setNetworkDetailMode(enabled) {
+  if (enabled) return;
+  networkDetailMode = false;
+  networkLocalExit.hidden = true;
+  document.documentElement.dataset.networkDetailMode = 'off';
+  setNetworkRouteFocus(null);
+  networkCableLayer.visible = false;
+  if (processDemoPlaying) {
+    applyMode('xray');
+    updateCalibrationPartVisibility('process');
+    setFlowChannelPlaybackAppearance(true);
+    setExternalModulesGhosted(true);
+  } else {
+    updateCalibrationPartVisibility('external');
+    applyMode(networkReturnView?.mode || 'solid');
+    setFlowChannelPlaybackAppearance(false);
+    setExternalModulesGhosted(false);
+  }
+  if (networkReturnView) {
+    camera.position.copy(networkReturnView.position);
+    camera.up.copy(networkReturnView.up);
+    camera.zoom = networkReturnView.zoom;
+    camera.updateProjectionMatrix();
+    controls.target.copy(networkReturnView.target);
+    controls.update();
+  }
+  networkReturnView = null;
+}
+
+networkLocalExit?.addEventListener('click', () => setNetworkDetailMode(false));
+
+function updateNetworkAnimation(time) {
+  const routeIds = activeNetworkRouteIds();
+  const routeKey = routeIds.join(',');
+  const activeRoutes = new Set(routeIds);
+  const blinkFrame = Math.floor(time / 120) % 2;
+  if (routeKey === activeNetworkRouteKey && blinkFrame === networkBlinkFrame && !networkCablesDirty) return;
+  activeNetworkRouteKey = routeKey;
+  networkBlinkFrame = blinkFrame;
+  networkPortInstances.forEach((record) => {
+    const active = record.routeId && activeRoutes.has(record.routeId);
+    const baseColor = record.kind === 'camera'
+      ? networkColors.cameraPort
+      : record.portName === 'enp0s0'
+        ? networkColors.switchPort
+        : networkColors.port;
+    record.portMesh.setColorAt(record.portInstanceIndex, active ? networkColors.portActive : baseColor);
+  });
+  networkGreenLedMaterial.color.setHex(blinkFrame ? 0x45ff70 : 0x092914);
+  networkGreenLedMaterial.opacity = blinkFrame ? 1 : 0.18;
+  networkPortMeshes.forEach((mesh) => {
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  });
+  if (routeKey !== document.documentElement.dataset.networkActiveRoutes || networkCablesDirty) {
+    document.documentElement.dataset.networkActiveRoutes = routeKey || 'none';
+    refreshNetworkCableGeometry();
   }
 }
 
@@ -2269,6 +2985,7 @@ calibrationParts.forEach(trackCalibrationExplode);
 
 function updateCalibrationPartVisibility(mode = 'external') {
   calibrationLayer.visible = true;
+  networkCableLayer.visible = networkDetailMode;
   calibrationParts.forEach((part, id) => {
     const kind = part.userData.config.kind;
     const external = kind === 'cover' || kind === 'heatsink' || kind === 'external-control' || id === 'flow-channel-1';
@@ -2374,6 +3091,7 @@ function selectCalibrationPart(id) {
 }
 
 function setCalibrationEnabled(enabled) {
+  if (enabled && networkDetailMode) setNetworkDetailMode(false);
   if (enabled && faultDemoPlaying) setFaultDemo(false);
   calibrationEnabled = enabled;
   updateCalibrationPartVisibility(enabled ? 'all' : 'external');
@@ -2424,6 +3142,7 @@ calibrationInputs.forEach((input) => {
     else if (axis.startsWith('position.')) selectedCalibrationPart.position[axis.split('.')[1]] = value;
     else selectedCalibrationPart.rotation[axis.split('.')[1]] = THREE.MathUtils.degToRad(value);
     syncExplodeBase(selectedCalibrationPart);
+    markNetworkCablesDirty();
     calibrationHelper?.update();
     persistCalibrationLayout();
     updateCalibrationFields();
@@ -2444,6 +3163,7 @@ calibrationDimensionInputs.forEach((input) => {
 });
 transformControls.addEventListener('objectChange', () => {
   if (selectedCalibrationPart) syncExplodeBase(selectedCalibrationPart);
+  markNetworkCablesDirty();
   calibrationHelper?.update();
   updateCalibrationFields();
   persistCalibrationLayout();
@@ -2750,7 +3470,10 @@ cottonFlow.visible = false;
 machine.add(cottonFlow);
 const processStatus = document.querySelector('#process-status');
 const processPlay = document.querySelector('#process-play');
+const mobileProcessPlay = document.querySelector('#process-play-mobile');
+const processPlayButtons = [processPlay, mobileProcessPlay].filter(Boolean);
 const faultPlay = document.querySelector('#fault-play');
+const lineProcessPhaseItems = [...document.querySelectorAll('[data-line-phase]')];
 const faultXInput = document.querySelector('#fault-x');
 const faultXValue = document.querySelector('#fault-x-value');
 const faultLevelOutput = document.querySelector('#fault-level');
@@ -2758,6 +3481,9 @@ let processDemoPlaying = false;
 let faultDemoPlaying = false;
 let processPlaybackRate = 1.5;
 let processTimelineMs = 0;
+const lineProcessCycleDurationSeconds = 52;
+let currentLineProcessPhase = 'feed';
+let lineProcessIndicatorActive = false;
 const faultSettings = {
   type: 'channel',
   surface: 'front',
@@ -2767,7 +3493,25 @@ const faultSettings = {
 };
 document.documentElement.dataset.activeProcessSpeed = '1';
 document.documentElement.dataset.activeProcessPlaybackRate = String(processPlaybackRate);
+document.documentElement.dataset.lineProcessLoop = 'idle';
+document.documentElement.dataset.lineProcessPhase = currentLineProcessPhase;
 document.documentElement.dataset.faultWidthCm = String(faultSettings.sizeCm);
+
+function setLineProcessPhase(phase, active = processDemoPlaying) {
+  if (currentLineProcessPhase === phase && lineProcessIndicatorActive === active) return;
+  currentLineProcessPhase = phase;
+  lineProcessIndicatorActive = active;
+  lineProcessPhaseItems.forEach((item) => {
+    item.classList.toggle('active', active && item.dataset.linePhase === phase);
+  });
+  document.documentElement.dataset.lineProcessPhase = phase;
+}
+
+function lineProcessPhaseAt(cycleSeconds) {
+  if (cycleSeconds < 3.5) return 'feed';
+  if (cycleSeconds < 47) return 'inspect';
+  return 'relay';
+}
 
 const processVoice = {
   intake: new Audio('./assets/audio/step-intake.mp3'),
@@ -3072,6 +3816,7 @@ let opticalPathMode = 'off';
 let opticalTriggerStrength = 0;
 let opticalTriggerType = null;
 let opticalTriggerIndex = -1;
+buildNetworkCables();
 
 function clearOpticalPaths() {
   opticalPathLayer.children.forEach((child) => child.geometry?.dispose());
@@ -4038,6 +4783,30 @@ const downstreamCottonTufts = Array.from({ length: downstreamBaseCottonCount + d
   tuft.userData.wanderPhase = seededUnit(10700 + index * 15.1) * Math.PI * 2;
   return tuft;
 });
+let cottonFlowMobileProfile = false;
+
+function updateCottonFlowPerformanceProfile() {
+  const mobileProfile = stage.clientWidth <= 820;
+  if (mobileProfile === cottonFlowMobileProfile && document.documentElement.dataset.cottonActiveTufts) return;
+  cottonFlowMobileProfile = mobileProfile;
+  let activeCount = 0;
+  const applyProfile = (tufts, keep) => {
+    tufts.forEach((tuft, index) => {
+      const hidden = mobileProfile && !keep(tuft, index);
+      tuft.userData.performanceHidden = hidden;
+      tuft.visible = !hidden;
+      if (!hidden) activeCount += 1;
+    });
+  };
+  applyProfile(whiteCottonTufts, (_tuft, index) => index % 3 !== 2);
+  applyProfile(upstreamCottonTufts, (_tuft, index) => index % 3 !== 2);
+  applyProfile(downstreamCottonTufts, (tuft, index) => (
+    tuft.userData.roundOnly ? index % 2 === 0 : index % 3 !== 2
+  ));
+  document.documentElement.dataset.cottonPerformanceProfile = mobileProfile ? 'mobile-balanced' : 'desktop-full';
+  document.documentElement.dataset.cottonActiveTufts = String(activeCount);
+}
+updateCottonFlowPerformanceProfile();
 document.documentElement.dataset.cottonFlowProfile = 'unified-fluffy-tufts';
 document.documentElement.dataset.cottonFlowSpeed = 'shared-world-distance-speed';
 document.documentElement.dataset.faultModes = 'channel,duct';
@@ -4871,6 +5640,7 @@ function updateCottonProcess(time) {
   const roundProgress = travelDistance / Math.max(downstreamRoundProcessLength, 0.001);
 
   whiteCottonTufts.forEach((tuft, index) => {
+    if (tuft.userData.performanceHidden) return;
     const progress = (mainProgress + tuft.userData.flowOffset) % 1;
     const lane = faultDemoPlaying
       ? faultAffectedLane(tuft.userData.lane, progress, width, index + 2100)
@@ -4880,6 +5650,7 @@ function updateCottonProcess(time) {
   });
 
   upstreamCottonTufts.forEach((tuft) => {
+    if (tuft.userData.performanceHidden) return;
     const progress = (upstreamProgress + tuft.userData.lineOffset) % 1;
     const wanderingLane = tuft.userData.sheetLane + Math.sin(tuft.userData.wanderPhase + time * 0.0007) * 0.028;
     const wanderingLayer = tuft.userData.sheetLayer + Math.cos(tuft.userData.wanderPhase * 1.31 + time * 0.0009) * 0.08;
@@ -4895,6 +5666,7 @@ function updateCottonProcess(time) {
   });
 
   downstreamCottonTufts.forEach((tuft) => {
+    if (tuft.userData.performanceHidden) return;
     const loopProgress = ((tuft.userData.roundOnly ? roundProgress : downstreamProgress) + tuft.userData.lineOffset) % 1;
     const progress = tuft.userData.roundOnly
       ? downstreamTaperFraction + loopProgress * (1 - downstreamTaperFraction)
@@ -4935,8 +5707,7 @@ function updateCottonProcess(time) {
     updateProcessStatus('16台主相机持续扫描：前视直射，后视经反光镜折射覆盖通道');
     return;
   }
-  let activeStatus = '正常棉流：JWF1124送入 → JWF0019A检测 → FA151进棉风机接力抽吸';
-  const cycleDuration = 52;
+  const cycleDuration = lineProcessCycleDurationSeconds;
   const impurityDuration = 7.4;
   const voiceCycleIndex = Math.floor(time / (cycleDuration * 1000));
   if (processDemoPlaying && voiceCycleIndex !== processVoiceCycleIndex) {
@@ -4945,6 +5716,13 @@ function updateCottonProcess(time) {
     queueProcessVoiceCue(`第${voiceCycleIndex + 1}轮棉流进入主通道`, 'intake');
   }
   const cycleSeconds = (time / 1000) % cycleDuration;
+  const linePhase = lineProcessPhaseAt(cycleSeconds);
+  if (processDemoPlaying) setLineProcessPhase(linePhase, true);
+  let activeStatus = linePhase === 'feed'
+    ? 'JWF1124打手开松棉层，沿连续扁管送入JWF0019A'
+    : linePhase === 'relay'
+      ? '净棉进入FA151接力风机，持续吸送至后道并准备下一轮'
+      : 'JWF0019A持续检测棉流，识别异纤后精准喷杂';
   let activeCameraTrigger = null;
   fluorescentWhiteImpurityMaterial.emissiveIntensity = 0.38;
   if (processDemoPlaying && time >= 2500) queueProcessVoiceCue('扫描透明检测窗', 'scan');
@@ -5100,16 +5878,80 @@ function worldVisible(object) {
   return true;
 }
 
+function pickNetworkRoute() {
+  if (!networkCableLayer.visible || !worldVisible(networkCableLayer)) return null;
+  calibrationLayer.updateMatrixWorld(true);
+  const threshold = 0.012 / Math.max(camera.zoom, 0.22);
+  const thresholdSquared = threshold * threshold;
+  let closest = null;
+  let closestDistance = thresholdSquared;
+  const pointOnRay = new THREE.Vector3();
+  const pointOnSegment = new THREE.Vector3();
+  const activeRouteSet = new Set(activeNetworkRouteIds());
+  networkRoutes.filter((route) => activeRouteSet.has(route.id)).forEach((route) => {
+    for (let index = 0; index < route.points.length - 1; index += 1) {
+      const start = calibrationLayer.localToWorld(route.points[index].clone());
+      const end = calibrationLayer.localToWorld(route.points[index + 1].clone());
+      const distance = raycaster.ray.distanceSqToSegment(start, end, pointOnRay, pointOnSegment);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closest = route;
+      }
+    }
+  });
+  return closest;
+}
+
 function pickAt(event) {
   const rect = canvas.getBoundingClientRect();
   pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
   raycaster.setFromCamera(pointer, camera);
   const hits = raycaster.intersectObjects(selectable, false);
+  const networkPortHit = hits.find((item) => Number.isInteger(item.instanceId)
+    && item.object.userData.networkInstances?.[item.instanceId]
+    && worldVisible(item.object));
+  const networkUnitHit = hits.find((item) => item.object.userData.networkUnit && worldVisible(item.object));
   const hit = calibrationEnabled
     ? hits.find((item) => item.object.userData.calibrationId && worldVisible(item.object))
       || hits.find((item) => worldVisible(item.object))
-    : hits.find((item) => worldVisible(item.object));
+    : (networkDetailMode ? networkPortHit : null)
+      || networkUnitHit
+      || hits.find((item) => worldVisible(item.object));
+  const networkRecord = Number.isInteger(hit?.instanceId)
+    ? hit.object.userData.networkInstances?.[hit.instanceId]
+    : null;
+  if (calibrationEnabled && hit?.object.userData.calibrationId) {
+    selectCalibrationPart(hit.object.userData.calibrationId);
+    return;
+  }
+  if (networkRecord) {
+    if (!networkDetailMode) {
+      const unitRecord = networkUnitRecords.find((record) => networkRecord.kind === 'compute'
+        ? record.kind === 'compute' && record.computeNumber === networkRecord.computeNumber
+        : record.kind === 'camera' && record.opticalType === networkRecord.opticalType
+          && record.cameraNumber === networkRecord.cameraNumber);
+      enterNetworkLocalDetail(unitRecord);
+    }
+    setNetworkRouteFocus(networkRecord.routeId);
+    const focusedRoute = networkRecord.routeId ? networkRouteMap.get(networkRecord.routeId) : null;
+    partTitle.textContent = focusedRoute ? `${focusedRoute.code}｜${networkRecord.name}` : networkRecord.name;
+    partDetail.textContent = networkRecord.routeId
+      ? focusedRoute?.detail || networkRecord.detail
+      : networkRecord.detail;
+    return;
+  }
+  if (!calibrationEnabled && hit?.object.userData.networkUnit) {
+    enterNetworkLocalDetail(hit.object.userData.networkUnit);
+    return;
+  }
+  const cableRoute = !calibrationEnabled ? pickNetworkRoute() : null;
+  if (cableRoute) {
+    setNetworkRouteFocus(cableRoute.id);
+    partTitle.textContent = cableRoute.name;
+    partDetail.textContent = cableRoute.detail;
+    return;
+  }
   if (!hit) return;
   window.__lastPick = {
     faceIndex: hit.faceIndex,
@@ -5117,10 +5959,6 @@ function pickAt(event) {
     shellColorId: hit.object.userData.shellColorId,
     partName: hit.object.userData.name
   };
-  if (calibrationEnabled && hit.object.userData.calibrationId) {
-    selectCalibrationPart(hit.object.userData.calibrationId);
-    return;
-  }
   if (hit.object.userData.factoryDoorAction) toggleFactoryDoor(hit.object.userData.factoryDoorAction);
   if (hit.object.userData.factoryDoorActions) {
     hit.object.userData.factoryDoorActions.forEach((actionId) => toggleFactoryDoor(actionId));
@@ -5169,8 +6007,20 @@ const lineInspectionViews = {
 
 function updateViewZoom() {
   const amount = Number(document.querySelector('#explode')?.value || 0) / 100;
-  const baseZoom = currentView === 'top' ? 0.24 : 0.46;
-  camera.zoom = Math.max(currentView === 'top' ? 0.17 : 0.36, baseZoom * (1 - amount * 0.30));
+  const mobileViewport = stage.clientWidth <= 820;
+  const viewZoom = {
+    isoRight: 0.32,
+    isoLeft: 0.32,
+    front: 0.34,
+    rear: 0.34,
+    left: 0.31,
+    right: 0.31,
+    top: 0.28,
+    line: mobileViewport ? 0.26 : 0.46
+  };
+  const baseZoom = viewZoom[currentView] || 0.34;
+  const minimumZoom = currentView === 'line' ? (mobileViewport ? 0.24 : 0.36) : 0.20;
+  camera.zoom = Math.max(minimumZoom, baseZoom * (1 - amount * 0.30));
   camera.updateProjectionMatrix();
 }
 
@@ -5357,6 +6207,7 @@ function updateFaultControlLabels() {
 }
 
 function setFaultDemo(enabled) {
+  if (enabled && networkDetailMode) setNetworkDetailMode(false);
   faultDemoPlaying = enabled;
   faultPlay.classList.toggle('active', enabled);
   faultPlay.textContent = enabled ? '暂停堵花偏流' : '播放堵花偏流';
@@ -5394,6 +6245,12 @@ function setFaultDemo(enabled) {
     setFlowChannelPlaybackAppearance(false);
     setExternalModulesGhosted(false);
     setOpticalPathState('off');
+    if (networkDetailMode) {
+      applyMode('xray');
+      updateCalibrationPartVisibility('process');
+      setFlowChannelPlaybackAppearance(true);
+      setExternalModulesGhosted(true);
+    }
   }
 }
 
@@ -5420,12 +6277,22 @@ updateFaultControlLabels();
 function setProcessDemo(enabled) {
   if (enabled && faultDemoPlaying) setFaultDemo(false);
   processDemoPlaying = enabled;
-  processPlay.classList.toggle('active', enabled);
-  processPlay.textContent = enabled ? '暂停工作原理' : '播放工作原理';
+  processPlayButtons.forEach((button) => {
+    button.classList.toggle('active', enabled);
+    button.setAttribute('aria-pressed', String(enabled));
+  });
+  processPlay.textContent = enabled ? '暂停整线循环' : '一键循环整线演示';
+  if (mobileProcessPlay) mobileProcessPlay.textContent = enabled ? '暂停循环' : '循环演示';
+  document.documentElement.dataset.lineProcessLoop = enabled ? 'running' : 'idle';
   cottonFlow.visible = enabled;
   processStatus.hidden = !enabled;
   if (enabled) {
+    if (!networkDetailMode) {
+      setNetworkRouteFocus(null);
+      document.querySelector('[data-view="line"]')?.click();
+    }
     processTimelineMs = 0;
+    setLineProcessPhase('feed', true);
     processVoiceCycleIndex = 0;
     stopProcessVoice();
     queueProcessVoiceCue('棉流进入主通道', 'intake');
@@ -5439,9 +6306,12 @@ function setProcessDemo(enabled) {
     setOpticalPathState('process', 0);
     setLayerVisible('hunyuan', importedModelReady);
     setLayerVisible('shell', false);
-    partTitle.textContent = '异纤机工作原理动画';
-    partDetail.textContent = '实体展示时主通道为白色铁质风道，前后相机对射位置是透明玻璃窗；播放时整条通道切换为淡蓝透明，玻璃窗发白，便于观察内部棉流。';
+    if (!networkDetailMode) {
+      partTitle.textContent = '异纤机工作原理动画';
+      partDetail.textContent = '实体展示时主通道为白色铁质风道，前后相机对射位置是透明玻璃窗；播放时整条通道切换为淡蓝透明，玻璃窗发白，便于观察内部棉流。';
+    }
   } else {
+    setLineProcessPhase('feed', false);
     stopProcessVoice();
     valvePulse.visible = false;
     airJet.visible = false;
@@ -5455,10 +6325,17 @@ function setProcessDemo(enabled) {
     setFlowChannelPlaybackAppearance(false);
     setExternalModulesGhosted(false);
     setOpticalPathState('off');
+    if (networkDetailMode) {
+      applyMode('xray');
+      updateCalibrationPartVisibility('process');
+      setFlowChannelPlaybackAppearance(true);
+      setExternalModulesGhosted(true);
+    }
   }
 }
 
 processPlay.addEventListener('click', () => setProcessDemo(!processDemoPlaying));
+mobileProcessPlay?.addEventListener('click', () => setProcessDemo(!processDemoPlaying));
 document.querySelectorAll('[data-process-speed]').forEach((button) => {
   button.addEventListener('click', () => {
     processPlaybackRate = Number(button.dataset.processRate) || 1.5;
@@ -5528,6 +6405,7 @@ function updateExplode() {
     const progress = rawProgress * rawProgress * (3 - 2 * rawProgress);
     object.position.copy(base).addScaledVector(direction, progress * distance);
   });
+  markNetworkCablesDirty();
   updateViewZoom();
 }
 explodeSlider.addEventListener('input', () => {
@@ -5566,6 +6444,7 @@ function resize() {
   camera.top = frustumHeight / 2;
   camera.bottom = -frustumHeight / 2;
   camera.updateProjectionMatrix();
+  updateCottonFlowPerformanceProfile();
 }
 
 window.addEventListener('resize', resize);
@@ -5602,6 +6481,7 @@ function animate(time = 0) {
     updateCottonProcess(processDemoPlaying || faultDemoPlaying ? processTimelineMs : time);
   }
   updateOpticalPathAnimation(time);
+  updateNetworkAnimation(time);
   controls.update();
   renderer.render(scene, camera);
   requestAnimationFrame(animate);

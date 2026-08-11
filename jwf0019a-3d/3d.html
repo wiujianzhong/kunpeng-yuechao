@@ -6,7 +6,7 @@
   <title>JWF0019A 设备超级知识平台</title>
   <meta name="description" content="JWF0019A异纤机3D结构、工作原理、操作保养、故障诊断、参数质量与设备知识库。">
   <script defer src="https://xiaowustudio.cn/assets/analytics.js?v=20260710"></script>
-  <link rel="stylesheet" href="./styles.css?v=9-simple-fault-collapsed-layout">
+  <link rel="stylesheet" href="./styles.css?v=11-network-focus-detail-20260811">
   <script type="importmap">
     {
       "imports": {
@@ -21,6 +21,8 @@
     <section class="stage" aria-label="JWF1124-JWF0019A-FA151整线三维模型">
       <canvas id="scene"></canvas>
       <div id="model-load-status" class="status" hidden aria-live="polite"><span class="dot warning"></span>模型加载中</div>
+      <button id="process-play-mobile" class="mobile-process-button" type="button" aria-pressed="false">循环演示</button>
+      <button id="network-local-exit" class="network-local-exit" type="button" hidden>退出局部放大</button>
       <div id="process-status" class="process-status" hidden>白色棉絮正常通过</div>
       <div class="hint">拖动旋转 · 滚轮缩放 · 点击内部部件查看</div>
     </section>
@@ -30,8 +32,13 @@
         <p class="eyebrow">JWF0019A</p>
         <h1>异纤机数字讲解平台</h1>
         <div class="demo-buttons">
-          <button id="process-play" class="primary-demo-button">播放工作原理</button>
+          <button id="process-play" class="primary-demo-button" aria-pressed="false">一键循环整线演示</button>
           <button id="fault-play" class="fault-demo-button">播放堵花偏流</button>
+        </div>
+        <div id="line-cycle-strip" class="line-cycle-strip" aria-label="整线循环流程">
+          <span data-line-phase="feed">JWF1124送棉</span>
+          <span data-line-phase="inspect">JWF0019A检测与喷杂</span>
+          <span data-line-phase="relay">FA151接力吸送</span>
         </div>
         <div class="platform-switch" aria-label="平台区域导航">
           <a href="#scene" class="active">3D工作台</a>
@@ -280,7 +287,7 @@
     </div>
   </dialog>
 
-  <script type="module" src="./app.js?v=labels-fa151-20260810"></script>
+  <script type="module" src="./app.js?v=rear-port-route-alignment-20260811-v10"></script>
   <script type="module" src="./knowledge-app.js?v=4-customer-copy"></script>
   <script src="./ui-access.js?v=1-calibration-lock"></script>
 </body>
