@@ -6,7 +6,7 @@
   <title>JWF0019A 设备超级知识平台</title>
   <meta name="description" content="JWF0019A异纤机3D结构、工作原理、操作保养、故障诊断、参数质量与设备知识库。">
   <script defer src="https://xiaowustudio.cn/assets/analytics.js?v=20260710"></script>
-  <link rel="stylesheet" href="./styles.css?v=11-network-focus-detail-20260811">
+  <link rel="stylesheet" href="./styles.css?v=13-process-part-filter-20260812">
   <script type="importmap">
     {
       "imports": {
@@ -22,6 +22,13 @@
       <canvas id="scene"></canvas>
       <div id="model-load-status" class="status" hidden aria-live="polite"><span class="dot warning"></span>模型加载中</div>
       <button id="process-play-mobile" class="mobile-process-button" type="button" aria-pressed="false">循环演示</button>
+      <div id="process-display-control" class="process-display-control" hidden>
+        <button id="process-overlay-toggle" class="process-overlay-toggle" type="button" aria-expanded="false">演示显示设置 ▾</button>
+        <div id="process-display-menu" class="process-display-menu" hidden>
+          <p>选择演示中显示的内部部件</p>
+          <div id="process-display-parts" class="process-display-parts"></div>
+        </div>
+      </div>
       <button id="network-local-exit" class="network-local-exit" type="button" hidden>退出局部放大</button>
       <div id="process-status" class="process-status" hidden>白色棉絮正常通过</div>
       <div class="hint">拖动旋转 · 滚轮缩放 · 点击内部部件查看</div>
@@ -177,7 +184,7 @@
         <div class="calibration-actions calibration-edit-actions">
           <button id="line-layout-save" type="button" disabled>保存布局</button>
           <button id="line-layout-import" type="button" disabled>导入JSON</button>
-          <button id="line-layout-export" type="button" disabled>导出JSON</button>
+          <button id="line-layout-export" type="button">导出JSON</button>
           <button id="line-layout-reset" type="button" disabled>复位全部</button>
           <input id="line-layout-import-file" type="file" accept="application/json,.json" hidden>
         </div>
@@ -223,7 +230,7 @@
         </div>
         <div class="calibration-actions">
           <button id="calibration-save" disabled>保存本机位置</button>
-          <button id="calibration-export" disabled>导出布局JSON</button>
+          <button id="calibration-export">导出布局JSON</button>
         </div>
         <div class="calibration-actions calibration-edit-actions">
           <button id="calibration-duplicate" disabled>复制当前部件</button>
@@ -287,7 +294,7 @@
     </div>
   </dialog>
 
-  <script type="module" src="./app.js?v=rear-port-route-alignment-20260811-v10"></script>
+  <script type="module" src="./app.js?v=process-part-filter-20260812-v16"></script>
   <script type="module" src="./knowledge-app.js?v=4-customer-copy"></script>
   <script src="./ui-access.js?v=1-calibration-lock"></script>
 </body>

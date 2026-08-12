@@ -8,6 +8,12 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const canvas = document.querySelector('#scene');
 const stage = document.querySelector('.stage');
+const calibrationPrivateContent = document.querySelector('#calibration-private-content');
+const lineLayoutSection = document.querySelector('#line-layout-section');
+if (calibrationPrivateContent && lineLayoutSection) {
+  calibrationPrivateContent.appendChild(lineLayoutSection);
+  document.documentElement.dataset.lineLayoutLocation = 'internal-calibration';
+}
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
@@ -990,9 +996,11 @@ const calibrationMaterials = {
 const calibrationLayer = makeLayer('calibration');
 calibrationLayer.visible = false;
 const calibrationParts = new Map();
+const processPartVisibility = new Map();
 const cameraLensMeshes = [];
 const cameraNetworkPorts = new Map();
 const computeNetworkPorts = new Map();
+const networkSwitchPorts = new Map();
 const networkPortInstances = [];
 const networkGreenLedInstances = [];
 const networkLedMeshes = new Set();
@@ -1535,13 +1543,111 @@ function addComputeRow(group, calibrationId, count) {
   });
 }
 
+function addNetworkSwitch16(group, calibrationId) {
+  const portCount = 16;
+  const body = addCalibrationMesh(
+    group,
+    new RoundedBoxGeometry(0.50, 0.18, 0.10, 3, 0.012),
+    calibrationMaterials.cameraDark,
+    calibrationId
+  );
+  body.userData.name = '16网口交换机';
+  body.userData.detail = '1—10口分别连接算力盒1—10的enp0s0；11—16口预留。';
+  const unitRecord = {
+    kind: 'switch',
+    name: '16网口交换机',
+    source: body,
+    routeIds: []
+  };
+  body.userData.networkUnit = unitRecord;
+  networkUnitRecords.push(unitRecord);
+
+  const title = new THREE.Mesh(networkGeometry.label, networkLabelMaterial('16网口交换机'));
+  title.position.set(0, 0, -0.051);
+  title.rotation.y = Math.PI;
+  title.scale.set(0.30, 0.050, 1);
+  title.renderOrder = 24;
+  title.userData.calibrationId = calibrationId;
+  title.userData.componentNumberLabel = true;
+  registerMesh(title, '', '', 'decal', false);
+  group.add(title);
+
+  const portMesh = createNetworkInstances(
+    group,
+    networkGeometry.computePort,
+    networkPortMaterial,
+    portCount,
+    calibrationId,
+    '16网口交换机RJ45网口',
+    '1—10口连接算力盒，11—16口预留；工作口左侧绿色快闪，右侧黄色常亮。',
+    true
+  );
+  const greenLedMesh = createNetworkInstances(group, networkGeometry.led, networkGreenLedMaterial, portCount, calibrationId, '', '', false);
+  const yellowLedMesh = createNetworkInstances(group, networkGeometry.led, networkYellowLedMaterial, portCount, calibrationId, '', '', false);
+  networkPortMeshes.add(portMesh);
+  networkLedMeshes.add(greenLedMesh);
+  networkLedMeshes.add(yellowLedMesh);
+
+  for (let portIndex = 0; portIndex < portCount; portIndex += 1) {
+    const portNumber = portIndex + 1;
+    const column = portIndex % 8;
+    const row = portIndex < 8 ? 0 : 1;
+    const localX = (3.5 - column) * 0.056;
+    const localZ = row === 0 ? 0.026 : -0.026;
+    const anchor = new THREE.Object3D();
+    anchor.position.set(localX, 0.108, localZ);
+    anchor.name = `交换机${portNumber}口网线连接点`;
+    group.add(anchor);
+    const record = {
+      kind: 'switch',
+      portNumber,
+      portName: `SW${String(portNumber).padStart(2, '0')}`,
+      name: `交换机${portNumber}口`,
+      detail: portNumber <= 10
+        ? `交换机${portNumber}口连接算力盒${portNumber} enp0s0；左侧绿色工作灯快速闪烁，右侧黄色链路灯常亮。`
+        : `交换机${portNumber}口为预留口，当前未插网线，信号灯熄灭。`,
+      routeId: null,
+      anchor,
+      portMesh,
+      portInstanceIndex: portIndex,
+      greenLedMesh,
+      greenLedInstanceIndex: portIndex,
+      normal: portNumber <= 10
+    };
+    networkSwitchPorts.set(portNumber, record);
+    networkPortInstances.push(record);
+    networkGreenLedInstances.push(record);
+    portMesh.userData.networkInstances[portIndex] = record;
+    setNetworkInstanceTransform(portMesh, portIndex, [localX, 0.096, localZ]);
+    const ledScale = portNumber <= 10 ? [1, 1, 1] : [0.01, 0.01, 0.01];
+    setNetworkInstanceTransform(greenLedMesh, portIndex, [localX + 0.012, 0.112, localZ + 0.009], [0, 0, 0], ledScale);
+    setNetworkInstanceTransform(yellowLedMesh, portIndex, [localX - 0.012, 0.112, localZ + 0.009], [0, 0, 0], ledScale);
+    portMesh.setColorAt(portIndex, portNumber <= 10 ? networkColors.switchPort : networkColors.unused);
+    const portLabel = new THREE.Mesh(networkGeometry.label, networkLabelMaterial(String(portNumber).padStart(2, '0')));
+    portLabel.position.set(localX, 0.105, localZ - 0.011);
+    portLabel.rotation.x = -Math.PI / 2;
+    portLabel.scale.set(0.026, 0.011, 1);
+    portLabel.renderOrder = 24;
+    portLabel.userData.calibrationId = calibrationId;
+    portLabel.userData.componentNumberLabel = true;
+    portLabel.userData.name = `交换机${portNumber}口编号`;
+    registerMesh(portLabel, '', '', 'decal', false);
+    group.add(portLabel);
+  }
+  [portMesh, greenLedMesh, yellowLedMesh].forEach((mesh) => {
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  });
+}
+
 function addNetworkRoute(computeNumber, computePortName, cameraType, cameraNumber, cameraPortNumber) {
   const computePort = computeNetworkPorts.get(`${computeNumber}-${computePortName}`);
   const cameraPort = cameraType
     ? cameraNetworkPorts.get(`${cameraType}-${cameraNumber}-${cameraPortNumber}`)
     : null;
-  if (!computePort || (cameraType && !cameraPort)) return;
-  const cameraLabel = cameraPort?.name || '机器侧面交换机';
+  const switchPort = cameraType ? null : networkSwitchPorts.get(computeNumber);
+  if (!computePort || (cameraType && !cameraPort) || (!cameraType && !switchPort)) return;
+  const cameraLabel = cameraPort?.name || switchPort.name;
   const routeType = cameraType || 'switch';
   const routePrefix = routeType === 'front' ? 'F' : routeType === 'rear' ? 'R' : routeType === 'spirit' ? 'S' : 'SW';
   const code = routeType === 'switch'
@@ -1556,14 +1662,16 @@ function addNetworkRoute(computeNumber, computePortName, cameraType, cameraNumbe
     computePortName,
     computePort,
     cameraPort,
+    switchPort,
     name: `${code}｜${cameraLabel} ↔ 算力盒${computeNumber} ${computePortName}`,
     detail: cameraPort
       ? `算力盒${computeNumber}的${computePortName}连接${cameraLabel}；正常工作时绿灯快速闪烁、黄灯常亮。`
-      : `算力盒${computeNumber}的${computePortName}默认接机器侧面交换机。`,
+      : `算力盒${computeNumber}的${computePortName}连接16网口交换机${switchPort.portNumber}口。`,
     points: []
   };
   computePort.routeId = id;
   if (cameraPort) cameraPort.routeId = id;
+  if (switchPort) switchPort.routeId = id;
   networkRoutes.push(route);
   networkRouteMap.set(id, route);
 }
@@ -1604,9 +1712,11 @@ function assignNetworkUnitRoutes() {
   networkUnitRecords.forEach((record) => {
     record.routeIds = networkRoutes
       .filter((route) => record.kind === 'compute'
-        ? route.computeNumber === record.computeNumber && Boolean(route.cameraPort)
-        : route.cameraPort?.opticalType === record.opticalType
-          && route.cameraPort.cameraNumber === record.cameraNumber)
+        ? route.computeNumber === record.computeNumber
+        : record.kind === 'switch'
+          ? route.routeType === 'switch'
+          : route.cameraPort?.opticalType === record.opticalType
+            && route.cameraPort.cameraNumber === record.cameraNumber)
       .map((route) => route.id);
   });
 }
@@ -1624,7 +1734,11 @@ function refreshNetworkHitTargets() {
 function buildNetworkHitTargets() {
   assignNetworkUnitRoutes();
   networkUnitRecords.forEach((record) => {
-    const size = record.kind === 'compute' ? [0.22, 0.28, 0.18] : [0.23, 0.18, 0.20];
+    const size = record.kind === 'compute'
+      ? [0.22, 0.28, 0.18]
+      : record.kind === 'switch'
+        ? [0.56, 0.24, 0.18]
+        : [0.23, 0.18, 0.20];
     const target = new THREE.Mesh(new THREE.BoxGeometry(...size), networkHitTargetMaterial);
     target.userData.networkUnit = record;
     target.userData.name = `${record.name}局部放大热区`;
@@ -1640,10 +1754,17 @@ function networkRoutePoints(route) {
   const startWorld = route.computePort.anchor.getWorldPosition(new THREE.Vector3());
   const start = calibrationLayer.worldToLocal(startWorld.clone());
   if (!route.cameraPort) {
+    const endWorld = route.switchPort.anchor.getWorldPosition(new THREE.Vector3());
+    const end = calibrationLayer.worldToLocal(endWorld.clone());
+    const laneOffset = (route.computeNumber - 5.5) * 0.010;
+    const railY = Math.min(start.y, end.y) - 0.08 + laneOffset;
+    const backZ = Math.min(start.z, end.z) - 0.10;
     return [
       start,
-      start.clone().add(new THREE.Vector3(0, 0.035, -0.055)),
-      start.clone().add(new THREE.Vector3(0, -0.10, -0.14))
+      new THREE.Vector3(start.x, railY, backZ),
+      new THREE.Vector3(end.x, railY, backZ),
+      new THREE.Vector3(end.x, end.y + 0.050, end.z - 0.045),
+      end
     ];
   }
   const endWorld = route.cameraPort.anchor.getWorldPosition(new THREE.Vector3());
@@ -1744,8 +1865,9 @@ function setNetworkRouteFocus(routeId) {
   markNetworkCablesDirty();
   const route = selectedNetworkRouteId ? networkRouteMap.get(selectedNetworkRouteId) : null;
   if (route && networkDetailMode) {
-    partTitle.textContent = `${route.code}｜${route.cameraPort?.name || '机器侧面交换机'}`;
-    partDetail.textContent = `${route.cameraPort?.name || '机器侧面交换机'} → 算力盒${route.computeNumber} ${route.computePortName}；绿灯快闪，黄灯常亮。`;
+    const endpointName = route.cameraPort?.name || route.switchPort?.name || '16网口交换机';
+    partTitle.textContent = `${route.code}｜${endpointName}`;
+    partDetail.textContent = `${endpointName} → 算力盒${route.computeNumber} ${route.computePortName}；绿灯快闪，黄灯常亮。`;
   }
 }
 
@@ -1765,13 +1887,18 @@ function focusNetworkPoint(record) {
   const bounds = new THREE.Box3().setFromObject(unit);
   bounds.max.y += record.kind === 'compute' ? 0.022 : 0.018;
   const target = bounds.getCenter(new THREE.Vector3());
-  const localOffset = record.kind === 'compute'
-    ? new THREE.Vector3(0.42, 0.62, -0.68)
-    : new THREE.Vector3(0.40, 0.56, record.opticalType === 'front' ? 0.70 : -0.70);
-  const worldQuaternion = unit.getWorldQuaternion(new THREE.Quaternion());
-  const offset = localOffset.applyQuaternion(worldQuaternion).normalize().multiplyScalar(4.2);
-  camera.position.copy(target).add(offset);
-  camera.up.set(0, 1, 0);
+  if (record.kind === 'switch') {
+    camera.position.copy(target).add(new THREE.Vector3(-4.2, 0, 0));
+    camera.up.set(0, 1, 0);
+  } else {
+    const localOffset = record.kind === 'compute'
+      ? new THREE.Vector3(0.42, 0.62, -0.68)
+      : new THREE.Vector3(0.40, 0.56, record.opticalType === 'front' ? 0.70 : -0.70);
+    const worldQuaternion = unit.getWorldQuaternion(new THREE.Quaternion());
+    const offset = localOffset.applyQuaternion(worldQuaternion).normalize().multiplyScalar(4.2);
+    camera.position.copy(target).add(offset);
+    camera.up.set(0, 1, 0);
+  }
   controls.target.copy(target);
   controls.update();
   const forward = camera.getWorldDirection(new THREE.Vector3());
@@ -1828,8 +1955,10 @@ function enterNetworkLocalDetail(record) {
   focusNetworkPoint(record);
   partTitle.textContent = `${record.name}局部放大`;
   partDetail.textContent = record.kind === 'compute'
-    ? `已点亮${record.name}对应的两个相机和8根网线；点击具体网口可单独查看该线，绿色工作灯快闪、黄色链路灯常亮。`
-    : `已点亮${record.name}的4根网线；点击具体网口可单独查看该线，绿色工作灯快闪、黄色链路灯常亮。`;
+    ? `已点亮${record.name}对应的两个相机、8根相机网线和1根交换机网线；点击具体网口可单独查看该线。`
+    : record.kind === 'switch'
+      ? '已点亮交换机1—10口连接10个算力盒的网线；左侧绿色工作灯快闪，右侧黄色链路灯常亮。'
+      : `已点亮${record.name}的4根网线；点击具体网口可单独查看该线，绿色工作灯快闪、黄色链路灯常亮。`;
 }
 
 function setNetworkDetailMode(enabled) {
@@ -2448,6 +2577,7 @@ function createCalibrationPart(config) {
 
   if (config.kind === 'camera-row') addCameraRow(group, config.id, config.count, config.direction);
   if (config.kind === 'compute-row') addComputeRow(group, config.id, config.count);
+  if (config.kind === 'network-switch-16') addNetworkSwitch16(group, config.id);
   if (['mirror-single', 'cover', 'heatsink', 'lamp-board', 'flow-channel'].includes(config.kind)) buildParametricCalibrationPart(group);
   if (config.kind === 'valve-row') addValveRow(group, config.id, config.count);
 
@@ -2472,6 +2602,10 @@ function createCalibrationPart(config) {
   {
     id: 'compute-boxes', label: '算力盒子组（10个）', count: 10, kind: 'compute-row',
     position: [-0.005878268014597491, 2.2357131959323113, -1.1885237207551664], rotation: [0, 0, 0], scale: [0.774307, 0.774307, 0.774307], note: '精灵眼罩壳下部，横向排列。'
+  },
+  {
+    id: 'network-switch-16', label: '16网口交换机', count: 1, kind: 'network-switch-16',
+    position: [-1.28, 2.66, -0.02], rotation: [0, 0, 90], scale: [0.5, 0.5, 0.5], note: '1—10口连接算力盒1—10的enp0s0，11—16口预留；可调整位置、旋转和整体比例。'
   },
   {
     id: 'mirrors', label: '反光镜1', count: 1, kind: 'mirror-single',
@@ -2803,6 +2937,21 @@ function persistCalibrationLayout(showStatus = false) {
   if (showStatus) calibrationStatus.textContent = '位置已保存';
 }
 
+function downloadJsonFile(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.hidden = true;
+  document.body.appendChild(anchor);
+  anchor.click();
+  window.setTimeout(() => {
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }, 1000);
+}
+
 function applySavedCalibrationItem(part, item) {
   if (item.dimensions && part.userData.config.dimensions) {
     part.userData.config.dimensions = { ...item.dimensions };
@@ -2950,6 +3099,19 @@ if (!localStorage.getItem(layout10MigrationKey)) {
   localStorage.setItem(layout10MigrationKey, '1');
   persistCalibrationLayout();
 }
+const importedSwitchLayoutMigrationKey = 'jwf0019a-switch-layout-download-11-v1';
+if (!localStorage.getItem(importedSwitchLayoutMigrationKey)) {
+  const switchPart = calibrationParts.get('network-switch-16');
+  if (switchPart) {
+    applySavedCalibrationItem(switchPart, {
+      position: { x: -1.28, y: 2.66, z: -0.02 },
+      rotationDegrees: { x: 0, y: 0, z: 90 },
+      scale: { x: 0.5, y: 0.5, z: 0.5 }
+    });
+  }
+  localStorage.setItem(importedSwitchLayoutMigrationKey, '1');
+  persistCalibrationLayout();
+}
 
 function trackCalibrationExplode(part, id) {
   if (!part || explodeItems.some((entry) => entry.object === part)) return;
@@ -2971,6 +3133,7 @@ function trackCalibrationExplode(part, id) {
     'rear-cameras': [[0, 0.12, -1], 0.80, 0.25, 0.52],
     'magic-cameras': [[0, -0.10, -1], 0.95, 0.34, 0.60],
     'compute-boxes': [[0, -0.06, -1], 0.88, 0.38, 0.68],
+    'network-switch-16': [[1, -0.04, -1], 0.84, 0.38, 0.68],
     'lamp-board-purple-1': [[0, -0.04, -1], 1.05, 0.32, 0.62],
     valves: [[0, 1, -0.20], 0.55, 0.58, 0.82],
     'flow-channel-1': [[0, -1, 0], 0.28, 0.78, 1.00]
@@ -2983,6 +3146,21 @@ function trackCalibrationExplode(part, id) {
 
 calibrationParts.forEach(trackCalibrationExplode);
 
+function isProcessCalibrationPart(part, id) {
+  const kind = part.userData.config.kind;
+  return id === 'flow-channel-1'
+    || id === 'front-cameras'
+    || id === 'rear-cameras'
+    || id === 'magic-cameras'
+    || id === 'compute-boxes'
+    || id === 'network-switch-16'
+    || id === 'mirrors'
+    || id === 'mirror-single-1784558446608'
+    || id === 'mirror-single-1784558638431'
+    || id === 'valves'
+    || kind === 'lamp-board';
+}
+
 function updateCalibrationPartVisibility(mode = 'external') {
   calibrationLayer.visible = true;
   networkCableLayer.visible = networkDetailMode;
@@ -2991,15 +3169,15 @@ function updateCalibrationPartVisibility(mode = 'external') {
     const external = kind === 'cover' || kind === 'heatsink' || kind === 'external-control' || id === 'flow-channel-1';
     const processDuct = id === 'flow-channel-1';
     const detectionPart = id === 'front-cameras' || id === 'rear-cameras' || id === 'mirrors';
-    const spiritEyeProcessPart = id === 'magic-cameras'
-      || id === 'compute-boxes'
-      || id === 'mirror-single-1784558446608'
-      || id === 'mirror-single-1784558638431';
-    const processPart = processDuct || detectionPart || spiritEyeProcessPart || id === 'valves' || kind === 'lamp-board';
-    part.visible = mode === 'all'
+    const processPart = isProcessCalibrationPart(part, id);
+    const modeVisible = mode === 'all'
       || external
       || (mode === 'process' && processPart)
       || (mode === 'detect' && detectionPart);
+    const processChoiceVisible = mode !== 'process'
+      || !processDemoPlaying
+      || processPartVisibility.get(id) !== false;
+    part.visible = modeVisible && processChoiceVisible;
   });
 }
 
@@ -3100,7 +3278,6 @@ function setCalibrationEnabled(enabled) {
   calibrationPartSelect.disabled = !enabled;
   calibrationTransformButtons.forEach((button) => { button.disabled = !enabled; });
   calibrationSave.disabled = !enabled;
-  calibrationExport.disabled = !enabled;
   calibrationStatus.textContent = enabled ? '请选择部件' : '未开启';
   if (enabled) {
     applyMode('xray');
@@ -3170,13 +3347,7 @@ transformControls.addEventListener('objectChange', () => {
 });
 calibrationSave.addEventListener('click', () => persistCalibrationLayout(true));
 calibrationExport.addEventListener('click', () => {
-  const blob = new Blob([JSON.stringify(serializeCalibrationLayout(), null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = 'JWF0019A-内部布局校准.json';
-  anchor.click();
-  URL.revokeObjectURL(url);
+  downloadJsonFile(serializeCalibrationLayout(), 'JWF0019A-内部布局校准.json');
   calibrationStatus.textContent = '布局已导出';
 });
 calibrationDuplicate.addEventListener('click', () => {
@@ -3469,6 +3640,10 @@ const cottonFlow = new THREE.Group();
 cottonFlow.visible = false;
 machine.add(cottonFlow);
 const processStatus = document.querySelector('#process-status');
+const processDisplayControl = document.querySelector('#process-display-control');
+const processOverlayToggle = document.querySelector('#process-overlay-toggle');
+const processDisplayMenu = document.querySelector('#process-display-menu');
+const processDisplayParts = document.querySelector('#process-display-parts');
 const processPlay = document.querySelector('#process-play');
 const mobileProcessPlay = document.querySelector('#process-play-mobile');
 const processPlayButtons = [processPlay, mobileProcessPlay].filter(Boolean);
@@ -3496,6 +3671,39 @@ document.documentElement.dataset.activeProcessPlaybackRate = String(processPlayb
 document.documentElement.dataset.lineProcessLoop = 'idle';
 document.documentElement.dataset.lineProcessPhase = currentLineProcessPhase;
 document.documentElement.dataset.faultWidthCm = String(faultSettings.sizeCm);
+
+function setProcessDisplayMenuOpen(open) {
+  if (processDisplayMenu) processDisplayMenu.hidden = !open;
+  if (!processOverlayToggle) return;
+  processOverlayToggle.textContent = open ? '演示显示设置 ▴' : '演示显示设置 ▾';
+  processOverlayToggle.setAttribute('aria-expanded', String(open));
+}
+
+processOverlayToggle?.addEventListener('click', () => {
+  setProcessDisplayMenuOpen(processDisplayMenu?.hidden !== false);
+});
+
+function buildProcessDisplayPartList() {
+  if (!processDisplayParts) return;
+  processDisplayParts.replaceChildren();
+  calibrationParts.forEach((part, id) => {
+    if (!isProcessCalibrationPart(part, id)) return;
+    if (!processPartVisibility.has(id)) processPartVisibility.set(id, true);
+    const label = document.createElement('label');
+    const input = document.createElement('input');
+    const text = document.createElement('span');
+    input.type = 'checkbox';
+    input.checked = processPartVisibility.get(id) !== false;
+    input.dataset.processPartId = id;
+    text.textContent = part.userData.label;
+    input.addEventListener('change', () => {
+      processPartVisibility.set(id, input.checked);
+      if (processDemoPlaying) updateCalibrationPartVisibility('process');
+    });
+    label.append(input, text);
+    processDisplayParts.appendChild(label);
+  });
+}
 
 function setLineProcessPhase(phase, active = processDemoPlaying) {
   if (currentLineProcessPhase === phase && lineProcessIndicatorActive === active) return;
@@ -4233,11 +4441,11 @@ function buildJwf1124Outline() {
   buildJwf1124OpposingDoors(group, -1);
   buildJwf1124OpposingDoors(group, 1);
   // 朝向FA151宽面：固定罩壳贴图，不是门。
-  box(group, [0.010, 0.16, 2.18], [0.845, 1.98, 0], factoryGreen, '', '', 'decal');
-  box(group, [0.010, 0.14, 2.18], [0.845, 0.28, 0], factoryGreen, '', '', 'decal');
-  textPlate(group, 'JWF1124 开棉机', 1.58, 0.30, [0.872, 1.18, -0.12], 72, '#3d4b49', [0, Math.PI / 2, 0]);
-  textPlate(group, 'JINGWEI', 0.90, 0.18, [0.872, 0.90, -0.12], 60, '#62aa2a', [0, Math.PI / 2, 0]);
-  const jwf1124JingweiLogo = addLogo(group, [0.875, 0.90, 0.70]);
+  box(group, [0.010, 0.16, 2.18], [0.837, 1.98, 0], factoryGreen, '', '', 'decal');
+  box(group, [0.010, 0.14, 2.18], [0.837, 0.28, 0], factoryGreen, '', '', 'decal');
+  textPlate(group, 'JWF1124 开棉机', 1.58, 0.30, [0.844, 1.18, -0.12], 72, '#3d4b49', [0, Math.PI / 2, 0]);
+  textPlate(group, 'JINGWEI', 0.90, 0.18, [0.844, 0.90, -0.12], 60, '#62aa2a', [0, Math.PI / 2, 0]);
+  const jwf1124JingweiLogo = addLogo(group, [0.858, 0.90, 0.70]);
   jwf1124JingweiLogo.rotation.y = Math.PI / 2;
   jwf1124JingweiLogo.scale.setScalar(1.18);
 
@@ -4897,7 +5105,7 @@ function setLineLayoutEnabled(enabled) {
   lineLayoutModeButton.classList.toggle('active', enabled);
   lineLayoutModeButton.textContent = enabled ? '关闭整线布局调整' : '开启整线布局调整';
   lineLayoutPartSelect.disabled = !enabled;
-  [...lineLayoutTransformButtons, ...lineLayoutAxisInputs, ...lineLayoutDimensionInputs, ...lineLayoutPipeInputs, ...beaterInputs, lineLayoutSave, lineLayoutImport, lineLayoutExport, lineLayoutReset]
+  [...lineLayoutTransformButtons, ...lineLayoutAxisInputs, ...lineLayoutDimensionInputs, ...lineLayoutPipeInputs, ...beaterInputs, lineLayoutSave, lineLayoutImport, lineLayoutReset]
     .forEach((element) => { element.disabled = !enabled; });
   if (enabled) {
     if (calibrationEnabled) setCalibrationEnabled(false);
@@ -5046,13 +5254,7 @@ lineLayoutImportFile.addEventListener('change', async () => {
   }
 });
 lineLayoutExport.addEventListener('click', () => {
-  const blob = new Blob([JSON.stringify(currentFactoryLayoutData(), null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = 'JWF1124-JWF0019A-FA151-整线布局.json';
-  anchor.click();
-  URL.revokeObjectURL(url);
+  downloadJsonFile(currentFactoryLayoutData(), 'JWF1124-JWF0019A-FA151-整线布局.json');
   lineLayoutStatus.textContent = '布局JSON已导出';
 });
 lineLayoutReset.addEventListener('click', () => {
@@ -5929,8 +6131,10 @@ function pickAt(event) {
     if (!networkDetailMode) {
       const unitRecord = networkUnitRecords.find((record) => networkRecord.kind === 'compute'
         ? record.kind === 'compute' && record.computeNumber === networkRecord.computeNumber
-        : record.kind === 'camera' && record.opticalType === networkRecord.opticalType
-          && record.cameraNumber === networkRecord.cameraNumber);
+        : networkRecord.kind === 'switch'
+          ? record.kind === 'switch'
+          : record.kind === 'camera' && record.opticalType === networkRecord.opticalType
+            && record.cameraNumber === networkRecord.cameraNumber);
       enterNetworkLocalDetail(unitRecord);
     }
     setNetworkRouteFocus(networkRecord.routeId);
@@ -6286,7 +6490,10 @@ function setProcessDemo(enabled) {
   document.documentElement.dataset.lineProcessLoop = enabled ? 'running' : 'idle';
   cottonFlow.visible = enabled;
   processStatus.hidden = !enabled;
+  if (processDisplayControl) processDisplayControl.hidden = !enabled;
+  setProcessDisplayMenuOpen(false);
   if (enabled) {
+    buildProcessDisplayPartList();
     if (!networkDetailMode) {
       setNetworkRouteFocus(null);
       document.querySelector('[data-view="line"]')?.click();
