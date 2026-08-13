@@ -3935,10 +3935,36 @@ const faultObstructionMaterial = new THREE.MeshStandardMaterial({
   opacity: 0.94
 });
 const faultObstructionShadowMaterial = new THREE.MeshStandardMaterial({
-  color: 0xb9b09d,
+  color: 0xe9e5dc,
+  emissive: 0x25231f,
+  emissiveIntensity: 0.18,
   roughness: 1,
   transparent: true,
-  opacity: 0.78
+  opacity: 0.88,
+  side: THREE.DoubleSide
+});
+faultObstructionMaterial.color.setHex(0xf4f1e9);
+faultObstructionMaterial.emissive.setHex(0x25231f);
+faultObstructionMaterial.emissiveIntensity = 0.18;
+faultObstructionMaterial.side = THREE.DoubleSide;
+// 主通道毛笔头挂花单独使用棉絮白材质，不能跟排杂风道堵花共用深色阴影材质。
+const brushCottonMaterial = new THREE.MeshStandardMaterial({
+  color: 0xfffdf7,
+  emissive: 0x807a6d,
+  emissiveIntensity: 0.16,
+  roughness: 0.95,
+  transparent: true,
+  opacity: 0.98,
+  side: THREE.DoubleSide
+});
+const brushCottonShadowMaterial = new THREE.MeshStandardMaterial({
+  color: 0xf3efe5,
+  emissive: 0x625c52,
+  emissiveIntensity: 0.12,
+  roughness: 1,
+  transparent: true,
+  opacity: 0.96,
+  side: THREE.DoubleSide
 });
 const faultObstruction = new THREE.Group();
 faultObstruction.name = '可调挂花与堵花';
@@ -3946,25 +3972,41 @@ faultObstruction.visible = false;
 
 const channelBrushObstruction = new THREE.Group();
 channelBrushObstruction.name = '主通道毛笔头挂花';
-const brushProfile = [
-  { x: -0.25, y: 0.04, scale: 3.7 },
-  { x: 0.02, y: 0.08, scale: 4.1 },
-  { x: 0.25, y: 0.05, scale: 3.5 },
-  { x: -0.16, y: 0.32, scale: 3.2 },
-  { x: 0.13, y: 0.36, scale: 3.0 },
-  { x: -0.08, y: 0.58, scale: 2.5 },
-  { x: 0.07, y: 0.70, scale: 2.2 },
-  { x: 0.00, y: 0.88, scale: 1.55 }
+const brushBodyProfile = [
+  new THREE.Vector2(0.31, 0.00),
+  new THREE.Vector2(0.35, 0.10),
+  new THREE.Vector2(0.33, 0.30),
+  new THREE.Vector2(0.27, 0.52),
+  new THREE.Vector2(0.18, 0.72),
+  new THREE.Vector2(0.08, 0.88),
+  new THREE.Vector2(0.018, 1.00)
 ];
-brushProfile.forEach((profile, index) => {
-  const tuft = makeFluffyTuft(
-    1200 + index,
-    index % 3 === 0 ? faultObstructionShadowMaterial : faultObstructionMaterial
+const brushBodyGeometry = new THREE.LatheGeometry(brushBodyProfile, 20);
+const brushBody = new THREE.Mesh(brushBodyGeometry, brushCottonMaterial);
+brushBody.scale.z = 0.58;
+brushBody.position.z = -0.012;
+registerMesh(brushBody, '', '', 'flow', false);
+channelBrushObstruction.add(brushBody);
+
+for (let index = 0; index < 18; index += 1) {
+  const side = index % 2 ? 1 : -1;
+  const rootX = side * (0.07 + seededUnit(2100 + index) * 0.23);
+  const rootZ = (seededUnit(2200 + index) - 0.5) * 0.22;
+  const tipSpread = (seededUnit(2300 + index) - 0.5) * 0.08;
+  const strandCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(rootX, 0.03, rootZ),
+    new THREE.Vector3(rootX * 0.82, 0.36, rootZ * 0.76),
+    new THREE.Vector3(rootX * 0.44 + tipSpread, 0.70, rootZ * 0.42),
+    new THREE.Vector3(tipSpread * 0.35, 0.98 + seededUnit(2400 + index) * 0.05, rootZ * 0.10)
+  ]);
+  const strandGeometry = new THREE.TubeGeometry(strandCurve, 10, 0.0065, 5, false);
+  const strand = new THREE.Mesh(
+    strandGeometry,
+    index % 4 === 0 ? brushCottonShadowMaterial : brushCottonMaterial
   );
-  tuft.position.set(profile.x, profile.y, (index % 2 ? 0.04 : -0.025));
-  tuft.scale.setScalar(profile.scale);
-  channelBrushObstruction.add(tuft);
-});
+  registerMesh(strand, '', '', 'flow', false);
+  channelBrushObstruction.add(strand);
+}
 faultObstruction.add(channelBrushObstruction);
 
 const ductClumpObstruction = makeFluffyTuft(1650, faultObstructionMaterial);
@@ -3976,6 +4018,34 @@ cottonFlow.add(faultObstruction);
 const faultImpurity = makeFluffyTuft(1701, redImpurityMaterial, true);
 faultImpurity.name = '堵花偏流演示异纤';
 faultImpurity.visible = false;
+
+const faultForwardCottonPath = {
+  userData: {
+    wanderPhase: seededUnit(1702) * Math.PI * 2,
+    sheetLane: 0,
+    sheetLayer: 0.14,
+    radialAngle: seededUnit(1703) * Math.PI * 2,
+    radialRadius: 0.38
+  }
+};
+
+const faultImpurityVariants = [
+  { label: '红色异纤', material: redImpurityMaterial },
+  { label: '黑色异纤', material: blackImpurityMaterial },
+  { label: '蓝色异纤', material: blueImpurityMaterial },
+  { label: '黄色异纤', material: yellowImpurityMaterial },
+  { label: '绿色异纤', material: greenImpurityMaterial },
+  { label: '荧光白色异纤', material: fluorescentWhiteImpurityMaterial }
+];
+
+function setFaultImpurityVariant(index) {
+  if (faultImpurity.userData.variantIndex === index) return;
+  faultImpurity.userData.variantIndex = index;
+  const variant = faultImpurityVariants[index];
+  faultImpurity.traverse((object) => {
+    if (object.isMesh) object.material = variant.material;
+  });
+}
 
 const faultSprayCotton = Array.from({ length: 7 }, (_, index) => {
   const tuft = makeFluffyTuft(1750 + index);
@@ -5735,6 +5805,8 @@ function updateFaultProcess(time, curve, width) {
   hideNormalImpurityEvents();
   hideFaultSprayCotton();
   updateFaultObstruction(curve, width);
+  channelBrushObstruction.position.x = Math.sin(time * 0.0024) * 0.14;
+  channelBrushObstruction.rotation.z = Math.sin(time * 0.0020) * 0.075;
   valvePulse.visible = false;
   airJet.visible = false;
   setValveRowActive(true);
@@ -5742,13 +5814,17 @@ function updateFaultProcess(time, curve, width) {
   const field = faultField(width);
   const cycleDuration = 7.0;
   const cycleProgress = ((time / 1000) % cycleDuration) / cycleDuration;
+  const faultCycleIndex = Math.floor((time / 1000) / cycleDuration);
+  const faultVariant = faultImpurityVariants[faultCycleIndex % faultImpurityVariants.length];
+  setFaultImpurityVariant(faultCycleIndex % faultImpurityVariants.length);
   const sourceLane = THREE.MathUtils.clamp(
     field.centerLane + (field.centerLane > 0.72 ? -0.018 : 0.018),
     -0.90,
     0.90
   );
   const detectionProgress = 0.30;
-  const detectedLane = faultAffectedLane(sourceLane, detectionProgress, width, 1901);
+  // 阀位由相机首次识别到的原始横向坐标锁定；后续挂花造成的偏移只影响异纤实际经过的位置。
+  const detectedLane = sourceLane;
   const valve = valvePosition(detectedLane);
   const valveChannelProgress = closestProgressOnFlowCurve(
     curve,
@@ -5766,8 +5842,11 @@ function updateFaultProcess(time, curve, width) {
   const actualValveIndex = valvePosition(actualLaneAtValve).index;
   const missCm = Math.round(Math.abs(actualLaneAtValve - detectedLane) * width * 50);
   const hasMeaningfulDrift = faultSettings.type === 'duct' || faultSettings.sizeCm > 2;
+  const carriesMissedImpurityForward = faultSettings.type === 'channel' && hasMeaningfulDrift;
   const detectorIndex = cameraIndexForLane(detectedLane, 8);
-  const channelProgress = THREE.MathUtils.lerp(0.04, 0.995, cycleProgress);
+  const channelMotionEnd = carriesMissedImpurityForward ? 0.70 : 1;
+  const channelFlowProgress = THREE.MathUtils.clamp(cycleProgress / channelMotionEnd, 0, 1);
+  const channelProgress = THREE.MathUtils.lerp(0.04, 0.995, channelFlowProgress);
   const cameraFlash = THREE.MathUtils.smoothstep(channelProgress, 0.285, 0.30)
     * (1 - THREE.MathUtils.smoothstep(channelProgress, 0.315, 0.335));
   setOpticalPathState('process', {
@@ -5776,7 +5855,11 @@ function updateFaultProcess(time, curve, width) {
     strength: cameraFlash
   });
 
-  const preBlowCycle = THREE.MathUtils.clamp((preBlowChannelProgress - 0.04) / 0.955, 0, 1);
+  const preBlowCycle = THREE.MathUtils.clamp(
+    ((preBlowChannelProgress - 0.04) / 0.955) * channelMotionEnd,
+    0,
+    1
+  );
   const sprayDuration = 0.085;
   const sprayProgress = THREE.MathUtils.clamp((cycleProgress - preBlowCycle) / sprayDuration, 0, 1);
   const ejectPoint = lanePoint(curve, valveChannelProgress, detectedLane, width);
@@ -5797,7 +5880,12 @@ function updateFaultProcess(time, curve, width) {
   faultImpurity.visible = cycleProgress < 0.985;
   faultImpurity.rotation.y += 0.036;
   faultImpurity.rotation.z += 0.022;
-  faultImpurity.scale.setScalar(cycleProgress < 0.92 ? 1.16 : Math.max(0.04, (0.985 - cycleProgress) * 15.4));
+  const impurityFadeStart = carriesMissedImpurityForward ? 0.975 : 0.92;
+  faultImpurity.scale.setScalar(
+    cycleProgress < impurityFadeStart
+      ? 1.16
+      : Math.max(0.04, (0.985 - cycleProgress) * 108)
+  );
 
   let status = faultSettings.type === 'duct'
     ? `排杂风道出现约${faultSettings.sizeCm}厘米局部堵花，对应区域棉流发生严重偏流`
@@ -5809,16 +5897,27 @@ function updateFaultProcess(time, curve, width) {
     status = `前视${detectorIndex + 1}号相机锁定第${valve.index + 1}号阀；异纤继续上升并局部偏移约${currentDriftCm}厘米`;
   }
 
-  const actualLane = faultAffectedLane(sourceLane, channelProgress, width, 1901);
+  const actualLane = channelProgress >= valveChannelProgress
+    ? actualLaneAtValve
+    : faultAffectedLane(sourceLane, channelProgress, width, 1901);
   if (!hasMeaningfulDrift && cycleProgress >= preBlowCycle) {
     faultImpurity.position.copy(pointAlongRoute(routePoints, whiteCottonRouteProgress));
     status = '约1厘米挂花基本不影响棉流，异纤仍由对应电磁阀准确喷出';
+  } else if (carriesMissedImpurityForward && cycleProgress >= channelMotionEnd) {
+    const downstreamProgress = THREE.MathUtils.clamp(
+      (cycleProgress - channelMotionEnd) / (0.985 - channelMotionEnd),
+      0,
+      1
+    );
+    faultForwardCottonPath.userData.sheetLane = actualLaneAtValve;
+    faultImpurity.position.copy(downstreamCottonPoint(downstreamProgress, faultForwardCottonPath, time));
+    status = `${faultVariant.label}未被原阀位喷除，正沿后送风道继续进入FA151`;
   } else {
     faultImpurity.position.copy(lanePoint(curve, channelProgress, actualLane, width));
     if (cycleProgress >= preBlowCycle && cycleProgress <= preBlowCycle + sprayDuration) {
       status = `第${valve.index + 1}号阀仍按原位置喷射，只喷走附近白棉；异纤已漂到第${actualValveIndex + 1}号附近`;
     } else if (cycleProgress > preBlowCycle + sprayDuration) {
-      status = `白棉已从原阀位喷出，异纤偏移约${missCm}厘米后漏过并继续进入后道`;
+      status = `白棉已从原阀位喷出，异纤偏移约${missCm}厘米后漏过并继续进入后送风道`;
     }
   }
   updateProcessStatus(status);
