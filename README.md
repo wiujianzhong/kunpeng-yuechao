@@ -10,7 +10,9 @@
 
 ## 运行方式
 
-直接用浏览器打开 [`/Users/xiaowu/Desktop/明早惊艳项目/index.html`](/Users/xiaowu/Desktop/明早惊艳项目/index.html)。
+直接用浏览器打开 [`/Users/xiaowu/Projects/01-游戏工坊/小伍工坊-当前站点/明早惊艳项目/index.html`](/Users/xiaowu/Projects/01-游戏工坊/小伍工坊-当前站点/明早惊艳项目/index.html)。
+
+JWF0019A 整线演示请直接打开 [`/Users/xiaowu/Projects/01-游戏工坊/小伍工坊-当前站点/明早惊艳项目/jwf0019a-3d/3d.html`](/Users/xiaowu/Projects/01-游戏工坊/小伍工坊-当前站点/明早惊艳项目/jwf0019a-3d/3d.html)，再点击“一键循环整线演示”。
 
 ## 长任务经验
 
