@@ -7,7 +7,7 @@ from urllib.parse import urlsplit
 
 
 class JWF0019AHandler(SimpleHTTPRequestHandler):
-    REMOTE_ASSET_BASE = "https://wiujianzhong.github.io/kunpeng-yuechao/jwf0019a-3d"
+    REMOTE_ASSET_BASE = "https://cdn.jsdelivr.net/gh/wiujianzhong/kunpeng-yuechao@747a801/jwf0019a-3d"
 
     def end_headers(self):
         request_path = urlsplit(self.path).path
