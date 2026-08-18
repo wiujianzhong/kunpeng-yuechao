@@ -7,6 +7,18 @@
   <meta name="description" content="JWF0019A异纤机3D结构、工作原理、操作保养、故障诊断、参数质量与设备知识库。">
   <script defer src="https://xiaowustudio.cn/assets/analytics.js?v=20260710"></script>
   <link rel="stylesheet" href="./styles.css?v=13-process-part-filter-20260812">
+  <script nomodule>
+    document.addEventListener('DOMContentLoaded', function () {
+      var status = document.getElementById('model-load-status');
+      if (status) {
+        status.hidden = false;
+        status.textContent = '当前浏览器版本过旧，请升级最新版 Edge、Chrome 或 Safari';
+      }
+    });
+  </script>
+  <link rel="modulepreload" href="./vendor/three/core/three.module.js">
+  <link rel="modulepreload" href="./vendor/three/examples/jsm/loaders/GLTFLoader.js">
+  <link rel="preload" href="./assets/models/JWF0019A-新主体对齐-720贴图-前罩底板削平-2026-07-25.glb?v=e5e75993-20260818" as="fetch" crossorigin fetchpriority="high">
   <script type="importmap">
     {
       "imports": {
@@ -80,8 +92,8 @@
         </section>
 
         <section>
-          <div class="range-head"><h2>分段讲解</h2><button id="tour-play" class="mini">自动演示</button></div>
-          <div class="tour">
+          <div class="range-head tour-controls"><h2>分段讲解</h2><button id="tour-play" class="mini">自动演示</button></div>
+          <div class="tour tour-controls">
             <button data-tour="overview" class="active">整机</button>
             <button data-tour="intake">进棉</button>
             <button data-tour="detect">检测</button>
@@ -294,8 +306,8 @@
     </div>
   </dialog>
 
-  <script type="module" src="./app.js?v=hang-cotton-camera-valve-align-20260813"></script>
-  <script type="module" src="./knowledge-app.js?v=4-customer-copy"></script>
+  <script type="module" src="./app.js?v=cross-platform-loading-20260818"></script>
+  <script type="module" src="./knowledge-app.js?v=7-no-auto-popup"></script>
   <script src="./ui-access.js?v=1-calibration-lock"></script>
 </body>
 </html>

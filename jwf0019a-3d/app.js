@@ -14,8 +14,31 @@ if (calibrationPrivateContent && lineLayoutSection) {
   calibrationPrivateContent.appendChild(lineLayoutSection);
   document.documentElement.dataset.lineLayoutLocation = 'internal-calibration';
 }
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const deviceMemory = Number(navigator.deviceMemory || 0);
+const hardwareConcurrency = Number(navigator.hardwareConcurrency || 0);
+const coarsePointer = window.matchMedia?.('(pointer: coarse)').matches === true;
+const constrainedDevice = (deviceMemory > 0 && deviceMemory <= 4)
+  || (hardwareConcurrency > 0 && hardwareConcurrency <= 4);
+const renderPixelRatioLimit = constrainedDevice ? 1.25 : (coarsePointer ? 1.5 : 2);
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: !constrainedDevice,
+    powerPreference: 'high-performance'
+  });
+} catch (error) {
+  const loadStatus = document.querySelector('#model-load-status');
+  if (loadStatus) {
+    loadStatus.hidden = false;
+    loadStatus.textContent = '当前浏览器无法启动3D，请升级最新版 Edge、Chrome 或 Safari，并开启硬件加速';
+  }
+  throw error;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, renderPixelRatioLimit));
+document.documentElement.dataset.renderProfile = constrainedDevice
+  ? 'lightweight'
+  : (coarsePointer ? 'mobile' : 'desktop');
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -40,7 +63,8 @@ scene.add(new THREE.HemisphereLight(0xe5f4fb, 0x29312d, 2.15));
 const keyLight = new THREE.DirectionalLight(0xffffff, 3.4);
 keyLight.position.set(4.5, 7, 5.5);
 keyLight.castShadow = true;
-keyLight.shadow.mapSize.set(2048, 2048);
+const shadowMapSize = (constrainedDevice || coarsePointer) ? 1024 : 2048;
+keyLight.shadow.mapSize.set(shadowMapSize, shadowMapSize);
 keyLight.shadow.camera.left = -8;
 keyLight.shadow.camera.right = 8;
 keyLight.shadow.camera.top = 7;
@@ -752,7 +776,7 @@ const modelStatusValue = document.querySelector('#model-status-value');
 const importedModelLoader = new GLTFLoader();
 importedModelLoader.setMeshoptDecoder(MeshoptDecoder);
 const CURRENT_MODEL_PATH = 'assets/models/JWF0019A-新主体对齐-720贴图-前罩底板削平-2026-07-25.glb';
-const CURRENT_MODEL_VERSION = 'e5e75993-20260802';
+const CURRENT_MODEL_VERSION = 'e5e75993-20260818';
 const CURRENT_MODEL_ATTEMPTS_PER_SOURCE = 2;
 const currentModelSources = [...new Map([
   `./${CURRENT_MODEL_PATH}?v=${CURRENT_MODEL_VERSION}`,

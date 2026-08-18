@@ -178,6 +178,57 @@
       cursor: pointer;
     }
     .fault-symptom-list button.active { color: var(--leaf-deep); border-color: #a9c990; background: var(--leaf-soft); }
+    .fault-support-dialog {
+      width: min(860px, calc(100vw - 28px));
+      max-height: min(88vh, 900px);
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      color: var(--ink);
+      background: var(--paper);
+      box-shadow: 0 30px 100px rgba(41, 64, 49, .22);
+    }
+    .fault-support-dialog::backdrop { background: rgba(30, 43, 37, .32); backdrop-filter: blur(6px); }
+    .fault-support-frame { max-height: inherit; overflow: auto; }
+    .fault-support-dialog header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .94);
+      backdrop-filter: blur(16px);
+    }
+    .fault-support-dialog header p { margin: 0 0 7px; color: #7d8a82; font-size: 11px; letter-spacing: .08em; }
+    .fault-support-dialog header h2 { margin: 0; font-size: 25px; }
+    .fault-support-close { padding: 8px 13px; border: 1px solid var(--line); border-radius: 10px; background: white; cursor: pointer; }
+    .fault-support-body { padding: 24px 24px 34px; }
+    .fault-support-lead { padding: 15px 16px; border: 1px solid rgba(220, 106, 95, .28); border-radius: 12px; color: #77534f; background: rgba(220, 106, 95, .07); font-size: 13px; line-height: 1.7; }
+    .diagnosis-mode-switch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 16px; padding: 5px; border: 1px solid var(--line); border-radius: 14px; background: var(--porcelain); }
+    .diagnosis-mode-switch button { display: grid; gap: 4px; padding: 13px 15px; border: 1px solid transparent; border-radius: 10px; background: transparent; text-align: left; cursor: pointer; }
+    .diagnosis-mode-switch button.active { border-color: #a9c990; background: white; box-shadow: 0 5px 18px rgba(60, 86, 68, .08); }
+    .diagnosis-mode-switch strong { color: var(--ink); font-size: 14px; }
+    .diagnosis-mode-switch span { color: var(--muted); font-size: 11px; }
+    .diagnosis-panel { margin-top: 15px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: white; }
+    .diagnosis-question-head > span, .diagnosis-result-label { color: var(--leaf-deep); font-size: 10px; letter-spacing: .08em; }
+    .diagnosis-question-head h3, .diagnosis-result h3 { margin: 8px 0 5px; font-size: 20px; }
+    .diagnosis-question-head p, .diagnosis-conclusion { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .diagnosis-choice-grid, .diagnosis-binary-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 17px; }
+    .diagnosis-choice-grid button, .diagnosis-binary-actions button { min-height: 52px; padding: 11px 14px; border: 1px solid #cfd9d1; border-radius: 11px; color: #34463d; background: #f8faf7; text-align: left; cursor: pointer; }
+    .diagnosis-choice-grid button:hover, .diagnosis-binary-actions button:hover { border-color: #86b36d; background: #edf6e8; }
+    .diagnosis-result { margin-top: 17px; padding: 19px; border: 1px solid #b8d2a7; border-left: 5px solid var(--leaf); border-radius: 12px; background: #f3f8ef; }
+    .diagnosis-conclusion { color: #48604f; }
+    .diagnosis-result-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; margin-top: 15px; padding-top: 14px; border-top: 1px solid #d6e5cc; }
+    .diagnosis-result-grid strong { color: var(--leaf-deep); font-size: 11px; }
+    .diagnosis-result-grid ol { margin: 8px 0 0; padding-left: 20px; }
+    .diagnosis-result-grid li, .diagnosis-result-grid p { color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .diagnosis-result-grid p { margin: 6px 0 12px; }
+    .diagnosis-restart { margin-top: 8px; padding: 8px 12px; border: 1px solid #a9c990; border-radius: 9px; color: var(--leaf-deep); background: white; cursor: pointer; }
     .primary, .secondary {
       min-height: 50px;
       padding: 0 22px;
@@ -417,6 +468,12 @@
       .learning-console { margin-top: 10px; }
       .caption-line p { font-size: 14px; }
       .playback-controls button { min-width: 72px; }
+      .fault-support-dialog { width: calc(100vw - 14px); max-height: 92vh; border-radius: 17px; }
+      .fault-support-dialog header { padding: 17px 15px 14px; }
+      .fault-support-dialog header h2 { font-size: 20px; }
+      .fault-support-body { padding: 16px 14px 26px; }
+      .diagnosis-mode-switch, .diagnosis-choice-grid, .diagnosis-binary-actions, .diagnosis-result-grid { grid-template-columns: 1fr; }
+      .diagnosis-panel { padding: 15px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -449,10 +506,10 @@
         <div class="fault-symptoms" id="fault-symptoms" hidden>
           <span>先选择现场症状</span>
           <div class="fault-symptom-list">
-            <button class="active" type="button" data-symptom="camera">相机画面不刷新</button>
-            <button type="button" data-symptom="channel">通道通讯故障</button>
-            <button type="button" data-symptom="temperature">高温报警</button>
-            <button type="button" data-symptom="flow">偏流报警</button>
+            <button class="active" type="button" data-symptom="camera" data-fault-id="random-eject">吹阀过多</button>
+            <button type="button" data-symptom="flow" data-fault-id="flow-bias">流速异常</button>
+            <button type="button" data-symptom="temperature" data-fault-id="high-temp">高温报警</button>
+            <button type="button" data-symptom="channel" data-fault-id="communication">通讯故障</button>
           </div>
         </div>
         <div class="mode-choice" role="group" aria-label="学习方式">
@@ -512,14 +569,25 @@
     <p class="demo-note">JWF0019A 异纤机设备知识平台 · 3D演示与知识内容</p>
   </div>
 
-  <script>
+  <dialog class="fault-support-dialog" id="fault-support-dialog">
+    <div class="fault-support-frame">
+      <header>
+        <div><p>设备故障</p><h2 id="fault-support-title">故障诊断</h2></div>
+        <button class="fault-support-close" id="fault-support-close" type="button">关闭</button>
+      </header>
+      <div class="fault-support-body" id="fault-support-body"></div>
+    </div>
+  </dialog>
+
+  <script type="module">
+    import { knowledgeData } from "./knowledge/knowledge-data.js?v=6-fault-dual-layer";
     const modules = {
       "认识结构": {
         slug: "structure",
         kicker: "认识结构 · 从外到内",
         title: "从外到内，<em>看懂每个部件</em>",
         lead: "先建立整机方位，再逐层认识相机、算力盒子、电磁阀与排杂风道。",
-        action: "预览结构讲解",
+        action: "故障诊断",
         status: "整机结构认识",
         steps: [
           "先从正面观察两侧支撑腿与检测通道。",
@@ -590,26 +658,26 @@
       },
       "故障诊断": {
         slug: "fault",
-        kicker: "故障诊断 · 先看现象",
-        title: "先判断范围，<em>再处理故障</em>",
-        lead: "先选一个现场症状，再按照屏幕信息和设备状态逐步排查。",
-        action: "预览诊断讲解",
-        status: "按现象定位故障",
+        kicker: "故障诊断 · 两种路径",
+        title: "想快速处理，<em>也能深入分析</em>",
+        lead: "选择故障后，可以直接获得处理结果，也可以跟着现场逻辑逐步判断。",
+        action: "打开故障诊断",
+        status: "快速答案 / 逐步分析",
         symptoms: {
           camera: {
-            lead: "单个相机画面停止刷新时，先确认报警编号，再复核对应相机。",
-            status: "相机画面不刷新",
+            lead: "先分清真异物、固定轮廓、变化棉束和固定阀区，再决定怎么处理。",
+            status: "吹阀过多（乱喷）",
             steps: [
-              "观察20个相机画面，确认只有一个画面停止刷新。",
-              "读取主屏右侧报警信息，记录对应相机编号。",
-              "关闭整机电源，等待20秒后重新上电复核。",
-              "如果短期内反复出现，检查接线并准备对应相机。",
-              "确认故障持续后，更换对应相机并验证画面刷新。"
+              "先看落棉里是否真有异物。",
+              "再看触发图像是固定轮廓还是变化棉束。",
+              "根据图像特征检查玻璃脏污、挂花和光源。",
+              "如果固定阀区异常，再检查对应阀区。",
+              "处理后同时验证图像、落棉和喷次。"
             ]
           },
           channel: {
-            lead: "同一通道的前后两个相机同时不刷新，重点排查对应算力盒子。",
-            status: "通道通讯故障",
+            lead: "维修后先查接线；单相机卡住偏向相机侧，同通道两画面卡住偏向算力通道。",
+            status: "通讯故障",
             steps: [
               "确认同一通道的两个相机画面都停止刷新。",
               "读取报警信息，记录故障通道编号。",
@@ -630,8 +698,8 @@
             ]
           },
           flow: {
-            lead: "偏流报警要先看通道是否堵花，再核对风口、玻璃和实际流速。",
-            status: "偏流报警",
+            lead: "先区分局部异常、全部偏高、全部偏低还是参数异常，再检查对应风路。",
+            status: "流速异常",
             steps: [
               "观察棉流是否明显偏向通道一侧。",
               "停机检查入口、出口和上部风口是否积花或漏风。",
@@ -649,9 +717,9 @@
           ["20%", "27%", "61%", "35%", "确认更换范围"]
         ],
         cards: [
-          ["01 · 看报警", "先确认编号", "报警信息会指出异常相机或通道，先记录再断电处理。"],
-          ["02 · 看画面", "判断一个还是两个", "单画面卡住偏向相机；同通道双画面卡住偏向算力盒子。"],
-          ["03 · 看频率", "偶发重启，反复更换", "断电重启可用于复核；短期反复出现不能只靠重启。"]
+          ["01 · 快速答案", "直接选现象", "适合希望尽快得到处理结果的人员。"],
+          ["02 · 逐步分析", "跟着问题判断", "保留现场证据，按分析路径缩小故障范围。"],
+          ["03 · 处理验证", "不只看报警消失", "同时确认画面、棉流、喷次和设备运行状态。"]
         ]
       },
       "参数资料": {
@@ -703,6 +771,15 @@
     const focusBeacon = document.querySelector("#focus-beacon");
     const focusLabel = document.querySelector("#focus-label");
     const cards = [...document.querySelectorAll(".info-card")];
+    const faultSupportDialog = document.querySelector("#fault-support-dialog");
+    const faultSupportTitle = document.querySelector("#fault-support-title");
+    const faultSupportBody = document.querySelector("#fault-support-body");
+    const faultIdBySymptom = {
+      camera: "random-eject",
+      flow: "flow-bias",
+      temperature: "high-temp",
+      channel: "communication"
+    };
 
     let currentModule = "认识结构";
     let currentMode = "free";
@@ -712,6 +789,68 @@
     let speed = 1;
     let stepTimer = null;
     let currentSymptom = "camera";
+    let activeSupportFault = null;
+
+    function escapeSupportText(value) {
+      return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[character]);
+    }
+
+    function supportDiagnosisResult(result, showRestart = false) {
+      return `
+        <section class="diagnosis-result" aria-live="polite">
+          <span class="diagnosis-result-label">当前判断</span>
+          <h3>${escapeSupportText(result.title)}</h3>
+          <p class="diagnosis-conclusion">${escapeSupportText(result.conclusion)}</p>
+          <div class="diagnosis-result-grid">
+            <div><strong>现在怎么做</strong><ol>${result.actions.map(item => `<li>${escapeSupportText(item)}</li>`).join("")}</ol></div>
+            <div><strong>怎样算处理好</strong><p>${escapeSupportText(result.verify)}</p><strong>什么时候上报</strong><p>${escapeSupportText(result.escalate)}</p></div>
+          </div>
+          ${showRestart ? '<button type="button" class="diagnosis-restart" data-support-restart>重新判断</button>' : ""}
+        </section>`;
+    }
+
+    function supportQuickDiagnosis(fault) {
+      const quick = fault.diagnosis.quick;
+      return `
+        <section class="diagnosis-panel">
+          <div class="diagnosis-question-head"><span>一步得到答案</span><h3>${escapeSupportText(quick.prompt)}</h3><p>${escapeSupportText(quick.hint)}</p></div>
+          <div class="diagnosis-choice-grid">${quick.options.map((option, index) => `<button type="button" data-support-quick="${index}">${escapeSupportText(option.label)}</button>`).join("")}</div>
+          <div id="support-diagnosis-answer"></div>
+        </section>`;
+    }
+
+    function supportDeepDiagnosis(fault, nodeId = fault.diagnosis.deep.start) {
+      const node = fault.diagnosis.deep.nodes[nodeId];
+      return `
+        <section class="diagnosis-panel" data-support-node="${escapeSupportText(nodeId)}">
+          <div class="diagnosis-question-head"><span>按现场逻辑逐步分析</span><h3>${escapeSupportText(node.question)}</h3><p>${escapeSupportText(node.why)}</p></div>
+          <div class="diagnosis-binary-actions">
+            <button type="button" data-support-answer="yes">是，符合</button>
+            <button type="button" data-support-answer="no">不是，继续判断</button>
+          </div>
+        </section>`;
+    }
+
+    function supportFaultContent(fault, mode = "quick") {
+      return `
+        <div class="fault-support-lead">${escapeSupportText(fault.summary)}</div>
+        <nav class="diagnosis-mode-switch" aria-label="选择诊断方式">
+          <button type="button" data-support-mode="quick" class="${mode === "quick" ? "active" : ""}"><strong>快速答案</strong><span>选一个现象，直接给结果</span></button>
+          <button type="button" data-support-mode="deep" class="${mode === "deep" ? "active" : ""}"><strong>逐步分析</strong><span>跟着判断路径找原因</span></button>
+        </nav>
+        <div id="support-diagnosis-workspace">${mode === "quick" ? supportQuickDiagnosis(fault) : supportDeepDiagnosis(fault)}</div>`;
+    }
+
+    function openSupportFault(faultId = faultIdBySymptom[currentSymptom]) {
+      const fault = knowledgeData.faultCases.find(item => item.id === faultId && item.diagnosis);
+      if (!fault) return;
+      activeSupportFault = fault;
+      faultSupportTitle.textContent = fault.title;
+      faultSupportBody.innerHTML = supportFaultContent(fault);
+      faultSupportDialog.showModal();
+    }
 
     const principleVoice = [
       "./assets/audio/step-intake.mp3",
@@ -967,9 +1106,28 @@
       }
     }
 
-    moduleButtons.forEach(button => button.addEventListener("click", () => selectModule(button.dataset.module)));
-    modeButtons.forEach(button => button.addEventListener("click", () => setMode(button.dataset.mode, button.dataset.mode === "guided")));
+    moduleButtons.forEach(button => button.addEventListener("click", () => {
+      if (button.dataset.module === "故障诊断" && currentMode === "guided") setMode("free");
+      selectModule(button.dataset.module);
+    }));
+    modeButtons.forEach(button => button.addEventListener("click", () => {
+      if (currentModule === "故障诊断" && button.dataset.mode === "guided") {
+        openSupportFault();
+        return;
+      }
+      setMode(button.dataset.mode, button.dataset.mode === "guided");
+    }));
     moduleAction.addEventListener("click", () => {
+      if (currentModule === "认识结构") {
+        if (currentMode === "guided") setMode("free");
+        selectModule("故障诊断");
+        return;
+      }
+      if (currentModule === "故障诊断") {
+        stopPlayback();
+        openSupportFault();
+        return;
+      }
       if (currentMode !== "guided") {
         setMode("guided", true);
         return;
@@ -989,11 +1147,49 @@
       currentStep = 0;
       paused = true;
       pauseButton.textContent = currentMode === "guided" ? "开始" : "暂停";
-      if (currentMode === "guided") {
-        playFromCurrent();
-        revealPlaybackControls();
-      }
+      openSupportFault(button.dataset.faultId);
     }));
+
+    document.querySelector("#fault-support-close").addEventListener("click", () => faultSupportDialog.close());
+    faultSupportDialog.addEventListener("click", event => {
+      if (event.target === faultSupportDialog) faultSupportDialog.close();
+    });
+    faultSupportDialog.addEventListener("close", () => { activeSupportFault = null; });
+    faultSupportBody.addEventListener("click", event => {
+      const fault = activeSupportFault;
+      if (!fault?.diagnosis) return;
+
+      const modeButton = event.target.closest("[data-support-mode]");
+      if (modeButton) {
+        faultSupportBody.innerHTML = supportFaultContent(fault, modeButton.dataset.supportMode);
+        return;
+      }
+
+      const quickButton = event.target.closest("[data-support-quick]");
+      if (quickButton) {
+        const result = fault.diagnosis.quick.options[Number(quickButton.dataset.supportQuick)]?.result;
+        const answer = faultSupportBody.querySelector("#support-diagnosis-answer");
+        if (result && answer) answer.innerHTML = supportDiagnosisResult(result);
+        return;
+      }
+
+      if (event.target.closest("[data-support-restart]")) {
+        faultSupportBody.innerHTML = supportFaultContent(fault, "deep");
+        return;
+      }
+
+      const answerButton = event.target.closest("[data-support-answer]");
+      if (!answerButton) return;
+      const nodeId = faultSupportBody.querySelector("[data-support-node]")?.dataset.supportNode;
+      const node = fault.diagnosis.deep.nodes[nodeId];
+      if (!node) return;
+      const yes = answerButton.dataset.supportAnswer === "yes";
+      const nextNode = yes ? node.yesNext : node.noNext;
+      const resultId = yes ? node.yesResult : node.noResult;
+      const workspace = faultSupportBody.querySelector("#support-diagnosis-workspace");
+      if (nextNode) workspace.innerHTML = supportDeepDiagnosis(fault, nextNode);
+      else if (resultId) workspace.innerHTML = supportDiagnosisResult(fault.diagnosis.deep.results[resultId], true);
+    });
 
     document.querySelector("#prev-step").addEventListener("click", () => {
       currentStep = Math.max(0, currentStep - 1);

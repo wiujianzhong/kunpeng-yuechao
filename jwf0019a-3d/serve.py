@@ -10,6 +10,19 @@ class JWF0019AHandler(SimpleHTTPRequestHandler):
     REMOTE_ASSET_BASE = "https://wiujianzhong.github.io/kunpeng-yuechao/jwf0019a-3d"
 
     def end_headers(self):
+        request_path = urlsplit(self.path).path
+        suffix = Path(request_path).suffix.lower()
+        if request_path == "/health":
+            cache_control = "no-store"
+        elif request_path.endswith("/") or suffix in {"", ".html"}:
+            cache_control = "no-cache"
+        elif request_path.startswith(("/assets/", "/vendor/")):
+            cache_control = "public, max-age=31536000, immutable"
+        elif suffix in {".js", ".css", ".json"}:
+            cache_control = "public, max-age=86400, stale-while-revalidate=604800"
+        else:
+            cache_control = "public, max-age=3600"
+        self.send_header("Cache-Control", cache_control)
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
         self.send_header("X-Frame-Options", "SAMEORIGIN")
@@ -22,7 +35,6 @@ class JWF0019AHandler(SimpleHTTPRequestHandler):
         if is_remote_asset and not local_path.is_file():
             self.send_response(302)
             self.send_header("Location", f"{self.REMOTE_ASSET_BASE}{self.path}")
-            self.send_header("Cache-Control", "public, max-age=300")
             self.end_headers()
             return None
         return super().send_head()
@@ -36,7 +48,6 @@ class JWF0019AHandler(SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
-            self.send_header("Cache-Control", "no-store")
             self.end_headers()
             self.wfile.write(body)
             return

@@ -20,6 +20,7 @@ const metricModules = document.querySelector('#knowledge-module-count');
 
 let activeModule = 'overview';
 let searchTerm = '';
+let activeDiagnosisFault = null;
 
 const statusNames = {
   active: '正式知识',
@@ -155,14 +156,75 @@ function faultSection(label, items) {
   `;
 }
 
+function diagnosisResult(result, showRestart = false) {
+  return `
+    <section class="diagnosis-result" aria-live="polite">
+      <span class="diagnosis-result-label">当前判断</span>
+      <h3>${escapeHtml(result.title)}</h3>
+      <p class="diagnosis-conclusion">${escapeHtml(result.conclusion)}</p>
+      <div class="diagnosis-result-grid">
+        <div><strong>现在怎么做</strong><ol>${result.actions.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol></div>
+        <div><strong>怎样算处理好</strong><p>${escapeHtml(result.verify)}</p><strong>什么时候上报</strong><p>${escapeHtml(result.escalate)}</p></div>
+      </div>
+      ${showRestart ? '<button type="button" class="diagnosis-restart" data-diagnosis-restart>重新判断</button>' : ''}
+    </section>
+  `;
+}
+
+function quickDiagnosis(fault) {
+  const quick = fault.diagnosis.quick;
+  return `
+    <section class="diagnosis-panel">
+      <div class="diagnosis-question-head"><span>一步得到答案</span><h3>${escapeHtml(quick.prompt)}</h3><p>${escapeHtml(quick.hint)}</p></div>
+      <div class="diagnosis-choice-grid">
+        ${quick.options.map((option, index) => `<button type="button" data-quick-result="${index}">${escapeHtml(option.label)}</button>`).join('')}
+      </div>
+      <div id="diagnosis-answer"></div>
+    </section>
+  `;
+}
+
+function deepDiagnosis(fault, nodeId = fault.diagnosis.deep.start) {
+  const node = fault.diagnosis.deep.nodes[nodeId];
+  return `
+    <section class="diagnosis-panel" data-deep-node="${escapeHtml(nodeId)}">
+      <div class="diagnosis-question-head"><span>按现场逻辑逐步分析</span><h3>${escapeHtml(node.question)}</h3><p>${escapeHtml(node.why)}</p></div>
+      <div class="diagnosis-binary-actions">
+        <button type="button" data-deep-answer="yes">是，符合</button>
+        <button type="button" data-deep-answer="no">不是，继续判断</button>
+      </div>
+      <div id="diagnosis-answer"></div>
+    </section>
+  `;
+}
+
+function enhancedFaultContent(fault, mode = 'quick') {
+  const related = fault.articleIds
+    .map((id) => knowledgeData.articles.find((article) => article.id === id))
+    .filter(Boolean);
+  return `
+    <div class="fault-lead">${escapeHtml(fault.summary)}</div>
+    <nav class="diagnosis-mode-switch" aria-label="选择诊断方式">
+      <button type="button" data-diagnosis-mode="quick" class="${mode === 'quick' ? 'active' : ''}"><strong>快速答案</strong><span>选一个现象，直接给结果</span></button>
+      <button type="button" data-diagnosis-mode="deep" class="${mode === 'deep' ? 'active' : ''}"><strong>逐步分析</strong><span>跟着判断路径找原因</span></button>
+    </nav>
+    <div id="diagnosis-workspace">${mode === 'quick' ? quickDiagnosis(fault) : deepDiagnosis(fault)}</div>
+    <div class="fault-related">
+      <span>相关知识卡</span>
+      ${related.map((article) => `<button type="button" data-open-article="${article.id}">${escapeHtml(article.title)}</button>`).join('')}
+    </div>
+  `;
+}
+
 function openFault(fault) {
+  activeDiagnosisFault = fault.diagnosis ? fault : null;
   const related = fault.articleIds
     .map((id) => knowledgeData.articles.find((article) => article.id === id))
     .filter(Boolean);
   openDialog({
     title: fault.title,
     meta: `<span>故障诊断</span><span>${escapeHtml(fault.level)}</span><span>按顺序检查</span>`,
-    html: `
+    html: fault.diagnosis ? enhancedFaultContent(fault) : `
       <div class="fault-lead">${escapeHtml(fault.summary)}</div>
       ${faultSection('你会看到', fault.symptoms)}
       ${faultSection('先检查', fault.checks)}
@@ -313,9 +375,44 @@ cardGrid.addEventListener('click', (event) => {
 
 dialogBody.addEventListener('click', (event) => {
   const articleButton = event.target.closest('[data-open-article]');
-  if (!articleButton) return;
-  const article = knowledgeData.articles.find((item) => item.id === articleButton.dataset.openArticle);
-  if (article) openArticle(article);
+  if (articleButton) {
+    const article = knowledgeData.articles.find((item) => item.id === articleButton.dataset.openArticle);
+    if (article) openArticle(article);
+    return;
+  }
+
+  const fault = activeDiagnosisFault;
+  if (!fault?.diagnosis) return;
+
+  const modeButton = event.target.closest('[data-diagnosis-mode]');
+  if (modeButton) {
+    dialogBody.innerHTML = enhancedFaultContent(fault, modeButton.dataset.diagnosisMode);
+    return;
+  }
+
+  const quickButton = event.target.closest('[data-quick-result]');
+  if (quickButton) {
+    const result = fault.diagnosis.quick.options[Number(quickButton.dataset.quickResult)]?.result;
+    if (result) dialogBody.querySelector('#diagnosis-answer').innerHTML = diagnosisResult(result);
+    return;
+  }
+
+  if (event.target.closest('[data-diagnosis-restart]')) {
+    dialogBody.innerHTML = enhancedFaultContent(fault, 'deep');
+    return;
+  }
+
+  const deepButton = event.target.closest('[data-deep-answer]');
+  if (!deepButton) return;
+  const nodeId = dialogBody.querySelector('[data-deep-node]')?.dataset.deepNode;
+  const node = fault.diagnosis.deep.nodes[nodeId];
+  if (!node) return;
+  const yes = deepButton.dataset.deepAnswer === 'yes';
+  const nextNode = yes ? node.yesNext : node.noNext;
+  const resultId = yes ? node.yesResult : node.noResult;
+  const workspace = dialogBody.querySelector('#diagnosis-workspace');
+  if (nextNode) workspace.innerHTML = deepDiagnosis(fault, nextNode);
+  else if (resultId) workspace.innerHTML = diagnosisResult(fault.diagnosis.deep.results[resultId], true);
 });
 
 searchInput.addEventListener('input', () => {
@@ -341,6 +438,7 @@ dialogClose.addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', (event) => {
   if (event.target === dialog) dialog.close();
 });
+dialog.addEventListener('close', () => { activeDiagnosisFault = null; });
 
 if (metricArticles) metricArticles.textContent = String(knowledgeData.articles.length);
 if (metricFaults) metricFaults.textContent = String(knowledgeData.faultCases.length);
