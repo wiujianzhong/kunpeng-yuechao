@@ -1,10 +1,22 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { PhotoFrame } from './components/PhotoFrame'
 import { financeStates, formulas, photos, profile } from './content'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const FinanceWorld3D = lazy(() =>
   import('./components/FinanceWorld3D').then((module) => ({ default: module.FinanceWorld3D })),
 )
+
+const heroChapters = [
+  { step: '01', title: '数字入账', note: '每一笔数字，都先找到自己的位置。' },
+  { step: '02', title: '借贷归位', note: '左边有来处，右边有去处。' },
+  { step: '03', title: '月底加速', note: '表格、凭证和咖啡，同时开始转快。' },
+  { step: '04', title: '锁定 0.01', note: '所有人都想放过它，只有她看见了它。' },
+  { step: '05', title: '账平放行', note: '差额归零，数字世界恢复秩序。' },
+] as const
 
 function ArrowIcon() {
   return (
@@ -23,10 +35,12 @@ function SparkIcon() {
 }
 
 function App() {
+  const heroRef = useRef<HTMLElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [monthEnd, setMonthEnd] = useState(false)
   const [closing, setClosing] = useState(false)
   const [progress, setProgress] = useState(24)
+  const [heroProgress, setHeroProgress] = useState(0)
   const [challengeState, setChallengeState] = useState<'idle' | 'rejected' | 'balanced'>('idle')
 
   useEffect(() => {
@@ -38,6 +52,33 @@ function App() {
     document.body.classList.toggle('month-end-active', monthEnd)
     return () => document.body.classList.remove('month-end-active')
   }, [monthEnd])
+
+  useEffect(() => {
+    const hero = heroRef.current
+    if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const scrollState = { progress: 0 }
+    const context = gsap.context(() => {
+      gsap.to(scrollState, {
+        progress: 1,
+        ease: 'none',
+        onUpdate: () => setHeroProgress(scrollState.progress),
+        scrollTrigger: {
+          trigger: hero,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.55,
+          invalidateOnRefresh: true,
+        },
+      })
+    }, hero)
+
+    const refreshFrame = window.requestAnimationFrame(() => ScrollTrigger.refresh())
+    return () => {
+      window.cancelAnimationFrame(refreshFrame)
+      context.revert()
+    }
+  }, [])
 
   useEffect(() => {
     const elements = document.querySelectorAll<HTMLElement>('[data-reveal]')
@@ -114,6 +155,11 @@ function App() {
     window.setTimeout(() => setChallengeState('idle'), 3200)
   }
 
+  const heroChapterIndex = Math.min(heroChapters.length - 1, Math.floor(heroProgress * heroChapters.length))
+  const titleExit = Math.min(1, Math.max(0, (heroProgress - 0.025) / 0.16))
+  const storyIn = Math.min(1, Math.max(0, (heroProgress - 0.12) / 0.1))
+  const heroBalanced = heroProgress > 0.91
+
   return (
     <>
       <div className={`page-loader ${isLoading ? '' : 'is-gone'}`} aria-hidden={!isLoading}>
@@ -142,7 +188,13 @@ function App() {
       </header>
 
       <main>
-        <section className="hero" id="top">
+        <section
+          ref={heroRef}
+          className={`hero ${heroProgress > 0.12 ? 'is-scrolling-story' : ''} ${heroBalanced ? 'is-story-balanced' : ''}`}
+          id="top"
+          style={{ '--hero-progress': heroProgress } as React.CSSProperties}
+        >
+          <div className="hero-sticky">
           <div className="hero-grid" aria-hidden="true" />
           <div className="floating-numbers" aria-hidden="true">
             <span style={{ '--x': '8%', '--y': '20%', '--delay': '-2s' } as React.CSSProperties}>¥ 520.00</span>
@@ -152,7 +204,14 @@ function App() {
             <span style={{ '--x': '47%', '--y': '12%', '--delay': '-3s' } as React.CSSProperties}>¥ 1314.00</span>
           </div>
 
-          <div className="hero-copy">
+          <div
+            className="hero-copy"
+            style={{
+              opacity: 1 - titleExit * 0.96,
+              transform: `translate3d(0, ${titleExit * -64}px, 0) scale(${1 - titleExit * 0.035})`,
+              pointerEvents: titleExit > 0.88 ? 'none' : 'auto',
+            }}
+          >
             <div className="eyebrow load-item"><span /> 一个财务女孩的数字世界</div>
             <h1 className="hero-title load-item">
               <span>{profile.name}</span>
@@ -179,16 +238,16 @@ function App() {
 
           <div className="hero-visual load-item">
             <div className="visual-caption">
-              <span>LIVE / LEDGER OBJECT</span>
-              <span>拖动目光，数字会回应</span>
+              <span>LIVE / SCROLL-DRIVEN LEDGER</span>
+              <span>{heroProgress < 0.12 ? '滚动滚轮，帮她把账对平' : heroChapters[heroChapterIndex].title}</span>
             </div>
             <Suspense fallback={<div className="finance-world-fallback"><span>0.01</span></div>}>
-              <FinanceWorld3D monthEnd={monthEnd} />
+              <FinanceWorld3D monthEnd={monthEnd} scrollProgress={heroProgress} />
             </Suspense>
-            <div className={`difference-chip ${monthEnd ? 'is-urgent' : ''}`}>
-              <span>账面差额</span>
-              <strong>¥ 0.01</strong>
-              <small>UNBALANCED</small>
+            <div className={`difference-chip ${monthEnd ? 'is-urgent' : ''} ${heroProgress > 0.62 ? 'is-tracking' : ''}`}>
+              <span>{heroBalanced ? '账面状态' : '账面差额'}</span>
+              <strong>¥ {heroBalanced ? '0.00' : '0.01'}</strong>
+              <small>{heroBalanced ? 'BALANCED / 放行' : heroProgress > 0.62 ? 'TRACING / 锁定中' : 'UNBALANCED'}</small>
             </div>
             <PhotoFrame src={photos.hero} label="PHOTO 00" caption="首页人物主照片" className="hero-photo" />
             <div className="visual-ticker" aria-hidden="true">
@@ -196,10 +255,31 @@ function App() {
             </div>
           </div>
 
+          <div className="hero-scroll-story" style={{ opacity: storyIn }} aria-hidden={storyIn < 0.15}>
+            <div className="story-counter">
+              <span>RECONCILING</span>
+              <strong>{String(Math.round(heroProgress * 100)).padStart(2, '0')}%</strong>
+            </div>
+            <div className="story-copy-stack">
+              {heroChapters.map((chapter, index) => (
+                <article className={index === heroChapterIndex ? 'is-active' : ''} key={chapter.step}>
+                  <span>{chapter.step} / 05</span>
+                  <h2>{chapter.title}</h2>
+                  <p>{chapter.note}</p>
+                </article>
+              ))}
+            </div>
+            <div className="story-rail" aria-hidden="true">
+              <span style={{ height: `${Math.max(2, heroProgress * 100)}%` }} />
+              {heroChapters.map((chapter, index) => <i className={index <= heroChapterIndex ? 'is-passed' : ''} key={chapter.step} />)}
+            </div>
+          </div>
+
           <a className="scroll-cue" href="#about" aria-label="向下浏览">
-            <span>SCROLL TO RECONCILE</span>
+            <span>{heroBalanced ? 'BALANCED / 继续认识她' : '滚动对账 / SCROLL TO RECONCILE'}</span>
             <i />
           </a>
+          </div>
         </section>
 
         <section className="about section-shell" id="about">

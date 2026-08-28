@@ -41,10 +41,23 @@ npm run preview
 
 需求原文中公司同时出现“阿新”和“阿兴”两种写法，当前按“个人介绍区域”中的“阿兴纺织有限公司”展示，上线正式版前建议本人确认。
 
+## 首页 3D 滚轮交互
+
+首页是一段由滚轮或手指滑动直接控制的 3D 对账叙事：
+
+1. 数字入账
+2. 借贷归位
+3. 月底加速
+4. 锁定 0.01
+5. 账平放行
+
+滚动进度会同步控制账本翻页、3D 天平、咖啡筹码、0.01 硬币、镜头景别和左侧章节文字。
+
 ## 技术说明
 
 - Vite + React + TypeScript
-- React Three Fiber + Drei（3D 数字账本主视觉）
-- 原生 CSS 动效与 IntersectionObserver（滚动显现）
+- React Three Fiber + Drei（3D 数字账本、天平和筹码场景）
+- GSAP ScrollTrigger（滚轮驱动 3D 时间线）
+- 原生 CSS 动效与 IntersectionObserver（其他区域滚动显现）
 - 无后端、无第三方数据、无 API Key
 - 支持 `prefers-reduced-motion`，并限制 WebGL 像素比以兼顾手机性能
