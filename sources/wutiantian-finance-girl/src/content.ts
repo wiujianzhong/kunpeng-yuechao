@@ -2,7 +2,7 @@ export const profile = {
   name: '吴甜甜',
   englishRole: 'FINANCE GIRL',
   role: '财务主管',
-  company: '阿兴纺织有限公司',
+  company: '阿新纺织有限公司',
   direction: '企业财务 / 财务管理',
 }
 

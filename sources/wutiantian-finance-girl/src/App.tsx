@@ -11,11 +11,11 @@ const FinanceWorld3D = lazy(() =>
 )
 
 const heroChapters = [
-  { step: '01', title: '数字入账', note: '每一笔数字，都先找到自己的位置。' },
-  { step: '02', title: '借贷归位', note: '左边有来处，右边有去处。' },
-  { step: '03', title: '月底加速', note: '表格、凭证和咖啡，同时开始转快。' },
-  { step: '04', title: '锁定 0.01', note: '所有人都想放过它，只有她看见了它。' },
-  { step: '05', title: '账平放行', note: '差额归零，数字世界恢复秩序。' },
+  { step: '01', title: '表面很安静', note: '她看起来，只是在看一张表。' },
+  { step: '02', title: '数字有来处', note: '但在她脑内，每一笔都在寻找自己应该在的位置。' },
+  { step: '03', title: '未平的数字会说话', note: '月底一到，凭证、引用和差额，同时在心里亮起。' },
+  { step: '04', title: '0.01 是一道裂缝', note: '它不是小数点。它是秩序里，还没有被说清楚的那件事。' },
+  { step: '05', title: '世界终于安静', note: '归零的那一刻，不是得到了什么，是所有数字终于各得其所。' },
 ] as const
 
 function ArrowIcon() {
@@ -155,10 +155,11 @@ function App() {
     window.setTimeout(() => setChallengeState('idle'), 3200)
   }
 
-  const heroChapterIndex = Math.min(heroChapters.length - 1, Math.floor(heroProgress * heroChapters.length))
+  const heroChapterIndex = heroProgress < 0.18 ? 0 : heroProgress < 0.38 ? 1 : heroProgress < 0.62 ? 2 : heroProgress < 0.88 ? 3 : 4
   const titleExit = Math.min(1, Math.max(0, (heroProgress - 0.025) / 0.16))
   const storyIn = Math.min(1, Math.max(0, (heroProgress - 0.12) / 0.1))
   const heroBalanced = heroProgress > 0.91
+  const insideFinanceMind = heroProgress > 0.31 && heroProgress < 0.88
 
   return (
     <>
@@ -190,7 +191,7 @@ function App() {
       <main>
         <section
           ref={heroRef}
-          className={`hero ${heroProgress > 0.12 ? 'is-scrolling-story' : ''} ${heroBalanced ? 'is-story-balanced' : ''}`}
+          className={`hero mind-stage-${heroChapterIndex} ${heroProgress > 0.12 ? 'is-scrolling-story' : ''} ${insideFinanceMind ? 'is-mind-dark' : ''} ${heroBalanced ? 'is-story-balanced' : ''}`}
           id="top"
           style={{ '--hero-progress': heroProgress } as React.CSSProperties}
         >
@@ -238,16 +239,16 @@ function App() {
 
           <div className="hero-visual load-item">
             <div className="visual-caption">
-              <span>LIVE / SCROLL-DRIVEN LEDGER</span>
-              <span>{heroProgress < 0.12 ? '滚动滚轮，帮她把账对平' : heroChapters[heroChapterIndex].title}</span>
+              <span>LIVE / DOUBLE-ENTRY MIND</span>
+              <span>{heroProgress < 0.12 ? '继续滚动，进入她看数字的方式' : heroChapters[heroChapterIndex].title}</span>
             </div>
             <Suspense fallback={<div className="finance-world-fallback"><span>0.01</span></div>}>
               <FinanceWorld3D monthEnd={monthEnd} scrollProgress={heroProgress} />
             </Suspense>
             <div className={`difference-chip ${monthEnd ? 'is-urgent' : ''} ${heroProgress > 0.62 ? 'is-tracking' : ''}`}>
-              <span>{heroBalanced ? '账面状态' : '账面差额'}</span>
+              <span>{heroBalanced ? '内心状态' : heroProgress > 0.31 ? '秩序裂缝' : '账面差额'}</span>
               <strong>¥ {heroBalanced ? '0.00' : '0.01'}</strong>
-              <small>{heroBalanced ? 'BALANCED / 放行' : heroProgress > 0.62 ? 'TRACING / 锁定中' : 'UNBALANCED'}</small>
+              <small>{heroBalanced ? 'QUIET / 秩序恢复' : heroProgress > 0.62 ? 'WHY / 还没说清楚' : insideFinanceMind ? 'UNRESOLVED / 它还在发光' : 'UNBALANCED'}</small>
             </div>
             <PhotoFrame src={photos.hero} label="PHOTO 00" caption="首页人物主照片" className="hero-photo" />
             <div className="visual-ticker" aria-hidden="true">
@@ -257,7 +258,7 @@ function App() {
 
           <div className="hero-scroll-story" style={{ opacity: storyIn }} aria-hidden={storyIn < 0.15}>
             <div className="story-counter">
-              <span>RECONCILING</span>
+              <span>INSIDE HER FINANCE MIND</span>
               <strong>{String(Math.round(heroProgress * 100)).padStart(2, '0')}%</strong>
             </div>
             <div className="story-copy-stack">
@@ -276,7 +277,7 @@ function App() {
           </div>
 
           <a className="scroll-cue" href="#about" aria-label="向下浏览">
-            <span>{heroBalanced ? 'BALANCED / 继续认识她' : '滚动对账 / SCROLL TO RECONCILE'}</span>
+            <span>{heroBalanced ? 'QUIET AGAIN / 继续认识她' : '继续滚动 / ENTER HER FINANCE MIND'}</span>
             <i />
           </a>
           </div>

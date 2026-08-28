@@ -231,7 +231,7 @@ svg {
 
 .hero {
   position: relative;
-  min-height: 360svh;
+  min-height: 430svh;
   overflow: visible;
   isolation: isolate;
 }
@@ -247,7 +247,35 @@ svg {
   min-height: 680px;
   padding: 130px clamp(22px, 4vw, 68px) 72px;
   overflow: hidden;
+  color: var(--ink);
+  background: #f5f1ec;
   isolation: isolate;
+  transition: color 1s ease, background-color 1s ease;
+}
+
+.hero-sticky::before {
+  position: absolute;
+  inset: -20%;
+  z-index: -2;
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 68% 48%, rgba(156, 75, 88, 0.35), transparent 24%),
+    radial-gradient(circle at 48% 44%, rgba(214, 180, 110, 0.1), transparent 36%),
+    #171316;
+  transform: scale(1.06);
+  transition: opacity 1.05s ease, transform 1.2s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+.hero.is-mind-dark .hero-sticky {
+  color: #f8f1e9;
+  background: #171316;
+}
+
+.hero.is-mind-dark .hero-sticky::before {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .hero-grid {
@@ -272,6 +300,21 @@ svg {
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(239, 216, 218, 0.42) 35%, transparent 69%);
   filter: blur(2px);
+  transition: opacity 0.9s ease;
+}
+
+.hero.is-mind-dark .hero-sticky::after {
+  opacity: 0.16;
+}
+
+.hero.is-mind-dark .hero-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+}
+
+.hero.is-mind-dark .floating-numbers span {
+  color: rgba(255, 255, 255, 0.14);
 }
 
 .floating-numbers {
@@ -513,6 +556,11 @@ svg {
   letter-spacing: 0.06em;
 }
 
+.hero.is-mind-dark .visual-caption,
+.hero.is-mind-dark .visual-caption span:last-child {
+  color: rgba(255, 255, 255, 0.58);
+}
+
 .difference-chip {
   position: absolute;
   top: 22%;
@@ -527,7 +575,7 @@ svg {
   box-shadow: 0 18px 48px rgba(50, 38, 30, 0.09);
   backdrop-filter: blur(14px);
   transform: rotate(-2deg);
-  transition: border-color 0.45s ease, background 0.45s ease, box-shadow 0.45s ease, transform 0.45s ease;
+  transition: opacity 0.45s ease, border-color 0.45s ease, background 0.45s ease, box-shadow 0.45s ease, transform 0.45s ease;
 }
 
 .difference-chip span,
@@ -553,6 +601,22 @@ svg {
   border-color: rgba(168, 94, 105, 0.72);
   box-shadow: 0 18px 58px rgba(168, 94, 105, 0.2), 0 0 0 6px rgba(168, 94, 105, 0.07);
   transform: rotate(-2deg) scale(1.035);
+}
+
+.hero.is-mind-dark .difference-chip {
+  border-color: rgba(229, 177, 185, 0.38);
+  color: #fff8f2;
+  background: rgba(33, 22, 26, 0.58);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+}
+
+.hero.is-mind-dark .difference-chip span,
+.hero.is-mind-dark .difference-chip small {
+  color: rgba(255, 255, 255, 0.56);
+}
+
+.hero.is-mind-dark .difference-chip strong {
+  color: #e4a1ac;
 }
 
 .is-story-balanced .difference-chip {
@@ -584,8 +648,8 @@ svg {
 }
 
 .is-scrolling-story .hero-photo {
-  opacity: 0.34;
-  transform: rotate(6deg) translate3d(28px, 30px, 0) scale(0.84);
+  opacity: 0;
+  transform: rotate(7deg) translate3d(42px, 34px, 0) scale(0.8);
 }
 
 .hero-photo figcaption {
@@ -613,12 +677,20 @@ svg {
   background: var(--line);
 }
 
+.hero.is-mind-dark .visual-ticker {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.hero.is-mind-dark .visual-ticker i {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 .hero-scroll-story {
   position: absolute;
   top: 53%;
   left: clamp(22px, 5.4vw, 92px);
   z-index: 8;
-  width: min(31vw, 470px);
+  width: min(35vw, 520px);
   pointer-events: none;
   transform: translateY(-50%);
   transition: opacity 0.28s ease;
@@ -687,6 +759,46 @@ svg {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.85;
+}
+
+.hero.is-mind-dark .story-counter,
+.hero.is-mind-dark .story-copy-stack p,
+.hero.is-mind-dark .scroll-cue {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.hero.is-mind-dark .story-counter {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.hero.is-mind-dark .story-counter strong {
+  color: #e5a3ad;
+}
+
+.hero.is-mind-dark .story-copy-stack article > span {
+  color: #d8b777;
+}
+
+.hero.is-mind-dark .story-rail {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.hero.is-mind-dark .story-rail > span {
+  background: #e5a3ad;
+}
+
+.hero.is-mind-dark .story-rail i {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: #171316;
+}
+
+.hero.is-mind-dark .story-rail i.is-passed {
+  border-color: #e5a3ad;
+  background: #e5a3ad;
+}
+
+.hero.is-mind-dark .scroll-cue i {
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .story-rail {
@@ -1829,7 +1941,7 @@ footer::before {
 
   .hero {
     display: block;
-    min-height: 330svh;
+    min-height: 390svh;
   }
 
   .hero-sticky {
@@ -2015,7 +2127,7 @@ footer::before {
   }
 
   .hero {
-    min-height: 310svh;
+    min-height: 370svh;
     padding: 0;
   }
 
@@ -2078,17 +2190,21 @@ footer::before {
 
   .visual-caption {
     top: 6%;
-    right: 3%;
+    right: 12%;
   }
 
   .difference-chip {
     top: 22%;
-    left: 1%;
+    left: 14%;
     min-width: 128px;
   }
 
   .difference-chip strong {
     font-size: 23px;
+  }
+
+  .is-scrolling-story:not(.is-story-balanced) .difference-chip {
+    opacity: 0;
   }
 
   .hero-photo {
