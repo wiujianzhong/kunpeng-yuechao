@@ -7,6 +7,7 @@ import argparse
 import json
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -23,7 +24,7 @@ class AppHandler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_GET(self) -> None:  # noqa: N802
-        if self.path.rstrip("/") == "/health":
+        if urlparse(self.path).path.rstrip("/") == "/health":
             payload = json.dumps(
                 {"ok": True, "app": "textile-experience", "mode": "mock"},
                 ensure_ascii=False,
