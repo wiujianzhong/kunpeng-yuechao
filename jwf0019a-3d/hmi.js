@@ -1,4 +1,5 @@
 const ASSET_BASE = "./assets/hmi-real";
+const ASSET_VERSION = "20260830";
 const EVIDENCE_CAPTURE_AT = Date.parse("2026-08-02T10:31:25+08:00");
 
 const baselineProfiles = {
@@ -480,7 +481,7 @@ const pad2 = (value) => String(value).padStart(2, "0");
 const targetChannel = () => Math.max(1, Math.min(8, Math.ceil(state.position / 4)));
 const targetPairCameraIndex = () => (targetChannel() - 1) * 2;
 const targetCameraIndex = () => targetPairCameraIndex() + (state.targetView === "rear" ? 1 : 0);
-const cameraSource = (index, phase) => `${ASSET_BASE}/cameras/cam-${pad2(index + 1)}-${index < 16 && phase ? "b" : "a"}.png`;
+const cameraSource = (index, phase) => `${ASSET_BASE}/cameras/cam-${pad2(index + 1)}-${index < 16 && phase ? "b" : "a"}.png?v=${ASSET_VERSION}`;
 const readyCameraFrames = new Set();
 const trainingText = (text) => text.startsWith("培训模拟：") ? text : `培训模拟：${text}`;
 const trainingLogText = (text) => text.startsWith("【培训提示】") ? text : `【培训提示】${text}`;
@@ -1295,7 +1296,7 @@ function renderTriggers() {
     const index = interactiveIndex++;
     const imageIndex = record.imageIndex;
     const cameraSourceNumber = record.cameraSourceNumber;
-    return `<button class="trigger-thumb${index === state.selectedTrigger ? " active" : ""}${record.repeated ? " repeated" : ""}" data-trigger="${index}" data-record-id="${record.id}" data-image="${imageIndex}" data-camera-source="${cameraSourceNumber}" data-trigger-time="${record.at}" data-repeated="${record.repeated ? "1" : "0"}" data-kind="${record.kind || ""}" type="button"><img src="${ASSET_BASE}/triggers/trigger-${pad2(imageIndex)}.png" alt="最近触发记录${index + 1}，来源${triggerCameraLabel(cameraSourceNumber)}"></button>`;
+    return `<button class="trigger-thumb${index === state.selectedTrigger ? " active" : ""}${record.repeated ? " repeated" : ""}" data-trigger="${index}" data-record-id="${record.id}" data-image="${imageIndex}" data-camera-source="${cameraSourceNumber}" data-trigger-time="${record.at}" data-repeated="${record.repeated ? "1" : "0"}" data-kind="${record.kind || ""}" type="button"><img src="${ASSET_BASE}/triggers/trigger-${pad2(imageIndex)}.png?v=${ASSET_VERSION}" alt="最近触发记录${index + 1}，来源${triggerCameraLabel(cameraSourceNumber)}"></button>`;
   }).join("");
   grid.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => selectTrigger(Number(button.dataset.trigger))));
   selectTrigger(state.selectedTrigger);
@@ -1315,8 +1316,8 @@ function selectTrigger(index) {
   const triggerKind = selected?.dataset.kind || "";
   const hasCapturedDetail = !triggerKind && !isRepeated && imageIndex === 13;
   detailImage.src = hasCapturedDetail
-    ? `${ASSET_BASE}/triggers/detail.png`
-    : `${ASSET_BASE}/triggers/trigger-${pad2(imageIndex)}.png`;
+    ? `${ASSET_BASE}/triggers/detail.png?v=${ASSET_VERSION}`
+    : `${ASSET_BASE}/triggers/trigger-${pad2(imageIndex)}.png?v=${ASSET_VERSION}`;
   const distorted = isRepeated;
   detailImage.classList.toggle("distorted", distorted);
   document.querySelector("#trigger-number").textContent = imageIndex;
@@ -2515,7 +2516,7 @@ document.querySelector("#narration-retry").addEventListener("click", retryNarrat
   image.src = src;
   if (image.complete && image.naturalWidth > 0) readyCameraFrames.add(src);
 });
-Array.from({ length: 32 }, (_, index) => `${ASSET_BASE}/triggers/trigger-${pad2(index + 1)}.png`).forEach((src) => { const image = new Image(); image.src = src; });
+Array.from({ length: 32 }, (_, index) => `${ASSET_BASE}/triggers/trigger-${pad2(index + 1)}.png?v=${ASSET_VERSION}`).forEach((src) => { const image = new Image(); image.src = src; });
 
 function parameterHelpText(title) {
   if (PARAMETER_HELP[title]) return PARAMETER_HELP[title];

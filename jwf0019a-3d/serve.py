@@ -7,7 +7,7 @@ from urllib.parse import urlsplit
 
 
 class JWF0019AHandler(SimpleHTTPRequestHandler):
-    REMOTE_ASSET_BASE = "https://cdn.jsdelivr.net/gh/wiujianzhong/kunpeng-yuechao@747a801/jwf0019a-3d"
+    REMOTE_ASSET_BASE = "https://cdn.jsdelivr.net/gh/wiujianzhong/kunpeng-yuechao@6c303ef/jwf0019a-3d"
 
     def end_headers(self):
         request_path = urlsplit(self.path).path
@@ -16,6 +16,8 @@ class JWF0019AHandler(SimpleHTTPRequestHandler):
             cache_control = "no-store"
         elif request_path.endswith("/") or suffix in {"", ".html"}:
             cache_control = "no-cache"
+        elif getattr(self, "_remote_asset_redirect", False):
+            cache_control = "no-store"
         elif request_path.startswith(("/assets/", "/vendor/")):
             cache_control = "public, max-age=31536000, immutable"
         elif suffix in {".js", ".css", ".json"}:
@@ -33,6 +35,7 @@ class JWF0019AHandler(SimpleHTTPRequestHandler):
         local_path = Path(self.translate_path(self.path))
         is_remote_asset = request_path.startswith(("/assets/", "/vendor/"))
         if is_remote_asset and not local_path.is_file():
+            self._remote_asset_redirect = True
             self.send_response(302)
             self.send_header("Location", f"{self.REMOTE_ASSET_BASE}{self.path}")
             self.end_headers()
