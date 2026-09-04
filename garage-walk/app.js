@@ -75,6 +75,7 @@ function safePosition(p){
 function orient(look){const d=look.clone().sub(camera.position).normalize();state.yaw=Math.atan2(-d.x,-d.z);state.pitch=Math.asin(d.y);camera.rotation.order='YXZ';camera.rotation.set(state.pitch,state.yaw,0);}
 function goTo(p,switchMode=true){
  if(switchMode&&state.mode!=='walk')setMode('walk');
+ setLayer('roof',true);
  transition=null;camera.fov=68;camera.updateProjectionMatrix();camera.position.copy(safePosition(new THREE.Vector3(...p.pos)));orient(new THREE.Vector3(...p.look));closeDetail();resetInput();$('destination').value='';$('map-caption').textContent=p.title;
  if(switchMode)toast('已到达'+p.title);
 }
