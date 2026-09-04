@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#e9eff3"><meta name="description" content="雅新纺织培训车间 · 走进真实模型，自由观察空间与布局。">
+<title>雅新培训车间 · 自由漫游</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23245779'/%3E%3Cpath d='M12 30L32 15 52 30v24H12z' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports":{"three":"./vendor/core/three.module.js","three/addons/":"./vendor/examples/jsm/"}}</script>
+</head>
+<body>
+<main id="viewport" aria-label="雅新培训车间三维模型"></main>
+<div id="labels"></div>
+<header class="masthead"><div class="brand"><span class="brand-mark">伍</span><span>小伍工作室<span class="divider">/</span>空间演示</span></div><h1>雅新培训车间<span>自由漫游</span></h1><p class="spec">纺织设备 · 技能实训 <span>56.8 × 18.3 m</span><span id="rack-count">— 台设备</span></p></header>
+<div class="top-actions"><span id="mode-status" class="status">空间总览</span><button id="settings-button" class="icon-button" aria-label="展示设置" aria-expanded="false">☷<span>展示设置</span></button></div>
+<aside id="settings" class="panel" hidden><div class="panel-heading">空间图层<button id="close-settings" aria-label="关闭设置">×</button></div><p>按需展开建筑，查看内部布局</p><label><span>屋顶</span><input type="checkbox" id="roof" checked><i></i></label><label><span>外围墙面与门窗</span><input type="checkbox" id="walls" checked><i></i></label><label><span>培训教室隔墙</span><input type="checkbox" id="inner" checked><i></i></label><label><span>空间标注</span><input type="checkbox" id="annotations" checked><i></i></label><button id="reset" class="reset">恢复完整建筑</button></aside>
+<aside class="map-panel"><div class="map-heading"><span>空间导航</span><span id="map-caption">当前位置</span></div><svg id="minimap" viewBox="0 0 280 112" role="img" aria-label="建筑平面与当前所在位置"><g id="map-shapes"></g><g id="map-person"><path d="M0 0 L-7 -18 Q0 -22 7 -18 Z" fill="#3877a8" opacity=".22"/><circle r="4" fill="#24608c" stroke="white" stroke-width="2"/></g></svg><select id="destination" aria-label="快速前往"><option value="">选择区域，进入漫游</option></select></aside>
+<div id="scene-note"><span class="note-line"></span><span id="scene-title">把空间交给你，亲自走进去。</span><small id="scene-hint">拖动旋转 · 滚轮缩放 · 点击标注查看详情</small></div>
+<nav class="mode-bar" aria-label="浏览模式"><button id="overview" class="mode active"><span>◇</span>空间总览</button><button id="walk" class="mode primary"><span>↗</span>进入漫游</button><button id="orbit" class="mode"><span>↻</span>外围环绕</button><button id="top" class="mode"><span>▱</span>俯视布局</button></nav>
+<div id="walk-controls" hidden><div id="joystick" aria-label="移动摇杆" role="application"><span class="joy-arrow up">⌃</span><span class="joy-arrow down">⌄</span><div id="stick"></div><span class="control-label">移动</span></div><div id="look-area" aria-label="拖动改变视角"><div class="look-guide"><span>✥</span><small>滑动视角</small></div></div><div class="crosshair"></div><span id="walking-help" class="walking-help">左手移动 · 右手转头</span></div>
+<div id="detail" class="panel" hidden><button id="close-detail" aria-label="关闭标注">×</button><span class="detail-kicker">空间标注</span><h2 id="detail-title"></h2><p id="detail-text"></p><button id="detail-go">走到这里 ↗</button></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="loading"><div class="loading-mark">伍</div><h2>正在打开这座空间</h2><p id="load-text">加载建筑与车间模型…</p><div class="load-track"><span id="load-progress"></span></div><small>首次打开需要加载模型，请稍候</small><button id="retry" hidden>重新加载</button></div>
+<script type="module" src="app.js?v=20260904-yaxin"></script>
+</body></html>
