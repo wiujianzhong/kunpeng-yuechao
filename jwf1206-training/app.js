@@ -1,8 +1,8 @@
 import * as T from 'three';
 import {OrbitControls} from './vendor/OrbitControls.js';
 import {GLTFExporter} from './vendor/GLTFExporter.js';
-import {createModel} from './model.js?v=20260910-6';
-import {narration} from './narration.js?v=20260910-6';
+import {createModel} from './model.js?v=20260910-7';
+import {narration} from './narration.js?v=20260910-7';
 import {EffectComposer} from './vendor/effects/postprocessing/EffectComposer.js';
 import {RenderPass} from './vendor/effects/postprocessing/RenderPass.js';
 import {SSAOPass} from './vendor/effects/postprocessing/SSAOPass.js';
@@ -21,7 +21,7 @@ scene.background=new T.Color(2,2,2);
 const composer=new EffectComposer(renderer),ao=new SSAOPass(scene,camera,1,1);ao.ssaoMaterial.defines.PERSPECTIVE_CAMERA=0;ao.depthRenderMaterial.defines.PERSPECTIVE_CAMERA=0;ao.kernelRadius=.10;ao.minDistance=.00005;ao.maxDistance=.004;composer.renderTarget1.samples=4;composer.renderTarget2.samples=4;composer.addPass(new RenderPass(scene,camera));composer.addPass(ao);composer.addPass(new OutputPass());
 let mode='full',explode=0,selected=null,isolated=null,stage=-1,view='home';
 const playback={playing:false,time:0,duration:narration.duration,speed:1};
-const voice=new Audio('assets/narration.m4a?v=20260910-6');voice.preload='auto';voice.volume=.9;voice.preservesPitch=true;let playRequest=0;
+const voice=new Audio('assets/narration.m4a?v=20260910-7');voice.preload='auto';voice.volume=.9;voice.preservesPitch=true;let playRequest=0;
 const lessons=[
   ['棉箱喂入','喂棉与开松','棉箱给棉罗拉','棉层先被定量喂入，开松打手松解棉块，再沿下棉箱形成均匀棉层。','观察：棉层沿左侧通道向下移动。'],
   ['三刺辊开松','三刺辊分梳','第三刺辊','给棉罗拉握持棉层，三只刺辊逐级开松、分梳和转移纤维；除尘刀与吸口排出杂质。','观察：三刺辊交接处与下方吸口。'],
@@ -36,7 +36,7 @@ function visible(p){if(p.hidden||(isolated&&isolated!==p))return false;if(p.kind
 function refresh(){for(const p of parts){p.g.visible=visible(p);p.g.position.copy(p.base).addScaledVector(p.v,explode);p.g.traverse(m=>{if(!m.isMesh)return;if(!m._baseMaterial)m._baseMaterial=m.material;if(mode==='xray'&&['shell','rearShell'].includes(p.kind)){if(!m._xray){m._xray=m._baseMaterial.clone();m._xray.transparent=true;m._xray.opacity=.10;m._xray.depthWrite=false;}m.material=m._xray;m.castShadow=false;}else{m.material=m._baseMaterial;m.castShadow=true;}});}$$('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));fiberFlow.visible=mode!=='full'&&explode===0&&!isolated;renderList();}
 const highlight=new T.BoxHelper(new T.Object3D(),0x87ab56);highlight.visible=false;scene.add(highlight);
 function select(p){selected=p;$('#part-name').textContent=p.name;$('#part-desc').textContent=p.desc;$('#selected-actions').hidden=false;highlight.setFromObject(p.g);highlight.visible=true;renderList();}
-function renderList(){const query=$('#search').value.trim(),list=$('#parts'),open=new Set([...list.querySelectorAll('details[open]')].map(d=>d.dataset.section));list.replaceChildren();for(const sec of model.sections){const found=parts.filter(p=>p.section===sec&&(!query||p.name.includes(query)));if(!found.length)continue;const d=document.createElement('details');d.dataset.section=sec;d.open=!!query||open.has(sec);const s=document.createElement('summary');s.textContent=sec+' · '+found.length;s.className='group-title';d.append(s);for(const p of found){const b=document.createElement('button');b.className='partrow'+(p===selected?' active':'');b.innerHTML='<i></i><span></span><small></small>';b.querySelector('span').textContent=p.name;b.querySelector('small').textContent=p.hidden?'已隐藏':'';b.onclick=()=>{isolated=null;p.hidden=false;if(['shell','rearShell','cap'].includes(p.kind))mode='full';refresh();select(p);};d.append(b);}list.append(d);}}
+function renderList(){const query=$('#search').value.trim(),list=$('#parts'),open=new Set([...list.querySelectorAll('details[open]')].map(d=>d.dataset.section));list.replaceChildren();for(const sec of model.sections){const found=parts.filter(p=>p.section===sec&&(!query||p.name.includes(query)));if(!found.length)continue;const d=document.createElement('details');d.dataset.section=sec;d.open=!!query||open.has(sec);const s=document.createElement('summary');s.textContent=sec+' · '+found.length;s.className='group-title';d.append(s);for(const p of found){const b=document.createElement('button');b.className='partrow'+(p===selected?' active':'');b.innerHTML='<i></i><span></span><small></small>';b.querySelector('span').textContent=p.name;b.querySelector('small').textContent=p.hidden?'已隐藏':'';b.onclick=()=>{isolated=null;p.hidden=false;if(['shell','rearShell','cap'].includes(p.kind))mode='full';else if(p.kind==='motor'){mode='drive';setView('back');}refresh();select(p);};d.append(b);}list.append(d);}}
 function setView(v){view=v;const positions={home:[-.5,3.05,9],side:[.10,1.52,9],front:[9,2.5,0],back:[.10,1.52,-9],left:[-9,1.6,0],left45:[-6,3.9,7],right45:[6,3.9,7],top:[.10,10,.001]};controls.target.set(.10,1.52,0);camera.position.set(...positions[v]);camera.zoom=['left45','right45'].includes(v)?.76:v==='top'?.78:.90;controls.update();camera.updateProjectionMatrix();$$('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));}
 function fitSelected(){const b=new T.Box3().setFromObject(selected.g),c=b.getCenter(new T.Vector3()),sz=b.getSize(new T.Vector3());controls.target.copy(c);camera.position.copy(c).add(new T.Vector3(.5,.4,4));camera.zoom=Math.min(3,4/Math.max(sz.x,sz.y,sz.z));controls.update();camera.updateProjectionMatrix();}
 function pause(){playRequest++;voice.pause();playback.playing=false;$('#play-toggle').textContent='▶ 播放原理';$('#play-state').textContent='已暂停';}
