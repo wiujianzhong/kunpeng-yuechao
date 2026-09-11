@@ -51,7 +51,7 @@
       box-shadow: 0 14px 42px rgba(49, 71, 57, .08);
       backdrop-filter: blur(18px);
     }
-    .brand { display: flex; align-items: center; gap: 12px; min-width: 205px; }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 390px; }
     .brand-mark {
       width: 36px;
       height: 36px;
@@ -65,6 +65,21 @@
     }
     .brand-copy strong { display: block; font-size: 15px; letter-spacing: .02em; }
     .brand-copy span { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .brand-credit {
+      padding: 7px 11px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--leaf-deep);
+      border: 1px solid #c9dbc0;
+      border-radius: 12px;
+      background: var(--leaf-soft);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .brand-credit strong { font-size: 12px; }
+    .brand-credit span { padding-left: 7px; color: #5f6c65; font-size: 11px; border-left: 1px solid #bad0b0; }
+    .brand-credit:hover { border-color: #9fbe92; background: #d9ebcd; }
     .topnav { display: flex; align-items: center; gap: 4px; flex: 1; }
     .topnav button {
       padding: 9px 13px;
@@ -424,11 +439,52 @@
     .playback-controls .pause-control { min-width: 64px; color: white; border-color: var(--leaf-deep); background: var(--leaf-deep); }
     .playback-controls .exit-control { color: #7b625d; }
     .demo-note { width: min(1220px, 100%); margin: -25px auto 30px; color: #8a948e; font-size: 12px; text-align: center; }
+    .studio-signature {
+      width: fit-content;
+      max-width: min(1220px, 100%);
+      margin: -16px auto 38px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #53605a;
+      font-size: 13px;
+      line-height: 1.45;
+      text-align: center;
+      border: 1px solid #c9dbc0;
+      border-radius: 999px;
+      background: rgba(244, 249, 241, .92);
+      box-shadow: 0 8px 24px rgba(66, 91, 57, .08);
+    }
+    .studio-signature::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--leaf-deep);
+      box-shadow: 0 0 0 4px rgba(98, 137, 79, .12);
+    }
+    .studio-signature strong { color: #334139; font-size: 14px; }
+    .studio-signature a {
+      color: var(--leaf-deep);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .studio-signature a:hover { text-decoration: underline; }
+
+    @media (min-width: 901px) and (max-width: 1040px) {
+      .brand { min-width: 350px; }
+      .topnav button { padding: 9px 7px; font-size: 12px; }
+      .knowledge-link { padding: 10px; font-size: 12px; }
+    }
 
     @media (max-width: 900px) {
       .shell { padding: 12px; }
       .topbar { border-radius: 18px; gap: 12px; }
-      .brand { min-width: 0; }
+      .brand { width: 100%; min-width: 0; }
+      .brand-credit { margin-left: auto; }
       .brand-copy span, .topnav, .knowledge-link { display: none; }
       .hero { min-height: 820px; grid-template-columns: minmax(0, 1fr); border-radius: 28px; }
       .hero-copy { padding: 48px 26px 20px; align-self: start; }
@@ -452,7 +508,14 @@
     @media (max-width: 560px) {
       html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
       .shell { width: 100%; max-width: 100%; padding: 8px; overflow: hidden; }
-      .topbar, .hero, .below, .learning-console, .demo-note { width: 100%; max-width: 100%; }
+      .topbar, .hero, .below, .learning-console, .demo-note, .studio-signature { width: 100%; max-width: 100%; }
+      .topbar { padding-left: 12px; }
+      .brand { gap: 8px; }
+      .brand-mark { width: 34px; height: 34px; }
+      .brand-copy strong { font-size: 13px; }
+      .brand-credit { padding: 5px 9px; flex-direction: column; align-items: flex-start; gap: 1px; }
+      .brand-credit strong { font-size: 11px; }
+      .brand-credit span { padding-left: 0; font-size: 10px; border-left: 0; }
       .hero { min-height: 880px; }
       .hero-copy, .machine-stage { width: 100%; min-width: 0; }
       .hero-copy { padding: 38px 20px 18px; }
@@ -487,6 +550,7 @@
       <div class="brand">
         <div class="brand-mark">JWF</div>
         <div class="brand-copy"><strong>JWF0019A</strong><span>异纤机设备知识平台</span></div>
+        <a class="brand-credit" href="tel:19009925522" aria-label="联系小伍工作室伍建忠，电话19009925522"><strong>小伍工作室</strong><span>伍建忠 · 19009925522</span></a>
       </div>
       <nav class="topnav" aria-label="主要模块">
         <button class="active" data-module="认识结构">认识结构</button>
@@ -567,6 +631,7 @@
       <article class="info-card"><small>03 · 继续深入</small><h2>精灵眼与算力</h2><p>认识4个精灵眼相机、10个算力通道及32个电磁阀的分工。</p></article>
     </section>
     <p class="demo-note">JWF0019A 异纤机设备知识平台 · 3D演示与知识内容</p>
+    <p class="studio-signature"><strong>小伍工作室</strong><span>伍建忠 · 联系电话 <a href="tel:19009925522">19009925522</a></span></p>
   </div>
 
   <dialog class="fault-support-dialog" id="fault-support-dialog">

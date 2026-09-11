@@ -377,3 +377,85 @@ button { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* 小伍设备课堂：延用设备面板绿色，以四步判断顺序组织学习。 */
+.course-hub { width: min(1420px, calc(100% - 28px)); margin: 14px auto 24px; padding: 28px; border: 1px solid #becfc3; border-radius: 14px; background: #f7faf7; }
+.course-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.course-kicker { margin: 0 0 12px; color: #316f3f; font-size: 13px; font-weight: 700; }
+.course-heading h1 { margin: 0; font-size: clamp(23px, 3vw, 34px); line-height: 1.4; letter-spacing: -.03em; }
+.course-heading p:not(.course-kicker) { color: #536158; line-height: 1.7; }
+.course-count { white-space: nowrap; color: #316f3f; font: 700 40px ui-monospace, monospace; }
+.course-count small { color: #536158; font: 13px "PingFang SC", sans-serif; }
+.course-cards { margin-top: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.course-cards article { min-width: 0; padding: 20px; border: 1px solid #d0dbd3; border-top: 4px solid #316f3f; border-radius: 5px; background: white; }
+.course-number { color: #536158; font-size: 12px; }
+.course-cards h2 { margin: 12px 0 8px; font-size: 20px; }
+.course-cards p { min-height: 48px; margin: 0 0 16px; color: #536158; font-size: 14px; line-height: 1.7; }
+.course-cards small { color: #536158; font-size: 12px; }
+.course-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.course-hub button, .course-panel button, .course-return { min-height: 44px; padding: 9px 13px; border: 1px solid #98b49f; border-radius: 7px; color: #295f35; background: #fff; font-size: 14px; font-weight: 600; }
+.course-hub button:first-child, .course-panel .course-primary { border-color: #316f3f; color: #fff; background: #316f3f; }
+.course-panel button:disabled { cursor: default; opacity: .5; }
+.course-hub button:hover, .course-panel button:not(:disabled):hover, .course-return:hover { box-shadow: inset 0 0 0 1px #316f3f; }
+.course-hub button:focus-visible, .course-panel button:focus-visible, .course-options input:focus-visible, .course-source summary:focus-visible, .course-return:focus-visible { outline: 3px solid #167ba1; outline-offset: 3px; }
+.course-storage { margin: 16px 0 0; color: #596d60; font-size: 12px; line-height: 1.7; }
+.course-panel { position: sticky; top: 12px; min-width: 0; padding: 22px; border: 1px solid #becfc3; border-radius: 12px; background: #f7faf7; scroll-margin-top: 12px; }
+.course-panel-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; color: #316f3f; }
+.course-panel-top button { padding: 6px 10px; font-size: 12px; }
+.course-panel h2 { margin: 18px 0; font-size: 23px; }
+.course-panel h3 { font-size: 17px; line-height: 1.8; font-weight: 600; }
+.course-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 14px 0; }
+.course-steps span { padding: 8px 2px; border-bottom: 3px solid #d0dbd3; color: #65746a; font-size: 13px; text-align: center; }
+.course-steps [aria-current] { border-color: #316f3f; color: #225b30; font-weight: 700; }
+.course-step-label { margin: 22px 0 8px; color: #316f3f; font-size: 13px; font-weight: 700; }
+.course-reason { margin: 18px 0; padding: 16px; border-left: 3px solid #3c91d8; color: #314d62; background: #edf4f8; font-size: 14px; line-height: 1.8; }
+.course-reason p { margin: 6px 0 0; }
+.course-small, .course-caption { color: #596d60; font-size: 13px; line-height: 1.75; }
+.course-caption { min-height: 46px; }
+.course-options { display: grid; gap: 10px; margin: 16px 0; padding: 0; border: 0; }
+.course-options label { display: flex; align-items: start; gap: 10px; padding: 13px; border: 1px solid #c5d2c9; border-radius: 7px; background: #fff; font-size: 14px; line-height: 1.7; cursor: pointer; }
+.course-options label:has(input:checked) { border-color: #316f3f; background: #e9f2eb; box-shadow: inset 0 0 0 1px #316f3f; }
+.course-options input { flex: 0 0 auto; margin: 5px 0 0; accent-color: #316f3f; }
+.course-feedback { margin: 16px 0; padding: 16px; border: 1px solid #c6a97b; border-radius: 7px; background: #fff6e8; font-size: 14px; line-height: 1.8; }
+.course-feedback.correct { border-color: #9abd9f; background: #eaf4ec; }
+.course-feedback p { margin: 8px 0 0; }
+.course-source { margin-top: 24px; padding-top: 16px; border-top: 1px solid #d0dbd3; color: #596d60; font-size: 12px; line-height: 1.8; }
+.course-source summary { cursor: pointer; min-height: 32px; }
+.course-result > strong { color: #316f3f; font: 700 56px ui-monospace, monospace; }
+.course-result > strong small { font-size: 24px; }
+.course-result p, .course-result li { color: #536158; font-size: 14px; line-height: 1.8; }
+.course-result button { margin: 4px 4px 4px 0; }
+.course-return { margin-bottom: 8px; }
+.course-observation-note { margin: 0 0 10px; padding: 12px 14px; border-left: 3px solid #3c91d8; background: #edf4f8; color: #314d62; font-size: 13px; line-height: 1.7; }
+.course-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+#course-hub[hidden], #course-panel[hidden], .course-return[hidden], .course-observation-note[hidden] { display: none !important; }
+.course-active .training-panel { display: none; }
+.course-active .training-layout { grid-template-columns: minmax(0, 1fr) 380px; }
+/* 练习保留现象，隐藏原模拟器的定位标记、答案和导航，避免提前揭题。 */
+.course-practice .freeze-mark, .course-practice .camera-evidence-boundary, .course-practice .runtime-log,
+.course-practice .channel-status, .course-practice .machine-nav, .course-practice .machine-header,
+.course-practice .hmi-titlebar, .course-practice .evidence-page-message { display: none !important; }
+.course-practice .main-screen { grid-template-columns: 1fr; }
+.course-practice .hmi-window { box-shadow: none; }
+.course-active .hmi-stage { scroll-margin-top: 12px; }
+@media (max-width: 1120px) {
+  .course-active .training-layout { grid-template-columns: minmax(0, 1fr) 350px; }
+}
+@media (max-width: 780px) {
+  .course-hub { padding: 20px; margin-top: 8px; }
+  .course-heading { display: block; }
+  .course-count { display: block; margin: 12px 0; font-size: 30px; }
+  .course-cards { grid-template-columns: 1fr; }
+  .course-cards p { min-height: 0; }
+  .course-active .training-layout { grid-template-columns: 1fr; padding: 0 14px 24px; gap: 16px; }
+  .course-panel { position: static; order: -1; padding: 18px; }
+  .course-active .hmi-stage { overflow-x: auto; }
+  .course-active .course-return { position: sticky; left: 0; }
+  .course-practice .hmi-window { width: 100%; border-radius: 5px; }
+  .course-practice .hmi-scroll-hint { display: none; }
+  .course-practice .camera-card small { font-size: 11px; }
+  .course-practice .machine-screen { height: 620px; }
+  .course-practice .stats-screen { min-width: 740px; }
+  .course-practice:has(#screen-stats:not([hidden])) .hmi-window { width: 740px; }
+  .course-practice:has(#screen-stats:not([hidden])) .hmi-scroll-hint { display: block; width: calc(100vw - 28px); }
+}

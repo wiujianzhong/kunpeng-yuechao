@@ -438,6 +438,7 @@ const PUBLIC_SCENARIOS = new Set([
 ]);
 
 let trainingStateBeforeSnapshot = null;
+let coursePractice = false;
 let trainingPlayButtonBeforeSnapshot = null;
 const narrationPlayer = new Audio();
 narrationPlayer.preload = "auto";
@@ -555,6 +556,7 @@ const trainingNow = () => new Date(state.simClockAt);
 const trainingHour = () => trainingNow().getHours();
 
 function narrationConfig() {
+  if (coursePractice) return null;
   return SCENARIO_NARRATION[state.scenario] || null;
 }
 
@@ -2577,3 +2579,264 @@ syncPositionLock();
 setInterval(tickClock, 1000);
 setInterval(tickCameraFrames, 200);
 setInterval(tickMachine, 1000);
+
+// 免费入门课程：事实来自已核对的知识卡；提问与选项是教学设计，不冒充本人原话。
+const HMI_LESSONS = [
+  {
+    id: "camera-fault", title: "相机画面不刷新", goal: "分清观察到的现象与尚未证实的原因。",
+    source: "《故障案例矩阵》《HMI场景验收矩阵》；现场经验＋培训推演。相机与485故障的正式区别仍待厂家确认。",
+    steps: [
+      ["观察", "先看前16幅主检测画面：只有一幅不刷新，还是同通道前后两幅都不刷新？再对照界面时钟。", "先分清异常范围，避免把单幅显示异常当成整机停止。"],
+      ["判断", "单幅不刷新，可把对应相机或通讯链路列为优先排查方向，不能立即认定相机硬件损坏。", "普通相机故障与485通讯异常都可能表现为单幅冻结，仅凭画面不够。"],
+      ["检查", "先记录画面编号、报警对象和发生时间。按现场安全流程处置；若恢复后很快复发，再检查对应线路与接口，由有资质人员判断是否换件。", "留下证据再处置，才能判断是偶发、复发还是持续故障。"],
+      ["复核", "核对目标画面是否持续刷新、相关报警状态和运行情况，并跟踪是否复发。", "重新上电后短时恢复，只能证明暂时恢复，不能证明根因已经消除。"]
+    ],
+    questions: [
+      { q: "观察模拟画面，前16幅主检测画面的刷新范围有什么变化？", options: ["只有一幅停止刷新，其余仍刷新", "同通道前后两幅都停止刷新", "前16幅全部停止刷新"], answer: 0, why: "这一题只有目标单幅被冻结。先数异常画面，再缩小排查范围；不把末4幅取证黑帧算进来。" },
+      { q: "仅凭这个现象，哪种判断更合适？", options: ["已经证明相机硬件损坏", "先排查对应相机与通讯，仍需报警和线路证据", "已经证明整机停止检测"], answer: 1, why: "画面冻结是观察事实，硬件损坏是待验证的原因。485通讯异常也可能产生相似现象。" },
+      { q: "进入现场处置前，优先补充哪组证据？", options: ["直接提高检测灵敏度", "立刻购买相机", "记录相机编号、报警对象、时间及是否复发"], answer: 2, why: "编号和报警帮助定位对象，复发情况帮助判断持续性。参数调整不能替代故障定位。" },
+      { q: "按现场流程处理后，哪项复核更完整？", options: ["目标持续刷新，核对报警与运行情况，再跟踪复发", "只看开机画面出现就结束", "恢复一次即可确定根因已消除"], answer: 0, why: "短时恢复不等于根因消除。恢复观察和后续复发记录也是排查的一部分。" }
+    ]
+  },
+  {
+    id: "channel-fault", title: "同通道两幅画面异常", goal: "识别配对关系，避免把显示故障等同于设备停检。",
+    source: "《现场实机确认》《故障案例矩阵》《HMI场景验收矩阵》；通道配对已确认，完整故障与恢复录像仍待补充。",
+    steps: [
+      ["观察", "对照前视与后视编号，观察是否为同一通道的两幅画面同时不刷新。1—8号算力通道各对应一对前后视主检测相机。", "两幅相邻画面不一定足够，必须确认它们属于同一通道。"],
+      ["判断", "同一通道的两幅画面同时冻结，优先检查对应算力通道、盒子及通讯链路。", "这是排查方向，不能仅凭上位机画面推断下位机已停检或喷射已停止。"],
+      ["检查", "记录通道编号与报警，结合喷次、流速、日志以及现场实际动作判断，再按安全流程检查线缆、接口与算力盒。", "屏幕上的数据和实际动作需要交叉核对；命令计数不等于实际喷气。"],
+      ["复核", "处理后观察对应前后两幅是否持续刷新，核对相关报警、运行情况和是否再次发生。", "只恢复其中一幅，不能算这组异常已完整恢复。"]
+    ],
+    questions: [
+      { q: "对照前后视编号，本次异常画面有什么关系？", options: ["前16幅全部停止刷新", "只有前视一幅停止刷新", "同一通道的前后两幅停止刷新"], answer: 2, why: "模拟的是同通道配对画面冻结，其他主检测画面继续刷新。配对关系有助于定位共同的通道。" },
+      { q: "能否据此直接断定下位机已经停止检测？", options: ["不能，还要结合统计、日志和现场动作", "能，两幅冻结就说明已经停检", "能，同时说明全部阀已停止喷气"], answer: 0, why: "上位机画面不刷新不等于下位机已停止。现有证据不足以把两者直接绑定。" },
+      { q: "优先沿哪条路径排查？", options: ["同时更换20台相机", "记录对应通道，核对报警及现场动作，再查通道线路与算力盒", "直接提高吹气时间"], answer: 1, why: "同通道两幅同时异常提示需要检查共同链路。先核对证据，避免扩大换件范围。" },
+      { q: "以下哪种情况仍不能结束恢复复核？", options: ["两幅持续刷新，报警和运行情况均已核对", "持续观察并记录后续是否复发", "只恢复了一幅，另一幅仍冻结"], answer: 2, why: "该场景的复核对象是一对画面。只恢复其中一幅，说明仍有异常需要定位。" }
+    ]
+  },
+  {
+    id: "flow-abnormal", title: "棉流异常怎么判断", goal: "分清监控范围、连续采样与现场排查顺序。",
+    source: "《当前软件版本与参数》（2026-07-22核验）、《HMI场景验收矩阵》；适用示例版本 JLH_2026.01.10.0930。",
+    steps: [
+      ["观察", "先看流速曲线与连续采样，留意是否持续偏离。示例版本基准10、范围±2，连续3次越界才进入报警培训态。", "8—12是该示例的监控窗口，不是所有设备通用的强制流速设定。"],
+      ["判断", "一次越界尚不足以满足连续3次条件。连续异常后，仍要区分挂花、堵塞、风压或前后工序风量问题。", "报警告诉你监控条件被触发，不等于已经确定故障根因。"],
+      ["检查", "按现场安全流程停机检查入口、出口和上部风口积花、漏风及检测玻璃污渍；必要时检查前后工序风量和管道连接。", "先排查影响棉流的实际问题，不先放宽报警范围来掩盖现象。"],
+      ["复核", "恢复后连续观察流速。本课程以连续3次回到范围内作为观察练习，再核对现场运行和报警状态。", "模拟器回到范围不代表实机会自动清警，也不代表所有工况都该照抄此阈值。"]
+    ],
+    questions: [
+      { q: "独立采样题：范围8—12，依次采样12.4、11.6、12.5（不取自左侧实时曲线），满足连续3次越界吗？", options: ["满足，有两次超过12", "不满足，中间11.6回到范围内，连续计数重置", "满足，只要出现一次越界就报警"], answer: 1, why: "关键是“连续”。第二次回到范围内后，第三次越界只能重新记为第1次。" },
+      { q: "连续异常已经触发，首先该怎么理解？", options: ["一定是相机损坏", "所有机型都必须把流速设为10", "监控条件被触发，根因还需要现场检查"], answer: 2, why: "阈值来自已核验版本的示例参数。报警条件成立，不能直接证明某个部件损坏。" },
+      { q: "下一步怎样处理更合理？", options: ["按安全流程检查挂花堵塞、漏风、玻璃及相关风量", "先把范围调大，让报警消失", "直接把吹气时间加倍"], answer: 0, why: "先查影响棉流的实际条件。通过放宽阈值消除报警，并不能证明异常已被处理。" },
+      { q: "培训中连续3次回到范围内，能说明什么？", options: ["实机一定已经自动清警", "所有工况都已永久恢复", "本轮恢复观察满足示例条件，实机报警与运行仍需核对"], answer: 2, why: "课程的恢复观察条件属于教学设计，不能冒充未取证的实机自动清警逻辑。" }
+    ]
+  }
+];
+const COURSE_STORAGE_KEY = "jwf0019a-lessons-v1";
+let courseStorageAvailable = true;
+let courseSession = null;
+
+function readCourseProgress(storage) {
+  try {
+    const raw = JSON.parse(storage.getItem(COURSE_STORAGE_KEY) || "{}");
+    return Object.fromEntries(HMI_LESSONS.map((lesson) => {
+      const item = raw?.[lesson.id] || {};
+      return [lesson.id, {
+        learned: item.learned === true,
+        best: Number.isInteger(item.best) && item.best >= 0 && item.best <= 4 ? item.best : 0,
+        attempts: Number.isSafeInteger(item.attempts) && item.attempts >= 0 ? item.attempts : 0,
+        wrong: [...new Set(Array.isArray(item.wrong) ? item.wrong.filter((n) => Number.isInteger(n) && n >= 0 && n < 4) : [])]
+      }];
+    }));
+  } catch {
+    courseStorageAvailable = false;
+    return Object.fromEntries(HMI_LESSONS.map((lesson) => [lesson.id, { learned: false, best: 0, attempts: 0, wrong: [] }]));
+  }
+}
+
+// 访问 localStorage 本身也可能被浏览器策略拒绝。
+let courseProgress;
+try { courseProgress = readCourseProgress(window.localStorage); }
+catch { courseProgress = readCourseProgress({ getItem() { throw new Error("本机存储不可用"); } }); }
+
+function saveCourseProgress() {
+  try {
+    window.localStorage.setItem(COURSE_STORAGE_KEY, JSON.stringify(courseProgress));
+    courseStorageAvailable = true;
+  } catch { courseStorageAvailable = false; }
+}
+
+function shuffledCourseOptions(question) {
+  const options = question.options.map((text, index) => ({ text, index }));
+  for (let i = options.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+  return options;
+}
+
+function recordCourseAttempt(progress, lessonId, answers, review = false) {
+  const lesson = HMI_LESSONS.find((item) => item.id === lessonId);
+  const record = progress[lessonId];
+  const wrong = answers.filter((a) => a.choice !== lesson.questions[a.index].answer).map((a) => a.index);
+  const correct = answers.length - wrong.length;
+  if (review) {
+    const reviewed = new Set(answers.map((a) => a.index));
+    record.wrong = [...new Set([...record.wrong.filter((i) => !reviewed.has(i)), ...wrong])];
+  } else {
+    record.best = Math.max(record.best, correct);
+    record.attempts += 1;
+    record.wrong = wrong;
+  }
+  return { correct, total: answers.length, wrong };
+}
+
+function renderCourseHub() {
+  const passed = HMI_LESSONS.filter((l) => courseProgress[l.id].best === 4).length;
+  document.querySelector("#course-hub").innerHTML = `
+    <div class="course-heading"><div><p class="course-kicker">小伍设备课堂 · 免费学习</p><h1 id="course-hub-title">跟着经验学，带着证据判断。</h1><p>三节入门课，从看见异常到完成复核。每节四步，学完自己练。</p></div><strong class="course-count">${passed}<small> / 3 节练习通过</small></strong></div>
+    <div class="course-cards">${HMI_LESSONS.map((l, i) => {
+      const p = courseProgress[l.id];
+      return `<article><span class="course-number">第${i + 1}课 · 约5分钟</span><h2>${l.title}</h2><p>${l.goal}</p><small>${p.learned ? "已读完讲解" : "尚未读完"} · ${p.attempts ? `练习最佳 ${p.best}/4` : "尚未练习"}</small><div class="course-actions"><button data-course="${l.id}" data-mode="learn">跟我学</button><button data-course="${l.id}" data-mode="practice">自己练</button>${p.wrong.length ? `<button data-course="${l.id}" data-mode="review">复习错题 ${p.wrong.length}</button>` : ""}</div></article>`;
+    }).join("")}</div><p class="course-storage">${courseStorageAvailable ? "免注册。进度仅保存在当前浏览器；换设备、切换本地/公网入口或清理浏览器数据后不会同步。" : "本机记录暂时无法保存，仍可学习和练习；关闭页面后本次进度可能丢失。"}</p>`;
+}
+
+function showCourseObservation(practice) {
+  coursePractice = practice;
+  document.body.classList.toggle("course-practice", practice);
+  if (isEvidenceSnapshot()) setSnapshot("training");
+  setAccountDialog(false);
+  if (!state.running) setRunning(true);
+  setScenario(courseSession.lesson.id);
+  // 练习固定在异常可观察阶段，保留动态刷新；不自动讲答案或推演已处理。
+  if (practice) {
+    state.position = 1 + Math.floor(Math.random() * 32);
+    state.targetView = Math.random() < .5 ? "front" : "rear";
+    state.phase = PHASE.FAULT_OBSERVABLE;
+    state.liveFlow = scenarioFlowValue();
+    renderAll();
+    if (state.scenario === "flow-abnormal") { setScreen("stats"); setStat("flow"); }
+  }
+}
+
+function startCourse(id, mode) {
+  const lesson = HMI_LESSONS.find((l) => l.id === id);
+  if (!lesson) return;
+  const review = mode === "review";
+  const indices = review ? [...courseProgress[id].wrong] : [0, 1, 2, 3];
+  if (review && !indices.length) return;
+  courseSession = { lesson, mode, indices, step: 0, answers: [], selected: null, submitted: false, result: null };
+  document.body.classList.add("course-active");
+  document.querySelector("#course-hub").hidden = true;
+  document.querySelector("#course-panel").hidden = false;
+  document.querySelector("#course-back-to-question").hidden = false;
+  document.querySelector("#course-observation-note").hidden = false;
+  showCourseObservation(mode !== "learn");
+  renderCoursePanel();
+  document.querySelector("#course-panel").scrollIntoView({ block: "start" });
+}
+
+function renderCoursePanel() {
+  const s = courseSession;
+  const l = s.lesson;
+  const learn = s.mode === "learn";
+  const title = learn || s.result ? l.title : s.mode === "review" ? "错题再练" : "观察练习";
+  let content;
+  if (s.result) {
+    const r = s.result;
+    content = `<div class="course-result"><strong>${r.correct}<small> / ${r.total}</small></strong><h3>${r.wrong.length ? "把漏看的证据，再看一遍。" : s.mode === "review" ? "本轮错题已答对。" : "本轮四项判断全部答对。"}</h3><p>${s.mode === "review" ? "错题复习不替代完整练习；可回目录再练四题。" : "得分记录每题第一次提交的答案。课程通过不代表获得现场操作资质。"}</p><ul>${s.answers.map((a) => `<li>${a.choice === l.questions[a.index].answer ? "✓" : "待复习"} · ${l.steps[a.index][0]}</li>`).join("")}</ul><button data-course-action="restart">再练完整四题</button><button data-course-action="learn">回看讲解</button></div>`;
+  } else if (learn) {
+    const step = l.steps[s.step];
+    content = `<p class="course-step-label">${s.step + 1} / 4 · ${step[0]}</p><h3>${step[1]}</h3><div class="course-reason"><b>为什么这样做</b><p>${step[2]}</p></div><button data-course-action="demo">重播完整模拟与讲解</button><button id="course-continue-demo" data-course-action="continue-demo" hidden>继续模拟</button><p id="course-caption" class="course-caption" aria-live="polite">使用已有分段讲解，随模拟阶段播放。</p><div class="course-actions">${s.step ? '<button data-course-action="previous">上一步</button>' : ""}<button class="course-primary" data-course-action="next">${s.step === 3 ? "读完了，开始自己练" : "下一步"}</button></div>`;
+  } else {
+    const index = s.indices[s.step];
+    const q = l.questions[index];
+    if (!s.options) s.options = shuffledCourseOptions(q);
+    content = `<p class="course-step-label">第${s.step + 1}题 / 共${s.indices.length}题 · ${l.steps[index][0]}</p><h3 id="course-question">${q.q}</h3><p class="course-small">先看证据再作答。练习已关闭语音与诊断提示。</p><fieldset class="course-options" aria-labelledby="course-question"><legend class="course-sr-only">选择一个答案</legend>${s.options.map((o) => `<label><input type="radio" name="course-answer" value="${o.index}" ${s.selected === o.index ? "checked" : ""} ${s.submitted ? "disabled" : ""}><span>${o.text}</span></label>`).join("")}</fieldset>${s.submitted ? `<div class="course-feedback ${s.selected === q.answer ? "correct" : "incorrect"}" role="status"><b>${s.selected === q.answer ? "判断正确" : "这一步需要再想一想"}</b><p>${q.why}</p><p>参考判断：${q.options[q.answer]}</p></div><button class="course-primary" data-course-action="next">${s.step === s.indices.length - 1 ? "查看本轮结果" : "下一题"}</button>` : `<button class="course-primary" data-course-action="submit" ${s.selected === null ? "disabled" : ""}>确认判断</button>`}`;
+  }
+  document.querySelector("#course-panel").innerHTML = `<div class="course-panel-top"><span>${learn ? "跟我学" : "自己练"}</span><button data-course-action="exit">返回课程</button></div><h2 tabindex="-1" id="course-title">${title}</h2><div class="course-steps" aria-label="学习顺序">${["观察", "判断", "检查", "复核"].map((name, i) => `<span ${!s.result && i === (learn ? s.step : s.indices[s.step]) ? 'aria-current="step"' : ""}>${name}</span>`).join("")}</div><button class="course-observe-button" data-course-action="observe">↓ 查看模拟画面与数据</button>${content}${learn || s.result ? `<details class="course-source"><summary>本课依据与适用范围</summary><p>${l.source}</p><p>内容整理自伍建忠已确认的知识资料。问答为教学设计，不是新增现场事实。只在离线模拟器练习；实机处置遵守所在工厂安全流程。</p></details>` : '<p class="course-small">离线培训模拟。参数以指定版本为例，实机处置遵守所在工厂安全流程。</p>'}${!courseStorageAvailable ? '<p class="course-storage" role="status">本机记录未能保存，关闭页面后进度可能丢失。</p>' : ""}`;
+}
+
+function exitCourse() {
+  coursePractice = false;
+  cancelScenarioPlayback();
+  setScenario("normal");
+  courseSession = null;
+  document.body.classList.remove("course-active", "course-practice");
+  document.querySelector("#course-panel").hidden = true;
+  document.querySelector("#course-hub").hidden = false;
+  document.querySelector("#course-back-to-question").hidden = true;
+  document.querySelector("#course-observation-note").hidden = true;
+  renderCourseHub();
+  document.querySelector("#course-hub").scrollIntoView({ block: "start" });
+}
+
+function handleCourseAction(action) {
+  const s = courseSession;
+  if (!s) return;
+  if (action === "exit") return exitCourse();
+  if (action === "observe") return document.querySelector(".hmi-stage").scrollIntoView({ block: "start" });
+  if (action === "restart") return startCourse(s.lesson.id, "practice");
+  if (action === "learn") return startCourse(s.lesson.id, "learn");
+  if (action === "demo" && s.mode === "learn") {
+    setScenario(s.lesson.id);
+    document.querySelector("#play-scenario").click();
+    return;
+  }
+  if (action === "continue-demo" && s.mode === "learn") {
+    if (state.narrationNeedsGesture) retryNarration();
+    else if (state.awaitingManual) document.querySelector("#play-scenario").click();
+    return;
+  }
+  if (action === "previous" && s.mode === "learn") s.step = Math.max(0, s.step - 1);
+  if (action === "submit" && s.mode !== "learn" && !s.submitted && s.selected !== null) {
+    s.submitted = true;
+    s.answers.push({ index: s.indices[s.step], choice: s.selected });
+  }
+  if (action === "next") {
+    if (s.mode === "learn" && s.step === 3) {
+      courseProgress[s.lesson.id].learned = true;
+      saveCourseProgress();
+      return startCourse(s.lesson.id, "practice");
+    }
+    if (s.mode !== "learn" && !s.submitted) return;
+    if (s.mode !== "learn" && s.step === s.indices.length - 1) {
+      if (s.result) return;
+      s.result = recordCourseAttempt(courseProgress, s.lesson.id, s.answers, s.mode === "review");
+      saveCourseProgress();
+    } else {
+      s.step += 1;
+      s.selected = null;
+      s.submitted = false;
+      s.options = null;
+    }
+  }
+  renderCoursePanel();
+  document.querySelector("#course-title").focus({ preventScroll: true });
+}
+
+document.querySelector("#course-hub").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-course]");
+  if (button) startCourse(button.dataset.course, button.dataset.mode);
+});
+document.querySelector("#course-panel").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-course-action]");
+  if (button) handleCourseAction(button.dataset.courseAction);
+});
+document.querySelector("#course-panel").addEventListener("change", (event) => {
+  if (event.target.name !== "course-answer" || !courseSession || courseSession.submitted) return;
+  courseSession.selected = Number(event.target.value);
+  document.querySelector('[data-course-action="submit"]').disabled = false;
+});
+document.querySelector("#course-back-to-question").addEventListener("click", () => document.querySelector("#course-panel").scrollIntoView({ block: "start" }));
+renderCourseHub();
+setInterval(() => {
+  if (courseSession?.mode !== "learn") return;
+  const caption = document.querySelector("#course-caption");
+  if (caption) caption.textContent = document.querySelector("#narration-caption").textContent;
+  const continueButton = document.querySelector("#course-continue-demo");
+  if (continueButton) {
+    continueButton.hidden = !state.narrationNeedsGesture && !state.awaitingManual;
+    continueButton.disabled = !state.narrationNeedsGesture && narrationStagePending(NARRATION_STAGE.MANUAL_WAIT);
+    continueButton.textContent = state.narrationNeedsGesture ? "开启语音继续" : "已了解处理步骤，模拟恢复观察";
+  }
+}, 1000);

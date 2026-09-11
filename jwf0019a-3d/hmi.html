@@ -6,7 +6,7 @@
   <title>JWF0019A 实机界面培训模拟</title>
   <meta name="description" content="依据真实JWF0019A运行界面、相机画面和触发记录制作的培训模拟。">
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./hmi.css?v=settings-sim-20260805">
+  <link rel="stylesheet" href="./hmi.css?v=lessons-20260909">
 </head>
 <body>
   <header class="page-head">
@@ -20,8 +20,11 @@
     </nav>
   </header>
 
+  <section id="course-hub" class="course-hub" aria-labelledby="course-hub-title"></section>
   <main class="training-layout">
     <div class="hmi-stage">
+    <button id="course-back-to-question" class="course-return" type="button" hidden>↑ 回到课程与题目</button>
+    <p id="course-observation-note" class="course-observation-note" hidden>画面素材来自实机，异常过程为培训模拟。观察前16幅主检测画面；末4幅精灵眼黑帧只反映取证素材，不作为正常或故障标准。</p>
     <p class="hmi-scroll-hint">左右滑动查看完整实机界面</p>
     <section class="hmi-window" aria-label="JWF0019A实机界面模拟">
       <div class="hmi-titlebar">KDistributionUIPlatform</div>
@@ -247,6 +250,7 @@
     </section>
     </div>
 
+    <aside id="course-panel" class="course-panel" hidden aria-label="课程与练习"></aside>
     <aside class="training-panel">
       <p class="eyebrow">培训联动</p>
       <h1>现象出现时，界面哪里会变化</h1>
@@ -351,6 +355,6 @@
     </aside>
   </main>
 
-  <script src="./hmi.js?v=hmi-assets-20260830"></script>
+  <script src="./hmi.js?v=lessons-20260909"></script>
 </body>
 </html>
