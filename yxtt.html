@@ -207,7 +207,12 @@
       display: grid;
       place-items: center;
       padding: 30px;
+      overflow: hidden;
+      touch-action: none;
     }
+
+    .image-stage.has-image { cursor: grab; }
+    .image-stage.panning { cursor: grabbing; }
 
     .image-stage::before,
     .image-stage::after {
@@ -239,7 +244,29 @@
       max-height: calc(100vh - 245px);
       object-fit: contain;
       box-shadow: 0 18px 50px rgb(0 0 0 / 32%);
+      pointer-events: none;
+      user-select: none;
+      transform-origin: center;
+      will-change: transform;
     }
+
+    .zoom-hud {
+      position: absolute;
+      z-index: 7;
+      top: 16px;
+      right: 16px;
+      display: none;
+      min-height: 34px;
+      padding: 0 11px;
+      border: 1px solid var(--line);
+      background: rgb(13 32 40 / 88%);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .image-stage.has-image .zoom-hud { display: block; }
+    .zoom-hud b { color: var(--teal); }
 
     .empty-state {
       max-width: 620px;
@@ -283,7 +310,7 @@
 
     .class-btn {
       display: grid;
-      grid-template-columns: 34px 1fr;
+      grid-template-columns: 34px 1fr auto;
       align-items: center;
       min-height: 58px;
       border: 1px solid var(--line);
@@ -302,6 +329,7 @@
     .class-btn:disabled { opacity: .35; cursor: not-allowed; }
     .class-btn kbd { color: var(--muted); font-size: 13px; text-align: center; }
     .class-btn strong { font-size: 15px; }
+    .default-tag { margin-right: 10px; color: var(--amber); font-size: 10px; font-weight: 800; }
 
     .key-guide {
       margin-top: 22px;
@@ -437,6 +465,19 @@
     .scan-progress .progress { height: 6px; margin: 0 0 10px; }
     .scan-progress span { color: var(--muted); font-size: 12px; }
 
+    .brand-footer,
+    .welcome-contact {
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: .04em;
+    }
+
+    .brand-footer { padding: 12px 0 0; }
+    .welcome-contact { margin-top: 18px; }
+    .brand-footer a,
+    .welcome-contact a { color: var(--teal); text-decoration: none; }
+
     .modal {
       position: fixed;
       z-index: 30;
@@ -480,6 +521,80 @@
     th { position: sticky; top: 83px; background: #1a3d47; color: var(--teal); }
     tbody tr:hover { background: rgb(91 193 191 / 7%); }
     tfoot { color: var(--amber); font-weight: 800; }
+
+    .detail-btn {
+      min-height: 32px;
+      padding: 0 11px;
+      border: 1px solid var(--teal);
+      background: transparent;
+      color: var(--teal);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .review-modal { z-index: 35; }
+    .review-card { width: min(1260px, 100%); overflow: hidden; }
+    .review-heading p { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+
+    .review-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .filter-btn {
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      background: var(--ink);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .filter-btn.active { border-color: var(--teal); background: var(--teal); color: #092126; font-weight: 800; }
+
+    .review-grid {
+      height: min(68vh, 720px);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      min-height: 440px;
+    }
+
+    .review-preview {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      background: var(--ink-deep);
+      border-right: 1px solid var(--line);
+    }
+
+    .review-image-stage { min-height: 0; display: grid; place-items: center; padding: 22px; overflow: hidden; }
+    #reviewImage { display: none; max-width: 100%; max-height: 100%; object-fit: contain; }
+    .review-empty { color: var(--muted); text-align: center; font-size: 13px; }
+
+    .review-caption {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      min-height: 60px;
+      padding: 10px 14px;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .review-caption strong { color: var(--amber); white-space: nowrap; }
+    .review-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+    .status-badge { padding: 6px 9px; border: 1px solid var(--teal); color: var(--teal); white-space: nowrap; font-size: 12px; font-weight: 800; }
+    .status-badge.unclassified { border-color: var(--line); color: var(--muted); }
+
+    .review-side { min-width: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: 14px; gap: 12px; }
+    .review-list { width: 100%; min-height: 0; border: 1px solid var(--line); background: var(--ink-deep); color: var(--text); padding: 6px; font: 12px/1.7 "SFMono-Regular", Consolas, monospace; }
+    .review-list option { padding: 7px 8px; }
+    .review-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 
     .toast {
       position: fixed;
@@ -542,6 +657,9 @@
       .key-guide { margin-top: 0; padding: 0 0 0 18px; border-top: 0; border-left: 1px solid var(--line); }
       .safety-note { grid-column: 1 / -1; margin-top: 0; }
       #previewImage { max-height: 50vh; }
+      .review-grid { grid-template-columns: 1fr; height: auto; max-height: 72vh; overflow: auto; }
+      .review-preview { min-height: 390px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .review-side { min-height: 280px; }
     }
 
     @media (max-width: 640px) {
@@ -602,6 +720,7 @@
       <div class="viewer">
         <div class="image-stage">
           <img id="previewImage" alt="当前待分类图片">
+          <button class="zoom-hud" id="resetZoom" title="双击图片区域也可复位">滚轮缩放 · <b id="zoomValue">100%</b> · 点击复位</button>
           <div class="empty-state" id="emptyState">
             <svg width="54" height="54" viewBox="0 0 64 64" fill="none" aria-hidden="true">
               <rect x="7" y="11" width="50" height="42" rx="4" stroke="currentColor" stroke-width="2"/>
@@ -630,17 +749,19 @@
 
       <aside class="side-panel">
         <h2>判定操作</h2>
-        <p>按 ↑ / ↓ 选择，回车确认</p>
+        <p>默认判“假”，直接回车确认并下一张</p>
         <div class="class-actions" id="classActions">
           <button class="class-btn" data-index="0" disabled><kbd>1</kbd><strong>—</strong></button>
-          <button class="class-btn" data-index="1" disabled><kbd>2</kbd><strong>—</strong></button>
+          <button class="class-btn" data-index="1" disabled><kbd>2</kbd><strong>—</strong><span class="default-tag">回车默认</span></button>
           <button class="class-btn" data-index="2" disabled><kbd>3</kbd><strong>—</strong></button>
         </div>
 
         <div class="key-guide">
           <div class="key-row"><kbd>← →</kbd><span>切换图片</span></div>
-          <div class="key-row"><kbd>↑ ↓</kbd><span>选择分类</span></div>
-          <div class="key-row"><kbd>Enter</kbd><span>确认并下一张</span></div>
+          <div class="key-row"><kbd>滚轮</kbd><span>放大 / 缩小图片</span></div>
+          <div class="key-row"><kbd>左键拖动</kbd><span>抓住图片移动</span></div>
+          <div class="key-row"><kbd>↑ ↓</kbd><span>改选“真 / 疑似”</span></div>
+          <div class="key-row"><kbd>Enter</kbd><span>默认判假并下一张</span></div>
           <div class="key-row"><kbd>1 2 3</kbd><span>快速选择</span></div>
           <div class="key-row"><kbd>Ctrl+Z</kbd><span>撤销上一次</span></div>
         </div>
@@ -650,6 +771,7 @@
         </div>
       </aside>
     </section>
+    <footer class="brand-footer">小伍工作室 · 技术支持 <a href="tel:19009925522">19009925522</a></footer>
   </main>
 
   <section class="welcome" id="welcome">
@@ -680,6 +802,7 @@
         <span>推荐最新版 Chrome / Edge（Windows、Mac 均可）</span>
         <code>总目录 / 相机 / ng / 0、1、2</code>
       </div>
+      <div class="welcome-contact">小伍工作室 · 技术支持 <a href="tel:19009925522">19009925522</a></div>
     </div>
   </section>
 
@@ -695,11 +818,46 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>相机</th><th>类型</th><th>总数</th><th>真</th><th>真占比</th><th>假</th><th>假占比</th><th>疑似</th><th>疑似占比</th><th>未分类</th><th>完成率</th></tr>
+            <tr><th>相机</th><th>类型</th><th>总数</th><th>真</th><th>真占比</th><th>假</th><th>假占比</th><th>疑似</th><th>疑似占比</th><th>未分类</th><th>完成率</th><th>逐张复核</th></tr>
           </thead>
           <tbody id="statsBody"></tbody>
           <tfoot id="statsFoot"></tfoot>
         </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="modal review-modal" id="reviewModal" aria-hidden="true">
+    <div class="modal-card review-card">
+      <div class="modal-head">
+        <div class="review-heading">
+          <h2 id="reviewTitle">分类明细复核</h2>
+          <p id="reviewSubtitle">按文件名自然顺序固定原图序号</p>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" id="closeReview">返回统计</button>
+        </div>
+      </div>
+      <div class="review-filters" id="reviewFilters"></div>
+      <div class="review-grid">
+        <div class="review-preview">
+          <div class="review-image-stage">
+            <img id="reviewImage" alt="分类明细图片">
+            <div class="review-empty" id="reviewEmpty">请选择一条分类明细</div>
+          </div>
+          <div class="review-caption">
+            <strong id="reviewPosition">—</strong>
+            <span class="review-name" id="reviewName">—</span>
+            <span class="status-badge unclassified" id="reviewStatus">—</span>
+          </div>
+        </div>
+        <aside class="review-side">
+          <select class="review-list" id="reviewList" size="16" aria-label="图片分类明细"></select>
+          <div class="review-nav">
+            <button class="btn" id="reviewPrev">上一张</button>
+            <button class="btn" id="reviewNext">下一张</button>
+          </div>
+        </aside>
       </div>
     </div>
   </section>
@@ -727,8 +885,22 @@
         previewUrl: null,
         renderToken: 0,
         menuOpen: false,
-        menuIndex: 0,
-        busy: false
+        menuIndex: 1,
+        busy: false,
+        zoom: 1,
+        panX: 0,
+        panY: 0,
+        panning: false,
+        pointerStartX: 0,
+        pointerStartY: 0,
+        panStartX: 0,
+        panStartY: 0,
+        reviewRow: null,
+        reviewEntries: [],
+        reviewIndex: 0,
+        reviewFilter: "全部",
+        reviewUrl: null,
+        reviewToken: 0
       };
 
       const el = {
@@ -750,7 +922,10 @@
         percentMetric: document.querySelector("#percentMetric"),
         statusLine: document.querySelector("#statusLine"),
         mainProgress: document.querySelector("#mainProgress"),
+        imageStage: document.querySelector(".image-stage"),
         previewImage: document.querySelector("#previewImage"),
+        resetZoom: document.querySelector("#resetZoom"),
+        zoomValue: document.querySelector("#zoomValue"),
         emptyState: document.querySelector("#emptyState"),
         filenameBar: document.querySelector("#filenameBar"),
         classButtons: [...document.querySelectorAll(".class-btn")],
@@ -762,6 +937,19 @@
         statsFoot: document.querySelector("#statsFoot"),
         downloadStats: document.querySelector("#downloadStats"),
         closeStats: document.querySelector("#closeStats"),
+        reviewModal: document.querySelector("#reviewModal"),
+        reviewTitle: document.querySelector("#reviewTitle"),
+        reviewSubtitle: document.querySelector("#reviewSubtitle"),
+        reviewFilters: document.querySelector("#reviewFilters"),
+        reviewImage: document.querySelector("#reviewImage"),
+        reviewEmpty: document.querySelector("#reviewEmpty"),
+        reviewPosition: document.querySelector("#reviewPosition"),
+        reviewName: document.querySelector("#reviewName"),
+        reviewStatus: document.querySelector("#reviewStatus"),
+        reviewList: document.querySelector("#reviewList"),
+        reviewPrev: document.querySelector("#reviewPrev"),
+        reviewNext: document.querySelector("#reviewNext"),
+        closeReview: document.querySelector("#closeReview"),
         toast: document.querySelector("#toast")
       };
 
@@ -801,8 +989,39 @@
         el.statsBtn.disabled = busy || !state.rootHandle;
       }
 
+      function clampPan() {
+        if (state.zoom <= 1 || !el.previewImage.offsetWidth) {
+          state.panX = 0;
+          state.panY = 0;
+          return;
+        }
+        const availableWidth = Math.max(1, el.imageStage.clientWidth - 60);
+        const availableHeight = Math.max(1, el.imageStage.clientHeight - 60);
+        const maxX = Math.max(0, (el.previewImage.offsetWidth * state.zoom - availableWidth) / 2);
+        const maxY = Math.max(0, (el.previewImage.offsetHeight * state.zoom - availableHeight) / 2);
+        state.panX = Math.max(-maxX, Math.min(maxX, state.panX));
+        state.panY = Math.max(-maxY, Math.min(maxY, state.panY));
+      }
+
+      function applyZoom() {
+        clampPan();
+        el.previewImage.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+        el.zoomValue.textContent = `${Math.round(state.zoom * 100)}%`;
+      }
+
+      function resetZoom() {
+        state.zoom = 1;
+        state.panX = 0;
+        state.panY = 0;
+        state.panning = false;
+        el.imageStage.classList.remove("panning");
+        applyZoom();
+      }
+
       function releasePreview() {
         state.renderToken += 1;
+        resetZoom();
+        el.imageStage.classList.remove("has-image");
         el.previewImage.removeAttribute("src");
         el.previewImage.style.display = "none";
         if (state.previewUrl) {
@@ -899,23 +1118,48 @@
               const sourceFiles = await listImages(sourceDirectory);
               if (sourceFiles.length) hasImages = true;
 
-              for (const file of sourceFiles) {
+              const details = sourceFiles.map(file => ({
+                originalName: file.name,
+                currentName: file.name,
+                status: "未分类",
+                fileHandle: file.handle,
+                directoryHandle: sourceDirectory,
+                originalIndex: 0
+              }));
+
+              const counts = [];
+              for (let labelIndex = 0; labelIndex < config.labels.length; labelIndex += 1) {
+                const label = config.labels[labelIndex];
+                const classifiedDirectory = await getDirectoryIfExists(ngHandle, label);
+                const classifiedFiles = await listImages(classifiedDirectory);
+                counts.push(classifiedFiles.length);
+                if (classifiedFiles.length) hasImages = true;
+                for (const file of classifiedFiles) {
+                  details.push({
+                    originalName: file.name,
+                    currentName: file.name,
+                    status: label,
+                    fileHandle: file.handle,
+                    directoryHandle: classifiedDirectory,
+                    originalIndex: 0
+                  });
+                }
+              }
+
+              details.sort((a, b) => collator.compare(a.originalName, b.originalName));
+              details.forEach((detail, detailIndex) => { detail.originalIndex = detailIndex + 1; });
+
+              for (const detail of details) {
+                if (detail.status !== "未分类") continue;
                 state.items.push({
                   cameraName: camera.name,
                   categoryCode: code,
                   ngHandle,
                   sourceDirectory,
-                  name: file.name,
-                  fileHandle: file.handle
+                  name: detail.currentName,
+                  fileHandle: detail.fileHandle,
+                  detail
                 });
-              }
-
-              const counts = [];
-              for (const label of config.labels) {
-                const classifiedDirectory = await getDirectoryIfExists(ngHandle, label);
-                const classifiedFiles = await listImages(classifiedDirectory);
-                counts.push(classifiedFiles.length);
-                if (classifiedFiles.length) hasImages = true;
               }
 
               const total = sourceFiles.length + counts.reduce((sum, value) => sum + value, 0);
@@ -926,7 +1170,8 @@
                   categoryName: config.name,
                   labels: config.labels,
                   counts,
-                  unclassified: sourceFiles.length
+                  unclassified: sourceFiles.length,
+                  details
                 });
               }
             }
@@ -1016,8 +1261,9 @@
         }
 
         el.emptyState.style.display = "none";
-        el.filenameBar.textContent = item.name;
-        el.statusLine.textContent = `第 ${state.index + 1} 张 / 当前待分类 ${state.items.length.toLocaleString("zh-CN")} 张`;
+        const row = state.stats.get(statKey(item.cameraName, item.categoryCode));
+        el.filenameBar.textContent = `本组原图第 ${item.detail.originalIndex} 张 · ${item.detail.originalName}`;
+        el.statusLine.textContent = `本组第 ${item.detail.originalIndex} / ${row.details.length} 张 · 当前待分类 ${state.items.length.toLocaleString("zh-CN")} 张`;
 
         try {
           const file = await item.fileHandle.getFile();
@@ -1025,6 +1271,8 @@
           state.previewUrl = URL.createObjectURL(file);
           el.previewImage.src = state.previewUrl;
           el.previewImage.style.display = "block";
+          el.imageStage.classList.add("has-image");
+          resetZoom();
         } catch (error) {
           if (token !== state.renderToken) return;
           el.emptyState.style.display = "block";
@@ -1034,7 +1282,7 @@
         }
       }
 
-      function showMenu(index = 0) {
+      function showMenu(index = 1) {
         if (!currentItem() || state.busy) return;
         state.menuOpen = true;
         state.menuIndex = index;
@@ -1045,10 +1293,10 @@
 
       function moveMenu(direction) {
         if (!state.menuOpen) {
-          showMenu(0);
+          showMenu(direction < 0 ? 0 : 2);
           return;
         }
-        state.menuIndex = (state.menuIndex + direction + 3) % 3;
+        state.menuIndex = Math.max(0, Math.min(2, state.menuIndex + direction));
         updateClassLabels(currentItem());
       }
 
@@ -1138,6 +1386,10 @@
           const row = state.stats.get(statKey(item.cameraName, item.categoryCode));
           row.unclassified -= 1;
           row.counts[labelIndex] += 1;
+          item.detail.status = label;
+          item.detail.currentName = moved.destinationName;
+          item.detail.fileHandle = moved.destinationHandle;
+          item.detail.directoryHandle = targetDirectory;
           state.items.splice(state.index, 1);
           if (state.index >= state.items.length) state.index = Math.max(0, state.items.length - 1);
           showToast(`已归入“${label}”${moved.mode === "direct" ? "" : "（复制核验完成）"}`);
@@ -1169,6 +1421,10 @@
             true
           );
           state.history.pop();
+          record.item.detail.status = "未分类";
+          record.item.detail.currentName = record.item.name;
+          record.item.detail.fileHandle = restored.destinationHandle;
+          record.item.detail.directoryHandle = record.item.sourceDirectory;
           const restoredItem = { ...record.item, fileHandle: restored.destinationHandle };
           const insertAt = Math.min(record.originalIndex, state.items.length);
           state.items.splice(insertAt, 0, restoredItem);
@@ -1200,7 +1456,7 @@
 
       function openStats() {
         const rows = statRows();
-        el.statsBody.innerHTML = rows.map(row => {
+        el.statsBody.innerHTML = rows.map((row, rowIndex) => {
           const total = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
           const completed = total - row.unclassified;
           return `<tr>
@@ -1209,8 +1465,12 @@
             <td>${row.counts[1]}</td><td>${percentage(row.counts[1], total)}</td>
             <td>${row.counts[2]}</td><td>${percentage(row.counts[2], total)}</td>
             <td>${row.unclassified}</td><td>${percentage(completed, total)}</td>
+            <td><button class="detail-btn" data-row-index="${rowIndex}">查看第几张</button></td>
           </tr>`;
         }).join("");
+        [...el.statsBody.querySelectorAll(".detail-btn")].forEach(button => {
+          button.addEventListener("click", () => openReview(rows[Number(button.dataset.rowIndex)]));
+        });
         const total = totals();
         const completed = total.total - total.unclassified;
         el.statsFoot.innerHTML = `<tr>
@@ -1218,7 +1478,7 @@
           <td>${total.truth}</td><td>${percentage(total.truth, total.total)}</td>
           <td>${total.falsehood}</td><td>${percentage(total.falsehood, total.total)}</td>
           <td>${total.unsure}</td><td>${percentage(total.unsure, total.total)}</td>
-          <td>${total.unclassified}</td><td>${percentage(completed, total.total)}</td>
+          <td>${total.unclassified}</td><td>${percentage(completed, total.total)}</td><td>—</td>
         </tr>`;
         el.statsModal.classList.add("open");
         el.statsModal.setAttribute("aria-hidden", "false");
@@ -1227,6 +1487,117 @@
       function closeStats() {
         el.statsModal.classList.remove("open");
         el.statsModal.setAttribute("aria-hidden", "true");
+      }
+
+      function releaseReviewPreview() {
+        state.reviewToken += 1;
+        el.reviewImage.removeAttribute("src");
+        el.reviewImage.style.display = "none";
+        if (state.reviewUrl) {
+          URL.revokeObjectURL(state.reviewUrl);
+          state.reviewUrl = null;
+        }
+      }
+
+      function reviewFilterOptions(row) {
+        return ["全部", ...row.labels, "未分类"];
+      }
+
+      function reviewEntriesForFilter(row, filter) {
+        return filter === "全部" ? row.details : row.details.filter(detail => detail.status === filter);
+      }
+
+      function renderReviewFilters() {
+        const row = state.reviewRow;
+        el.reviewFilters.innerHTML = reviewFilterOptions(row).map(filter => {
+          const count = reviewEntriesForFilter(row, filter).length;
+          return `<button class="filter-btn${filter === state.reviewFilter ? " active" : ""}" data-filter="${escapeHtml(filter)}">${escapeHtml(filter)} ${count}</button>`;
+        }).join("");
+        [...el.reviewFilters.querySelectorAll(".filter-btn")].forEach(button => {
+          button.addEventListener("click", () => {
+            state.reviewFilter = button.dataset.filter;
+            state.reviewIndex = 0;
+            refreshReview();
+          });
+        });
+      }
+
+      async function renderReviewImage() {
+        releaseReviewPreview();
+        const token = state.reviewToken;
+        const detail = state.reviewEntries[state.reviewIndex];
+        const total = state.reviewRow?.details.length || 0;
+        if (!detail) {
+          el.reviewEmpty.style.display = "block";
+          el.reviewEmpty.textContent = "这个分类下没有图片";
+          el.reviewPosition.textContent = "—";
+          el.reviewName.textContent = "—";
+          el.reviewStatus.textContent = "—";
+          el.reviewStatus.classList.add("unclassified");
+          el.reviewPrev.disabled = true;
+          el.reviewNext.disabled = true;
+          return;
+        }
+
+        el.reviewPosition.textContent = `第 ${detail.originalIndex} 张 / 共 ${total} 张`;
+        el.reviewName.textContent = detail.originalName;
+        el.reviewName.title = detail.originalName;
+        el.reviewStatus.textContent = detail.status;
+        el.reviewStatus.classList.toggle("unclassified", detail.status === "未分类");
+        el.reviewList.value = String(state.reviewIndex);
+        el.reviewPrev.disabled = state.reviewIndex <= 0;
+        el.reviewNext.disabled = state.reviewIndex >= state.reviewEntries.length - 1;
+        el.reviewEmpty.style.display = "block";
+        el.reviewEmpty.textContent = "正在读取本地图片…";
+
+        try {
+          const file = await detail.fileHandle.getFile();
+          if (token !== state.reviewToken) return;
+          state.reviewUrl = URL.createObjectURL(file);
+          el.reviewImage.src = state.reviewUrl;
+          el.reviewImage.style.display = "block";
+          el.reviewEmpty.style.display = "none";
+        } catch (error) {
+          if (token !== state.reviewToken) return;
+          el.reviewEmpty.textContent = `图片无法读取：${friendlyError(error)}`;
+        }
+      }
+
+      function refreshReview() {
+        const row = state.reviewRow;
+        if (!row) return;
+        state.reviewEntries = reviewEntriesForFilter(row, state.reviewFilter);
+        state.reviewIndex = Math.max(0, Math.min(state.reviewIndex, state.reviewEntries.length - 1));
+        renderReviewFilters();
+        el.reviewList.innerHTML = state.reviewEntries.map((detail, index) =>
+          `<option value="${index}">第 ${detail.originalIndex} 张 · ${escapeHtml(detail.originalName)} · ${escapeHtml(detail.status)}</option>`
+        ).join("");
+        renderReviewImage();
+      }
+
+      function openReview(row) {
+        state.reviewRow = row;
+        state.reviewFilter = "全部";
+        state.reviewIndex = 0;
+        el.reviewTitle.textContent = `${row.cameraName} · ${row.categoryName}分类明细`;
+        el.reviewSubtitle.textContent = `本组共 ${row.details.length} 张，按文件名自然顺序固定原图序号；移动到分类文件夹后序号不变`;
+        el.reviewModal.classList.add("open");
+        el.reviewModal.setAttribute("aria-hidden", "false");
+        refreshReview();
+      }
+
+      function closeReview() {
+        releaseReviewPreview();
+        state.reviewRow = null;
+        state.reviewEntries = [];
+        el.reviewModal.classList.remove("open");
+        el.reviewModal.setAttribute("aria-hidden", "true");
+      }
+
+      function stepReview(direction) {
+        if (!state.reviewEntries.length) return;
+        state.reviewIndex = Math.max(0, Math.min(state.reviewEntries.length - 1, state.reviewIndex + direction));
+        renderReviewImage();
       }
 
       function csvCell(value) {
@@ -1256,6 +1627,21 @@
           total.unsure, percentage(total.unsure, total.total),
           total.unclassified, percentage(completed, total.total)
         ].map(csvCell).join(","));
+
+        lines.push("");
+        lines.push(["分类明细（按文件名自然顺序固定原图序号）"].map(csvCell).join(","));
+        lines.push(["相机", "类型", "原图序号", "原始文件名", "判定结果"].map(csvCell).join(","));
+        for (const row of statRows()) {
+          for (const detail of row.details) {
+            lines.push([
+              row.cameraName,
+              row.categoryName,
+              detail.originalIndex,
+              detail.originalName,
+              detail.status
+            ].map(csvCell).join(","));
+          }
+        }
 
         const blob = new Blob(["\ufeff", lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
         const url = URL.createObjectURL(blob);
@@ -1302,19 +1688,88 @@
       el.statsBtn.addEventListener("click", openStats);
       el.closeStats.addEventListener("click", closeStats);
       el.downloadStats.addEventListener("click", downloadStatistics);
+      el.closeReview.addEventListener("click", closeReview);
+      el.reviewPrev.addEventListener("click", () => stepReview(-1));
+      el.reviewNext.addEventListener("click", () => stepReview(1));
+      el.reviewList.addEventListener("change", () => {
+        state.reviewIndex = Number(el.reviewList.value) || 0;
+        renderReviewImage();
+      });
       el.classButtons.forEach(button => button.addEventListener("click", () => classifyAt(Number(button.dataset.index))));
+
+      el.resetZoom.addEventListener("click", event => {
+        event.stopPropagation();
+        resetZoom();
+      });
+      el.imageStage.addEventListener("dblclick", event => {
+        if (event.target.closest("button,.class-popup")) return;
+        resetZoom();
+      });
+      el.imageStage.addEventListener("wheel", event => {
+        if (!el.imageStage.classList.contains("has-image")) return;
+        event.preventDefault();
+        const bounds = el.imageStage.getBoundingClientRect();
+        const pointerX = event.clientX - bounds.left - bounds.width / 2;
+        const pointerY = event.clientY - bounds.top - bounds.height / 2;
+        const oldZoom = state.zoom;
+        const nextZoom = Math.max(1, Math.min(8, oldZoom * Math.exp(-event.deltaY * 0.0015)));
+        if (nextZoom === oldZoom) return;
+        const imageX = (pointerX - state.panX) / oldZoom;
+        const imageY = (pointerY - state.panY) / oldZoom;
+        state.zoom = nextZoom;
+        state.panX = pointerX - imageX * nextZoom;
+        state.panY = pointerY - imageY * nextZoom;
+        if (state.zoom < 1.01) resetZoom();
+        else applyZoom();
+      }, { passive: false });
+      el.imageStage.addEventListener("pointerdown", event => {
+        if (event.button !== 0 || state.zoom <= 1 || event.target.closest("button,.class-popup,.empty-state")) return;
+        state.panning = true;
+        state.pointerStartX = event.clientX;
+        state.pointerStartY = event.clientY;
+        state.panStartX = state.panX;
+        state.panStartY = state.panY;
+        el.imageStage.classList.add("panning");
+        el.imageStage.setPointerCapture(event.pointerId);
+        event.preventDefault();
+      });
+      el.imageStage.addEventListener("pointermove", event => {
+        if (!state.panning) return;
+        state.panX = state.panStartX + event.clientX - state.pointerStartX;
+        state.panY = state.panStartY + event.clientY - state.pointerStartY;
+        applyZoom();
+      });
+      const stopPanning = event => {
+        if (!state.panning) return;
+        state.panning = false;
+        el.imageStage.classList.remove("panning");
+        if (el.imageStage.hasPointerCapture(event.pointerId)) el.imageStage.releasePointerCapture(event.pointerId);
+      };
+      el.imageStage.addEventListener("pointerup", stopPanning);
+      el.imageStage.addEventListener("pointercancel", stopPanning);
+      el.previewImage.addEventListener("load", applyZoom);
 
       el.previewImage.addEventListener("error", () => {
         if (!el.previewImage.getAttribute("src")) return;
+        el.imageStage.classList.remove("has-image", "panning");
         el.previewImage.style.display = "none";
         el.emptyState.style.display = "block";
         el.emptyState.querySelector("h2").textContent = "这张图片无法预览";
         el.emptyState.querySelector("p").textContent = "图片文件可能损坏，可以用左右方向键跳过；原文件不会被改动。";
         el.statusLine.textContent = "图片解码失败，已保留原文件";
       });
+      el.reviewImage.addEventListener("error", () => {
+        if (!el.reviewImage.getAttribute("src")) return;
+        el.reviewImage.style.display = "none";
+        el.reviewEmpty.style.display = "block";
+        el.reviewEmpty.textContent = "这张图片无法预览，但分类记录仍然保留";
+      });
 
       el.statsModal.addEventListener("click", event => {
         if (event.target === el.statsModal) closeStats();
+      });
+      el.reviewModal.addEventListener("click", event => {
+        if (event.target === el.reviewModal) closeReview();
       });
 
       ["dragenter", "dragover"].forEach(type => {
@@ -1344,6 +1799,13 @@
 
       document.addEventListener("keydown", event => {
         if (state.busy) return;
+        if (el.reviewModal.classList.contains("open")) {
+          if (["Escape", "ArrowLeft", "ArrowRight"].includes(event.key)) event.preventDefault();
+          if (event.key === "Escape") closeReview();
+          else if (event.key === "ArrowLeft") stepReview(-1);
+          else if (event.key === "ArrowRight") stepReview(1);
+          return;
+        }
         if (el.statsModal.classList.contains("open")) {
           if (event.key === "Escape") closeStats();
           return;
@@ -1371,7 +1833,7 @@
         } else if (event.key === "Enter" && !event.repeat) {
           event.preventDefault();
           if (state.menuOpen) classifyAt(state.menuIndex);
-          else showMenu(0);
+          else classifyAt(1);
         } else if (["1", "2", "3"].includes(event.key)) {
           event.preventDefault();
           showMenu(Number(event.key) - 1);
