@@ -533,34 +533,54 @@
     }
 
     .review-modal { z-index: 35; }
-    .review-card { width: min(1260px, 100%); overflow: hidden; }
+    .review-card {
+      width: min(1260px, 100%);
+      height: min(900px, 92vh);
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .review-card .modal-head { position: static; flex: 0 0 auto; }
     .review-heading p { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
 
     .review-filters {
+      flex: 0 0 auto;
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      align-items: center;
       gap: 8px;
+      min-height: 64px;
       padding: 14px 20px;
+      overflow-x: auto;
       border-bottom: 1px solid var(--line);
     }
 
     .filter-btn {
-      min-height: 34px;
+      flex: 0 0 auto;
+      min-height: 36px;
       padding: 0 12px;
       border: 1px solid var(--line);
       background: var(--ink);
       color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
       font-size: 12px;
+      line-height: 1.2;
+      white-space: nowrap;
     }
 
     .filter-btn.active { border-color: var(--teal); background: var(--teal); color: #092126; font-weight: 800; }
+    .filter-btn:disabled { opacity: .45; cursor: not-allowed; }
 
     .review-grid {
-      height: min(68vh, 720px);
+      flex: 1 1 auto;
       display: grid;
       grid-template-columns: minmax(0, 1fr) 390px;
-      min-height: 440px;
+      min-height: 0;
     }
 
     .review-preview {
@@ -571,9 +591,57 @@
       border-right: 1px solid var(--line);
     }
 
-    .review-image-stage { min-height: 0; display: grid; place-items: center; padding: 22px; overflow: hidden; }
-    #reviewImage { display: none; max-width: 100%; max-height: 100%; object-fit: contain; }
+    .review-image-stage {
+      position: relative;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .review-image-stage.has-image { cursor: grab; }
+    .review-image-stage.panning { cursor: grabbing; }
+    #reviewImage {
+      display: none;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      transform-origin: center;
+      will-change: transform;
+    }
+
     .review-empty { color: var(--muted); text-align: center; font-size: 13px; }
+
+    .review-zoom-tools {
+      position: absolute;
+      z-index: 3;
+      top: 14px;
+      right: 14px;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      background: rgb(13 32 40 / 92%);
+    }
+
+    .review-image-stage.has-image .review-zoom-tools { display: flex; }
+    .review-zoom-tools button {
+      min-width: 36px;
+      height: 34px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .review-zoom-tools button:last-child { min-width: 52px; }
+    .review-zoom-tools span { min-width: 48px; color: var(--teal); text-align: center; font-size: 11px; font-weight: 800; }
 
     .review-caption {
       display: grid;
@@ -591,9 +659,17 @@
     .status-badge { padding: 6px 9px; border: 1px solid var(--teal); color: var(--teal); white-space: nowrap; font-size: 12px; font-weight: 800; }
     .status-badge.unclassified { border-color: var(--line); color: var(--muted); }
 
-    .review-side { min-width: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: 14px; gap: 12px; }
-    .review-list { width: 100%; min-height: 0; border: 1px solid var(--line); background: var(--ink-deep); color: var(--text); padding: 6px; font: 12px/1.7 "SFMono-Regular", Consolas, monospace; }
+    .review-side { min-width: 0; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto auto; padding: 14px; gap: 12px; overflow: hidden; }
+    .review-list { width: 100%; min-height: 0; overflow-y: auto; border: 1px solid var(--line); background: var(--ink-deep); color: var(--text); padding: 6px; font: 12px/1.7 "SFMono-Regular", Consolas, monospace; }
     .review-list option { padding: 7px 8px; }
+    .review-correction { padding: 12px; border: 1px solid var(--line); background: #102a33; }
+    .review-correction > strong { display: block; margin-bottom: 9px; font-size: 13px; }
+    .review-class-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+    .review-class-btn { min-height: 38px; padding: 0 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; font-size: 12px; font-weight: 800; }
+    .review-class-btn.current { border-color: var(--teal); background: var(--teal); color: #092126; }
+    .review-class-btn:disabled { cursor: not-allowed; opacity: .48; }
+    .review-path { margin: 9px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; overflow-wrap: anywhere; }
+    .review-path b { color: var(--amber); }
     .review-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 
     .toast {
@@ -657,7 +733,8 @@
       .key-guide { margin-top: 0; padding: 0 0 0 18px; border-top: 0; border-left: 1px solid var(--line); }
       .safety-note { grid-column: 1 / -1; margin-top: 0; }
       #previewImage { max-height: 50vh; }
-      .review-grid { grid-template-columns: 1fr; height: auto; max-height: 72vh; overflow: auto; }
+      .review-card { height: 94vh; max-height: 94vh; }
+      .review-grid { grid-template-columns: 1fr; grid-template-rows: minmax(330px, 1fr) minmax(330px, auto); overflow-y: auto; }
       .review-preview { min-height: 390px; border-right: 0; border-bottom: 1px solid var(--line); }
       .review-side { min-height: 280px; }
     }
@@ -767,7 +844,7 @@
         </div>
 
         <div class="safety-note">
-          <b>安全移动：</b>浏览器不支持直接移动时，会先流式复制、核对文件大小，成功后才删除原图。
+          <b>真实文件归档：</b>分类会在各相机的 ng 目录直接创建“真 / 假 / 疑似”文件夹并移动原图；审核时改判也会同步移动硬盘文件，可直接用于后续 AI 训练。
         </div>
       </aside>
     </section>
@@ -818,7 +895,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>相机</th><th>类型</th><th>总数</th><th>真</th><th>真占比</th><th>假</th><th>假占比</th><th>疑似</th><th>疑似占比</th><th>未分类</th><th>完成率</th><th>逐张复核</th></tr>
+            <tr><th>相机</th><th>类型</th><th>总数</th><th>真</th><th>真占比</th><th>假</th><th>假占比</th><th>疑似</th><th>疑似占比</th><th>未分类</th><th>完成率</th><th>图片审核</th></tr>
           </thead>
           <tbody id="statsBody"></tbody>
           <tfoot id="statsFoot"></tfoot>
@@ -831,8 +908,8 @@
     <div class="modal-card review-card">
       <div class="modal-head">
         <div class="review-heading">
-          <h2 id="reviewTitle">分类明细复核</h2>
-          <p id="reviewSubtitle">按文件名自然顺序固定原图序号</p>
+          <h2 id="reviewTitle">分类图片审核</h2>
+          <p id="reviewSubtitle">修改判定会同步移动硬盘中的真实图片</p>
         </div>
         <div class="modal-actions">
           <button class="btn" id="closeReview">返回统计</button>
@@ -841,9 +918,15 @@
       <div class="review-filters" id="reviewFilters"></div>
       <div class="review-grid">
         <div class="review-preview">
-          <div class="review-image-stage">
+          <div class="review-image-stage" id="reviewImageStage">
             <img id="reviewImage" alt="分类明细图片">
             <div class="review-empty" id="reviewEmpty">请选择一条分类明细</div>
+            <div class="review-zoom-tools" id="reviewZoomTools">
+              <button id="reviewZoomOut" title="缩小图片">−</button>
+              <span id="reviewZoomValue">100%</span>
+              <button id="reviewZoomIn" title="放大图片">＋</button>
+              <button id="reviewZoomReset" title="恢复原始大小">复位</button>
+            </div>
           </div>
           <div class="review-caption">
             <strong id="reviewPosition">—</strong>
@@ -852,7 +935,16 @@
           </div>
         </div>
         <aside class="review-side">
-          <select class="review-list" id="reviewList" size="16" aria-label="图片分类明细"></select>
+          <select class="review-list" id="reviewList" size="16" aria-label="已分类图片"></select>
+          <div class="review-correction">
+            <strong>发现误判，直接调整</strong>
+            <div class="review-class-actions" id="reviewClassActions">
+              <button class="review-class-btn" data-index="0">真</button>
+              <button class="review-class-btn" data-index="1">假</button>
+              <button class="review-class-btn" data-index="2">疑似</button>
+            </div>
+            <p class="review-path" id="reviewPath">修改后会同步移动硬盘中的真实图片。</p>
+          </div>
           <div class="review-nav">
             <button class="btn" id="reviewPrev">上一张</button>
             <button class="btn" id="reviewNext">下一张</button>
@@ -900,7 +992,15 @@
         reviewIndex: 0,
         reviewFilter: "全部",
         reviewUrl: null,
-        reviewToken: 0
+        reviewToken: 0,
+        reviewZoom: 1,
+        reviewPanX: 0,
+        reviewPanY: 0,
+        reviewPanning: false,
+        reviewPointerStartX: 0,
+        reviewPointerStartY: 0,
+        reviewPanStartX: 0,
+        reviewPanStartY: 0
       };
 
       const el = {
@@ -941,12 +1041,19 @@
         reviewTitle: document.querySelector("#reviewTitle"),
         reviewSubtitle: document.querySelector("#reviewSubtitle"),
         reviewFilters: document.querySelector("#reviewFilters"),
+        reviewImageStage: document.querySelector("#reviewImageStage"),
         reviewImage: document.querySelector("#reviewImage"),
+        reviewZoomOut: document.querySelector("#reviewZoomOut"),
+        reviewZoomIn: document.querySelector("#reviewZoomIn"),
+        reviewZoomReset: document.querySelector("#reviewZoomReset"),
+        reviewZoomValue: document.querySelector("#reviewZoomValue"),
         reviewEmpty: document.querySelector("#reviewEmpty"),
         reviewPosition: document.querySelector("#reviewPosition"),
         reviewName: document.querySelector("#reviewName"),
         reviewStatus: document.querySelector("#reviewStatus"),
         reviewList: document.querySelector("#reviewList"),
+        reviewClassButtons: [...document.querySelectorAll(".review-class-btn")],
+        reviewPath: document.querySelector("#reviewPath"),
         reviewPrev: document.querySelector("#reviewPrev"),
         reviewNext: document.querySelector("#reviewNext"),
         closeReview: document.querySelector("#closeReview"),
@@ -987,6 +1094,20 @@
         el.undoBtn.disabled = busy || !state.history.length;
         el.chooseAgain.disabled = busy;
         el.statsBtn.disabled = busy || !state.rootHandle;
+        el.closeReview.disabled = busy;
+        el.reviewZoomOut.disabled = busy;
+        el.reviewZoomIn.disabled = busy;
+        el.reviewZoomReset.disabled = busy;
+        el.reviewList.disabled = busy;
+        [...el.reviewFilters.querySelectorAll(".filter-btn")].forEach(button => { button.disabled = busy; });
+        if (busy) {
+          el.reviewPrev.disabled = true;
+          el.reviewNext.disabled = true;
+        } else if (state.reviewRow) {
+          el.reviewPrev.disabled = state.reviewIndex <= 0;
+          el.reviewNext.disabled = state.reviewIndex >= state.reviewEntries.length - 1;
+        }
+        if (state.reviewRow) updateReviewClassActions(state.reviewEntries[state.reviewIndex]);
       }
 
       function clampPan() {
@@ -1169,6 +1290,7 @@
                   categoryCode: code,
                   categoryName: config.name,
                   labels: config.labels,
+                  ngHandle,
                   counts,
                   unclassified: sourceFiles.length,
                   details
@@ -1459,13 +1581,16 @@
         el.statsBody.innerHTML = rows.map((row, rowIndex) => {
           const total = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
           const completed = total - row.unclassified;
+          const reviewAction = total > 0 && row.unclassified === 0
+            ? `<button class="detail-btn" data-row-index="${rowIndex}">审核图片</button>`
+            : "—";
           return `<tr>
             <td>${escapeHtml(row.cameraName)}</td><td>${row.categoryName}</td><td>${total}</td>
             <td>${row.counts[0]}</td><td>${percentage(row.counts[0], total)}</td>
             <td>${row.counts[1]}</td><td>${percentage(row.counts[1], total)}</td>
             <td>${row.counts[2]}</td><td>${percentage(row.counts[2], total)}</td>
             <td>${row.unclassified}</td><td>${percentage(completed, total)}</td>
-            <td><button class="detail-btn" data-row-index="${rowIndex}">查看第几张</button></td>
+            <td>${reviewAction}</td>
           </tr>`;
         }).join("");
         [...el.statsBody.querySelectorAll(".detail-btn")].forEach(button => {
@@ -1489,8 +1614,45 @@
         el.statsModal.setAttribute("aria-hidden", "true");
       }
 
+      function clampReviewPan() {
+        if (state.reviewZoom <= 1 || !el.reviewImage.offsetWidth) {
+          state.reviewPanX = 0;
+          state.reviewPanY = 0;
+          return;
+        }
+        const availableWidth = Math.max(1, el.reviewImageStage.clientWidth - 44);
+        const availableHeight = Math.max(1, el.reviewImageStage.clientHeight - 44);
+        const maxX = Math.max(0, (el.reviewImage.offsetWidth * state.reviewZoom - availableWidth) / 2);
+        const maxY = Math.max(0, (el.reviewImage.offsetHeight * state.reviewZoom - availableHeight) / 2);
+        state.reviewPanX = Math.max(-maxX, Math.min(maxX, state.reviewPanX));
+        state.reviewPanY = Math.max(-maxY, Math.min(maxY, state.reviewPanY));
+      }
+
+      function applyReviewZoom() {
+        clampReviewPan();
+        el.reviewImage.style.transform = `translate(${state.reviewPanX}px, ${state.reviewPanY}px) scale(${state.reviewZoom})`;
+        el.reviewZoomValue.textContent = `${Math.round(state.reviewZoom * 100)}%`;
+      }
+
+      function resetReviewZoom() {
+        state.reviewZoom = 1;
+        state.reviewPanX = 0;
+        state.reviewPanY = 0;
+        state.reviewPanning = false;
+        el.reviewImageStage.classList.remove("panning");
+        applyReviewZoom();
+      }
+
+      function changeReviewZoom(multiplier) {
+        state.reviewZoom = Math.max(1, Math.min(8, state.reviewZoom * multiplier));
+        if (state.reviewZoom < 1.01) resetReviewZoom();
+        else applyReviewZoom();
+      }
+
       function releaseReviewPreview() {
         state.reviewToken += 1;
+        resetReviewZoom();
+        el.reviewImageStage.classList.remove("has-image");
         el.reviewImage.removeAttribute("src");
         el.reviewImage.style.display = "none";
         if (state.reviewUrl) {
@@ -1500,7 +1662,7 @@
       }
 
       function reviewFilterOptions(row) {
-        return ["全部", ...row.labels, "未分类"];
+        return ["全部", ...row.labels];
       }
 
       function reviewEntriesForFilter(row, filter) {
@@ -1511,7 +1673,7 @@
         const row = state.reviewRow;
         el.reviewFilters.innerHTML = reviewFilterOptions(row).map(filter => {
           const count = reviewEntriesForFilter(row, filter).length;
-          return `<button class="filter-btn${filter === state.reviewFilter ? " active" : ""}" data-filter="${escapeHtml(filter)}">${escapeHtml(filter)} ${count}</button>`;
+          return `<button class="filter-btn${filter === state.reviewFilter ? " active" : ""}" data-filter="${escapeHtml(filter)}"${state.busy ? " disabled" : ""}>${escapeHtml(filter)}（${count}）</button>`;
         }).join("");
         [...el.reviewFilters.querySelectorAll(".filter-btn")].forEach(button => {
           button.addEventListener("click", () => {
@@ -1522,11 +1684,24 @@
         });
       }
 
+      function updateReviewClassActions(detail) {
+        const row = state.reviewRow;
+        el.reviewClassButtons.forEach((button, index) => {
+          const label = row?.labels[index] || ["真", "假", "疑似"][index];
+          const current = detail?.status === label;
+          button.textContent = label;
+          button.classList.toggle("current", current);
+          button.disabled = state.busy || !detail || current;
+        });
+        el.reviewPath.innerHTML = detail && row
+          ? `硬盘文件：<b>${escapeHtml(row.cameraName)}/ng/${escapeHtml(detail.status)}/</b>${escapeHtml(detail.currentName)}<br>点击上方分类会直接移动这个真实文件，可用于后续 AI 训练。`
+          : "修改后会同步移动硬盘中的真实图片。";
+      }
+
       async function renderReviewImage() {
         releaseReviewPreview();
         const token = state.reviewToken;
         const detail = state.reviewEntries[state.reviewIndex];
-        const total = state.reviewRow?.details.length || 0;
         if (!detail) {
           el.reviewEmpty.style.display = "block";
           el.reviewEmpty.textContent = "这个分类下没有图片";
@@ -1536,17 +1711,19 @@
           el.reviewStatus.classList.add("unclassified");
           el.reviewPrev.disabled = true;
           el.reviewNext.disabled = true;
+          updateReviewClassActions(null);
           return;
         }
 
-        el.reviewPosition.textContent = `第 ${detail.originalIndex} 张 / 共 ${total} 张`;
-        el.reviewName.textContent = detail.originalName;
-        el.reviewName.title = detail.originalName;
+        el.reviewPosition.textContent = `审核进度 ${state.reviewIndex + 1} / ${state.reviewEntries.length}`;
+        el.reviewName.textContent = detail.currentName;
+        el.reviewName.title = detail.currentName;
         el.reviewStatus.textContent = detail.status;
         el.reviewStatus.classList.toggle("unclassified", detail.status === "未分类");
+        updateReviewClassActions(detail);
         el.reviewList.value = String(state.reviewIndex);
-        el.reviewPrev.disabled = state.reviewIndex <= 0;
-        el.reviewNext.disabled = state.reviewIndex >= state.reviewEntries.length - 1;
+        el.reviewPrev.disabled = state.busy || state.reviewIndex <= 0;
+        el.reviewNext.disabled = state.busy || state.reviewIndex >= state.reviewEntries.length - 1;
         el.reviewEmpty.style.display = "block";
         el.reviewEmpty.textContent = "正在读取本地图片…";
 
@@ -1556,6 +1733,8 @@
           state.reviewUrl = URL.createObjectURL(file);
           el.reviewImage.src = state.reviewUrl;
           el.reviewImage.style.display = "block";
+          el.reviewImageStage.classList.add("has-image");
+          resetReviewZoom();
           el.reviewEmpty.style.display = "none";
         } catch (error) {
           if (token !== state.reviewToken) return;
@@ -1563,24 +1742,32 @@
         }
       }
 
-      function refreshReview() {
+      function refreshReview(preferredDetail = null) {
         const row = state.reviewRow;
         if (!row) return;
+        const selectedDetail = preferredDetail || state.reviewEntries[state.reviewIndex];
         state.reviewEntries = reviewEntriesForFilter(row, state.reviewFilter);
-        state.reviewIndex = Math.max(0, Math.min(state.reviewIndex, state.reviewEntries.length - 1));
+        const selectedIndex = selectedDetail ? state.reviewEntries.indexOf(selectedDetail) : -1;
+        state.reviewIndex = selectedIndex >= 0
+          ? selectedIndex
+          : Math.max(0, Math.min(state.reviewIndex, state.reviewEntries.length - 1));
         renderReviewFilters();
         el.reviewList.innerHTML = state.reviewEntries.map((detail, index) =>
-          `<option value="${index}">第 ${detail.originalIndex} 张 · ${escapeHtml(detail.originalName)} · ${escapeHtml(detail.status)}</option>`
+          `<option value="${index}">${escapeHtml(detail.currentName)} · ${escapeHtml(detail.status)}</option>`
         ).join("");
         renderReviewImage();
       }
 
       function openReview(row) {
+        if (row.unclassified > 0) {
+          showToast("请先完成这一项的全部分类，再进入审核", true);
+          return;
+        }
         state.reviewRow = row;
         state.reviewFilter = "全部";
         state.reviewIndex = 0;
-        el.reviewTitle.textContent = `${row.cameraName} · ${row.categoryName}分类明细`;
-        el.reviewSubtitle.textContent = `本组共 ${row.details.length} 张，按文件名自然顺序固定原图序号；移动到分类文件夹后序号不变`;
+        el.reviewTitle.textContent = `${row.cameraName} · ${row.categoryName}图片审核`;
+        el.reviewSubtitle.textContent = `已全部分类，共 ${row.details.length} 张；修改判定会同步移动硬盘中的真实图片`;
         el.reviewModal.classList.add("open");
         el.reviewModal.setAttribute("aria-hidden", "false");
         refreshReview();
@@ -1598,6 +1785,46 @@
         if (!state.reviewEntries.length) return;
         state.reviewIndex = Math.max(0, Math.min(state.reviewEntries.length - 1, state.reviewIndex + direction));
         renderReviewImage();
+      }
+
+      async function reclassifyReview(labelIndex) {
+        const row = state.reviewRow;
+        const detail = state.reviewEntries[state.reviewIndex];
+        if (!row || !detail || state.busy) return;
+        const oldLabelIndex = row.labels.indexOf(detail.status);
+        const targetLabel = row.labels[labelIndex];
+        if (oldLabelIndex < 0 || detail.status === targetLabel) return;
+
+        const oldLabel = detail.status;
+        releaseReviewPreview();
+        setBusy(true, `正在把“${oldLabel}”调整为“${targetLabel}”…`);
+        try {
+          const targetDirectory = await row.ngHandle.getDirectoryHandle(targetLabel, { create: true });
+          const moved = await safeMove(
+            detail.fileHandle,
+            detail.directoryHandle,
+            detail.currentName,
+            targetDirectory,
+            detail.currentName
+          );
+          row.counts[oldLabelIndex] -= 1;
+          row.counts[labelIndex] += 1;
+          detail.status = targetLabel;
+          detail.currentName = moved.destinationName;
+          detail.fileHandle = moved.destinationHandle;
+          detail.directoryHandle = targetDirectory;
+          state.reviewFilter = "全部";
+          openStats();
+          refreshReview(detail);
+          showToast(`已从“${oldLabel}”改为“${targetLabel}”，硬盘图片已同步移动`);
+        } catch (error) {
+          console.error(error);
+          showToast(`调整失败，原图未删除：${friendlyError(error)}`, true);
+          renderReviewImage();
+        } finally {
+          setBusy(false);
+          updateReviewClassActions(state.reviewEntries[state.reviewIndex]);
+        }
       }
 
       function csvCell(value) {
@@ -1695,6 +1922,59 @@
         state.reviewIndex = Number(el.reviewList.value) || 0;
         renderReviewImage();
       });
+      el.reviewClassButtons.forEach(button => {
+        button.addEventListener("click", () => reclassifyReview(Number(button.dataset.index)));
+      });
+      el.reviewZoomOut.addEventListener("click", () => changeReviewZoom(0.8));
+      el.reviewZoomIn.addEventListener("click", () => changeReviewZoom(1.25));
+      el.reviewZoomReset.addEventListener("click", resetReviewZoom);
+      el.reviewImageStage.addEventListener("dblclick", event => {
+        if (event.target.closest("button")) return;
+        resetReviewZoom();
+      });
+      el.reviewImageStage.addEventListener("wheel", event => {
+        if (!el.reviewImageStage.classList.contains("has-image")) return;
+        event.preventDefault();
+        const bounds = el.reviewImageStage.getBoundingClientRect();
+        const pointerX = event.clientX - bounds.left - bounds.width / 2;
+        const pointerY = event.clientY - bounds.top - bounds.height / 2;
+        const oldZoom = state.reviewZoom;
+        const nextZoom = Math.max(1, Math.min(8, oldZoom * Math.exp(-event.deltaY * 0.0015)));
+        if (nextZoom === oldZoom) return;
+        const imageX = (pointerX - state.reviewPanX) / oldZoom;
+        const imageY = (pointerY - state.reviewPanY) / oldZoom;
+        state.reviewZoom = nextZoom;
+        state.reviewPanX = pointerX - imageX * nextZoom;
+        state.reviewPanY = pointerY - imageY * nextZoom;
+        if (state.reviewZoom < 1.01) resetReviewZoom();
+        else applyReviewZoom();
+      }, { passive: false });
+      el.reviewImageStage.addEventListener("pointerdown", event => {
+        if (event.button !== 0 || state.reviewZoom <= 1 || event.target.closest("button")) return;
+        state.reviewPanning = true;
+        state.reviewPointerStartX = event.clientX;
+        state.reviewPointerStartY = event.clientY;
+        state.reviewPanStartX = state.reviewPanX;
+        state.reviewPanStartY = state.reviewPanY;
+        el.reviewImageStage.classList.add("panning");
+        el.reviewImageStage.setPointerCapture(event.pointerId);
+        event.preventDefault();
+      });
+      el.reviewImageStage.addEventListener("pointermove", event => {
+        if (!state.reviewPanning) return;
+        state.reviewPanX = state.reviewPanStartX + event.clientX - state.reviewPointerStartX;
+        state.reviewPanY = state.reviewPanStartY + event.clientY - state.reviewPointerStartY;
+        applyReviewZoom();
+      });
+      const stopReviewPanning = event => {
+        if (!state.reviewPanning) return;
+        state.reviewPanning = false;
+        el.reviewImageStage.classList.remove("panning");
+        if (el.reviewImageStage.hasPointerCapture(event.pointerId)) el.reviewImageStage.releasePointerCapture(event.pointerId);
+      };
+      el.reviewImageStage.addEventListener("pointerup", stopReviewPanning);
+      el.reviewImageStage.addEventListener("pointercancel", stopReviewPanning);
+      el.reviewImage.addEventListener("load", applyReviewZoom);
       el.classButtons.forEach(button => button.addEventListener("click", () => classifyAt(Number(button.dataset.index))));
 
       el.resetZoom.addEventListener("click", event => {
@@ -1760,6 +2040,7 @@
       });
       el.reviewImage.addEventListener("error", () => {
         if (!el.reviewImage.getAttribute("src")) return;
+        el.reviewImageStage.classList.remove("has-image", "panning");
         el.reviewImage.style.display = "none";
         el.reviewEmpty.style.display = "block";
         el.reviewEmpty.textContent = "这张图片无法预览，但分类记录仍然保留";
