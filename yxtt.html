@@ -516,6 +516,17 @@
     .modal-actions { display: flex; gap: 9px; }
     .table-wrap { padding: 0 20px 22px; overflow-x: auto; }
 
+    .stats-card {
+      height: min(900px, 86vh);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .stats-card .modal-head { position: static; flex: 0 0 auto; }
+    .stats-card .table-wrap { flex: 1 1 auto; min-height: 0; overflow: auto; }
+    .stats-card th { top: 0; }
+
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
     th, td { padding: 11px 9px; border-bottom: 1px solid var(--line); text-align: center; white-space: nowrap; }
     th { position: sticky; top: 83px; background: #1a3d47; color: var(--teal); }
@@ -884,7 +895,7 @@
   </section>
 
   <section class="modal" id="statsModal" aria-hidden="true">
-    <div class="modal-card">
+    <div class="modal-card stats-card">
       <div class="modal-head">
         <h2>本批图片分类统计</h2>
         <div class="modal-actions">
