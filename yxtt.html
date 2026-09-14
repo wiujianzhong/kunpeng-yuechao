@@ -768,6 +768,7 @@
       let toastTimer = 0;
 
       function isImage(name) {
+        if (!name || name.startsWith(".")) return false;
         const dot = name.lastIndexOf(".");
         return dot > -1 && IMAGE_EXTENSIONS.has(name.slice(dot + 1).toLowerCase());
       }
@@ -1302,6 +1303,15 @@
       el.closeStats.addEventListener("click", closeStats);
       el.downloadStats.addEventListener("click", downloadStatistics);
       el.classButtons.forEach(button => button.addEventListener("click", () => classifyAt(Number(button.dataset.index))));
+
+      el.previewImage.addEventListener("error", () => {
+        if (!el.previewImage.getAttribute("src")) return;
+        el.previewImage.style.display = "none";
+        el.emptyState.style.display = "block";
+        el.emptyState.querySelector("h2").textContent = "这张图片无法预览";
+        el.emptyState.querySelector("p").textContent = "图片文件可能损坏，可以用左右方向键跳过；原文件不会被改动。";
+        el.statusLine.textContent = "图片解码失败，已保留原文件";
+      });
 
       el.statsModal.addEventListener("click", event => {
         if (event.target === el.statsModal) closeStats();
