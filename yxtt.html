@@ -1136,7 +1136,7 @@
         el.categorySwitchName.textContent = CONFIG[categoryCode].name;
         el.categorySwitch.classList.remove("show");
         requestAnimationFrame(() => el.categorySwitch.classList.add("show"));
-        categorySwitchTimer = window.setTimeout(() => el.categorySwitch.classList.remove("show"), 1300);
+        categorySwitchTimer = window.setTimeout(() => el.categorySwitch.classList.remove("show"), 3000);
       }
 
       function setBusy(busy, message = "正在安全移动图片…") {
@@ -1918,7 +1918,7 @@
         };
       }
 
-      function downloadStatistics() {
+      function buildStatisticsWorkbook() {
         const rows = statRows();
         const total = totals();
         const completed = total.total - total.unclassified;
@@ -1995,12 +1995,21 @@
 </Workbook>`;
 
         const blob = new Blob(["\ufeff", xml], { type: "application/vnd.ms-excel;charset=utf-8" });
+        return { blob, filename: `异纤挑图统计_${stamp}.xls` };
+      }
+
+      function downloadBlob(blob, filename) {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `异纤挑图统计_${stamp}.xls`;
+        link.download = filename;
         link.click();
         window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function downloadStatistics() {
+        const workbook = buildStatisticsWorkbook();
+        downloadBlob(workbook.blob, workbook.filename);
         showToast("Excel 表格已下载，包含总体分类汇总");
       }
 
@@ -2029,13 +2038,12 @@
         }
 
         const now = new Date();
-        const { date: dateLabel, stamp } = localDateParts(now);
+        const { stamp } = localDateParts(now);
         const zip = new JSZip();
         for (const config of Object.values(CONFIG)) {
           for (const label of config.labels) zip.folder(label);
         }
 
-        const manifest = [["分类", "相机", "类型", "原图序号", "原始文件名", "压缩包文件名"]];
         setBusy(true, `正在准备训练包（0 / ${records.length}）…`);
         try {
           for (let index = 0; index < records.length; index += 1) {
@@ -2043,40 +2051,19 @@
             const file = await detail.fileHandle.getFile();
             const archiveName = `${detail.status}/${archivePart(row.cameraName)}_${archivePart(detail.currentName || detail.originalName)}`;
             zip.file(archiveName, file);
-            manifest.push([
-              detail.status,
-              row.cameraName,
-              row.categoryName,
-              detail.originalIndex,
-              detail.originalName,
-              archiveName
-            ]);
             if (index % 20 === 0 || index === records.length - 1) {
               el.busyText.textContent = `正在读取训练图片（${index + 1} / ${records.length}）…`;
               await new Promise(resolve => requestAnimationFrame(resolve));
             }
           }
 
-          const csv = manifest.map(row => row.map(value => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\r\n");
-          const notes = [
-            "异纤图片训练包",
-            `生成日期：${dateLabel}`,
-            `已分类图片：${records.length} 张`,
-            "目录规则：每个分类文件夹内汇总所有相机图片；文件名前缀保留相机名，避免重名。",
-            "本压缩包只包含已经判定为真、假、疑似的图片，未分类图片不会加入。"
-          ].join("\r\n");
-          zip.file("分类清单.csv", "\ufeff" + csv);
-          zip.file("说明.txt", notes);
+          const workbook = buildStatisticsWorkbook();
+          zip.file(workbook.filename, workbook.blob);
           const blob = await zip.generateAsync(
             { type: "blob", compression: "STORE", streamFiles: true },
             metadata => { el.busyText.textContent = `正在生成 ZIP（${Math.round(metadata.percent)}%）…`; }
           );
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = `异纤模型训练包_${stamp}.zip`;
-          link.click();
-          window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+          downloadBlob(blob, `异纤模型训练包_${stamp}.zip`);
           showToast(`训练 ZIP 已生成，共 ${records.length.toLocaleString("zh-CN")} 张已分类图片`);
         } catch (error) {
           console.error(error);
