@@ -703,6 +703,30 @@
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
     .toast.error { background: #ffe9e7; color: #752d29; border-color: var(--danger); }
 
+    .category-switch {
+      position: fixed;
+      z-index: 45;
+      top: 22%;
+      left: 50%;
+      min-width: min(360px, calc(100% - 32px));
+      padding: 18px 30px 20px;
+      border: 2px solid var(--amber);
+      background: rgb(8 29 36 / 94%);
+      box-shadow: 0 20px 70px rgb(0 0 0 / 52%);
+      color: var(--amber);
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -18px) scale(.94);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .category-switch.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    .category-switch[data-code="1"] { border-color: var(--teal); color: var(--teal-light); }
+    .category-switch[data-code="2"] { border-color: #dbe5e3; color: #f4f7f3; }
+    .category-switch span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .18em; }
+    .category-switch strong { display: block; font-size: clamp(30px, 4vw, 48px); line-height: 1.1; letter-spacing: .12em; }
+
     .busy-layer {
       position: absolute;
       z-index: 12;
@@ -963,6 +987,10 @@
   </section>
 
   <div class="toast" id="toast" role="status"></div>
+  <div class="category-switch" id="categorySwitch" aria-live="polite">
+    <span id="categorySwitchText">分类已切换</span>
+    <strong id="categorySwitchName">地膜</strong>
+  </div>
 
   <script src="vendor/jszip.min.js"></script>
   <script>
@@ -1009,7 +1037,8 @@
         reviewPointerStartX: 0,
         reviewPointerStartY: 0,
         reviewPanStartX: 0,
-        reviewPanStartY: 0
+        reviewPanStartY: 0,
+        displayedCategoryCode: null
       };
 
       const el = {
@@ -1067,10 +1096,14 @@
         reviewPrev: document.querySelector("#reviewPrev"),
         reviewNext: document.querySelector("#reviewNext"),
         closeReview: document.querySelector("#closeReview"),
-        toast: document.querySelector("#toast")
+        toast: document.querySelector("#toast"),
+        categorySwitch: document.querySelector("#categorySwitch"),
+        categorySwitchText: document.querySelector("#categorySwitchText"),
+        categorySwitchName: document.querySelector("#categorySwitchName")
       };
 
       let toastTimer = 0;
+      let categorySwitchTimer = 0;
 
       function isImage(name) {
         if (!name || name.startsWith(".")) return false;
@@ -1094,6 +1127,16 @@
         el.toast.classList.toggle("error", isError);
         el.toast.classList.add("show");
         toastTimer = window.setTimeout(() => el.toast.classList.remove("show"), 2600);
+      }
+
+      function showCategorySwitch(categoryCode, initial = false) {
+        window.clearTimeout(categorySwitchTimer);
+        el.categorySwitch.dataset.code = categoryCode;
+        el.categorySwitchText.textContent = initial ? "当前分类" : "分类已切换";
+        el.categorySwitchName.textContent = CONFIG[categoryCode].name;
+        el.categorySwitch.classList.remove("show");
+        requestAnimationFrame(() => el.categorySwitch.classList.add("show"));
+        categorySwitchTimer = window.setTimeout(() => el.categorySwitch.classList.remove("show"), 1300);
       }
 
       function setBusy(busy, message = "正在安全移动图片…") {
@@ -1226,6 +1269,7 @@
           state.index = 0;
           state.history = [];
           state.stats = new Map();
+          state.displayedCategoryCode = null;
           releasePreview();
           showScanProgress("正在读取相机目录…", 3);
 
@@ -1396,6 +1440,11 @@
         }
 
         el.emptyState.style.display = "none";
+        if (state.displayedCategoryCode !== item.categoryCode) {
+          const initial = state.displayedCategoryCode === null;
+          state.displayedCategoryCode = item.categoryCode;
+          showCategorySwitch(item.categoryCode, initial);
+        }
         const row = state.stats.get(statKey(item.cameraName, item.categoryCode));
         el.filenameBar.textContent = `本组原图第 ${item.detail.originalIndex} 张 · ${item.detail.originalName}`;
         el.statusLine.textContent = `本组第 ${item.detail.originalIndex} / ${row.details.length} 张 · 当前待分类 ${state.items.length.toLocaleString("zh-CN")} 张`;
