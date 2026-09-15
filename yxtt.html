@@ -105,7 +105,7 @@
       white-space: nowrap;
     }
 
-    .top-actions { display: flex; gap: 10px; }
+    .top-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
 
     .btn {
       border: 1px solid var(--line);
@@ -788,6 +788,7 @@
         <button class="btn" id="chooseAgain">选择文件夹</button>
         <button class="btn" id="undoBtn" disabled>撤销上一次</button>
         <button class="btn primary" id="statsBtn" disabled>分类统计</button>
+        <button class="btn" id="trainingZipBtn" disabled>生成训练 ZIP</button>
       </div>
     </header>
 
@@ -963,6 +964,7 @@
 
   <div class="toast" id="toast" role="status"></div>
 
+  <script src="vendor/jszip.min.js"></script>
   <script>
     (() => {
       "use strict";
@@ -1021,6 +1023,7 @@
         chooseAgain: document.querySelector("#chooseAgain"),
         undoBtn: document.querySelector("#undoBtn"),
         statsBtn: document.querySelector("#statsBtn"),
+        trainingZipBtn: document.querySelector("#trainingZipBtn"),
         rootName: document.querySelector("#rootName"),
         cameraMetric: document.querySelector("#cameraMetric"),
         typeMetric: document.querySelector("#typeMetric"),
@@ -1101,6 +1104,7 @@
         el.undoBtn.disabled = busy || !state.history.length;
         el.chooseAgain.disabled = busy;
         el.statsBtn.disabled = busy || !state.rootHandle;
+        el.trainingZipBtn.disabled = busy || !state.rootHandle;
         el.closeReview.disabled = busy;
         el.reviewZoomOut.disabled = busy;
         el.reviewZoomIn.disabled = busy;
@@ -1311,6 +1315,7 @@
           el.welcome.classList.add("hidden");
           resetScanProgress();
           el.statsBtn.disabled = false;
+          el.trainingZipBtn.disabled = false;
           updateMetrics();
           await renderCurrent();
           showToast(`扫描完成：${state.items.length} 张待分类图片`);
@@ -1955,6 +1960,88 @@
         showToast("Excel 表格已下载，包含总体汇总和图片明细");
       }
 
+      function archivePart(value) {
+        return String(value).replace(/[<>:"/\\|?*]/g, "_").replace(/\.\.+/g, "_") || "未命名";
+      }
+
+      async function downloadTrainingZip() {
+        if (!state.rootHandle || state.busy) return;
+        if (typeof JSZip === "undefined") {
+          showToast("训练打包组件未加载，请刷新页面后重试", true);
+          return;
+        }
+
+        const rows = statRows();
+        const records = [];
+        for (const row of rows) {
+          for (const detail of row.details) {
+            if (detail.status === "未分类") continue;
+            records.push({ row, detail });
+          }
+        }
+        if (!records.length) {
+          showToast("还没有已分类图片，完成分类后再生成训练 ZIP", true);
+          return;
+        }
+
+        const now = new Date();
+        const { date: dateLabel, stamp } = localDateParts(now);
+        const zip = new JSZip();
+        for (const config of Object.values(CONFIG)) {
+          for (const label of config.labels) zip.folder(label);
+        }
+
+        const manifest = [["分类", "相机", "类型", "原图序号", "原始文件名", "压缩包文件名"]];
+        setBusy(true, `正在准备训练包（0 / ${records.length}）…`);
+        try {
+          for (let index = 0; index < records.length; index += 1) {
+            const { row, detail } = records[index];
+            const file = await detail.fileHandle.getFile();
+            const archiveName = `${detail.status}/${archivePart(row.cameraName)}_${archivePart(detail.currentName || detail.originalName)}`;
+            zip.file(archiveName, file);
+            manifest.push([
+              detail.status,
+              row.cameraName,
+              row.categoryName,
+              detail.originalIndex,
+              detail.originalName,
+              archiveName
+            ]);
+            if (index % 20 === 0 || index === records.length - 1) {
+              el.busyText.textContent = `正在读取训练图片（${index + 1} / ${records.length}）…`;
+              await new Promise(resolve => requestAnimationFrame(resolve));
+            }
+          }
+
+          const csv = manifest.map(row => row.map(value => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\r\n");
+          const notes = [
+            "异纤图片训练包",
+            `生成日期：${dateLabel}`,
+            `已分类图片：${records.length} 张`,
+            "目录规则：每个分类文件夹内汇总所有相机图片；文件名前缀保留相机名，避免重名。",
+            "本压缩包只包含已经判定为真、假、疑似的图片，未分类图片不会加入。"
+          ].join("\r\n");
+          zip.file("分类清单.csv", "\ufeff" + csv);
+          zip.file("说明.txt", notes);
+          const blob = await zip.generateAsync(
+            { type: "blob", compression: "STORE", streamFiles: true },
+            metadata => { el.busyText.textContent = `正在生成 ZIP（${Math.round(metadata.percent)}%）…`; }
+          );
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `异纤模型训练包_${stamp}.zip`;
+          link.click();
+          window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+          showToast(`训练 ZIP 已生成，共 ${records.length.toLocaleString("zh-CN")} 张已分类图片`);
+        } catch (error) {
+          console.error(error);
+          showToast(`训练 ZIP 生成失败：${friendlyError(error)}`, true);
+        } finally {
+          setBusy(false);
+        }
+      }
+
       function escapeHtml(value) {
         return String(value).replace(/[&<>'"]/g, character => ({
           "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
@@ -1989,6 +2076,7 @@
       el.statsBtn.addEventListener("click", openStats);
       el.closeStats.addEventListener("click", closeStats);
       el.downloadStats.addEventListener("click", downloadStatistics);
+      el.trainingZipBtn.addEventListener("click", downloadTrainingZip);
       el.closeReview.addEventListener("click", closeReview);
       el.reviewPrev.addEventListener("click", () => stepReview(-1));
       el.reviewNext.addEventListener("click", () => stepReview(1));
