@@ -1873,66 +1873,60 @@
         const rows = statRows();
         const total = totals();
         const completed = total.total - total.unclassified;
-        const categoryTotals = { "地膜": 0, "彩色": 0, "黑色": 0 };
-        for (const row of rows) categoryTotals[row.categoryName] = (categoryTotals[row.categoryName] || 0) + row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
-
         const now = new Date();
         const { date: dateLabel, stamp } = localDateParts(now);
-        const analysisHeaders = ["相机", "类型", "总图片数", "真数量", "真占比", "假数量", "假占比", "疑似数量", "疑似占比", "未分类", "完成率"];
-        const summaryRows = [
-          ["总图片数", total.total, 1],
-          ["地膜总数", categoryTotals["地膜"], total.total ? categoryTotals["地膜"] / total.total : 0],
-          ["彩色总数", categoryTotals["彩色"], total.total ? categoryTotals["彩色"] / total.total : 0],
-          ["黑色总数", categoryTotals["黑色"], total.total ? categoryTotals["黑色"] / total.total : 0],
-          ["真数量", total.truth, total.truth / (total.total || 1)],
-          ["假数量", total.falsehood, total.falsehood / (total.total || 1)],
-          ["疑似数量", total.unsure, total.unsure / (total.total || 1)],
-          ["未分类数量", total.unclassified, total.unclassified / (total.total || 1)],
-          ["已分类数量", completed, completed / (total.total || 1)],
-          ["完成率", completed / (total.total || 1), completed / (total.total || 1)]
-        ];
-        const blankSummary = [excelCell(""), excelCell(""), excelCell("")];
-        const blankAnalysis = analysisHeaders.map(() => excelCell(""));
-        const xmlRows = [];
-        xmlRows.push(excelRow([`<Cell ss:MergeAcross="14" ss:StyleID="Title"><Data ss:Type="String">异纤图片分类统计 · ${xmlEscape(dateLabel)}</Data></Cell>`], ' ss:AutoFitHeight="0" ss:Height="30"'));
-        xmlRows.push(excelRow([`<Cell ss:MergeAcross="14" ss:StyleID="Subtitle"><Data ss:Type="String">本地处理汇总与分类明细；图片文件仍保存在所选总目录内的相机 / ng 分类文件夹中</Data></Cell>`]));
-        xmlRows.push(excelRow([`<Cell ss:MergeAcross="2" ss:StyleID="Section"><Data ss:Type="String">总体汇总</Data></Cell>`, excelCell(""), `<Cell ss:MergeAcross="10" ss:StyleID="Section"><Data ss:Type="String">按相机 / 类型分析</Data></Cell>`]));
-        xmlRows.push(excelRow([excelCell("指标", "String", "Header"), excelCell("数量", "String", "Header"), excelCell("占比", "String", "Header"), excelCell(""), ...analysisHeaders.map(value => excelCell(value, "String", "Header"))]));
-        const maxRows = Math.max(summaryRows.length, rows.length);
-        for (let index = 0; index < maxRows; index += 1) {
-          const summary = summaryRows[index];
-          const summaryCells = summary
-            ? [excelCell(summary[0]), excelCell(summary[1], "Number"), excelCell(summary[2], "Number", "Percent")]
-            : blankSummary;
-          const row = rows[index];
-          const analysisCells = row
-            ? (() => {
-                const rowTotal = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
-                const rowCompleted = rowTotal - row.unclassified;
-                return [
-                  excelCell(row.cameraName), excelCell(row.categoryName), excelCell(rowTotal, "Number"),
-                  excelCell(row.counts[0], "Number"), excelCell(row.counts[0] / (rowTotal || 1), "Number", "Percent"),
-                  excelCell(row.counts[1], "Number"), excelCell(row.counts[1] / (rowTotal || 1), "Number", "Percent"),
-                  excelCell(row.counts[2], "Number"), excelCell(row.counts[2] / (rowTotal || 1), "Number", "Percent"),
-                  excelCell(row.unclassified, "Number"), excelCell(rowCompleted / (rowTotal || 1), "Number", "Percent")
-                ];
-              })()
-            : blankAnalysis;
-          xmlRows.push(excelRow([...summaryCells, excelCell(""), ...analysisCells]));
-        }
-        xmlRows.push(excelRow([`<Cell ss:MergeAcross="14" ss:StyleID="Section"><Data ss:Type="String">图片明细（原图序号按文件名自然顺序固定）</Data></Cell>`]));
-        const detailHeaders = ["相机", "类型", "原图序号", "原始文件名", "当前文件名", "判定结果", "所在文件夹"];
-        xmlRows.push(excelRow([excelCell(""), excelCell(""), excelCell(""), excelCell(""), ...detailHeaders.map(value => excelCell(value, "String", "Header")), ...Array(4).fill(excelCell(""))]));
-        for (const row of rows) {
-          for (const detail of row.details) {
-            xmlRows.push(excelRow([
-              excelCell(""), excelCell(""), excelCell(""), excelCell(""),
-              excelCell(row.cameraName), excelCell(row.categoryName), excelCell(detail.originalIndex, "Number"),
-              excelCell(detail.originalName), excelCell(detail.currentName), excelCell(detail.status),
-              excelCell(detail.status === "未分类" ? `ng/${row.categoryCode}` : `ng/${detail.status}`),
-              ...Array(4).fill(excelCell(""))
-            ]));
+        const categoryNames = ["地膜", "彩色", "黑色"];
+        const categoryRows = categoryNames.map(categoryName => {
+          const result = { name: categoryName, total: 0, truth: 0, falsehood: 0, unsure: 0, unclassified: 0 };
+          for (const row of rows) {
+            if (row.categoryName !== categoryName) continue;
+            const rowTotal = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
+            result.total += rowTotal;
+            result.truth += row.counts[0];
+            result.falsehood += row.counts[1];
+            result.unsure += row.counts[2];
+            result.unclassified += row.unclassified;
           }
+          return result;
+        });
+        const overallRow = {
+          name: "总体",
+          total: total.total,
+          truth: total.truth,
+          falsehood: total.falsehood,
+          unsure: total.unsure,
+          unclassified: total.unclassified
+        };
+        const reportRows = [...categoryRows, overallRow];
+        const summaryHeaders = ["汇总范围", "总图片数", "真数量", "真占比", "假数量", "假占比", "疑似数量", "疑似占比", "未分类", "是否人工判断完毕"];
+        const statusOf = row => row.total ? (row.unclassified === 0 ? "是" : "否") : "无图片";
+        const blankCells = Array(summaryHeaders.length).fill(null).map(() => excelCell(""));
+        const xmlRows = [];
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="9" ss:StyleID="Title"><Data ss:Type="String">异纤图片分类汇总 · ${xmlEscape(dateLabel)}</Data></Cell>`], ' ss:AutoFitHeight="0" ss:Height="34"'));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="9" ss:StyleID="Subtitle"><Data ss:Type="String">只统计图片文件；汇总范围为当前选择的整批图片目录</Data></Cell>`]));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="9" ss:StyleID="Section"><Data ss:Type="String">本批概览</Data></Cell>`]));
+        const overviewRows = [
+          ["生成日期", dateLabel],
+          ["总图片数", total.total],
+          ["已判断图片", completed],
+          ["未判断图片", total.unclassified],
+          ["是否人工判断完毕", statusOf(overallRow)]
+        ];
+        for (const [label, value] of overviewRows) {
+          const valueCell = typeof value === "number" ? excelCell(value, "Number") : excelCell(value);
+          xmlRows.push(excelRow([excelCell(label, "String", "Label"), valueCell, ...blankCells.slice(2)]));
+        }
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="9" ss:StyleID="Section"><Data ss:Type="String">分类汇总</Data></Cell>`]));
+        xmlRows.push(excelRow(summaryHeaders.map(value => excelCell(value, "String", "Header"))));
+        for (const row of reportRows) {
+          const denominator = row.total || 1;
+          xmlRows.push(excelRow([
+            excelCell(row.name), excelCell(row.total, "Number"),
+            excelCell(row.truth, "Number"), excelCell(row.truth / denominator, "Number", "Percent"),
+            excelCell(row.falsehood, "Number"), excelCell(row.falsehood / denominator, "Number", "Percent"),
+            excelCell(row.unsure, "Number"), excelCell(row.unsure / denominator, "Number", "Percent"),
+            excelCell(row.unclassified, "Number"), excelCell(statusOf(row))
+          ]));
         }
 
         const xml = `<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?>
@@ -1940,14 +1934,15 @@
   <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>小伍工作室</Author><Created>${now.toISOString()}</Created></DocumentProperties>
   <Styles>
     <Style ss:ID="Default" ss:Name="Normal"><Font ss:FontName="Microsoft YaHei" ss:Size="11"/><Alignment ss:Vertical="Center"/></Style>
-    <Style ss:ID="Title"><Font ss:FontName="Microsoft YaHei" ss:Size="18" ss:Bold="1" ss:Color="#153944"/><Alignment ss:Horizontal="Left" ss:Vertical="Center"/></Style>
+    <Style ss:ID="Title"><Font ss:FontName="Microsoft YaHei" ss:Size="18" ss:Bold="1" ss:Color="#153944"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
     <Style ss:ID="Subtitle"><Font ss:FontName="Microsoft YaHei" ss:Size="10" ss:Color="#5E7478"/></Style>
     <Style ss:ID="Section"><Font ss:FontName="Microsoft YaHei" ss:Size="13" ss:Bold="1" ss:Color="#153944"/><Interior ss:Color="#DDECEB" ss:Pattern="Solid"/><Alignment ss:Horizontal="Left" ss:Vertical="Center"/></Style>
     <Style ss:ID="Header"><Font ss:FontName="Microsoft YaHei" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#153944" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#5BC1BF"/></Borders></Style>
+    <Style ss:ID="Label"><Font ss:FontName="Microsoft YaHei" ss:Size="11" ss:Bold="1" ss:Color="#153944"/><Interior ss:Color="#EFF6F3" ss:Pattern="Solid"/></Style>
     <Style ss:ID="Body"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
     <Style ss:ID="Percent"><NumberFormat ss:Format="0.00%"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
   </Styles>
-  <Worksheet ss:Name="分类统计"><Table ss:ExpandedColumnCount="15" ss:ExpandedRowCount="${xmlRows.length}" x:FullColumns="1" x:FullRows="1"><Column ss:Width="92"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="18"/><Column ss:Width="78"/><Column ss:Width="78"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/>${xmlRows.join("")}</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><FreezePanes/><FrozenNoSplit/><SplitHorizontal>5</SplitHorizontal><TopRowBottomPane>5</TopRowBottomPane><ActivePane>2</ActivePane><ProtectContents>False</ProtectContents></WorksheetOptions></Worksheet>
+  <Worksheet ss:Name="汇总表"><Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="${xmlRows.length}" x:FullColumns="1" x:FullRows="1"><Column ss:Width="125"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="85"/><Column ss:Width="90"/><Column ss:Width="85"/><Column ss:Width="90"/><Column ss:Width="85"/><Column ss:Width="90"/><Column ss:Width="135"/>${xmlRows.join("")}</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><FreezePanes/><FrozenNoSplit/><SplitHorizontal>9</SplitHorizontal><TopRowBottomPane>9</TopRowBottomPane><ActivePane>2</ActivePane><ProtectContents>False</ProtectContents></WorksheetOptions></Worksheet>
 </Workbook>`;
 
         const blob = new Blob(["\ufeff", xml], { type: "application/vnd.ms-excel;charset=utf-8" });
