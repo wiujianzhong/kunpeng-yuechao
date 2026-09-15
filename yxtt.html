@@ -851,7 +851,7 @@
         </div>
 
         <div class="safety-note">
-          <b>真实文件归档：</b>分类会在各相机的 ng 目录直接创建“真 / 假 / 疑似”文件夹并移动原图；审核时改判也会同步移动硬盘文件，可直接用于后续 AI 训练。
+          <b>真实文件归档：</b>分类会在各相机的 ng 目录直接创建“真 / 假 / 疑似”文件夹并移动原图；所以分类后 ng/0、1、2 变空是正常的，图片在中文分类文件夹里。复制到 Windows 时请复制整个总目录，不要只复制数字目录。
         </div>
       </aside>
     </section>
@@ -895,7 +895,7 @@
       <div class="modal-head">
         <h2>本批图片分类统计</h2>
         <div class="modal-actions">
-          <button class="btn primary" id="downloadStats">下载统计表</button>
+          <button class="btn primary" id="downloadStats">下载 Excel 表格</button>
           <button class="btn" id="closeStats">关闭</button>
         </div>
       </div>
@@ -1835,58 +1835,124 @@
         }
       }
 
-      function csvCell(value) {
-        return `"${String(value).replaceAll('"', '""')}"`;
+      function xmlEscape(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&apos;");
+      }
+
+      function excelCell(value = "", type = "String", style = "Body") {
+        if (type === "Number" && !Number.isFinite(Number(value))) {
+          return `<Cell ss:StyleID="${style}"><Data ss:Type="String">${xmlEscape(value)}</Data></Cell>`;
+        }
+        const safeValue = type === "Number" ? Number(value) : xmlEscape(value);
+        return `<Cell ss:StyleID="${style}"><Data ss:Type="${type}">${safeValue}</Data></Cell>`;
+      }
+
+      function excelRow(cells, options = "") {
+        return `<Row${options}>${cells.join("")}</Row>`;
+      }
+
+      function localDateParts(date) {
+        const pad = value => String(value).padStart(2, "0");
+        return {
+          date: `${date.getFullYear()}年${pad(date.getMonth() + 1)}月${pad(date.getDate())}日`,
+          stamp: `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
+        };
       }
 
       function downloadStatistics() {
-        const headers = ["相机", "类型", "总图片数", "真数量", "真占比", "假数量", "假占比", "疑似数量", "疑似占比", "未分类", "完成率"];
-        const lines = [headers.map(csvCell).join(",")];
-        for (const row of statRows()) {
-          const total = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
-          const completed = total - row.unclassified;
-          lines.push([
-            row.cameraName, row.categoryName, total,
-            row.counts[0], percentage(row.counts[0], total),
-            row.counts[1], percentage(row.counts[1], total),
-            row.counts[2], percentage(row.counts[2], total),
-            row.unclassified, percentage(completed, total)
-          ].map(csvCell).join(","));
-        }
+        const rows = statRows();
         const total = totals();
         const completed = total.total - total.unclassified;
-        lines.push([
-          "全部相机", "合计", total.total,
-          total.truth, percentage(total.truth, total.total),
-          total.falsehood, percentage(total.falsehood, total.total),
-          total.unsure, percentage(total.unsure, total.total),
-          total.unclassified, percentage(completed, total.total)
-        ].map(csvCell).join(","));
+        const categoryTotals = { "地膜": 0, "彩色": 0, "黑色": 0 };
+        for (const row of rows) categoryTotals[row.categoryName] = (categoryTotals[row.categoryName] || 0) + row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
 
-        lines.push("");
-        lines.push(["分类明细（按文件名自然顺序固定原图序号）"].map(csvCell).join(","));
-        lines.push(["相机", "类型", "原图序号", "原始文件名", "判定结果"].map(csvCell).join(","));
-        for (const row of statRows()) {
+        const now = new Date();
+        const { date: dateLabel, stamp } = localDateParts(now);
+        const analysisHeaders = ["相机", "类型", "总图片数", "真数量", "真占比", "假数量", "假占比", "疑似数量", "疑似占比", "未分类", "完成率"];
+        const summaryRows = [
+          ["总图片数", total.total, 1],
+          ["地膜总数", categoryTotals["地膜"], total.total ? categoryTotals["地膜"] / total.total : 0],
+          ["彩色总数", categoryTotals["彩色"], total.total ? categoryTotals["彩色"] / total.total : 0],
+          ["黑色总数", categoryTotals["黑色"], total.total ? categoryTotals["黑色"] / total.total : 0],
+          ["真数量", total.truth, total.truth / (total.total || 1)],
+          ["假数量", total.falsehood, total.falsehood / (total.total || 1)],
+          ["疑似数量", total.unsure, total.unsure / (total.total || 1)],
+          ["未分类数量", total.unclassified, total.unclassified / (total.total || 1)],
+          ["已分类数量", completed, completed / (total.total || 1)],
+          ["完成率", completed / (total.total || 1), completed / (total.total || 1)]
+        ];
+        const blankSummary = [excelCell(""), excelCell(""), excelCell("")];
+        const blankAnalysis = analysisHeaders.map(() => excelCell(""));
+        const xmlRows = [];
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="14" ss:StyleID="Title"><Data ss:Type="String">异纤图片分类统计 · ${xmlEscape(dateLabel)}</Data></Cell>`], ' ss:AutoFitHeight="0" ss:Height="30"'));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="14" ss:StyleID="Subtitle"><Data ss:Type="String">本地处理汇总与分类明细；图片文件仍保存在所选总目录内的相机 / ng 分类文件夹中</Data></Cell>`]));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="2" ss:StyleID="Section"><Data ss:Type="String">总体汇总</Data></Cell>`, excelCell(""), `<Cell ss:MergeAcross="10" ss:StyleID="Section"><Data ss:Type="String">按相机 / 类型分析</Data></Cell>`]));
+        xmlRows.push(excelRow([excelCell("指标", "String", "Header"), excelCell("数量", "String", "Header"), excelCell("占比", "String", "Header"), excelCell(""), ...analysisHeaders.map(value => excelCell(value, "String", "Header"))]));
+        const maxRows = Math.max(summaryRows.length, rows.length);
+        for (let index = 0; index < maxRows; index += 1) {
+          const summary = summaryRows[index];
+          const summaryCells = summary
+            ? [excelCell(summary[0]), excelCell(summary[1], "Number"), excelCell(summary[2], "Number", "Percent")]
+            : blankSummary;
+          const row = rows[index];
+          const analysisCells = row
+            ? (() => {
+                const rowTotal = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
+                const rowCompleted = rowTotal - row.unclassified;
+                return [
+                  excelCell(row.cameraName), excelCell(row.categoryName), excelCell(rowTotal, "Number"),
+                  excelCell(row.counts[0], "Number"), excelCell(row.counts[0] / (rowTotal || 1), "Number", "Percent"),
+                  excelCell(row.counts[1], "Number"), excelCell(row.counts[1] / (rowTotal || 1), "Number", "Percent"),
+                  excelCell(row.counts[2], "Number"), excelCell(row.counts[2] / (rowTotal || 1), "Number", "Percent"),
+                  excelCell(row.unclassified, "Number"), excelCell(rowCompleted / (rowTotal || 1), "Number", "Percent")
+                ];
+              })()
+            : blankAnalysis;
+          xmlRows.push(excelRow([...summaryCells, excelCell(""), ...analysisCells]));
+        }
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="14" ss:StyleID="Section"><Data ss:Type="String">图片明细（原图序号按文件名自然顺序固定）</Data></Cell>`]));
+        const detailHeaders = ["相机", "类型", "原图序号", "原始文件名", "当前文件名", "判定结果", "所在文件夹"];
+        xmlRows.push(excelRow([excelCell(""), excelCell(""), excelCell(""), excelCell(""), ...detailHeaders.map(value => excelCell(value, "String", "Header")), ...Array(4).fill(excelCell(""))]));
+        for (const row of rows) {
           for (const detail of row.details) {
-            lines.push([
-              row.cameraName,
-              row.categoryName,
-              detail.originalIndex,
-              detail.originalName,
-              detail.status
-            ].map(csvCell).join(","));
+            xmlRows.push(excelRow([
+              excelCell(""), excelCell(""), excelCell(""), excelCell(""),
+              excelCell(row.cameraName), excelCell(row.categoryName), excelCell(detail.originalIndex, "Number"),
+              excelCell(detail.originalName), excelCell(detail.currentName), excelCell(detail.status),
+              excelCell(detail.status === "未分类" ? `ng/${row.categoryCode}` : `ng/${detail.status}`),
+              ...Array(4).fill(excelCell(""))
+            ]));
           }
         }
 
-        const blob = new Blob(["\ufeff", lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+        const xml = `<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">
+  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>小伍工作室</Author><Created>${now.toISOString()}</Created></DocumentProperties>
+  <Styles>
+    <Style ss:ID="Default" ss:Name="Normal"><Font ss:FontName="Microsoft YaHei" ss:Size="11"/><Alignment ss:Vertical="Center"/></Style>
+    <Style ss:ID="Title"><Font ss:FontName="Microsoft YaHei" ss:Size="18" ss:Bold="1" ss:Color="#153944"/><Alignment ss:Horizontal="Left" ss:Vertical="Center"/></Style>
+    <Style ss:ID="Subtitle"><Font ss:FontName="Microsoft YaHei" ss:Size="10" ss:Color="#5E7478"/></Style>
+    <Style ss:ID="Section"><Font ss:FontName="Microsoft YaHei" ss:Size="13" ss:Bold="1" ss:Color="#153944"/><Interior ss:Color="#DDECEB" ss:Pattern="Solid"/><Alignment ss:Horizontal="Left" ss:Vertical="Center"/></Style>
+    <Style ss:ID="Header"><Font ss:FontName="Microsoft YaHei" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#153944" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#5BC1BF"/></Borders></Style>
+    <Style ss:ID="Body"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
+    <Style ss:ID="Percent"><NumberFormat ss:Format="0.00%"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
+  </Styles>
+  <Worksheet ss:Name="分类统计"><Table ss:ExpandedColumnCount="15" ss:ExpandedRowCount="${xmlRows.length}" x:FullColumns="1" x:FullRows="1"><Column ss:Width="92"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="18"/><Column ss:Width="78"/><Column ss:Width="78"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/><Column ss:Width="70"/>${xmlRows.join("")}</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><FreezePanes/><FrozenNoSplit/><SplitHorizontal>5</SplitHorizontal><TopRowBottomPane>5</TopRowBottomPane><ActivePane>2</ActivePane><ProtectContents>False</ProtectContents></WorksheetOptions></Worksheet>
+</Workbook>`;
+
+        const blob = new Blob(["\ufeff", xml], { type: "application/vnd.ms-excel;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        const stamp = new Date().toISOString().slice(0, 19).replaceAll(/[-:T]/g, "");
         link.href = url;
-        link.download = `异纤挑图统计_${stamp}.csv`;
+        link.download = `异纤挑图统计_${stamp}.xls`;
         link.click();
         window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-        showToast("统计表已下载，可直接用 Excel 打开");
+        showToast("Excel 表格已下载，包含总体汇总和图片明细");
       }
 
       function escapeHtml(value) {
