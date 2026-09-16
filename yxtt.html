@@ -673,7 +673,7 @@
     .review-list option { padding: 7px 8px; }
     .review-correction { padding: 12px; border: 1px solid var(--line); background: #102a33; }
     .review-correction > strong { display: block; margin-bottom: 9px; font-size: 13px; }
-    .review-class-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+    .review-class-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; }
     .review-class-btn { min-height: 38px; padding: 0 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; font-size: 12px; font-weight: 800; }
     .review-class-btn.current { border-color: var(--teal); background: var(--teal); color: #092126; }
     .review-class-btn:disabled { cursor: not-allowed; opacity: .48; }
@@ -812,7 +812,7 @@
         <button class="btn" id="chooseAgain">选择文件夹</button>
         <button class="btn" id="undoBtn" disabled>撤销上一次</button>
         <button class="btn primary" id="statsBtn" disabled>分类统计</button>
-        <button class="btn" id="trainingZipBtn" title="汇总所有相机的9个分类并打包为ZIP" disabled>生成训练 ZIP</button>
+        <button class="btn" id="trainingZipBtn" title="汇总所有相机的6个分类并打包为ZIP" disabled>生成训练 ZIP</button>
       </div>
     </header>
 
@@ -845,7 +845,7 @@
           <div class="class-popup" id="classPopup" aria-hidden="true">
             <h3>这张图片判定为</h3>
             <div class="popup-list" id="popupList"></div>
-            <p class="popup-hint">↑ 真 · ↓ 疑似 · 回车确认 · Esc 取消</p>
+            <p class="popup-hint">↑ 真 · ↓ 假 · 回车确认 · Esc 取消</p>
           </div>
 
           <div class="busy-layer">
@@ -863,20 +863,20 @@
         <p>默认判“假”，直接回车确认并下一张</p>
         <div class="class-actions" id="classActions">
           <button class="class-btn" data-index="0" disabled><kbd>↑</kbd><strong>—</strong></button>
-          <button class="class-btn" data-index="2" disabled><kbd>↓</kbd><strong>—</strong></button>
+          <button class="class-btn" data-index="1" disabled><kbd>↓</kbd><strong>—</strong></button>
         </div>
 
         <div class="key-guide">
           <div class="key-row"><kbd>← →</kbd><span>切换图片</span></div>
           <div class="key-row"><kbd>滚轮</kbd><span>放大 / 缩小图片</span></div>
           <div class="key-row"><kbd>左键拖动</kbd><span>抓住图片移动</span></div>
-          <div class="key-row"><kbd>↑ ↓</kbd><span>改选“真 / 疑似”</span></div>
+          <div class="key-row"><kbd>↑ ↓</kbd><span>选择“真 / 假”</span></div>
           <div class="key-row"><kbd>Enter</kbd><span>默认判假并下一张</span></div>
           <div class="key-row"><kbd>Ctrl+Z</kbd><span>撤销上一次</span></div>
         </div>
 
         <div class="safety-note">
-          <b>真实文件归档：</b>分类会在各相机的 ng 目录直接创建“真 / 假 / 疑似”文件夹并移动原图；所以分类后 ng/0、1、2 变空是正常的，图片在中文分类文件夹里。复制到 Windows 时请复制整个总目录，不要只复制数字目录。
+          <b>真实文件归档：</b>分类会在各相机的 ng 目录直接创建“真 / 假”文件夹并移动原图；所以分类后 ng/0、1、2 变空是正常的，图片在中文分类文件夹里。复制到 Windows 时请复制整个总目录，不要只复制数字目录。
         </div>
       </aside>
     </section>
@@ -927,7 +927,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>相机</th><th>类型</th><th>总数</th><th>真</th><th>真占比</th><th>假</th><th>假占比</th><th>疑似</th><th>疑似占比</th><th>未分类</th><th>完成率</th><th>图片审核</th></tr>
+            <tr><th>相机</th><th>类型</th><th>总数</th><th>真</th><th>真占比</th><th>假</th><th>假占比</th><th>未分类</th><th>完成率</th><th>图片审核</th></tr>
           </thead>
           <tbody id="statsBody"></tbody>
           <tfoot id="statsFoot"></tfoot>
@@ -973,7 +973,6 @@
             <div class="review-class-actions" id="reviewClassActions">
               <button class="review-class-btn" data-index="0">真</button>
               <button class="review-class-btn" data-index="1">假</button>
-              <button class="review-class-btn" data-index="2">疑似</button>
             </div>
             <p class="review-path" id="reviewPath">修改后会同步移动硬盘中的真实图片。</p>
           </div>
@@ -998,9 +997,9 @@
       "use strict";
 
       const CONFIG = {
-        "0": { name: "地膜", labels: ["真地膜", "假地膜", "疑似地膜"] },
-        "1": { name: "彩色", labels: ["真彩色", "假彩色", "疑似彩色"] },
-        "2": { name: "黑色", labels: ["真黑色", "假黑色", "疑似黑色"] }
+        "0": { name: "地膜", labels: ["真地膜", "假地膜"] },
+        "1": { name: "彩色", labels: ["真彩色", "假彩色"] },
+        "2": { name: "黑色", labels: ["真黑色", "假黑色"] }
       };
       const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "bmp", "tif", "tiff", "webp"]);
       const collator = new Intl.Collator("zh-CN", { numeric: true, sensitivity: "base" });
@@ -1371,13 +1370,12 @@
       }
 
       function totals() {
-        const result = { total: 0, truth: 0, falsehood: 0, unsure: 0, unclassified: 0 };
+        const result = { total: 0, truth: 0, falsehood: 0, unclassified: 0 };
         for (const row of state.stats.values()) {
           const total = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
           result.total += total;
           result.truth += row.counts[0];
           result.falsehood += row.counts[1];
-          result.unsure += row.counts[2];
           result.unclassified += row.unclassified;
         }
         return result;
@@ -1399,13 +1397,13 @@
       }
 
       function updateClassLabels(item) {
-        const labels = item ? CONFIG[item.categoryCode].labels : ["—", "—", "—"];
+        const labels = item ? CONFIG[item.categoryCode].labels : ["—", "—"];
         el.classButtons.forEach(button => {
           const actualIndex = Number(button.dataset.index);
           button.querySelector("strong").textContent = labels[actualIndex];
           button.disabled = !item || state.busy;
         });
-        el.popupList.innerHTML = [0, 2].map(index =>
+        el.popupList.innerHTML = [0, 1].map(index =>
           `<button class="popup-option${index === state.menuIndex ? " selected" : ""}" data-index="${index}">${index === 0 ? "↑" : "↓"}&nbsp;&nbsp;${labels[index]}</button>`
         ).join("");
         [...el.popupList.querySelectorAll(".popup-option")].forEach(button => {
@@ -1477,10 +1475,10 @@
 
       function moveMenu(direction) {
         if (!state.menuOpen) {
-          showMenu(direction < 0 ? 0 : 2);
+          showMenu(direction < 0 ? 0 : 1);
           return;
         }
-        state.menuIndex = direction < 0 ? 0 : 2;
+        state.menuIndex = direction < 0 ? 0 : 1;
         updateClassLabels(currentItem());
       }
 
@@ -1650,7 +1648,6 @@
             <td>${escapeHtml(row.cameraName)}</td><td>${row.categoryName}</td><td>${total}</td>
             <td>${row.counts[0]}</td><td>${percentage(row.counts[0], total)}</td>
             <td>${row.counts[1]}</td><td>${percentage(row.counts[1], total)}</td>
-            <td>${row.counts[2]}</td><td>${percentage(row.counts[2], total)}</td>
             <td>${row.unclassified}</td><td>${percentage(completed, total)}</td>
             <td>${reviewAction}</td>
           </tr>`;
@@ -1664,7 +1661,6 @@
           <td>全部相机</td><td>合计</td><td>${total.total}</td>
           <td>${total.truth}</td><td>${percentage(total.truth, total.total)}</td>
           <td>${total.falsehood}</td><td>${percentage(total.falsehood, total.total)}</td>
-          <td>${total.unsure}</td><td>${percentage(total.unsure, total.total)}</td>
           <td>${total.unclassified}</td><td>${percentage(completed, total.total)}</td><td>—</td>
         </tr>`;
         el.statsModal.classList.add("open");
@@ -1749,7 +1745,7 @@
       function updateReviewClassActions(detail) {
         const row = state.reviewRow;
         el.reviewClassButtons.forEach((button, index) => {
-          const label = row?.labels[index] || ["真", "假", "疑似"][index];
+          const label = row?.labels[index] || ["真", "假"][index];
           const current = detail?.status === label;
           button.textContent = label;
           button.classList.toggle("current", current);
@@ -1926,14 +1922,13 @@
         const { date: dateLabel, stamp } = localDateParts(now);
         const categoryNames = ["地膜", "彩色", "黑色"];
         const categoryRows = categoryNames.map(categoryName => {
-          const result = { name: categoryName, total: 0, truth: 0, falsehood: 0, unsure: 0, unclassified: 0 };
+          const result = { name: categoryName, total: 0, truth: 0, falsehood: 0, unclassified: 0 };
           for (const row of rows) {
             if (row.categoryName !== categoryName) continue;
             const rowTotal = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
             result.total += rowTotal;
             result.truth += row.counts[0];
             result.falsehood += row.counts[1];
-            result.unsure += row.counts[2];
             result.unclassified += row.unclassified;
           }
           return result;
@@ -1943,17 +1938,16 @@
           total: total.total,
           truth: total.truth,
           falsehood: total.falsehood,
-          unsure: total.unsure,
           unclassified: total.unclassified
         };
         const reportRows = [...categoryRows, overallRow];
-        const summaryHeaders = ["汇总范围", "总图片数", "真数量", "真占比", "假数量", "假占比", "疑似数量", "疑似占比", "未分类", "是否人工判断完毕"];
+        const summaryHeaders = ["汇总范围", "总图片数", "真数量", "真占比", "假数量", "假占比", "未分类", "是否人工判断完毕"];
         const statusOf = row => row.total ? (row.unclassified === 0 ? "是" : "否") : "无图片";
         const blankCells = Array(summaryHeaders.length).fill(null).map(() => excelCell(""));
         const xmlRows = [];
-        xmlRows.push(excelRow([`<Cell ss:MergeAcross="9" ss:StyleID="Title"><Data ss:Type="String">异纤图片分类汇总 · ${xmlEscape(dateLabel)}</Data></Cell>`], ' ss:AutoFitHeight="0" ss:Height="34"'));
-        xmlRows.push(excelRow([`<Cell ss:MergeAcross="9" ss:StyleID="Subtitle"><Data ss:Type="String">只统计图片文件；汇总范围为当前选择的整批图片目录</Data></Cell>`]));
-        xmlRows.push(excelRow([`<Cell ss:MergeAcross="9" ss:StyleID="Section"><Data ss:Type="String">本批概览</Data></Cell>`]));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="7" ss:StyleID="Title"><Data ss:Type="String">异纤图片分类汇总 · ${xmlEscape(dateLabel)}</Data></Cell>`], ' ss:AutoFitHeight="0" ss:Height="34"'));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="7" ss:StyleID="Subtitle"><Data ss:Type="String">只统计图片文件；汇总范围为当前选择的整批图片目录</Data></Cell>`]));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="7" ss:StyleID="Section"><Data ss:Type="String">本批概览</Data></Cell>`]));
         const overviewRows = [
           ["生成日期", dateLabel],
           ["总图片数", total.total],
@@ -1965,7 +1959,7 @@
           const valueCell = typeof value === "number" ? excelCell(value, "Number") : excelCell(value);
           xmlRows.push(excelRow([excelCell(label, "String", "Label"), valueCell, ...blankCells.slice(2)]));
         }
-        xmlRows.push(excelRow([`<Cell ss:MergeAcross="9" ss:StyleID="Section"><Data ss:Type="String">分类汇总</Data></Cell>`]));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="7" ss:StyleID="Section"><Data ss:Type="String">分类汇总</Data></Cell>`]));
         xmlRows.push(excelRow(summaryHeaders.map(value => excelCell(value, "String", "Header"))));
         for (const row of reportRows) {
           const denominator = row.total || 1;
@@ -1973,7 +1967,6 @@
             excelCell(row.name), excelCell(row.total, "Number"),
             excelCell(row.truth, "Number"), excelCell(row.truth / denominator, "Number", "Percent"),
             excelCell(row.falsehood, "Number"), excelCell(row.falsehood / denominator, "Number", "Percent"),
-            excelCell(row.unsure, "Number"), excelCell(row.unsure / denominator, "Number", "Percent"),
             excelCell(row.unclassified, "Number"), excelCell(statusOf(row))
           ]));
         }
@@ -1991,7 +1984,7 @@
     <Style ss:ID="Body"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
     <Style ss:ID="Percent"><NumberFormat ss:Format="0.00%"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
   </Styles>
-  <Worksheet ss:Name="汇总表"><Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="${xmlRows.length}" x:FullColumns="1" x:FullRows="1"><Column ss:Width="125"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="85"/><Column ss:Width="90"/><Column ss:Width="85"/><Column ss:Width="90"/><Column ss:Width="85"/><Column ss:Width="90"/><Column ss:Width="135"/>${xmlRows.join("")}</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><FreezePanes/><FrozenNoSplit/><SplitHorizontal>9</SplitHorizontal><TopRowBottomPane>9</TopRowBottomPane><ActivePane>2</ActivePane><ProtectContents>False</ProtectContents></WorksheetOptions></Worksheet>
+  <Worksheet ss:Name="汇总表"><Table ss:ExpandedColumnCount="8" ss:ExpandedRowCount="${xmlRows.length}" x:FullColumns="1" x:FullRows="1"><Column ss:Width="125"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="85"/><Column ss:Width="90"/><Column ss:Width="85"/><Column ss:Width="90"/><Column ss:Width="135"/>${xmlRows.join("")}</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><FreezePanes/><FrozenNoSplit/><SplitHorizontal>10</SplitHorizontal><TopRowBottomPane>10</TopRowBottomPane><ActivePane>2</ActivePane><ProtectContents>False</ProtectContents></WorksheetOptions></Worksheet>
 </Workbook>`;
 
         const blob = new Blob(["\ufeff", xml], { type: "application/vnd.ms-excel;charset=utf-8" });
