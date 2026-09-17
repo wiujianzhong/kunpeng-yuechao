@@ -324,7 +324,6 @@
 
     .class-btn:hover:not(:disabled) { background: #28515a; transform: translateX(-3px); }
     .class-btn:nth-child(1) { border-left-color: var(--teal); }
-    .class-btn:nth-child(2) { border-left-color: var(--amber); }
     .class-btn:disabled { opacity: .35; cursor: not-allowed; }
     .class-btn kbd { color: var(--muted); font-size: 13px; text-align: center; }
     .class-btn strong { font-size: 15px; }
@@ -845,7 +844,7 @@
           <div class="class-popup" id="classPopup" aria-hidden="true">
             <h3>这张图片判定为</h3>
             <div class="popup-list" id="popupList"></div>
-            <p class="popup-hint">↑ 真 · ↓ 假 · 回车确认 · Esc 取消</p>
+            <p class="popup-hint">↑ 选择真 · 回车确认 · Esc 取消</p>
           </div>
 
           <div class="busy-layer">
@@ -860,17 +859,16 @@
 
       <aside class="side-panel">
         <h2>判定操作</h2>
-        <p>默认判“假”，直接回车确认并下一张</p>
+        <p>直接回车默认判“假”；按 ↑ 选择“真”后回车确认</p>
         <div class="class-actions" id="classActions">
           <button class="class-btn" data-index="0" disabled><kbd>↑</kbd><strong>—</strong></button>
-          <button class="class-btn" data-index="1" disabled><kbd>↓</kbd><strong>—</strong></button>
         </div>
 
         <div class="key-guide">
           <div class="key-row"><kbd>← →</kbd><span>切换图片</span></div>
           <div class="key-row"><kbd>滚轮</kbd><span>放大 / 缩小图片</span></div>
           <div class="key-row"><kbd>左键拖动</kbd><span>抓住图片移动</span></div>
-          <div class="key-row"><kbd>↑ ↓</kbd><span>选择“真 / 假”</span></div>
+          <div class="key-row"><kbd>↑</kbd><span>选择“真”</span></div>
           <div class="key-row"><kbd>Enter</kbd><span>默认判假并下一张</span></div>
           <div class="key-row"><kbd>Ctrl+Z</kbd><span>撤销上一次</span></div>
         </div>
@@ -1403,8 +1401,8 @@
           button.querySelector("strong").textContent = labels[actualIndex];
           button.disabled = !item || state.busy;
         });
-        el.popupList.innerHTML = [0, 1].map(index =>
-          `<button class="popup-option${index === state.menuIndex ? " selected" : ""}" data-index="${index}">${index === 0 ? "↑" : "↓"}&nbsp;&nbsp;${labels[index]}</button>`
+        el.popupList.innerHTML = [0].map(index =>
+          `<button class="popup-option${index === state.menuIndex ? " selected" : ""}" data-index="${index}">↑&nbsp;&nbsp;${labels[index]}</button>`
         ).join("");
         [...el.popupList.querySelectorAll(".popup-option")].forEach(button => {
           button.addEventListener("click", () => classifyAt(Number(button.dataset.index)));
@@ -1473,12 +1471,12 @@
         el.classPopup.setAttribute("aria-hidden", "false");
       }
 
-      function moveMenu(direction) {
+      function moveMenu() {
         if (!state.menuOpen) {
-          showMenu(direction < 0 ? 0 : 1);
+          showMenu(0);
           return;
         }
-        state.menuIndex = direction < 0 ? 0 : 1;
+        state.menuIndex = 0;
         updateClassLabels(currentItem());
       }
 
@@ -2293,10 +2291,7 @@
           }
         } else if (event.key === "ArrowUp") {
           event.preventDefault();
-          moveMenu(-1);
-        } else if (event.key === "ArrowDown") {
-          event.preventDefault();
-          moveMenu(1);
+          moveMenu();
         } else if (event.key === "Enter" && !event.repeat) {
           event.preventDefault();
           if (state.menuOpen) classifyAt(state.menuIndex);
