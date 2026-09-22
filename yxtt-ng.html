@@ -1,0 +1,2307 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0d2028">
+  <title>异纤图片挑选工具·NG直分版｜小伍工作室</title>
+  <script defer src="https://xiaowustudio.cn/assets/analytics.js"></script>
+  <style>
+    :root {
+      --ink: #0d2028;
+      --ink-deep: #07151b;
+      --panel: #15343e;
+      --panel-2: #1c414b;
+      --line: #2b5660;
+      --text: #f4f7f3;
+      --muted: #9bb2b5;
+      --teal: #5bc1bf;
+      --teal-light: #7ad2cf;
+      --amber: #f2aa56;
+      --danger: #f06d68;
+      --white: #fff;
+      --shadow: 0 24px 80px rgb(0 0 0 / 28%);
+      font-family: "PingFang SC", "Microsoft YaHei UI", "Noto Sans CJK SC", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--ink);
+      color: var(--text);
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    button { font: inherit; }
+
+    button:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 3px solid rgb(91 193 191 / 65%);
+      outline-offset: 3px;
+    }
+
+    .app-shell {
+      width: min(1720px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 22px 26px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) minmax(360px, 1.6fr) auto;
+      align-items: center;
+      gap: 22px;
+      padding-bottom: 16px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(24px, 2.2vw, 34px);
+      letter-spacing: .02em;
+      line-height: 1.12;
+    }
+
+    .brand p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: .08em;
+    }
+
+    .privacy-strip {
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 15px;
+    }
+
+    .privacy-strip svg { flex: 0 0 auto; color: var(--teal); }
+
+    .privacy-strip strong {
+      color: var(--teal);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .privacy-strip span {
+      color: var(--text);
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .top-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      min-height: 46px;
+      padding: 0 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .15s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: #28515a;
+      border-color: #477984;
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      border-color: var(--teal);
+      background: var(--teal);
+      color: #092126;
+    }
+
+    .btn.primary:hover:not(:disabled) { background: var(--teal-light); }
+
+    .btn:disabled { opacity: .38; cursor: not-allowed; }
+
+    .metrics {
+      min-height: 45px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding-bottom: 10px;
+    }
+
+    .metric {
+      min-width: 122px;
+      padding: 9px 13px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric b {
+      margin-left: 7px;
+      color: var(--text);
+      font-family: "DIN Alternate", "Arial Narrow", sans-serif;
+      font-size: 15px;
+    }
+
+    .metric.type { border-color: var(--amber); }
+    .metric.type b { color: var(--amber); }
+
+    .status-line {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .progress {
+      height: 3px;
+      margin: -3px 0 11px;
+      overflow: hidden;
+      background: #19323a;
+    }
+
+    .progress > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--teal), var(--amber));
+      transition: width .25s ease;
+    }
+
+    .workspace {
+      min-height: 0;
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 292px;
+      gap: 12px;
+    }
+
+    .viewer {
+      position: relative;
+      min-height: 620px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--ink-deep);
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) 46px;
+    }
+
+    .image-stage {
+      position: relative;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 30px;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .image-stage.has-image { cursor: grab; }
+    .image-stage.panning { cursor: grabbing; }
+
+    .image-stage::before,
+    .image-stage::after {
+      content: "";
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      pointer-events: none;
+      opacity: .45;
+    }
+
+    .image-stage::before {
+      top: 18px;
+      left: 18px;
+      border-top: 2px solid var(--teal);
+      border-left: 2px solid var(--teal);
+    }
+
+    .image-stage::after {
+      right: 18px;
+      bottom: 18px;
+      border-right: 2px solid var(--teal);
+      border-bottom: 2px solid var(--teal);
+    }
+
+    #previewImage {
+      display: none;
+      max-width: 100%;
+      max-height: calc(100vh - 245px);
+      object-fit: contain;
+      box-shadow: 0 18px 50px rgb(0 0 0 / 32%);
+      pointer-events: none;
+      user-select: none;
+      transform-origin: center;
+      will-change: transform;
+    }
+
+    .zoom-hud {
+      position: absolute;
+      z-index: 7;
+      top: 16px;
+      right: 16px;
+      display: none;
+      min-height: 34px;
+      padding: 0 11px;
+      border: 1px solid var(--line);
+      background: rgb(13 32 40 / 88%);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .image-stage.has-image .zoom-hud { display: block; }
+    .zoom-hud b { color: var(--teal); }
+
+    .empty-state {
+      max-width: 620px;
+      padding: 44px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty-state svg { color: var(--teal); margin-bottom: 18px; }
+
+    .empty-state h2 {
+      margin: 0 0 10px;
+      color: var(--text);
+      font-size: 22px;
+    }
+
+    .empty-state p { margin: 0; line-height: 1.8; font-size: 14px; }
+
+    .filename-bar {
+      min-width: 0;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
+      padding: 13px 16px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .side-panel {
+      background: var(--panel);
+      padding: 22px 18px;
+      overflow: auto;
+    }
+
+    .side-panel h2 { margin: 0; font-size: 19px; }
+    .side-panel > p { margin: 6px 0 18px; color: var(--muted); font-size: 12px; }
+
+    .class-actions { display: grid; gap: 9px; }
+
+    .class-btn {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      min-height: 58px;
+      border: 1px solid var(--line);
+      border-left-width: 3px;
+      background: var(--panel-2);
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      transition: transform .14s ease, background .14s ease;
+    }
+
+    .class-btn:hover:not(:disabled) { background: #28515a; transform: translateX(-3px); }
+    .class-btn:nth-child(1) { border-left-color: var(--teal); }
+    .class-btn:nth-child(2) { border-left-color: var(--amber); }
+    .class-btn:nth-child(3) { border-left-color: var(--danger); }
+    .class-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .class-btn kbd { color: var(--muted); font-size: 13px; text-align: center; }
+    .class-btn strong { font-size: 15px; }
+
+    .key-guide {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      gap: 9px;
+    }
+
+    .key-row { display: grid; grid-template-columns: 72px 1fr; align-items: center; font-size: 12px; }
+    .key-row kbd { color: var(--amber); font-weight: 800; font-family: "DIN Alternate", sans-serif; }
+    .key-row span { color: var(--muted); }
+
+    .safety-note {
+      margin-top: 20px;
+      padding: 13px;
+      border: 1px solid rgb(91 193 191 / 35%);
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.65;
+    }
+
+    .safety-note b { color: var(--teal); }
+
+    .class-popup {
+      position: absolute;
+      z-index: 8;
+      left: 50%;
+      top: 58%;
+      width: min(330px, calc(100% - 36px));
+      padding: 20px;
+      border: 2px solid var(--teal);
+      background: #eaf2ef;
+      color: #17333b;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -42%) scale(.96);
+      transition: opacity .12s ease, transform .12s ease;
+    }
+
+    .class-popup.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .class-popup h3 { margin: 0 0 12px; text-align: center; font-size: 16px; }
+    .popup-list { display: grid; gap: 7px; }
+
+    .popup-option {
+      border: 0;
+      background: #d7e7e4;
+      color: #17333b;
+      padding: 11px 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .popup-option.selected { background: var(--teal); color: #092126; }
+    .popup-hint { margin: 12px 0 0; color: #5e7478; text-align: center; font-size: 11px; }
+
+    .welcome {
+      position: fixed;
+      z-index: 20;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        linear-gradient(rgb(7 21 27 / 90%), rgb(7 21 27 / 95%)),
+        repeating-linear-gradient(90deg, transparent 0 79px, rgb(91 193 191 / 7%) 80px 81px);
+    }
+
+    .welcome.hidden { display: none; }
+
+    .welcome-card {
+      width: min(760px, 100%);
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      padding: clamp(28px, 5vw, 54px);
+    }
+
+    .eyebrow { color: var(--teal); font-size: 12px; font-weight: 800; letter-spacing: .16em; }
+
+    .welcome-card h2 {
+      margin: 12px 0 10px;
+      max-width: 620px;
+      font-size: clamp(27px, 4vw, 42px);
+      line-height: 1.18;
+    }
+
+    .welcome-card > p { margin: 0; color: var(--muted); line-height: 1.8; }
+
+    .drop-zone {
+      margin-top: 26px;
+      min-height: 190px;
+      border: 1px dashed #57909a;
+      background: var(--ink-deep);
+      display: grid;
+      place-items: center;
+      padding: 26px;
+      text-align: center;
+      transition: border-color .15s ease, background .15s ease;
+    }
+
+    .drop-zone.dragging { border-color: var(--teal); background: #0e2d35; }
+    .drop-zone svg { color: var(--teal); }
+    .drop-zone strong { display: block; margin: 12px 0 5px; font-size: 17px; }
+    .drop-zone span { color: var(--muted); font-size: 12px; }
+    .drop-zone .btn { margin-top: 17px; }
+
+    .structure {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .structure code {
+      color: var(--amber);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      white-space: nowrap;
+    }
+
+    .scan-progress { display: none; width: 100%; max-width: 480px; }
+    .scan-progress.visible { display: block; }
+    .scan-progress b { display: block; margin-bottom: 12px; font-size: 16px; }
+    .scan-progress .progress { height: 6px; margin: 0 0 10px; }
+    .scan-progress span { color: var(--muted); font-size: 12px; }
+
+    .brand-footer,
+    .welcome-contact {
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: .04em;
+    }
+
+    .brand-footer { padding: 12px 0 0; }
+    .welcome-contact { margin-top: 18px; }
+    .brand-footer a,
+    .welcome-contact a { color: var(--teal); text-decoration: none; }
+
+    .modal {
+      position: fixed;
+      z-index: 30;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgb(3 12 16 / 78%);
+    }
+
+    .modal.open { display: grid; }
+
+    .modal-card {
+      width: min(1100px, 100%);
+      max-height: 86vh;
+      overflow: auto;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-head {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .modal-head h2 { margin: 0; font-size: 20px; }
+    .modal-actions { display: flex; gap: 9px; }
+    .table-wrap { padding: 0 20px 22px; overflow-x: auto; }
+
+    .stats-card {
+      height: min(900px, 86vh);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .stats-card .modal-head { position: static; flex: 0 0 auto; }
+    .stats-card .table-wrap { flex: 1 1 auto; min-height: 0; overflow: auto; }
+    .stats-card th { top: 0; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 11px 9px; border-bottom: 1px solid var(--line); text-align: center; white-space: nowrap; }
+    th { position: sticky; top: 83px; background: #1a3d47; color: var(--teal); }
+    tbody tr:hover { background: rgb(91 193 191 / 7%); }
+    tfoot { color: var(--amber); font-weight: 800; }
+
+    .detail-btn {
+      min-height: 32px;
+      padding: 0 11px;
+      border: 1px solid var(--teal);
+      background: transparent;
+      color: var(--teal);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .review-modal { z-index: 35; }
+    .review-card {
+      width: min(1260px, 100%);
+      height: min(900px, 92vh);
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .review-card .modal-head { position: static; flex: 0 0 auto; }
+    .review-heading p { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+
+    .review-filters {
+      flex: 0 0 auto;
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      min-height: 64px;
+      padding: 14px 20px;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .filter-btn {
+      flex: 0 0 auto;
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      background: var(--ink);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .filter-btn.active { border-color: var(--teal); background: var(--teal); color: #092126; font-weight: 800; }
+    .filter-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .review-grid {
+      flex: 1 1 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      min-height: 0;
+    }
+
+    .review-preview {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      background: var(--ink-deep);
+      border-right: 1px solid var(--line);
+    }
+
+    .review-image-stage {
+      position: relative;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .review-image-stage.has-image { cursor: grab; }
+    .review-image-stage.panning { cursor: grabbing; }
+    #reviewImage {
+      display: none;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      transform-origin: center;
+      will-change: transform;
+    }
+
+    .review-empty { color: var(--muted); text-align: center; font-size: 13px; }
+
+    .review-zoom-tools {
+      position: absolute;
+      z-index: 3;
+      top: 14px;
+      right: 14px;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      background: rgb(13 32 40 / 92%);
+    }
+
+    .review-image-stage.has-image .review-zoom-tools { display: flex; }
+    .review-zoom-tools button {
+      min-width: 36px;
+      height: 34px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .review-zoom-tools button:last-child { min-width: 52px; }
+    .review-zoom-tools span { min-width: 48px; color: var(--teal); text-align: center; font-size: 11px; font-weight: 800; }
+
+    .review-caption {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      min-height: 60px;
+      padding: 10px 14px;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .review-caption strong { color: var(--amber); white-space: nowrap; }
+    .review-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+    .status-badge { padding: 6px 9px; border: 1px solid var(--teal); color: var(--teal); white-space: nowrap; font-size: 12px; font-weight: 800; }
+    .status-badge.unclassified { border-color: var(--line); color: var(--muted); }
+
+    .review-side { min-width: 0; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto auto; padding: 14px; gap: 12px; overflow: hidden; }
+    .review-list { width: 100%; min-height: 0; overflow-y: auto; border: 1px solid var(--line); background: var(--ink-deep); color: var(--text); padding: 6px; font: 12px/1.7 "SFMono-Regular", Consolas, monospace; }
+    .review-list option { padding: 7px 8px; }
+    .review-correction { padding: 12px; border: 1px solid var(--line); background: #102a33; }
+    .review-correction > strong { display: block; margin-bottom: 9px; font-size: 13px; }
+    .review-class-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; }
+    .review-class-btn { min-height: 38px; padding: 0 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; font-size: 12px; font-weight: 800; }
+    .review-class-btn.current { border-color: var(--teal); background: var(--teal); color: #092126; }
+    .review-class-btn:disabled { cursor: not-allowed; opacity: .48; }
+    .review-path { margin: 9px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; overflow-wrap: anywhere; }
+    .review-path b { color: var(--amber); }
+    .review-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+
+    .toast {
+      position: fixed;
+      z-index: 40;
+      left: 50%;
+      bottom: 26px;
+      max-width: min(560px, calc(100% - 30px));
+      padding: 12px 18px;
+      border: 1px solid var(--line);
+      background: #eaf2ef;
+      color: #17333b;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 16px);
+      transition: opacity .2s ease, transform .2s ease;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.error { background: #ffe9e7; color: #752d29; border-color: var(--danger); }
+
+    .category-switch {
+      position: fixed;
+      z-index: 45;
+      top: 22%;
+      left: 50%;
+      min-width: min(360px, calc(100% - 32px));
+      padding: 18px 30px 20px;
+      border: 2px solid var(--amber);
+      background: rgb(8 29 36 / 94%);
+      box-shadow: 0 20px 70px rgb(0 0 0 / 52%);
+      color: var(--amber);
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -18px) scale(.94);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .category-switch.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    .category-switch[data-code="1"] { border-color: var(--teal); color: var(--teal-light); }
+    .category-switch[data-code="2"] { border-color: #dbe5e3; color: #f4f7f3; }
+    .category-switch span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .18em; }
+    .category-switch strong { display: block; font-size: clamp(30px, 4vw, 48px); line-height: 1.1; letter-spacing: .12em; }
+
+    .busy-layer {
+      position: absolute;
+      z-index: 12;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgb(7 21 27 / 78%);
+      backdrop-filter: blur(3px);
+    }
+
+    body.busy .busy-layer { display: grid; }
+
+    .busy-box { text-align: center; }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 14px;
+      border: 3px solid rgb(91 193 191 / 20%);
+      border-top-color: var(--teal);
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+    }
+
+    .busy-box p { margin: 0; color: var(--text); font-size: 13px; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 980px) {
+      .app-shell { padding: 16px; }
+      .topbar { grid-template-columns: 1fr auto; }
+      .privacy-strip { grid-column: 1 / -1; grid-row: 2; }
+      .workspace { grid-template-columns: 1fr; }
+      .viewer { min-height: 58vh; }
+      .side-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+      .side-panel > p, .side-panel h2 { grid-column: 1 / -1; }
+      .key-guide { margin-top: 0; padding: 0 0 0 18px; border-top: 0; border-left: 1px solid var(--line); }
+      .safety-note { grid-column: 1 / -1; margin-top: 0; }
+      #previewImage { max-height: 50vh; }
+      .review-card { height: 94vh; max-height: 94vh; }
+      .review-grid { grid-template-columns: 1fr; grid-template-rows: minmax(330px, 1fr) minmax(330px, auto); overflow-y: auto; }
+      .review-preview { min-height: 390px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .review-side { min-height: 280px; }
+    }
+
+    @media (max-width: 640px) {
+      .topbar { grid-template-columns: 1fr; }
+      .top-actions { grid-row: 3; }
+      .top-actions .btn { flex: 1; padding: 0 10px; font-size: 12px; }
+      .metrics { flex-wrap: wrap; }
+      .status-line { width: 100%; margin-left: 0; text-align: left; }
+      .workspace { display: block; }
+      .viewer { min-height: 500px; }
+      .side-panel { margin-top: 12px; display: block; }
+      .key-guide { margin-top: 18px; padding: 16px 0 0; border-left: 0; border-top: 1px solid var(--line); }
+      .structure { align-items: flex-start; flex-direction: column; }
+      .structure code { white-space: normal; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>异纤图片挑选工具 · NG直分版</h1>
+        <p>无 012 目录 · 人工判定 · 本地归档</p>
+      </div>
+
+      <div class="privacy-strip" title="网页不会上传图片或文件名">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M7 10V7a5 5 0 0 1 10 0v3M5 10h14v10H5V10Z" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 14v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <strong>本地处理</strong>
+        <span id="rootName">图片和文件名不会上传服务器</span>
+      </div>
+
+      <div class="top-actions">
+        <button class="btn" id="chooseAgain">选择文件夹</button>
+        <button class="btn" id="undoBtn" disabled>撤销上一次</button>
+        <button class="btn primary" id="statsBtn" disabled>分类统计</button>
+        <button class="btn" id="trainingZipBtn" title="汇总所有相机的4个分类并打包为ZIP" disabled>生成训练 ZIP</button>
+      </div>
+    </header>
+
+    <section class="metrics" aria-label="当前进度">
+      <div class="metric">相机<b id="cameraMetric">—</b></div>
+      <div class="metric type">类型<b id="typeMetric">—</b></div>
+      <div class="metric">总图片<b id="totalMetric">0</b></div>
+      <div class="metric">待分类<b id="remainingMetric">0</b></div>
+      <div class="metric">完成率<b id="percentMetric">0%</b></div>
+      <div class="status-line" id="statusLine">请选择一批图片总文件夹</div>
+    </section>
+
+    <div class="progress" aria-hidden="true"><span id="mainProgress"></span></div>
+
+    <section class="workspace">
+      <div class="viewer">
+        <div class="image-stage">
+          <img id="previewImage" alt="当前待分类图片">
+          <button class="zoom-hud" id="resetZoom" title="双击图片区域也可复位">滚轮缩放 · <b id="zoomValue">100%</b> · 点击复位</button>
+          <div class="empty-state" id="emptyState">
+            <svg width="54" height="54" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+              <rect x="7" y="11" width="50" height="42" rx="4" stroke="currentColor" stroke-width="2"/>
+              <path d="m14 44 12-13 9 9 6-6 9 10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <circle cx="43" cy="24" r="5" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <h2>等待选择图片目录</h2>
+            <p>工具只读取各相机目录里 NG 根目录中的图片，<br>不会读取 mark、src，也不会上传任何图片。</p>
+          </div>
+
+          <div class="class-popup" id="classPopup" aria-hidden="true">
+            <h3>这张图片判定为</h3>
+            <div class="popup-list" id="popupList"></div>
+            <p class="popup-hint">↑ / ↓ 选择 · 回车确认 · Esc 取消</p>
+          </div>
+
+          <div class="busy-layer">
+            <div class="busy-box">
+              <div class="spinner"></div>
+              <p id="busyText">正在安全移动图片…</p>
+            </div>
+          </div>
+        </div>
+        <div class="filename-bar" id="filenameBar">—</div>
+      </div>
+
+      <aside class="side-panel">
+        <h2>判定操作</h2>
+        <p>直接回车判“假异纤”；按 ↑ 打开真异纤菜单</p>
+        <div class="class-actions" id="classActions">
+          <button class="class-btn" data-index="0" disabled><kbd>真</kbd><strong>—</strong></button>
+          <button class="class-btn" data-index="1" disabled><kbd>真</kbd><strong>—</strong></button>
+          <button class="class-btn" data-index="2" disabled><kbd>真</kbd><strong>—</strong></button>
+        </div>
+
+        <div class="key-guide">
+          <div class="key-row"><kbd>← →</kbd><span>切换图片</span></div>
+          <div class="key-row"><kbd>滚轮</kbd><span>放大 / 缩小图片</span></div>
+          <div class="key-row"><kbd>左键拖动</kbd><span>抓住图片移动</span></div>
+          <div class="key-row"><kbd>↑</kbd><span>打开真异纤菜单</span></div>
+          <div class="key-row"><kbd>↑ ↓</kbd><span>选择真地膜 / 彩色 / 黑色</span></div>
+          <div class="key-row"><kbd>Enter</kbd><span>直接判假，或确认菜单选项</span></div>
+          <div class="key-row"><kbd>Ctrl+Z</kbd><span>撤销上一次</span></div>
+        </div>
+
+        <div class="safety-note">
+          <b>真实文件归档：</b>分类会在各相机的 NG 目录创建“真地膜 / 真彩色 / 真黑色 / 假异纤”文件夹并移动原图。分类完成后，NG 根目录中的图片会进入对应中文文件夹。
+        </div>
+      </aside>
+    </section>
+    <footer class="brand-footer">小伍工作室 · 技术支持 <a href="tel:19009925522">19009925522</a></footer>
+  </main>
+
+  <section class="welcome" id="welcome">
+    <div class="welcome-card">
+      <div class="eyebrow">LOCAL IMAGE SORTER</div>
+      <h2>没有 012 目录，<br>NG 原图直接分类。</h2>
+      <p>选择包含全部相机目录的总文件夹。网页直接读取每个相机 NG 根目录中的图片，只处理本机文件，不上传服务器。</p>
+
+      <div class="drop-zone" id="dropZone">
+        <div id="dropContent">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+            <path d="M5 12h14l4 5h20v22H5V12Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M24 32V21m0 0-5 5m5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <strong>拖入总文件夹</strong>
+          <span>或点击按钮选择；不要上传 ZIP 压缩包</span><br>
+          <button class="btn primary" id="chooseFolder">选择总文件夹</button>
+        </div>
+
+        <div class="scan-progress" id="scanProgress">
+          <b>正在扫描目录…</b>
+          <div class="progress"><span id="scanBar"></span></div>
+          <span id="scanText">准备读取相机目录</span>
+        </div>
+      </div>
+
+      <div class="structure">
+        <span>推荐最新版 Chrome / Edge（Windows、Mac 均可）</span>
+        <code>总目录 / 相机 / NG / 图片</code>
+      </div>
+      <div class="welcome-contact">小伍工作室 · 技术支持 <a href="tel:19009925522">19009925522</a></div>
+    </div>
+  </section>
+
+  <section class="modal" id="statsModal" aria-hidden="true">
+    <div class="modal-card stats-card">
+      <div class="modal-head">
+        <h2>本批图片分类统计</h2>
+        <div class="modal-actions">
+          <button class="btn primary" id="downloadStats">下载 Excel 表格</button>
+          <button class="btn" id="closeStats">关闭</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>相机</th><th>总数</th><th>真地膜</th><th>占比</th><th>真彩色</th><th>占比</th><th>真黑色</th><th>占比</th><th>假异纤</th><th>占比</th><th>未分类</th><th>完成率</th><th>图片审核</th></tr>
+          </thead>
+          <tbody id="statsBody"></tbody>
+          <tfoot id="statsFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="modal review-modal" id="reviewModal" aria-hidden="true">
+    <div class="modal-card review-card">
+      <div class="modal-head">
+        <div class="review-heading">
+          <h2 id="reviewTitle">分类图片审核</h2>
+          <p id="reviewSubtitle">修改判定会同步移动硬盘中的真实图片</p>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" id="closeReview">返回统计</button>
+        </div>
+      </div>
+      <div class="review-filters" id="reviewFilters"></div>
+      <div class="review-grid">
+        <div class="review-preview">
+          <div class="review-image-stage" id="reviewImageStage">
+            <img id="reviewImage" alt="分类明细图片">
+            <div class="review-empty" id="reviewEmpty">请选择一条分类明细</div>
+            <div class="review-zoom-tools" id="reviewZoomTools">
+              <button id="reviewZoomOut" title="缩小图片">−</button>
+              <span id="reviewZoomValue">100%</span>
+              <button id="reviewZoomIn" title="放大图片">＋</button>
+              <button id="reviewZoomReset" title="恢复原始大小">复位</button>
+            </div>
+          </div>
+          <div class="review-caption">
+            <strong id="reviewPosition">—</strong>
+            <span class="review-name" id="reviewName">—</span>
+            <span class="status-badge unclassified" id="reviewStatus">—</span>
+          </div>
+        </div>
+        <aside class="review-side">
+          <select class="review-list" id="reviewList" size="16" aria-label="已分类图片"></select>
+          <div class="review-correction">
+            <strong>发现误判，直接调整</strong>
+            <div class="review-class-actions" id="reviewClassActions">
+              <button class="review-class-btn" data-index="0">真地膜</button>
+              <button class="review-class-btn" data-index="1">真彩色</button>
+              <button class="review-class-btn" data-index="2">真黑色</button>
+              <button class="review-class-btn" data-index="3">假异纤</button>
+            </div>
+            <p class="review-path" id="reviewPath">修改后会同步移动硬盘中的真实图片。</p>
+          </div>
+          <div class="review-nav">
+            <button class="btn" id="reviewPrev">上一张</button>
+            <button class="btn" id="reviewNext">下一张</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status"></div>
+  <div class="category-switch" id="categorySwitch" aria-live="polite">
+    <span id="categorySwitchText">分类已切换</span>
+    <strong id="categorySwitchName">NG直分</strong>
+  </div>
+
+  <script src="vendor/jszip.min.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const CONFIG = {
+        "ng": { name: "NG直分", labels: ["真地膜", "真彩色", "真黑色", "假异纤"] }
+      };
+      const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "bmp", "tif", "tiff", "webp"]);
+      const collator = new Intl.Collator("zh-CN", { numeric: true, sensitivity: "base" });
+
+      const state = {
+        rootHandle: null,
+        items: [],
+        index: 0,
+        history: [],
+        stats: new Map(),
+        previewUrl: null,
+        renderToken: 0,
+        menuOpen: false,
+        menuIndex: 0,
+        busy: false,
+        zoom: 1,
+        panX: 0,
+        panY: 0,
+        panning: false,
+        pointerStartX: 0,
+        pointerStartY: 0,
+        panStartX: 0,
+        panStartY: 0,
+        reviewRow: null,
+        reviewEntries: [],
+        reviewIndex: 0,
+        reviewFilter: "全部",
+        reviewUrl: null,
+        reviewToken: 0,
+        reviewZoom: 1,
+        reviewPanX: 0,
+        reviewPanY: 0,
+        reviewPanning: false,
+        reviewPointerStartX: 0,
+        reviewPointerStartY: 0,
+        reviewPanStartX: 0,
+        reviewPanStartY: 0,
+        displayedCategoryCode: null
+      };
+
+      const el = {
+        welcome: document.querySelector("#welcome"),
+        dropZone: document.querySelector("#dropZone"),
+        dropContent: document.querySelector("#dropContent"),
+        scanProgress: document.querySelector("#scanProgress"),
+        scanBar: document.querySelector("#scanBar"),
+        scanText: document.querySelector("#scanText"),
+        chooseFolder: document.querySelector("#chooseFolder"),
+        chooseAgain: document.querySelector("#chooseAgain"),
+        undoBtn: document.querySelector("#undoBtn"),
+        statsBtn: document.querySelector("#statsBtn"),
+        trainingZipBtn: document.querySelector("#trainingZipBtn"),
+        rootName: document.querySelector("#rootName"),
+        cameraMetric: document.querySelector("#cameraMetric"),
+        typeMetric: document.querySelector("#typeMetric"),
+        totalMetric: document.querySelector("#totalMetric"),
+        remainingMetric: document.querySelector("#remainingMetric"),
+        percentMetric: document.querySelector("#percentMetric"),
+        statusLine: document.querySelector("#statusLine"),
+        mainProgress: document.querySelector("#mainProgress"),
+        imageStage: document.querySelector(".image-stage"),
+        previewImage: document.querySelector("#previewImage"),
+        resetZoom: document.querySelector("#resetZoom"),
+        zoomValue: document.querySelector("#zoomValue"),
+        emptyState: document.querySelector("#emptyState"),
+        filenameBar: document.querySelector("#filenameBar"),
+        classButtons: [...document.querySelectorAll(".class-btn")],
+        classPopup: document.querySelector("#classPopup"),
+        popupList: document.querySelector("#popupList"),
+        busyText: document.querySelector("#busyText"),
+        statsModal: document.querySelector("#statsModal"),
+        statsBody: document.querySelector("#statsBody"),
+        statsFoot: document.querySelector("#statsFoot"),
+        downloadStats: document.querySelector("#downloadStats"),
+        closeStats: document.querySelector("#closeStats"),
+        reviewModal: document.querySelector("#reviewModal"),
+        reviewTitle: document.querySelector("#reviewTitle"),
+        reviewSubtitle: document.querySelector("#reviewSubtitle"),
+        reviewFilters: document.querySelector("#reviewFilters"),
+        reviewImageStage: document.querySelector("#reviewImageStage"),
+        reviewImage: document.querySelector("#reviewImage"),
+        reviewZoomOut: document.querySelector("#reviewZoomOut"),
+        reviewZoomIn: document.querySelector("#reviewZoomIn"),
+        reviewZoomReset: document.querySelector("#reviewZoomReset"),
+        reviewZoomValue: document.querySelector("#reviewZoomValue"),
+        reviewEmpty: document.querySelector("#reviewEmpty"),
+        reviewPosition: document.querySelector("#reviewPosition"),
+        reviewName: document.querySelector("#reviewName"),
+        reviewStatus: document.querySelector("#reviewStatus"),
+        reviewList: document.querySelector("#reviewList"),
+        reviewClassButtons: [...document.querySelectorAll(".review-class-btn")],
+        reviewPath: document.querySelector("#reviewPath"),
+        reviewPrev: document.querySelector("#reviewPrev"),
+        reviewNext: document.querySelector("#reviewNext"),
+        closeReview: document.querySelector("#closeReview"),
+        toast: document.querySelector("#toast"),
+        categorySwitch: document.querySelector("#categorySwitch"),
+        categorySwitchText: document.querySelector("#categorySwitchText"),
+        categorySwitchName: document.querySelector("#categorySwitchName")
+      };
+
+      let toastTimer = 0;
+      let categorySwitchTimer = 0;
+
+      function isImage(name) {
+        if (!name || name.startsWith(".")) return false;
+        const dot = name.lastIndexOf(".");
+        return dot > -1 && IMAGE_EXTENSIONS.has(name.slice(dot + 1).toLowerCase());
+      }
+
+      function currentItem() {
+        if (!state.items.length) return null;
+        state.index = Math.max(0, Math.min(state.index, state.items.length - 1));
+        return state.items[state.index];
+      }
+
+      function statKey(cameraName, code) {
+        return `${cameraName}\u0000${code}`;
+      }
+
+      function showToast(message, isError = false) {
+        window.clearTimeout(toastTimer);
+        el.toast.textContent = message;
+        el.toast.classList.toggle("error", isError);
+        el.toast.classList.add("show");
+        toastTimer = window.setTimeout(() => el.toast.classList.remove("show"), 2600);
+      }
+
+      function showCategorySwitch(categoryCode, initial = false) {
+        window.clearTimeout(categorySwitchTimer);
+        el.categorySwitch.dataset.code = categoryCode;
+        el.categorySwitchText.textContent = initial ? "当前分类" : "分类已切换";
+        el.categorySwitchName.textContent = CONFIG[categoryCode].name;
+        el.categorySwitch.classList.remove("show");
+        requestAnimationFrame(() => el.categorySwitch.classList.add("show"));
+        categorySwitchTimer = window.setTimeout(() => el.categorySwitch.classList.remove("show"), 3000);
+      }
+
+      function setBusy(busy, message = "正在安全移动图片…") {
+        state.busy = busy;
+        document.body.classList.toggle("busy", busy);
+        el.busyText.textContent = message;
+        el.classButtons.forEach(button => { button.disabled = busy || !currentItem(); });
+        el.undoBtn.disabled = busy || !state.history.length;
+        el.chooseAgain.disabled = busy;
+        el.statsBtn.disabled = busy || !state.rootHandle;
+        el.trainingZipBtn.disabled = busy || !state.rootHandle;
+        el.closeReview.disabled = busy;
+        el.reviewZoomOut.disabled = busy;
+        el.reviewZoomIn.disabled = busy;
+        el.reviewZoomReset.disabled = busy;
+        el.reviewList.disabled = busy;
+        [...el.reviewFilters.querySelectorAll(".filter-btn")].forEach(button => { button.disabled = busy; });
+        if (busy) {
+          el.reviewPrev.disabled = true;
+          el.reviewNext.disabled = true;
+        } else if (state.reviewRow) {
+          el.reviewPrev.disabled = state.reviewIndex <= 0;
+          el.reviewNext.disabled = state.reviewIndex >= state.reviewEntries.length - 1;
+        }
+        if (state.reviewRow) updateReviewClassActions(state.reviewEntries[state.reviewIndex]);
+      }
+
+      function clampPan() {
+        if (state.zoom <= 1 || !el.previewImage.offsetWidth) {
+          state.panX = 0;
+          state.panY = 0;
+          return;
+        }
+        const availableWidth = Math.max(1, el.imageStage.clientWidth - 60);
+        const availableHeight = Math.max(1, el.imageStage.clientHeight - 60);
+        const maxX = Math.max(0, (el.previewImage.offsetWidth * state.zoom - availableWidth) / 2);
+        const maxY = Math.max(0, (el.previewImage.offsetHeight * state.zoom - availableHeight) / 2);
+        state.panX = Math.max(-maxX, Math.min(maxX, state.panX));
+        state.panY = Math.max(-maxY, Math.min(maxY, state.panY));
+      }
+
+      function applyZoom() {
+        clampPan();
+        el.previewImage.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+        el.zoomValue.textContent = `${Math.round(state.zoom * 100)}%`;
+      }
+
+      function resetZoom() {
+        state.zoom = 1;
+        state.panX = 0;
+        state.panY = 0;
+        state.panning = false;
+        el.imageStage.classList.remove("panning");
+        applyZoom();
+      }
+
+      function releasePreview() {
+        state.renderToken += 1;
+        resetZoom();
+        el.imageStage.classList.remove("has-image");
+        el.previewImage.removeAttribute("src");
+        el.previewImage.style.display = "none";
+        if (state.previewUrl) {
+          URL.revokeObjectURL(state.previewUrl);
+          state.previewUrl = null;
+        }
+      }
+
+      async function verifyPermission(handle) {
+        const options = { mode: "readwrite" };
+        if (!handle.queryPermission || !handle.requestPermission) return true;
+        if (await handle.queryPermission(options) === "granted") return true;
+        return await handle.requestPermission(options) === "granted";
+      }
+
+      async function getDirectoryIfExists(parent, name) {
+        try {
+          return await parent.getDirectoryHandle(name);
+        } catch (error) {
+          if (error.name === "NotFoundError") return null;
+          throw error;
+        }
+      }
+
+      async function findNgDirectory(cameraHandle) {
+        for await (const [name, handle] of cameraHandle.entries()) {
+          if (handle.kind === "directory" && name.toLowerCase() === "ng") return handle;
+        }
+        return null;
+      }
+
+      async function listImages(directoryHandle) {
+        if (!directoryHandle) return [];
+        const files = [];
+        for await (const [name, handle] of directoryHandle.entries()) {
+          if (handle.kind === "file" && isImage(name)) files.push({ name, handle });
+        }
+        files.sort((a, b) => collator.compare(a.name, b.name));
+        return files;
+      }
+
+      function showScanProgress(text, percent) {
+        el.dropContent.style.display = "none";
+        el.scanProgress.classList.add("visible");
+        el.scanText.textContent = text;
+        el.scanBar.style.width = `${Math.max(2, percent)}%`;
+      }
+
+      function resetScanProgress() {
+        el.dropContent.style.display = "block";
+        el.scanProgress.classList.remove("visible");
+        el.scanBar.style.width = "0";
+      }
+
+      async function loadRoot(handle) {
+        if (!handle || handle.kind !== "directory") {
+          showToast("请选择整个图片总文件夹，不要选择 ZIP 或单张图片", true);
+          return;
+        }
+
+        try {
+          const granted = await verifyPermission(handle);
+          if (!granted) {
+            showToast("需要允许读写该文件夹，才能自动建立分类目录", true);
+            return;
+          }
+
+          state.rootHandle = handle;
+          state.items = [];
+          state.index = 0;
+          state.history = [];
+          state.stats = new Map();
+          state.displayedCategoryCode = null;
+          releasePreview();
+          showScanProgress("正在读取相机目录…", 3);
+
+          const cameras = [];
+          for await (const [name, child] of handle.entries()) {
+            if (child.kind === "directory") cameras.push({ name, handle: child });
+          }
+          cameras.sort((a, b) => collator.compare(a.name, b.name));
+
+          let activeCameras = 0;
+          for (let cameraIndex = 0; cameraIndex < cameras.length; cameraIndex += 1) {
+            const camera = cameras[cameraIndex];
+            showScanProgress(`正在扫描 ${camera.name}（${cameraIndex + 1}/${cameras.length}）`, 5 + ((cameraIndex + 1) / Math.max(cameras.length, 1)) * 90);
+            await new Promise(resolve => requestAnimationFrame(resolve));
+
+            const ngHandle = await findNgDirectory(camera.handle);
+            if (!ngHandle) continue;
+            let hasImages = false;
+
+            for (const [code, config] of Object.entries(CONFIG)) {
+              const sourceDirectory = ngHandle;
+              const sourceFiles = await listImages(sourceDirectory);
+              if (sourceFiles.length) hasImages = true;
+
+              const details = sourceFiles.map(file => ({
+                originalName: file.name,
+                currentName: file.name,
+                status: "未分类",
+                fileHandle: file.handle,
+                directoryHandle: sourceDirectory,
+                originalIndex: 0
+              }));
+
+              const counts = [];
+              for (let labelIndex = 0; labelIndex < config.labels.length; labelIndex += 1) {
+                const label = config.labels[labelIndex];
+                const classifiedDirectory = await getDirectoryIfExists(ngHandle, label);
+                const classifiedFiles = await listImages(classifiedDirectory);
+                counts.push(classifiedFiles.length);
+                if (classifiedFiles.length) hasImages = true;
+                for (const file of classifiedFiles) {
+                  details.push({
+                    originalName: file.name,
+                    currentName: file.name,
+                    status: label,
+                    fileHandle: file.handle,
+                    directoryHandle: classifiedDirectory,
+                    originalIndex: 0
+                  });
+                }
+              }
+
+              details.sort((a, b) => collator.compare(a.originalName, b.originalName));
+              details.forEach((detail, detailIndex) => { detail.originalIndex = detailIndex + 1; });
+
+              for (const detail of details) {
+                if (detail.status !== "未分类") continue;
+                state.items.push({
+                  cameraName: camera.name,
+                  categoryCode: code,
+                  ngHandle,
+                  sourceDirectory,
+                  name: detail.currentName,
+                  fileHandle: detail.fileHandle,
+                  detail
+                });
+              }
+
+              const total = sourceFiles.length + counts.reduce((sum, value) => sum + value, 0);
+              if (total) {
+                state.stats.set(statKey(camera.name, code), {
+                  cameraName: camera.name,
+                  categoryCode: code,
+                  categoryName: config.name,
+                  labels: config.labels,
+                  ngHandle,
+                  counts,
+                  unclassified: sourceFiles.length,
+                  details
+                });
+              }
+            }
+            if (hasImages) activeCameras += 1;
+          }
+
+          el.rootName.textContent = `${handle.name} · ${activeCameras} 个有图相机 · 图片不上传`;
+          el.welcome.classList.add("hidden");
+          resetScanProgress();
+          el.statsBtn.disabled = false;
+          el.trainingZipBtn.disabled = false;
+          updateMetrics();
+          await renderCurrent();
+          showToast(`扫描完成：${state.items.length} 张待分类图片`);
+        } catch (error) {
+          console.error(error);
+          resetScanProgress();
+          showToast(`读取失败：${friendlyError(error)}`, true);
+        }
+      }
+
+      function totals() {
+        const result = { total: 0, counts: [0, 0, 0, 0], unclassified: 0 };
+        for (const row of state.stats.values()) {
+          const total = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
+          result.total += total;
+          row.counts.forEach((value, index) => { result.counts[index] += value; });
+          result.unclassified += row.unclassified;
+        }
+        return result;
+      }
+
+      function updateMetrics() {
+        const item = currentItem();
+        const summary = totals();
+        const completed = summary.total - summary.unclassified;
+        const percent = summary.total ? completed / summary.total : 0;
+        el.cameraMetric.textContent = item?.cameraName || "—";
+        el.typeMetric.textContent = item ? CONFIG[item.categoryCode].name : "—";
+        el.totalMetric.textContent = summary.total.toLocaleString("zh-CN");
+        el.remainingMetric.textContent = summary.unclassified.toLocaleString("zh-CN");
+        el.percentMetric.textContent = `${(percent * 100).toFixed(1)}%`;
+        el.mainProgress.style.width = `${percent * 100}%`;
+        el.undoBtn.disabled = !state.history.length || state.busy;
+        el.statsBtn.disabled = !state.rootHandle || state.busy;
+      }
+
+      function updateClassLabels(item) {
+        const labels = item ? CONFIG[item.categoryCode].labels : ["—", "—", "—", "—"];
+        el.classButtons.forEach(button => {
+          const actualIndex = Number(button.dataset.index);
+          button.querySelector("strong").textContent = labels[actualIndex];
+          button.disabled = !item || state.busy;
+        });
+        el.popupList.innerHTML = [0, 1, 2].map(index =>
+          `<button class="popup-option${index === state.menuIndex ? " selected" : ""}" data-index="${index}">${index + 1}&nbsp;&nbsp;${labels[index]}</button>`
+        ).join("");
+        [...el.popupList.querySelectorAll(".popup-option")].forEach(button => {
+          button.addEventListener("click", () => classifyAt(Number(button.dataset.index)));
+        });
+      }
+
+      async function renderCurrent() {
+        hideMenu();
+        releasePreview();
+        const token = state.renderToken;
+        const item = currentItem();
+        updateMetrics();
+        updateClassLabels(item);
+
+        if (!item) {
+          const hasBatchImages = state.stats.size > 0;
+          el.emptyState.style.display = "block";
+          el.emptyState.querySelector("h2").textContent = state.rootHandle
+            ? (hasBatchImages ? "本批图片已全部分类完成" : "没有找到符合结构的图片")
+            : "等待选择图片目录";
+          el.emptyState.querySelector("p").innerHTML = state.rootHandle
+            ? (hasBatchImages
+              ? "数字目录中已经没有待分类图片。<br>可以查看统计并下载表格。"
+              : "请确认结构为：总目录 / 相机目录 / NG / 图片。")
+            : "工具只读取各相机目录里 NG 根目录中的图片，<br>不会读取 mark、src，也不会上传任何图片。";
+          el.filenameBar.textContent = "—";
+          el.statusLine.textContent = state.rootHandle
+            ? (hasBatchImages ? "分类完成" : "未找到可处理图片")
+            : "请选择一批图片总文件夹";
+          return;
+        }
+
+        el.emptyState.style.display = "none";
+        if (state.displayedCategoryCode !== item.categoryCode) {
+          const initial = state.displayedCategoryCode === null;
+          state.displayedCategoryCode = item.categoryCode;
+          showCategorySwitch(item.categoryCode, initial);
+        }
+        const row = state.stats.get(statKey(item.cameraName, item.categoryCode));
+        el.filenameBar.textContent = `本组原图第 ${item.detail.originalIndex} 张 · ${item.detail.originalName}`;
+        el.statusLine.textContent = `本组第 ${item.detail.originalIndex} / ${row.details.length} 张 · 当前待分类 ${state.items.length.toLocaleString("zh-CN")} 张`;
+
+        try {
+          const file = await item.fileHandle.getFile();
+          if (token !== state.renderToken) return;
+          state.previewUrl = URL.createObjectURL(file);
+          el.previewImage.src = state.previewUrl;
+          el.previewImage.style.display = "block";
+          el.imageStage.classList.add("has-image");
+          resetZoom();
+        } catch (error) {
+          if (token !== state.renderToken) return;
+          el.emptyState.style.display = "block";
+          el.emptyState.querySelector("h2").textContent = "这张图片无法预览";
+          el.emptyState.querySelector("p").textContent = "可以用左右方向键跳过，原文件不会被改动。";
+          el.statusLine.textContent = friendlyError(error);
+        }
+      }
+
+      function showMenu(index = 0) {
+        if (!currentItem() || state.busy) return;
+        state.menuOpen = true;
+        state.menuIndex = index;
+        updateClassLabels(currentItem());
+        el.classPopup.classList.add("open");
+        el.classPopup.setAttribute("aria-hidden", "false");
+      }
+
+      function moveMenu(direction) {
+        if (!state.menuOpen) return;
+        const optionCount = 3;
+        state.menuIndex = (state.menuIndex + direction + optionCount) % optionCount;
+        updateClassLabels(currentItem());
+      }
+
+      function hideMenu() {
+        state.menuOpen = false;
+        el.classPopup.classList.remove("open");
+        el.classPopup.setAttribute("aria-hidden", "true");
+      }
+
+      async function entryExists(directory, name) {
+        try {
+          await directory.getFileHandle(name);
+          return true;
+        } catch (error) {
+          if (error.name === "NotFoundError") return false;
+          throw error;
+        }
+      }
+
+      async function uniqueName(directory, originalName) {
+        if (!await entryExists(directory, originalName)) return originalName;
+        const dot = originalName.lastIndexOf(".");
+        const stem = dot > 0 ? originalName.slice(0, dot) : originalName;
+        const extension = dot > 0 ? originalName.slice(dot) : "";
+        let counter = 1;
+        while (await entryExists(directory, `${stem}_${counter}${extension}`)) counter += 1;
+        return `${stem}_${counter}${extension}`;
+      }
+
+      async function safeMove(sourceHandle, sourceDirectory, sourceName, targetDirectory, requestedName, requireExactName = false) {
+        if (requireExactName && await entryExists(targetDirectory, requestedName)) {
+          throw new Error(`原位置已有同名文件：${requestedName}`);
+        }
+        const destinationName = requireExactName ? requestedName : await uniqueName(targetDirectory, requestedName);
+
+        if (typeof sourceHandle.move === "function") {
+          try {
+            await sourceHandle.move(targetDirectory, destinationName);
+            return {
+              destinationName,
+              destinationHandle: await targetDirectory.getFileHandle(destinationName),
+              mode: "direct"
+            };
+          } catch (error) {
+            if (!["NotSupportedError", "InvalidStateError", "NoModificationAllowedError", "SecurityError"].includes(error.name)) {
+              console.warn("直接移动不可用，切换到安全复制模式", error);
+            }
+          }
+        }
+
+        const sourceFile = await sourceHandle.getFile();
+        const destinationHandle = await targetDirectory.getFileHandle(destinationName, { create: true });
+        try {
+          const writable = await destinationHandle.createWritable();
+          await sourceFile.stream().pipeTo(writable);
+          const copiedFile = await destinationHandle.getFile();
+          if (copiedFile.size !== sourceFile.size) throw new Error("复制后的文件大小不一致，已停止删除原图");
+          await sourceDirectory.removeEntry(sourceName);
+          return { destinationName, destinationHandle, mode: "verified-copy" };
+        } catch (error) {
+          try { await targetDirectory.removeEntry(destinationName); } catch (_) { /* 保留原图优先 */ }
+          throw error;
+        }
+      }
+
+      async function classifyAt(labelIndex) {
+        const item = currentItem();
+        if (!item || state.busy) return;
+        const label = CONFIG[item.categoryCode].labels[labelIndex];
+        const originalIndex = state.index;
+        hideMenu();
+        releasePreview();
+        setBusy(true, `正在归入“${label}”…`);
+
+        try {
+          const targetDirectory = await item.ngHandle.getDirectoryHandle(label, { create: true });
+          const moved = await safeMove(item.fileHandle, item.sourceDirectory, item.name, targetDirectory, item.name);
+          state.history.push({
+            item,
+            labelIndex,
+            originalIndex,
+            destinationDirectory: targetDirectory,
+            destinationName: moved.destinationName,
+            destinationHandle: moved.destinationHandle
+          });
+
+          const row = state.stats.get(statKey(item.cameraName, item.categoryCode));
+          row.unclassified -= 1;
+          row.counts[labelIndex] += 1;
+          item.detail.status = label;
+          item.detail.currentName = moved.destinationName;
+          item.detail.fileHandle = moved.destinationHandle;
+          item.detail.directoryHandle = targetDirectory;
+          state.items.splice(state.index, 1);
+          if (state.index >= state.items.length) state.index = Math.max(0, state.items.length - 1);
+          showToast(`已归入“${label}”${moved.mode === "direct" ? "" : "（复制核验完成）"}`);
+        } catch (error) {
+          console.error(error);
+          showToast(`分类失败，原图未删除：${friendlyError(error)}`, true);
+        } finally {
+          setBusy(false);
+          await renderCurrent();
+        }
+      }
+
+      async function undoLast() {
+        if (!state.history.length || state.busy) {
+          showToast("没有可以撤销的操作");
+          return;
+        }
+
+        const record = state.history[state.history.length - 1];
+        releasePreview();
+        setBusy(true, "正在撤销上一次分类…");
+        try {
+          const restored = await safeMove(
+            record.destinationHandle,
+            record.destinationDirectory,
+            record.destinationName,
+            record.item.sourceDirectory,
+            record.item.name,
+            true
+          );
+          state.history.pop();
+          record.item.detail.status = "未分类";
+          record.item.detail.currentName = record.item.name;
+          record.item.detail.fileHandle = restored.destinationHandle;
+          record.item.detail.directoryHandle = record.item.sourceDirectory;
+          const restoredItem = { ...record.item, fileHandle: restored.destinationHandle };
+          const insertAt = Math.min(record.originalIndex, state.items.length);
+          state.items.splice(insertAt, 0, restoredItem);
+          state.index = insertAt;
+
+          const row = state.stats.get(statKey(record.item.cameraName, record.item.categoryCode));
+          row.unclassified += 1;
+          row.counts[record.labelIndex] -= 1;
+          showToast("已撤销上一次分类");
+        } catch (error) {
+          console.error(error);
+          showToast(`撤销失败：${friendlyError(error)}`, true);
+        } finally {
+          setBusy(false);
+          await renderCurrent();
+        }
+      }
+
+      function statRows() {
+        return [...state.stats.values()].sort((a, b) => {
+          const cameraOrder = collator.compare(a.cameraName, b.cameraName);
+          return cameraOrder || collator.compare(a.categoryCode, b.categoryCode);
+        });
+      }
+
+      function percentage(value, total) {
+        return total ? `${(value / total * 100).toFixed(2)}%` : "0.00%";
+      }
+
+      function openStats() {
+        const rows = statRows();
+        el.statsBody.innerHTML = rows.map((row, rowIndex) => {
+          const total = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
+          const completed = total - row.unclassified;
+          const reviewAction = total > 0 && row.unclassified === 0
+            ? `<button class="detail-btn" data-row-index="${rowIndex}">审核图片</button>`
+            : "—";
+          return `<tr>
+            <td>${escapeHtml(row.cameraName)}</td><td>${total}</td>
+            <td>${row.counts[0]}</td><td>${percentage(row.counts[0], total)}</td>
+            <td>${row.counts[1]}</td><td>${percentage(row.counts[1], total)}</td>
+            <td>${row.counts[2]}</td><td>${percentage(row.counts[2], total)}</td>
+            <td>${row.counts[3]}</td><td>${percentage(row.counts[3], total)}</td>
+            <td>${row.unclassified}</td><td>${percentage(completed, total)}</td>
+            <td>${reviewAction}</td>
+          </tr>`;
+        }).join("");
+        [...el.statsBody.querySelectorAll(".detail-btn")].forEach(button => {
+          button.addEventListener("click", () => openReview(rows[Number(button.dataset.rowIndex)]));
+        });
+        const total = totals();
+        const completed = total.total - total.unclassified;
+        el.statsFoot.innerHTML = `<tr>
+          <td>全部相机</td><td>${total.total}</td>
+          <td>${total.counts[0]}</td><td>${percentage(total.counts[0], total.total)}</td>
+          <td>${total.counts[1]}</td><td>${percentage(total.counts[1], total.total)}</td>
+          <td>${total.counts[2]}</td><td>${percentage(total.counts[2], total.total)}</td>
+          <td>${total.counts[3]}</td><td>${percentage(total.counts[3], total.total)}</td>
+          <td>${total.unclassified}</td><td>${percentage(completed, total.total)}</td><td>—</td>
+        </tr>`;
+        el.statsModal.classList.add("open");
+        el.statsModal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeStats() {
+        el.statsModal.classList.remove("open");
+        el.statsModal.setAttribute("aria-hidden", "true");
+      }
+
+      function clampReviewPan() {
+        if (state.reviewZoom <= 1 || !el.reviewImage.offsetWidth) {
+          state.reviewPanX = 0;
+          state.reviewPanY = 0;
+          return;
+        }
+        const availableWidth = Math.max(1, el.reviewImageStage.clientWidth - 44);
+        const availableHeight = Math.max(1, el.reviewImageStage.clientHeight - 44);
+        const maxX = Math.max(0, (el.reviewImage.offsetWidth * state.reviewZoom - availableWidth) / 2);
+        const maxY = Math.max(0, (el.reviewImage.offsetHeight * state.reviewZoom - availableHeight) / 2);
+        state.reviewPanX = Math.max(-maxX, Math.min(maxX, state.reviewPanX));
+        state.reviewPanY = Math.max(-maxY, Math.min(maxY, state.reviewPanY));
+      }
+
+      function applyReviewZoom() {
+        clampReviewPan();
+        el.reviewImage.style.transform = `translate(${state.reviewPanX}px, ${state.reviewPanY}px) scale(${state.reviewZoom})`;
+        el.reviewZoomValue.textContent = `${Math.round(state.reviewZoom * 100)}%`;
+      }
+
+      function resetReviewZoom() {
+        state.reviewZoom = 1;
+        state.reviewPanX = 0;
+        state.reviewPanY = 0;
+        state.reviewPanning = false;
+        el.reviewImageStage.classList.remove("panning");
+        applyReviewZoom();
+      }
+
+      function changeReviewZoom(multiplier) {
+        state.reviewZoom = Math.max(1, Math.min(8, state.reviewZoom * multiplier));
+        if (state.reviewZoom < 1.01) resetReviewZoom();
+        else applyReviewZoom();
+      }
+
+      function releaseReviewPreview() {
+        state.reviewToken += 1;
+        resetReviewZoom();
+        el.reviewImageStage.classList.remove("has-image");
+        el.reviewImage.removeAttribute("src");
+        el.reviewImage.style.display = "none";
+        if (state.reviewUrl) {
+          URL.revokeObjectURL(state.reviewUrl);
+          state.reviewUrl = null;
+        }
+      }
+
+      function reviewFilterOptions(row) {
+        return ["全部", ...row.labels];
+      }
+
+      function reviewEntriesForFilter(row, filter) {
+        return filter === "全部" ? row.details : row.details.filter(detail => detail.status === filter);
+      }
+
+      function renderReviewFilters() {
+        const row = state.reviewRow;
+        el.reviewFilters.innerHTML = reviewFilterOptions(row).map(filter => {
+          const count = reviewEntriesForFilter(row, filter).length;
+          return `<button class="filter-btn${filter === state.reviewFilter ? " active" : ""}" data-filter="${escapeHtml(filter)}"${state.busy ? " disabled" : ""}>${escapeHtml(filter)}（${count}）</button>`;
+        }).join("");
+        [...el.reviewFilters.querySelectorAll(".filter-btn")].forEach(button => {
+          button.addEventListener("click", () => {
+            state.reviewFilter = button.dataset.filter;
+            state.reviewIndex = 0;
+            refreshReview();
+          });
+        });
+      }
+
+      function updateReviewClassActions(detail) {
+        const row = state.reviewRow;
+        el.reviewClassButtons.forEach((button, index) => {
+          const label = row?.labels[index] || ["真地膜", "真彩色", "真黑色", "假异纤"][index];
+          const current = detail?.status === label;
+          button.textContent = label;
+          button.classList.toggle("current", current);
+          button.disabled = state.busy || !detail || current;
+        });
+        el.reviewPath.innerHTML = detail && row
+          ? `硬盘文件：<b>${escapeHtml(row.cameraName)}/ng/${escapeHtml(detail.status)}/</b>${escapeHtml(detail.currentName)}<br>点击上方分类会直接移动这个真实文件，可用于后续 AI 训练。`
+          : "修改后会同步移动硬盘中的真实图片。";
+      }
+
+      async function renderReviewImage() {
+        releaseReviewPreview();
+        const token = state.reviewToken;
+        const detail = state.reviewEntries[state.reviewIndex];
+        if (!detail) {
+          el.reviewEmpty.style.display = "block";
+          el.reviewEmpty.textContent = "这个分类下没有图片";
+          el.reviewPosition.textContent = "—";
+          el.reviewName.textContent = "—";
+          el.reviewStatus.textContent = "—";
+          el.reviewStatus.classList.add("unclassified");
+          el.reviewPrev.disabled = true;
+          el.reviewNext.disabled = true;
+          updateReviewClassActions(null);
+          return;
+        }
+
+        el.reviewPosition.textContent = `审核进度 ${state.reviewIndex + 1} / ${state.reviewEntries.length}`;
+        el.reviewName.textContent = detail.currentName;
+        el.reviewName.title = detail.currentName;
+        el.reviewStatus.textContent = detail.status;
+        el.reviewStatus.classList.toggle("unclassified", detail.status === "未分类");
+        updateReviewClassActions(detail);
+        el.reviewList.value = String(state.reviewIndex);
+        el.reviewPrev.disabled = state.busy || state.reviewIndex <= 0;
+        el.reviewNext.disabled = state.busy || state.reviewIndex >= state.reviewEntries.length - 1;
+        el.reviewEmpty.style.display = "block";
+        el.reviewEmpty.textContent = "正在读取本地图片…";
+
+        try {
+          const file = await detail.fileHandle.getFile();
+          if (token !== state.reviewToken) return;
+          state.reviewUrl = URL.createObjectURL(file);
+          el.reviewImage.src = state.reviewUrl;
+          el.reviewImage.style.display = "block";
+          el.reviewImageStage.classList.add("has-image");
+          resetReviewZoom();
+          el.reviewEmpty.style.display = "none";
+        } catch (error) {
+          if (token !== state.reviewToken) return;
+          el.reviewEmpty.textContent = `图片无法读取：${friendlyError(error)}`;
+        }
+      }
+
+      function refreshReview(preferredDetail = null) {
+        const row = state.reviewRow;
+        if (!row) return;
+        const selectedDetail = preferredDetail || state.reviewEntries[state.reviewIndex];
+        state.reviewEntries = reviewEntriesForFilter(row, state.reviewFilter);
+        const selectedIndex = selectedDetail ? state.reviewEntries.indexOf(selectedDetail) : -1;
+        state.reviewIndex = selectedIndex >= 0
+          ? selectedIndex
+          : Math.max(0, Math.min(state.reviewIndex, state.reviewEntries.length - 1));
+        renderReviewFilters();
+        el.reviewList.innerHTML = state.reviewEntries.map((detail, index) =>
+          `<option value="${index}">${escapeHtml(detail.currentName)} · ${escapeHtml(detail.status)}</option>`
+        ).join("");
+        renderReviewImage();
+      }
+
+      function openReview(row) {
+        if (row.unclassified > 0) {
+          showToast("请先完成这一项的全部分类，再进入审核", true);
+          return;
+        }
+        state.reviewRow = row;
+        state.reviewFilter = "全部";
+        state.reviewIndex = 0;
+        el.reviewTitle.textContent = `${row.cameraName} · ${row.categoryName}图片审核`;
+        el.reviewSubtitle.textContent = `已全部分类，共 ${row.details.length} 张；修改判定会同步移动硬盘中的真实图片`;
+        el.reviewModal.classList.add("open");
+        el.reviewModal.setAttribute("aria-hidden", "false");
+        refreshReview();
+      }
+
+      function closeReview() {
+        releaseReviewPreview();
+        state.reviewRow = null;
+        state.reviewEntries = [];
+        el.reviewModal.classList.remove("open");
+        el.reviewModal.setAttribute("aria-hidden", "true");
+      }
+
+      function stepReview(direction) {
+        if (!state.reviewEntries.length) return;
+        state.reviewIndex = Math.max(0, Math.min(state.reviewEntries.length - 1, state.reviewIndex + direction));
+        renderReviewImage();
+      }
+
+      async function reclassifyReview(labelIndex) {
+        const row = state.reviewRow;
+        const detail = state.reviewEntries[state.reviewIndex];
+        if (!row || !detail || state.busy) return;
+        const oldLabelIndex = row.labels.indexOf(detail.status);
+        const targetLabel = row.labels[labelIndex];
+        if (oldLabelIndex < 0 || detail.status === targetLabel) return;
+
+        const oldLabel = detail.status;
+        releaseReviewPreview();
+        setBusy(true, `正在把“${oldLabel}”调整为“${targetLabel}”…`);
+        try {
+          const targetDirectory = await row.ngHandle.getDirectoryHandle(targetLabel, { create: true });
+          const moved = await safeMove(
+            detail.fileHandle,
+            detail.directoryHandle,
+            detail.currentName,
+            targetDirectory,
+            detail.currentName
+          );
+          row.counts[oldLabelIndex] -= 1;
+          row.counts[labelIndex] += 1;
+          detail.status = targetLabel;
+          detail.currentName = moved.destinationName;
+          detail.fileHandle = moved.destinationHandle;
+          detail.directoryHandle = targetDirectory;
+          state.reviewFilter = "全部";
+          openStats();
+          refreshReview(detail);
+          showToast(`已从“${oldLabel}”改为“${targetLabel}”，硬盘图片已同步移动`);
+        } catch (error) {
+          console.error(error);
+          showToast(`调整失败，原图未删除：${friendlyError(error)}`, true);
+          renderReviewImage();
+        } finally {
+          setBusy(false);
+          updateReviewClassActions(state.reviewEntries[state.reviewIndex]);
+        }
+      }
+
+      function xmlEscape(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&apos;");
+      }
+
+      function excelCell(value = "", type = "String", style = "Body") {
+        if (type === "Number" && !Number.isFinite(Number(value))) {
+          return `<Cell ss:StyleID="${style}"><Data ss:Type="String">${xmlEscape(value)}</Data></Cell>`;
+        }
+        const safeValue = type === "Number" ? Number(value) : xmlEscape(value);
+        return `<Cell ss:StyleID="${style}"><Data ss:Type="${type}">${safeValue}</Data></Cell>`;
+      }
+
+      function excelRow(cells, options = "") {
+        return `<Row${options}>${cells.join("")}</Row>`;
+      }
+
+      function localDateParts(date) {
+        const pad = value => String(value).padStart(2, "0");
+        return {
+          date: `${date.getFullYear()}年${pad(date.getMonth() + 1)}月${pad(date.getDate())}日`,
+          stamp: `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
+        };
+      }
+
+      function buildStatisticsWorkbook() {
+        const total = totals();
+        const completed = total.total - total.unclassified;
+        const now = new Date();
+        const { date: dateLabel, stamp } = localDateParts(now);
+        const reportRows = CONFIG.ng.labels.map((name, index) => ({ name, count: total.counts[index] }));
+        const summaryHeaders = ["分类", "数量", "占总图片比", "占已判断图片比"];
+        const completionStatus = total.total ? (total.unclassified === 0 ? "是" : "否") : "无图片";
+        const blankCells = Array(summaryHeaders.length).fill(null).map(() => excelCell(""));
+        const xmlRows = [];
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="3" ss:StyleID="Title"><Data ss:Type="String">异纤图片分类汇总（NG直分版）· ${xmlEscape(dateLabel)}</Data></Cell>`], ' ss:AutoFitHeight="0" ss:Height="34"'));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="3" ss:StyleID="Subtitle"><Data ss:Type="String">统计各相机 NG 根目录及四个分类文件夹中的图片</Data></Cell>`]));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="3" ss:StyleID="Section"><Data ss:Type="String">本批概览</Data></Cell>`]));
+        const overviewRows = [
+          ["生成日期", dateLabel],
+          ["总图片数", total.total],
+          ["已判断图片", completed],
+          ["未判断图片", total.unclassified],
+          ["是否人工判断完毕", completionStatus]
+        ];
+        for (const [label, value] of overviewRows) {
+          const valueCell = typeof value === "number" ? excelCell(value, "Number") : excelCell(value);
+          xmlRows.push(excelRow([excelCell(label, "String", "Label"), valueCell, ...blankCells.slice(2)]));
+        }
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="3" ss:StyleID="Section"><Data ss:Type="String">分类汇总</Data></Cell>`]));
+        xmlRows.push(excelRow(summaryHeaders.map(value => excelCell(value, "String", "Header"))));
+        for (const row of reportRows) {
+          xmlRows.push(excelRow([
+            excelCell(row.name), excelCell(row.count, "Number"),
+            excelCell(row.count / (total.total || 1), "Number", "Percent"),
+            excelCell(row.count / (completed || 1), "Number", "Percent")
+          ]));
+        }
+
+        const xml = `<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">
+  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>小伍工作室</Author><Created>${now.toISOString()}</Created></DocumentProperties>
+  <Styles>
+    <Style ss:ID="Default" ss:Name="Normal"><Font ss:FontName="Microsoft YaHei" ss:Size="11"/><Alignment ss:Vertical="Center"/></Style>
+    <Style ss:ID="Title"><Font ss:FontName="Microsoft YaHei" ss:Size="18" ss:Bold="1" ss:Color="#153944"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
+    <Style ss:ID="Subtitle"><Font ss:FontName="Microsoft YaHei" ss:Size="10" ss:Color="#5E7478"/></Style>
+    <Style ss:ID="Section"><Font ss:FontName="Microsoft YaHei" ss:Size="13" ss:Bold="1" ss:Color="#153944"/><Interior ss:Color="#DDECEB" ss:Pattern="Solid"/><Alignment ss:Horizontal="Left" ss:Vertical="Center"/></Style>
+    <Style ss:ID="Header"><Font ss:FontName="Microsoft YaHei" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#153944" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#5BC1BF"/></Borders></Style>
+    <Style ss:ID="Label"><Font ss:FontName="Microsoft YaHei" ss:Size="11" ss:Bold="1" ss:Color="#153944"/><Interior ss:Color="#EFF6F3" ss:Pattern="Solid"/></Style>
+    <Style ss:ID="Body"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
+    <Style ss:ID="Percent"><NumberFormat ss:Format="0.00%"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
+  </Styles>
+  <Worksheet ss:Name="汇总表"><Table ss:ExpandedColumnCount="4" ss:ExpandedRowCount="${xmlRows.length}" x:FullColumns="1" x:FullRows="1"><Column ss:Width="140"/><Column ss:Width="95"/><Column ss:Width="115"/><Column ss:Width="135"/>${xmlRows.join("")}</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><FreezePanes/><FrozenNoSplit/><SplitHorizontal>10</SplitHorizontal><TopRowBottomPane>10</TopRowBottomPane><ActivePane>2</ActivePane><ProtectContents>False</ProtectContents></WorksheetOptions></Worksheet>
+</Workbook>`;
+
+        const blob = new Blob(["\ufeff", xml], { type: "application/vnd.ms-excel;charset=utf-8" });
+        return { blob, filename: `异纤NG直分统计_${stamp}.xls` };
+      }
+
+      function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function downloadStatistics() {
+        const workbook = buildStatisticsWorkbook();
+        downloadBlob(workbook.blob, workbook.filename);
+        showToast("Excel 表格已下载，包含总体分类汇总");
+      }
+
+      function archivePart(value) {
+        return String(value).replace(/[<>:"/\\|?*]/g, "_").replace(/\.\.+/g, "_") || "未命名";
+      }
+
+      async function downloadTrainingZip() {
+        if (!state.rootHandle || state.busy) return;
+        if (typeof JSZip === "undefined") {
+          showToast("训练打包组件未加载，请刷新页面后重试", true);
+          return;
+        }
+
+        const rows = statRows();
+        const records = [];
+        for (const row of rows) {
+          for (const detail of row.details) {
+            if (detail.status === "未分类") continue;
+            records.push({ row, detail });
+          }
+        }
+        if (!records.length) {
+          showToast("还没有已分类图片，完成分类后再生成训练 ZIP", true);
+          return;
+        }
+
+        const now = new Date();
+        const { stamp } = localDateParts(now);
+        const zip = new JSZip();
+        for (const config of Object.values(CONFIG)) {
+          for (const label of config.labels) zip.folder(label);
+        }
+
+        setBusy(true, `正在准备训练包（0 / ${records.length}）…`);
+        try {
+          for (let index = 0; index < records.length; index += 1) {
+            const { row, detail } = records[index];
+            const file = await detail.fileHandle.getFile();
+            const archiveName = `${detail.status}/${archivePart(row.cameraName)}_${archivePart(detail.currentName || detail.originalName)}`;
+            zip.file(archiveName, file);
+            if (index % 20 === 0 || index === records.length - 1) {
+              el.busyText.textContent = `正在读取训练图片（${index + 1} / ${records.length}）…`;
+              await new Promise(resolve => requestAnimationFrame(resolve));
+            }
+          }
+
+          const workbook = buildStatisticsWorkbook();
+          zip.file(workbook.filename, workbook.blob);
+          const blob = await zip.generateAsync(
+            { type: "blob", compression: "STORE", streamFiles: true },
+            metadata => { el.busyText.textContent = `正在生成 ZIP（${Math.round(metadata.percent)}%）…`; }
+          );
+          downloadBlob(blob, `异纤模型训练包_${stamp}.zip`);
+          showToast(`训练 ZIP 已生成，共 ${records.length.toLocaleString("zh-CN")} 张已分类图片`);
+        } catch (error) {
+          console.error(error);
+          showToast(`训练 ZIP 生成失败：${friendlyError(error)}`, true);
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>'"]/g, character => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+        })[character]);
+      }
+
+      function friendlyError(error) {
+        if (!error) return "未知错误";
+        if (error.name === "AbortError") return "已取消选择";
+        if (error.name === "NotAllowedError") return "没有获得文件夹读写权限";
+        if (error.name === "NotFoundError") return "文件已被移动或删除，请重新扫描";
+        if (error.name === "QuotaExceededError") return "目标磁盘空间不足";
+        return error.message || error.name || String(error);
+      }
+
+      async function chooseDirectory() {
+        if (!("showDirectoryPicker" in window) || !window.isSecureContext) {
+          showToast("请使用最新版 Chrome 或 Edge，并通过 HTTPS 公网链接打开", true);
+          return;
+        }
+        try {
+          const handle = await window.showDirectoryPicker({ id: "xiaowu-fiber-sorter", mode: "readwrite" });
+          await loadRoot(handle);
+        } catch (error) {
+          if (error.name !== "AbortError") showToast(`选择失败：${friendlyError(error)}`, true);
+        }
+      }
+
+      el.chooseFolder.addEventListener("click", chooseDirectory);
+      el.chooseAgain.addEventListener("click", chooseDirectory);
+      el.undoBtn.addEventListener("click", undoLast);
+      el.statsBtn.addEventListener("click", openStats);
+      el.closeStats.addEventListener("click", closeStats);
+      el.downloadStats.addEventListener("click", downloadStatistics);
+      el.trainingZipBtn.addEventListener("click", downloadTrainingZip);
+      el.closeReview.addEventListener("click", closeReview);
+      el.reviewPrev.addEventListener("click", () => stepReview(-1));
+      el.reviewNext.addEventListener("click", () => stepReview(1));
+      el.reviewList.addEventListener("change", () => {
+        state.reviewIndex = Number(el.reviewList.value) || 0;
+        renderReviewImage();
+      });
+      el.reviewClassButtons.forEach(button => {
+        button.addEventListener("click", () => reclassifyReview(Number(button.dataset.index)));
+      });
+      el.reviewZoomOut.addEventListener("click", () => changeReviewZoom(0.8));
+      el.reviewZoomIn.addEventListener("click", () => changeReviewZoom(1.25));
+      el.reviewZoomReset.addEventListener("click", resetReviewZoom);
+      el.reviewImageStage.addEventListener("dblclick", event => {
+        if (event.target.closest("button")) return;
+        resetReviewZoom();
+      });
+      el.reviewImageStage.addEventListener("wheel", event => {
+        if (!el.reviewImageStage.classList.contains("has-image")) return;
+        event.preventDefault();
+        const bounds = el.reviewImageStage.getBoundingClientRect();
+        const pointerX = event.clientX - bounds.left - bounds.width / 2;
+        const pointerY = event.clientY - bounds.top - bounds.height / 2;
+        const oldZoom = state.reviewZoom;
+        const nextZoom = Math.max(1, Math.min(8, oldZoom * Math.exp(-event.deltaY * 0.0015)));
+        if (nextZoom === oldZoom) return;
+        const imageX = (pointerX - state.reviewPanX) / oldZoom;
+        const imageY = (pointerY - state.reviewPanY) / oldZoom;
+        state.reviewZoom = nextZoom;
+        state.reviewPanX = pointerX - imageX * nextZoom;
+        state.reviewPanY = pointerY - imageY * nextZoom;
+        if (state.reviewZoom < 1.01) resetReviewZoom();
+        else applyReviewZoom();
+      }, { passive: false });
+      el.reviewImageStage.addEventListener("pointerdown", event => {
+        if (event.button !== 0 || state.reviewZoom <= 1 || event.target.closest("button")) return;
+        state.reviewPanning = true;
+        state.reviewPointerStartX = event.clientX;
+        state.reviewPointerStartY = event.clientY;
+        state.reviewPanStartX = state.reviewPanX;
+        state.reviewPanStartY = state.reviewPanY;
+        el.reviewImageStage.classList.add("panning");
+        el.reviewImageStage.setPointerCapture(event.pointerId);
+        event.preventDefault();
+      });
+      el.reviewImageStage.addEventListener("pointermove", event => {
+        if (!state.reviewPanning) return;
+        state.reviewPanX = state.reviewPanStartX + event.clientX - state.reviewPointerStartX;
+        state.reviewPanY = state.reviewPanStartY + event.clientY - state.reviewPointerStartY;
+        applyReviewZoom();
+      });
+      const stopReviewPanning = event => {
+        if (!state.reviewPanning) return;
+        state.reviewPanning = false;
+        el.reviewImageStage.classList.remove("panning");
+        if (el.reviewImageStage.hasPointerCapture(event.pointerId)) el.reviewImageStage.releasePointerCapture(event.pointerId);
+      };
+      el.reviewImageStage.addEventListener("pointerup", stopReviewPanning);
+      el.reviewImageStage.addEventListener("pointercancel", stopReviewPanning);
+      el.reviewImage.addEventListener("load", applyReviewZoom);
+      el.classButtons.forEach(button => button.addEventListener("click", () => classifyAt(Number(button.dataset.index))));
+
+      el.resetZoom.addEventListener("click", event => {
+        event.stopPropagation();
+        resetZoom();
+      });
+      el.imageStage.addEventListener("dblclick", event => {
+        if (event.target.closest("button,.class-popup")) return;
+        resetZoom();
+      });
+      el.imageStage.addEventListener("wheel", event => {
+        if (!el.imageStage.classList.contains("has-image")) return;
+        event.preventDefault();
+        const bounds = el.imageStage.getBoundingClientRect();
+        const pointerX = event.clientX - bounds.left - bounds.width / 2;
+        const pointerY = event.clientY - bounds.top - bounds.height / 2;
+        const oldZoom = state.zoom;
+        const nextZoom = Math.max(1, Math.min(8, oldZoom * Math.exp(-event.deltaY * 0.0015)));
+        if (nextZoom === oldZoom) return;
+        const imageX = (pointerX - state.panX) / oldZoom;
+        const imageY = (pointerY - state.panY) / oldZoom;
+        state.zoom = nextZoom;
+        state.panX = pointerX - imageX * nextZoom;
+        state.panY = pointerY - imageY * nextZoom;
+        if (state.zoom < 1.01) resetZoom();
+        else applyZoom();
+      }, { passive: false });
+      el.imageStage.addEventListener("pointerdown", event => {
+        if (event.button !== 0 || state.zoom <= 1 || event.target.closest("button,.class-popup,.empty-state")) return;
+        state.panning = true;
+        state.pointerStartX = event.clientX;
+        state.pointerStartY = event.clientY;
+        state.panStartX = state.panX;
+        state.panStartY = state.panY;
+        el.imageStage.classList.add("panning");
+        el.imageStage.setPointerCapture(event.pointerId);
+        event.preventDefault();
+      });
+      el.imageStage.addEventListener("pointermove", event => {
+        if (!state.panning) return;
+        state.panX = state.panStartX + event.clientX - state.pointerStartX;
+        state.panY = state.panStartY + event.clientY - state.pointerStartY;
+        applyZoom();
+      });
+      const stopPanning = event => {
+        if (!state.panning) return;
+        state.panning = false;
+        el.imageStage.classList.remove("panning");
+        if (el.imageStage.hasPointerCapture(event.pointerId)) el.imageStage.releasePointerCapture(event.pointerId);
+      };
+      el.imageStage.addEventListener("pointerup", stopPanning);
+      el.imageStage.addEventListener("pointercancel", stopPanning);
+      el.previewImage.addEventListener("load", applyZoom);
+
+      el.previewImage.addEventListener("error", () => {
+        if (!el.previewImage.getAttribute("src")) return;
+        el.imageStage.classList.remove("has-image", "panning");
+        el.previewImage.style.display = "none";
+        el.emptyState.style.display = "block";
+        el.emptyState.querySelector("h2").textContent = "这张图片无法预览";
+        el.emptyState.querySelector("p").textContent = "图片文件可能损坏，可以用左右方向键跳过；原文件不会被改动。";
+        el.statusLine.textContent = "图片解码失败，已保留原文件";
+      });
+      el.reviewImage.addEventListener("error", () => {
+        if (!el.reviewImage.getAttribute("src")) return;
+        el.reviewImageStage.classList.remove("has-image", "panning");
+        el.reviewImage.style.display = "none";
+        el.reviewEmpty.style.display = "block";
+        el.reviewEmpty.textContent = "这张图片无法预览，但分类记录仍然保留";
+      });
+
+      el.statsModal.addEventListener("click", event => {
+        if (event.target === el.statsModal) closeStats();
+      });
+      el.reviewModal.addEventListener("click", event => {
+        if (event.target === el.reviewModal) closeReview();
+      });
+
+      ["dragenter", "dragover"].forEach(type => {
+        el.dropZone.addEventListener(type, event => {
+          event.preventDefault();
+          el.dropZone.classList.add("dragging");
+        });
+      });
+      ["dragleave", "drop"].forEach(type => {
+        el.dropZone.addEventListener(type, event => {
+          event.preventDefault();
+          el.dropZone.classList.remove("dragging");
+        });
+      });
+      el.dropZone.addEventListener("drop", async event => {
+        const promises = [...event.dataTransfer.items]
+          .filter(item => item.kind === "file" && typeof item.getAsFileSystemHandle === "function")
+          .map(item => item.getAsFileSystemHandle());
+        const handles = await Promise.all(promises);
+        const directory = handles.find(handle => handle?.kind === "directory");
+        if (!directory) {
+          showToast("请拖入整个总文件夹；ZIP 压缩包不能直接分类", true);
+          return;
+        }
+        await loadRoot(directory);
+      });
+
+      document.addEventListener("keydown", event => {
+        if (state.busy) return;
+        if (el.reviewModal.classList.contains("open")) {
+          if (["Escape", "ArrowLeft", "ArrowRight"].includes(event.key)) event.preventDefault();
+          if (event.key === "Escape") closeReview();
+          else if (event.key === "ArrowLeft") stepReview(-1);
+          else if (event.key === "ArrowRight") stepReview(1);
+          return;
+        }
+        if (el.statsModal.classList.contains("open")) {
+          if (event.key === "Escape") closeStats();
+          return;
+        }
+        if (!state.rootHandle) return;
+
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          if (state.items.length) {
+            state.index = Math.max(0, state.index - 1);
+            renderCurrent();
+          }
+        } else if (event.key === "ArrowRight") {
+          event.preventDefault();
+          if (state.items.length) {
+            state.index = Math.min(state.items.length - 1, state.index + 1);
+            renderCurrent();
+          }
+        } else if (event.key === "ArrowUp") {
+          event.preventDefault();
+          if (state.menuOpen) moveMenu(-1);
+          else showMenu(0);
+        } else if (event.key === "ArrowDown") {
+          event.preventDefault();
+          if (state.menuOpen) moveMenu(1);
+        } else if (event.key === "Enter" && !event.repeat) {
+          event.preventDefault();
+          if (state.menuOpen) classifyAt(state.menuIndex);
+          else classifyAt(3);
+        } else if (event.key === "Escape") {
+          hideMenu();
+        } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
+          event.preventDefault();
+          undoLast();
+        }
+      });
+
+      window.addEventListener("beforeunload", event => {
+        if (!state.busy) return;
+        event.preventDefault();
+        event.returnValue = "";
+      });
+
+      if (!("showDirectoryPicker" in window) || !window.isSecureContext) {
+        el.chooseFolder.textContent = "请改用 Chrome / Edge 打开";
+        el.chooseFolder.disabled = true;
+      }
+    })();
+  </script>
+</body>
+</html>
