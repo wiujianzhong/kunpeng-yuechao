@@ -306,32 +306,57 @@
     .side-panel h2 { margin: 0; font-size: 19px; }
     .side-panel > p { margin: 6px 0 18px; color: var(--muted); font-size: 12px; }
 
-    .class-actions { display: grid; gap: 7px; }
-    .true-class-actions { display: grid; gap: 6px; }
+    .layout-tools { display: flex; gap: 6px; margin: -4px 0 8px; }
+    .layout-tool-btn { min-height: 28px; padding: 0 9px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; }
+    .layout-tool-btn:hover { border-color: var(--teal); color: var(--teal); }
+    .layout-hint { min-height: 18px; margin: 0 0 6px; color: var(--amber); font-size: 10px; }
+
+    .class-actions {
+      position: relative;
+      height: 236px;
+      border: 1px solid transparent;
+      transition: border-color .16s ease, background .16s ease;
+    }
+
+    .class-actions.layout-editing {
+      border-color: var(--amber);
+      background-color: rgba(255, 174, 69, .035);
+      background-image: linear-gradient(rgba(255, 174, 69, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 174, 69, .08) 1px, transparent 1px);
+      background-size: 16px 16px;
+      touch-action: none;
+    }
 
     .class-btn {
+      position: absolute;
       display: grid;
       grid-template-columns: 34px 1fr auto;
       align-items: center;
       min-height: 38px;
+      margin: 0;
+      padding: 0 8px;
       border: 1px solid var(--line);
       border-left-width: 3px;
       background: var(--panel-2);
       color: var(--text);
       text-align: left;
       cursor: pointer;
-      transition: transform .14s ease, background .14s ease;
+      overflow: hidden;
+      user-select: none;
+      transition: background .14s ease;
     }
 
-    .class-btn:hover:not(:disabled) { background: #28515a; transform: translateX(-2px); }
+    .class-btn:hover:not(:disabled) { background: #28515a; }
     .class-btn[data-index="0"] { border-left-color: var(--teal); }
     .class-btn[data-index="1"] { border-left-color: var(--amber); }
     .class-btn[data-index="2"], .class-btn[data-index="3"] { border-left-color: var(--danger); }
-    .false-class-btn { min-height: 76px; border-left-width: 5px; background: #244a54; }
+    .false-class-btn { border-left-width: 5px; background: #244a54; }
     .false-class-btn:hover:not(:disabled) { background: #2a5b66; }
     .false-class-btn strong { font-size: 20px; }
     .undo-class-btn { min-height: 30px; border-left-color: var(--muted); grid-template-columns: 64px 1fr; }
     .undo-class-btn strong { font-size: 12px; color: var(--muted); }
+    .class-actions.layout-editing .class-btn { cursor: move; outline: 1px dashed rgba(255, 174, 69, .55); opacity: 1; }
+    .resize-handle { display: none; width: 16px; height: 16px; color: var(--amber); cursor: nwse-resize; font-size: 15px; line-height: 14px; text-align: center; }
+    .class-actions.layout-editing .resize-handle { display: block; }
     .class-btn:disabled { opacity: .35; cursor: not-allowed; }
     .class-btn kbd { color: var(--muted); font-size: 13px; text-align: center; }
     .class-btn strong { font-size: 15px; }
@@ -880,14 +905,17 @@
       <aside class="side-panel">
         <h2>判定操作</h2>
         <p>回车判假异纤；键盘快捷键或鼠标点击即可归类</p>
+        <div class="layout-tools">
+          <button class="layout-tool-btn" id="layoutToggle" type="button">调整按钮位置和大小</button>
+          <button class="layout-tool-btn" id="layoutReset" type="button">恢复默认竖排</button>
+        </div>
+        <div class="layout-hint" id="layoutHint">默认竖排；需要时可自由拖动调整</div>
         <div class="class-actions" id="classActions">
-          <div class="true-class-actions">
-            <button class="class-btn" data-index="0" disabled><kbd>1</kbd><strong>—</strong></button>
-            <button class="class-btn" data-index="1" disabled><kbd>2</kbd><strong>—</strong></button>
-            <button class="class-btn" data-index="2" disabled><kbd>3</kbd><strong>—</strong></button>
-          </div>
-          <button class="class-btn false-class-btn" data-index="3" disabled><kbd>Enter</kbd><strong>—</strong></button>
-          <button class="class-btn undo-class-btn" id="quickUndo" disabled><kbd>Ctrl+Z</kbd><strong>撤回上一张</strong></button>
+          <button class="class-btn" data-index="0" data-layout-key="true0" disabled><kbd>1</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
+          <button class="class-btn" data-index="1" data-layout-key="true1" disabled><kbd>2</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
+          <button class="class-btn" data-index="2" data-layout-key="true2" disabled><kbd>3</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
+          <button class="class-btn false-class-btn" data-index="3" data-layout-key="false" disabled><kbd>Enter</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
+          <button class="class-btn undo-class-btn" id="quickUndo" data-layout-key="undo" disabled><kbd>Ctrl+Z</kbd><strong>撤回上一张</strong><span class="resize-handle">⌟</span></button>
         </div>
 
         <div class="key-guide">
@@ -944,7 +972,7 @@
   <section class="modal" id="settingsModal" aria-hidden="true">
     <div class="modal-card settings-card">
       <div class="modal-head">
-        <h2>真异纤分类设置</h2>
+        <h2>分类与快捷键设置</h2>
         <div class="modal-actions">
           <button class="btn primary" id="saveSettings">保存设置</button>
           <button class="btn" id="closeSettings">关闭</button>
@@ -969,7 +997,7 @@
             <label class="settings-field">撤回快捷键（点击输入框后，直接按下想用的按键）<input id="settingUndoShortcut" readonly autocomplete="off" aria-label="撤回快捷键"></label>
           </div>
         </div>
-        <p class="settings-note">名称会直接用于 NG 内的分类文件夹、统计表和训练 ZIP。为保证同一批数据一致，请在选择文件夹前完成设置；载入图片后本批设置锁定，如需更改请刷新页面再开始新批。</p>
+        <p class="settings-note">快捷键在打开图片后也能随时修改并立即生效。分类名称会用于硬盘文件夹、统计表和训练 ZIP，因此打开一批图片后只锁定名称，不锁定快捷键。</p>
       </div>
     </div>
   </section>
@@ -1061,7 +1089,15 @@
         "ng": { name: "NG直分", labels: ["真地膜", "真彩色", "真黑色", "假异纤"] }
       };
       const SETTINGS_STORAGE_KEY = "xiaowu-fiber-ng-direct-settings-v1";
+      const BUTTON_LAYOUT_STORAGE_KEY = "xiaowu-fiber-ng-direct-button-layout-v1";
       const DEFAULT_UNDO_SHORTCUT = "Ctrl+Z";
+      const DEFAULT_BUTTON_LAYOUT = {
+        true0: { x: 0, y: 0, w: 1, h: 38 },
+        true1: { x: 0, y: 44, w: 1, h: 38 },
+        true2: { x: 0, y: 88, w: 1, h: 38 },
+        false: { x: 0, y: 132, w: 1, h: 68 },
+        undo: { x: 0, y: 206, w: 1, h: 30 }
+      };
       let trueShortcuts = ["1", "2", "3"];
       let undoShortcut = DEFAULT_UNDO_SHORTCUT;
       const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "bmp", "tif", "tiff", "webp"]);
@@ -1100,7 +1136,9 @@
         reviewPointerStartY: 0,
         reviewPanStartX: 0,
         reviewPanStartY: 0,
-        displayedCategoryCode: null
+        displayedCategoryCode: null,
+        layoutEditing: false,
+        layoutGesture: null
       };
 
       const el = {
@@ -1130,8 +1168,12 @@
         zoomValue: document.querySelector("#zoomValue"),
         emptyState: document.querySelector("#emptyState"),
         filenameBar: document.querySelector("#filenameBar"),
+        classActions: document.querySelector("#classActions"),
         classButtons: [...document.querySelectorAll(".class-btn[data-index]")],
         quickUndo: document.querySelector("#quickUndo"),
+        layoutToggle: document.querySelector("#layoutToggle"),
+        layoutReset: document.querySelector("#layoutReset"),
+        layoutHint: document.querySelector("#layoutHint"),
         trueShortcutKeys: document.querySelector("#trueShortcutKeys"),
         undoShortcutKey: document.querySelector("#undoShortcutKey"),
         classPopup: document.querySelector("#classPopup"),
@@ -1268,9 +1310,10 @@
 
       function openSettings() {
         fillSettingsForm();
-        const locked = Boolean(state.rootHandle) || state.busy;
-        el.saveSettings.disabled = locked;
-        [...el.settingNames, ...el.settingKeys, el.settingUndoShortcut].forEach(input => { input.disabled = locked; });
+        const namesLocked = Boolean(state.rootHandle);
+        el.saveSettings.disabled = state.busy;
+        el.settingNames.forEach(input => { input.disabled = namesLocked || state.busy; });
+        [...el.settingKeys, el.settingUndoShortcut].forEach(input => { input.disabled = state.busy; });
         el.settingsModal.classList.add("open");
         el.settingsModal.setAttribute("aria-hidden", "false");
       }
@@ -1281,10 +1324,6 @@
       }
 
       function saveSettings() {
-        if (state.rootHandle) {
-          showToast("本批图片已载入，分类设置已锁定；请刷新页面后再开始新批", true);
-          return;
-        }
         try {
           const settings = normalizeSettings(
             el.settingNames.map(input => input.value),
@@ -1295,10 +1334,129 @@
           try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings)); } catch (_) { /* 浏览器仍可本次使用 */ }
           updateClassLabels(currentItem());
           closeSettings();
-          showToast("分类名称和快捷键已保存，将用于下一批图片");
+          showToast(state.rootHandle ? "快捷键已保存，本批图片立即生效" : "分类名称和快捷键已保存");
         } catch (error) {
           showToast(error.message || "设置保存失败", true);
         }
+      }
+
+      function controlButtons() {
+        return [...el.classButtons, el.quickUndo];
+      }
+
+      function applyButtonLayout(layout) {
+        controlButtons().forEach(button => {
+          const key = button.dataset.layoutKey;
+          const fallback = DEFAULT_BUTTON_LAYOUT[key];
+          const saved = layout?.[key] || fallback;
+          const widthRatio = Math.max(.24, Math.min(1, Number(saved.w) || fallback.w));
+          const leftRatio = Math.max(0, Math.min(1 - widthRatio, Number(saved.x) || 0));
+          const height = Math.max(28, Math.min(110, Number(saved.h) || fallback.h));
+          const top = Math.max(0, Math.min(el.classActions.clientHeight - height, Number(saved.y) || 0));
+          button.style.left = `${leftRatio * 100}%`;
+          button.style.top = `${top}px`;
+          button.style.width = `${widthRatio * 100}%`;
+          button.style.height = `${height}px`;
+        });
+      }
+
+      function currentButtonLayout() {
+        const containerRect = el.classActions.getBoundingClientRect();
+        const containerWidth = Math.max(1, containerRect.width);
+        return Object.fromEntries(controlButtons().map(button => {
+          const rect = button.getBoundingClientRect();
+          return [button.dataset.layoutKey, {
+            x: Math.max(0, (rect.left - containerRect.left) / containerWidth),
+            y: Math.max(0, rect.top - containerRect.top),
+            w: Math.min(1, rect.width / containerWidth),
+            h: rect.height
+          }];
+        }));
+      }
+
+      function saveButtonLayout() {
+        const layout = currentButtonLayout();
+        try { localStorage.setItem(BUTTON_LAYOUT_STORAGE_KEY, JSON.stringify(layout)); } catch (_) { /* 本次仍可使用 */ }
+        applyButtonLayout(layout);
+      }
+
+      function restoreButtonLayout() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(BUTTON_LAYOUT_STORAGE_KEY) || "null");
+          applyButtonLayout(saved || DEFAULT_BUTTON_LAYOUT);
+        } catch (_) {
+          applyButtonLayout(DEFAULT_BUTTON_LAYOUT);
+        }
+      }
+
+      function setLayoutEditing(editing) {
+        state.layoutEditing = editing;
+        state.layoutGesture = null;
+        el.classActions.classList.toggle("layout-editing", editing);
+        el.layoutToggle.textContent = editing ? "完成调整" : "调整按钮位置和大小";
+        el.layoutHint.textContent = editing ? "拖动按钮换位置，拖右下角改变大小" : "默认竖排；需要时可自由拖动调整";
+        if (editing) {
+          controlButtons().forEach(button => { button.disabled = false; });
+        } else {
+          saveButtonLayout();
+          updateClassLabels(currentItem());
+          updateMetrics();
+        }
+      }
+
+      function resetButtonLayout() {
+        applyButtonLayout(DEFAULT_BUTTON_LAYOUT);
+        try { localStorage.removeItem(BUTTON_LAYOUT_STORAGE_KEY); } catch (_) { /* 本次仍可使用 */ }
+        showToast("判定按钮已恢复默认竖排");
+      }
+
+      function startLayoutGesture(event, button) {
+        if (!state.layoutEditing || event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const containerRect = el.classActions.getBoundingClientRect();
+        const buttonRect = button.getBoundingClientRect();
+        state.layoutGesture = {
+          pointerId: event.pointerId,
+          button,
+          mode: event.target.closest(".resize-handle") ? "resize" : "move",
+          startX: event.clientX,
+          startY: event.clientY,
+          left: buttonRect.left - containerRect.left,
+          top: buttonRect.top - containerRect.top,
+          width: buttonRect.width,
+          height: buttonRect.height
+        };
+        if (button.setPointerCapture) button.setPointerCapture(event.pointerId);
+      }
+
+      function moveLayoutGesture(event) {
+        const gesture = state.layoutGesture;
+        if (!gesture || event.pointerId !== gesture.pointerId) return;
+        event.preventDefault();
+        const dx = event.clientX - gesture.startX;
+        const dy = event.clientY - gesture.startY;
+        const containerWidth = el.classActions.clientWidth;
+        const containerHeight = el.classActions.clientHeight;
+        if (gesture.mode === "move") {
+          const left = Math.max(0, Math.min(containerWidth - gesture.width, gesture.left + dx));
+          const top = Math.max(0, Math.min(containerHeight - gesture.height, gesture.top + dy));
+          gesture.button.style.left = `${left}px`;
+          gesture.button.style.top = `${top}px`;
+        } else {
+          const width = Math.max(80, Math.min(containerWidth - gesture.left, gesture.width + dx));
+          const height = Math.max(28, Math.min(containerHeight - gesture.top, gesture.height + dy));
+          gesture.button.style.width = `${width}px`;
+          gesture.button.style.height = `${height}px`;
+        }
+      }
+
+      function finishLayoutGesture(event) {
+        const gesture = state.layoutGesture;
+        if (!gesture || event.pointerId !== gesture.pointerId) return;
+        state.layoutGesture = null;
+        if (gesture.button.hasPointerCapture?.(event.pointerId)) gesture.button.releasePointerCapture(event.pointerId);
+        saveButtonLayout();
       }
 
       function isImage(name) {
@@ -1842,7 +2000,7 @@
         el.statsBody.innerHTML = rows.map((row, rowIndex) => {
           const total = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
           const completed = total - row.unclassified;
-          const reviewAction = total > 0 && row.unclassified === 0
+          const reviewAction = completed > 0
             ? `<button class="detail-btn" data-row-index="${rowIndex}">审核图片</button>`
             : "—";
           return `<tr>
@@ -2022,15 +2180,11 @@
       }
 
       function openReview(row) {
-        if (row.unclassified > 0) {
-          showToast("请先完成这一项的全部分类，再进入审核", true);
-          return;
-        }
         state.reviewRow = row;
         state.reviewFilter = "全部";
         state.reviewIndex = 0;
         el.reviewTitle.textContent = `${row.cameraName} · ${row.categoryName}图片审核`;
-        el.reviewSubtitle.textContent = `已全部分类，共 ${row.details.length} 张；修改判定会同步移动硬盘中的真实图片`;
+        el.reviewSubtitle.textContent = `已判断 ${row.details.length} 张，待判断 ${row.unclassified} 张；修改判定会同步移动硬盘中的真实图片`;
         el.reviewModal.classList.add("open");
         el.reviewModal.setAttribute("aria-hidden", "false");
         refreshReview();
@@ -2281,6 +2435,12 @@
       el.settingsBtn.addEventListener("click", openSettings);
       el.saveSettings.addEventListener("click", saveSettings);
       el.closeSettings.addEventListener("click", closeSettings);
+      el.layoutToggle.addEventListener("click", () => setLayoutEditing(!state.layoutEditing));
+      el.layoutReset.addEventListener("click", resetButtonLayout);
+      controlButtons().forEach(button => button.addEventListener("pointerdown", event => startLayoutGesture(event, button)));
+      document.addEventListener("pointermove", moveLayoutGesture);
+      document.addEventListener("pointerup", finishLayoutGesture);
+      document.addEventListener("pointercancel", finishLayoutGesture);
       el.settingUndoShortcut.addEventListener("keydown", event => {
         if (event.key === "Tab") return;
         event.preventDefault();
@@ -2297,7 +2457,13 @@
         el.settingUndoShortcut.value = recorded;
       });
       el.undoBtn.addEventListener("click", undoLast);
-      el.quickUndo.addEventListener("click", undoLast);
+      el.quickUndo.addEventListener("click", event => {
+        if (state.layoutEditing) {
+          event.preventDefault();
+          return;
+        }
+        undoLast();
+      });
       el.statsBtn.addEventListener("click", openStats);
       el.closeStats.addEventListener("click", closeStats);
       el.downloadStats.addEventListener("click", downloadStatistics);
@@ -2362,7 +2528,13 @@
       el.reviewImageStage.addEventListener("pointerup", stopReviewPanning);
       el.reviewImageStage.addEventListener("pointercancel", stopReviewPanning);
       el.reviewImage.addEventListener("load", applyReviewZoom);
-      el.classButtons.forEach(button => button.addEventListener("click", () => classifyAt(Number(button.dataset.index))));
+      el.classButtons.forEach(button => button.addEventListener("click", event => {
+        if (state.layoutEditing) {
+          event.preventDefault();
+          return;
+        }
+        classifyAt(Number(button.dataset.index));
+      }));
 
       el.resetZoom.addEventListener("click", event => {
         event.stopPropagation();
@@ -2470,6 +2642,11 @@
 
       document.addEventListener("keydown", event => {
         if (state.busy) return;
+        if (state.layoutEditing) {
+          if (event.key === "Escape") setLayoutEditing(false);
+          event.preventDefault();
+          return;
+        }
         if (el.settingsModal.classList.contains("open")) {
           if (event.key === "Escape") closeSettings();
           return;
@@ -2537,6 +2714,7 @@
       });
 
       restoreSettings();
+      restoreButtonLayout();
       updateClassLabels(null);
 
       if (!("showDirectoryPicker" in window) || !window.isSecureContext) {
