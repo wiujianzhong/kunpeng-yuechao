@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#0d2028">
-  <title>异纤图片挑选工具·NG直分版｜小伍工作室</title>
+  <title>异纤图片挑选工具·兼容版｜小伍工作室</title>
   <script defer src="https://xiaowustudio.cn/assets/analytics.js"></script>
   <style>
     :root {
@@ -312,10 +312,8 @@
     .layout-hint { min-height: 18px; margin: 0 0 6px; color: var(--amber); font-size: 10px; }
 
     .class-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      height: 236px;
+      position: relative;
+      height: 252px;
       border: 1px solid transparent;
       transition: border-color .16s ease, background .16s ease;
     }
@@ -323,17 +321,17 @@
     .class-actions.layout-editing {
       border-color: var(--amber);
       background-color: rgba(255, 174, 69, .035);
-      background-image: repeating-linear-gradient(0deg, transparent 0 46px, rgba(255, 174, 69, .08) 46px 47px);
+      background-image: linear-gradient(rgba(255, 174, 69, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 174, 69, .08) 1px, transparent 1px);
+      background-size: 16px 16px;
       touch-action: none;
     }
 
     .class-btn {
-      position: relative;
+      position: absolute;
       display: grid;
       grid-template-columns: 34px 1fr auto;
       align-items: center;
       min-height: 28px;
-      width: 100%;
       margin: 0;
       padding: 0 8px;
       border: 1px solid var(--line);
@@ -356,9 +354,14 @@
     .false-class-btn strong { font-size: 20px; }
     .undo-class-btn { border-left-color: var(--muted); grid-template-columns: 64px 1fr auto; }
     .undo-class-btn strong { font-size: 12px; color: var(--muted); }
-    .class-actions.layout-editing .class-btn { outline: 1px dashed rgba(255, 174, 69, .55); opacity: 1; }
-    .resize-handle { display: none; width: 20px; height: 20px; color: var(--amber); cursor: ns-resize; font-size: 15px; line-height: 18px; text-align: center; }
+    .class-actions.layout-editing .class-btn { cursor: move; outline: 1px dashed rgba(255, 174, 69, .55); opacity: 1; }
+    .resize-handle { display: none; width: 20px; height: 20px; color: var(--amber); cursor: nwse-resize; font-size: 15px; line-height: 18px; text-align: center; }
     .class-actions.layout-editing .resize-handle { display: block; }
+    .class-actions.binary-mode .class-btn[data-index="1"],
+    .class-actions.binary-mode .class-btn[data-index="2"] { display: none; }
+    .class-actions.binary-mode .class-btn[data-index="0"] { left: 0 !important; top: 0 !important; width: 100% !important; height: 110px !important; }
+    .class-actions.binary-mode .class-btn[data-index="3"] { left: 0 !important; top: 116px !important; width: 100% !important; height: 80px !important; }
+    .class-actions.binary-mode .undo-class-btn { left: 0 !important; top: 202px !important; width: 100% !important; height: 48px !important; }
     .class-btn:disabled { opacity: .35; cursor: not-allowed; }
     .class-btn kbd { color: var(--muted); font-size: 13px; text-align: center; }
     .class-btn strong { font-size: 15px; }
@@ -840,8 +843,8 @@
   <main class="app-shell">
     <header class="topbar">
       <div class="brand">
-        <h1>异纤图片挑选工具 · NG直分版</h1>
-        <p>无 012 目录 · 人工判定 · 本地归档</p>
+        <h1>异纤图片挑选工具 · 兼容版</h1>
+        <p>自动识别 012 / NG直分 · 人工判定 · 本地归档</p>
       </div>
 
       <div class="privacy-strip" title="网页不会上传图片或文件名">
@@ -857,7 +860,7 @@
         <button class="btn" id="settingsBtn">分类设置</button>
         <button class="btn" id="chooseAgain">选择文件夹</button>
         <button class="btn primary" id="statsBtn" disabled>分类统计</button>
-        <button class="btn" id="trainingZipBtn" title="汇总所有相机的4个分类并打包为ZIP" disabled>生成训练 ZIP</button>
+        <button class="btn" id="trainingZipBtn" title="汇总所有相机的分类图片并打包为ZIP" disabled>生成训练 ZIP</button>
       </div>
     </header>
 
@@ -884,7 +887,7 @@
               <circle cx="43" cy="24" r="5" stroke="currentColor" stroke-width="2"/>
             </svg>
             <h2>等待选择图片目录</h2>
-            <p>工具只读取各相机目录里 NG 根目录中的图片，<br>不会读取 mark、src，也不会上传任何图片。</p>
+            <p>工具会自动识别 NG/0、1、2 或 NG 根目录图片，<br>不会读取 mark、src，也不会上传任何图片。</p>
           </div>
 
           <div class="class-popup" id="classPopup" aria-hidden="true">
@@ -905,33 +908,33 @@
 
       <aside class="side-panel">
         <h2>判定操作</h2>
-        <p>回车判假异纤；键盘快捷键或鼠标点击即可归类</p>
+        <p id="operationHint">回车判假异纤；键盘快捷键或鼠标点击即可归类</p>
         <div class="layout-tools">
-          <button class="layout-tool-btn" id="layoutToggle" type="button">调整按钮大小</button>
-          <button class="layout-tool-btn" id="layoutReset" type="button">恢复等高竖排</button>
+          <button class="layout-tool-btn" id="layoutToggle" type="button">调整位置和大小</button>
+          <button class="layout-tool-btn" id="layoutReset" type="button">恢复默认布局</button>
         </div>
-        <div class="layout-hint" id="layoutHint">五个按钮等高竖排并自动铺满</div>
+        <div class="layout-hint" id="layoutHint">默认上面三块竖排，下面是假异纤和撤回</div>
         <div class="class-actions" id="classActions">
-          <button class="class-btn" data-index="0" data-layout-key="true0" disabled><kbd>1</kbd><strong>—</strong><span class="resize-handle">↕</span></button>
-          <button class="class-btn" data-index="1" data-layout-key="true1" disabled><kbd>2</kbd><strong>—</strong><span class="resize-handle">↕</span></button>
-          <button class="class-btn" data-index="2" data-layout-key="true2" disabled><kbd>3</kbd><strong>—</strong><span class="resize-handle">↕</span></button>
-          <button class="class-btn false-class-btn" data-index="3" data-layout-key="false" disabled><kbd>Enter</kbd><strong>—</strong><span class="resize-handle">↕</span></button>
-          <button class="class-btn undo-class-btn" id="quickUndo" data-layout-key="undo" disabled><kbd>Ctrl+Z</kbd><strong>撤回上一张</strong><span class="resize-handle">↕</span></button>
+          <button class="class-btn" data-index="0" data-layout-key="true0" disabled><kbd>1</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
+          <button class="class-btn" data-index="1" data-layout-key="true1" disabled><kbd>2</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
+          <button class="class-btn" data-index="2" data-layout-key="true2" disabled><kbd>3</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
+          <button class="class-btn false-class-btn" data-index="3" data-layout-key="false" disabled><kbd>Enter</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
+          <button class="class-btn undo-class-btn" id="quickUndo" data-layout-key="undo" disabled><kbd>Ctrl+Z</kbd><strong>撤回上一张</strong><span class="resize-handle">⌟</span></button>
         </div>
 
         <div class="key-guide">
           <div class="key-row"><kbd>← →</kbd><span>切换图片</span></div>
           <div class="key-row"><kbd>滚轮</kbd><span>放大 / 缩小图片</span></div>
           <div class="key-row"><kbd>左键拖动</kbd><span>抓住图片移动</span></div>
-          <div class="key-row"><kbd id="trueShortcutKeys">1 / 2 / 3</kbd><span>直接判定三个真异纤</span></div>
-          <div class="key-row"><kbd>↑</kbd><span>打开真异纤菜单</span></div>
-          <div class="key-row"><kbd>↑ ↓</kbd><span>选择真异纤类别</span></div>
+          <div class="key-row"><kbd id="trueShortcutKeys">1 / 2 / 3</kbd><span id="trueShortcutHint">直接判定三个真异纤</span></div>
+          <div class="key-row"><kbd>↑</kbd><span id="upMenuHint">打开真异纤菜单</span></div>
+          <div class="key-row"><kbd>↑ ↓</kbd><span id="menuSelectHint">选择真异纤类别</span></div>
           <div class="key-row"><kbd>Enter</kbd><span>直接判假，或确认菜单选项</span></div>
           <div class="key-row"><kbd id="undoShortcutKey">Ctrl+Z</kbd><span>撤销上一次</span></div>
         </div>
 
         <div class="safety-note">
-          <b>真实文件归档：</b>分类会在各相机的 NG 目录创建“真地膜 / 真彩色 / 真黑色 / 假异纤”文件夹并移动原图。分类完成后，NG 根目录中的图片会进入对应中文文件夹。
+          <b>真实文件归档：</b>工具会自动识别目录结构，并在各相机的 NG 目录创建对应分类文件夹后移动原图。012 模式按地膜、彩色、黑色分别判真假；NG 直分模式判真地膜、真彩色、真黑色或假异纤。
         </div>
       </aside>
     </section>
@@ -941,8 +944,8 @@
   <section class="welcome" id="welcome">
     <div class="welcome-card">
       <div class="eyebrow">LOCAL IMAGE SORTER</div>
-      <h2>没有 012 目录，<br>NG 原图直接分类。</h2>
-      <p>选择包含全部相机目录的总文件夹。网页直接读取每个相机 NG 根目录中的图片，只处理本机文件，不上传服务器。</p>
+      <h2>一套工具，兼容两种目录。</h2>
+      <p>选择包含全部相机目录的总文件夹。网页会自动识别 NG/0、1、2 或 NG 根目录图片，只处理本机文件，不上传服务器。</p>
 
       <div class="drop-zone" id="dropZone">
         <div id="dropContent">
@@ -964,7 +967,7 @@
 
       <div class="structure">
         <span>推荐最新版 Chrome / Edge（Windows、Mac 均可）</span>
-        <code>总目录 / 相机 / NG / 图片</code>
+        <code>总目录 / 相机 / NG / 0、1、2 / 图片　或　总目录 / 相机 / NG / 图片</code>
       </div>
       <div class="welcome-contact">小伍工作室 · 技术支持 <a href="tel:19009925522">19009925522</a></div>
     </div>
@@ -1015,7 +1018,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>相机</th><th>总数</th><th>真地膜</th><th>占比</th><th>真彩色</th><th>占比</th><th>真黑色</th><th>占比</th><th>假异纤</th><th>占比</th><th>未分类</th><th>完成率</th><th>图片审核</th></tr>
+            <tr id="statsHead"><th>相机</th><th>总数</th><th>真地膜</th><th>占比</th><th>真彩色</th><th>占比</th><th>真黑色</th><th>占比</th><th>假异纤</th><th>占比</th><th>未分类</th><th>完成率</th><th>图片审核</th></tr>
           </thead>
           <tbody id="statsBody"></tbody>
           <tfoot id="statsFoot"></tfoot>
@@ -1087,17 +1090,20 @@
       "use strict";
 
       const CONFIG = {
+        "0": { name: "地膜", labels: ["真地膜", "假地膜"] },
+        "1": { name: "彩色", labels: ["真彩色", "假彩色"] },
+        "2": { name: "黑色", labels: ["真黑色", "假黑色"] },
         "ng": { name: "NG直分", labels: ["真地膜", "真彩色", "真黑色", "假异纤"] }
       };
       const SETTINGS_STORAGE_KEY = "xiaowu-fiber-ng-direct-settings-v1";
-      const BUTTON_LAYOUT_STORAGE_KEY = "xiaowu-fiber-ng-direct-button-layout-v2";
+      const BUTTON_LAYOUT_STORAGE_KEY = "xiaowu-fiber-ng-direct-button-layout-v3";
       const DEFAULT_UNDO_SHORTCUT = "Ctrl+Z";
       const DEFAULT_BUTTON_LAYOUT = {
-        true0: 1,
-        true1: 1,
-        true2: 1,
-        false: 1,
-        undo: 1
+        true0: { x: 0, y: 0, w: .31, h: 142 },
+        true1: { x: .345, y: 0, w: .31, h: 142 },
+        true2: { x: .69, y: 0, w: .31, h: 142 },
+        false: { x: 0, y: 148, w: 1, h: 58 },
+        undo: { x: 0, y: 212, w: 1, h: 38 }
       };
       let trueShortcuts = ["1", "2", "3"];
       let undoShortcut = DEFAULT_UNDO_SHORTCUT;
@@ -1106,6 +1112,7 @@
 
       const state = {
         rootHandle: null,
+        mode: "direct",
         items: [],
         index: 0,
         history: [],
@@ -1169,12 +1176,16 @@
         emptyState: document.querySelector("#emptyState"),
         filenameBar: document.querySelector("#filenameBar"),
         classActions: document.querySelector("#classActions"),
+        operationHint: document.querySelector("#operationHint"),
         classButtons: [...document.querySelectorAll(".class-btn[data-index]")],
         quickUndo: document.querySelector("#quickUndo"),
         layoutToggle: document.querySelector("#layoutToggle"),
         layoutReset: document.querySelector("#layoutReset"),
         layoutHint: document.querySelector("#layoutHint"),
         trueShortcutKeys: document.querySelector("#trueShortcutKeys"),
+        trueShortcutHint: document.querySelector("#trueShortcutHint"),
+        upMenuHint: document.querySelector("#upMenuHint"),
+        menuSelectHint: document.querySelector("#menuSelectHint"),
         undoShortcutKey: document.querySelector("#undoShortcutKey"),
         classPopup: document.querySelector("#classPopup"),
         popupList: document.querySelector("#popupList"),
@@ -1186,6 +1197,7 @@
         settingKeys: [0, 1, 2].map(index => document.querySelector(`#settingKey${index}`)),
         settingUndoShortcut: document.querySelector("#settingUndoShortcut"),
         statsModal: document.querySelector("#statsModal"),
+        statsHead: document.querySelector("#statsHead"),
         statsBody: document.querySelector("#statsBody"),
         statsFoot: document.querySelector("#statsFoot"),
         downloadStats: document.querySelector("#downloadStats"),
@@ -1346,23 +1358,33 @@
 
       function applyButtonLayout(layout) {
         const buttons = controlButtons();
-        const rawSizes = buttons.map(button => Math.max(.2, Number(layout?.[button.dataset.layoutKey]) || 1));
-        const total = rawSizes.reduce((sum, value) => sum + value, 0);
-        buttons.forEach((button, index) => {
-          const ratio = rawSizes[index] / total;
-          button.style.removeProperty("left");
-          button.style.removeProperty("top");
-          button.style.removeProperty("width");
-          button.style.removeProperty("height");
-          button.style.flex = `${ratio} 1 0px`;
+        const containerWidth = Math.max(1, el.classActions.clientWidth);
+        buttons.forEach(button => {
+          const key = button.dataset.layoutKey;
+          const fallback = DEFAULT_BUTTON_LAYOUT[key];
+          const saved = layout?.[key] || fallback;
+          const minimumWidth = Math.min(1, 72 / containerWidth);
+          const width = Math.max(minimumWidth, Math.min(1, Number(saved.w) || fallback.w));
+          const left = Math.max(0, Math.min(1 - width, Number(saved.x) || 0));
+          const height = Math.max(28, Math.min(el.classActions.clientHeight, Number(saved.h) || fallback.h));
+          const top = Math.max(0, Math.min(el.classActions.clientHeight - height, Number(saved.y) || 0));
+          button.style.removeProperty("flex");
+          button.style.left = `${left * 100}%`;
+          button.style.top = `${top}px`;
+          button.style.width = `${width * 100}%`;
+          button.style.height = `${height}px`;
         });
       }
 
       function currentButtonLayout() {
         const buttons = controlButtons();
-        const heights = buttons.map(button => button.getBoundingClientRect().height);
-        const total = Math.max(1, heights.reduce((sum, value) => sum + value, 0));
-        return Object.fromEntries(buttons.map((button, index) => [button.dataset.layoutKey, heights[index] / total]));
+        const containerWidth = Math.max(1, el.classActions.clientWidth);
+        return Object.fromEntries(buttons.map(button => [button.dataset.layoutKey, {
+          x: button.offsetLeft / containerWidth,
+          y: button.offsetTop,
+          w: button.offsetWidth / containerWidth,
+          h: button.offsetHeight
+        }]));
       }
 
       function saveButtonLayout() {
@@ -1384,12 +1406,11 @@
         state.layoutEditing = editing;
         state.layoutGesture = null;
         el.classActions.classList.toggle("layout-editing", editing);
-        el.layoutToggle.textContent = editing ? "完成调整" : "调整按钮大小";
-        el.layoutHint.textContent = editing ? "上下拖动 ↕ 调整一项，其余按钮会自动补满" : "五个按钮竖排并自动铺满整个区域";
+        el.layoutToggle.textContent = editing ? "完成调整" : "调整位置和大小";
+        el.layoutHint.textContent = editing ? "拖动按钮可上下左右移动；拖右下角可拉宽拉高" : "默认上面三块竖排，下面是假异纤和撤回";
         if (editing) {
           controlButtons().forEach(button => { button.disabled = false; });
         } else {
-          saveButtonLayout();
           updateClassLabels(currentItem());
           updateMetrics();
         }
@@ -1398,22 +1419,24 @@
       function resetButtonLayout() {
         applyButtonLayout(DEFAULT_BUTTON_LAYOUT);
         try { localStorage.removeItem(BUTTON_LAYOUT_STORAGE_KEY); } catch (_) { /* 本次仍可使用 */ }
-        showToast("判定按钮已恢复等高竖排并铺满区域");
+        showToast("判定按钮已恢复默认布局");
       }
 
       function startLayoutGesture(event, button) {
-        if (!state.layoutEditing || event.button !== 0 || !event.target.closest(".resize-handle")) return;
+        if (!state.layoutEditing || event.button !== 0) return;
         event.preventDefault();
         event.stopPropagation();
-        const buttons = controlButtons();
-        const heights = buttons.map(item => item.getBoundingClientRect().height);
         state.layoutGesture = {
           pointerId: event.pointerId,
           button,
-          index: buttons.indexOf(button),
+          mode: event.target.closest(".resize-handle") ? "resize" : "move",
+          startX: event.clientX,
           startY: event.clientY,
-          heights,
-          totalHeight: heights.reduce((sum, value) => sum + value, 0)
+          left: button.offsetLeft,
+          top: button.offsetTop,
+          width: button.offsetWidth,
+          height: button.offsetHeight,
+          moved: false
         };
         if (button.setPointerCapture) button.setPointerCapture(event.pointerId);
       }
@@ -1422,22 +1445,22 @@
         const gesture = state.layoutGesture;
         if (!gesture || event.pointerId !== gesture.pointerId) return;
         event.preventDefault();
+        const dx = event.clientX - gesture.startX;
         const dy = event.clientY - gesture.startY;
-        const buttons = controlButtons();
-        const minimumHeight = 28;
-        const maximumHeight = gesture.totalHeight - minimumHeight * (buttons.length - 1);
-        const selectedHeight = Math.max(minimumHeight, Math.min(maximumHeight, gesture.heights[gesture.index] + dy));
-        const otherIndexes = buttons.map((_, index) => index).filter(index => index !== gesture.index);
-        const remainingHeight = gesture.totalHeight - selectedHeight;
-        const extraHeight = Math.max(0, remainingHeight - minimumHeight * otherIndexes.length);
-        const originalExtra = otherIndexes.map(index => Math.max(1, gesture.heights[index] - minimumHeight));
-        const extraTotal = originalExtra.reduce((sum, value) => sum + value, 0);
-        const nextHeights = [...gesture.heights];
-        nextHeights[gesture.index] = selectedHeight;
-        otherIndexes.forEach((index, order) => {
-          nextHeights[index] = minimumHeight + extraHeight * originalExtra[order] / extraTotal;
-        });
-        buttons.forEach((item, index) => { item.style.flex = `0 0 ${nextHeights[index]}px`; });
+        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) gesture.moved = true;
+        const containerWidth = el.classActions.clientWidth;
+        const containerHeight = el.classActions.clientHeight;
+        if (gesture.mode === "move") {
+          const left = Math.max(0, Math.min(containerWidth - gesture.width, gesture.left + dx));
+          const top = Math.max(0, Math.min(containerHeight - gesture.height, gesture.top + dy));
+          gesture.button.style.left = `${left}px`;
+          gesture.button.style.top = `${top}px`;
+        } else {
+          const width = Math.max(72, Math.min(containerWidth - gesture.left, gesture.width + dx));
+          const height = Math.max(28, Math.min(containerHeight - gesture.top, gesture.height + dy));
+          gesture.button.style.width = `${width}px`;
+          gesture.button.style.height = `${height}px`;
+        }
       }
 
       function finishLayoutGesture(event) {
@@ -1445,7 +1468,7 @@
         if (!gesture || event.pointerId !== gesture.pointerId) return;
         state.layoutGesture = null;
         if (gesture.button.hasPointerCapture?.(event.pointerId)) gesture.button.releasePointerCapture(event.pointerId);
-        saveButtonLayout();
+        if (gesture.moved) saveButtonLayout();
       }
 
       function isImage(name) {
@@ -1613,6 +1636,7 @@
           state.index = 0;
           state.history = [];
           state.stats = new Map();
+          state.mode = "direct";
           state.displayedCategoryCode = null;
           releasePreview();
           showScanProgress("正在读取相机目录…", 3);
@@ -1623,18 +1647,34 @@
           }
           cameras.sort((a, b) => collator.compare(a.name, b.name));
 
-          let activeCameras = 0;
-          for (let cameraIndex = 0; cameraIndex < cameras.length; cameraIndex += 1) {
-            const camera = cameras[cameraIndex];
-            showScanProgress(`正在扫描 ${camera.name}（${cameraIndex + 1}/${cameras.length}）`, 5 + ((cameraIndex + 1) / Math.max(cameras.length, 1)) * 90);
-            await new Promise(resolve => requestAnimationFrame(resolve));
-
+          const cameraSources = [];
+          let hasNumberedDirectories = false;
+          for (const camera of cameras) {
             const ngHandle = await findNgDirectory(camera.handle);
             if (!ngHandle) continue;
+            const numberedDirectories = {};
+            for (const code of ["0", "1", "2"]) {
+              numberedDirectories[code] = await getDirectoryIfExists(ngHandle, code);
+              if (numberedDirectories[code]) hasNumberedDirectories = true;
+            }
+            cameraSources.push({ ...camera, ngHandle, numberedDirectories });
+          }
+          state.mode = hasNumberedDirectories ? "numbered" : "direct";
+          const activeConfigs = state.mode === "numbered"
+            ? [["0", CONFIG["0"]], ["1", CONFIG["1"]], ["2", CONFIG["2"]]]
+            : [["ng", CONFIG.ng]];
+
+          let activeCameras = 0;
+          for (let cameraIndex = 0; cameraIndex < cameraSources.length; cameraIndex += 1) {
+            const camera = cameraSources[cameraIndex];
+            showScanProgress(`正在扫描 ${camera.name}（${cameraIndex + 1}/${cameraSources.length}）`, 5 + ((cameraIndex + 1) / Math.max(cameraSources.length, 1)) * 90);
+            await new Promise(resolve => requestAnimationFrame(resolve));
+
+            const ngHandle = camera.ngHandle;
             let hasImages = false;
 
-            for (const [code, config] of Object.entries(CONFIG)) {
-              const sourceDirectory = ngHandle;
+            for (const [code, config] of activeConfigs) {
+              const sourceDirectory = state.mode === "numbered" ? camera.numberedDirectories[code] : ngHandle;
               const sourceFiles = await listImages(sourceDirectory);
               if (sourceFiles.length) hasImages = true;
 
@@ -1699,14 +1739,15 @@
             if (hasImages) activeCameras += 1;
           }
 
-          el.rootName.textContent = `${handle.name} · ${activeCameras} 个有图相机 · 图片不上传`;
+          const modeLabel = state.mode === "numbered" ? "已识别 012 分类目录" : "已识别 NG 直分目录";
+          el.rootName.textContent = `${handle.name} · ${modeLabel} · ${activeCameras} 个有图相机 · 图片不上传`;
           el.welcome.classList.add("hidden");
           resetScanProgress();
           el.statsBtn.disabled = false;
           el.trainingZipBtn.disabled = false;
           updateMetrics();
           await renderCurrent();
-          showToast(`扫描完成：${state.items.length} 张待分类图片`);
+          showToast(`${modeLabel}：${state.items.length} 张待分类图片`);
         } catch (error) {
           console.error(error);
           resetScanProgress();
@@ -1715,11 +1756,18 @@
       }
 
       function totals() {
-        const result = { total: 0, counts: [0, 0, 0, 0], unclassified: 0 };
+        const result = { total: 0, counts: [0, 0, 0, 0], truth: 0, falsehood: 0, unclassified: 0 };
         for (const row of state.stats.values()) {
           const total = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
           result.total += total;
           row.counts.forEach((value, index) => { result.counts[index] += value; });
+          if (row.labels.length === 2) {
+            result.truth += row.counts[0];
+            result.falsehood += row.counts[1];
+          } else {
+            result.truth += row.counts.slice(0, 3).reduce((sum, value) => sum + value, 0);
+            result.falsehood += row.counts[3];
+          }
           result.unclassified += row.unclassified;
         }
         return result;
@@ -1740,18 +1788,52 @@
         el.statsBtn.disabled = !state.rootHandle || state.busy;
       }
 
+      function labelsForItem(item) {
+        return item ? CONFIG[item.categoryCode].labels : CONFIG.ng.labels;
+      }
+
+      function trueLabelIndexes(item) {
+        return labelsForItem(item).length === 2 ? [0] : [0, 1, 2];
+      }
+
+      function falseLabelIndex(item) {
+        return labelsForItem(item).length - 1;
+      }
+
+      function buttonLabelIndex(button, item) {
+        const visualIndex = Number(button.dataset.index);
+        if (labelsForItem(item).length === 4) return visualIndex;
+        if (visualIndex === 0) return 0;
+        if (visualIndex === 3) return 1;
+        return -1;
+      }
+
       function updateClassLabels(item) {
-        const labels = item ? CONFIG[item.categoryCode].labels : CONFIG.ng.labels;
+        const labels = labelsForItem(item);
+        const binaryMode = Boolean(item && labels.length === 2);
+        el.classActions.classList.toggle("binary-mode", binaryMode);
         el.classButtons.forEach(button => {
-          const actualIndex = Number(button.dataset.index);
-          button.querySelector("strong").textContent = labels[actualIndex];
-          button.querySelector("kbd").textContent = actualIndex === 3 ? "Enter" : trueShortcuts[actualIndex];
-          button.disabled = !item || state.busy;
+          const visualIndex = Number(button.dataset.index);
+          const actualIndex = item ? buttonLabelIndex(button, item) : visualIndex;
+          button.querySelector("strong").textContent = actualIndex >= 0 ? labels[actualIndex] : "—";
+          button.querySelector("kbd").textContent = visualIndex === 3 ? "Enter" : trueShortcuts[visualIndex];
+          button.disabled = !item || state.busy || actualIndex < 0;
         });
-        el.trueShortcutKeys.textContent = trueShortcuts.join(" / ");
+        el.trueShortcutKeys.textContent = binaryMode ? trueShortcuts[0] : trueShortcuts.join(" / ");
+        el.operationHint.textContent = binaryMode
+          ? `回车判${labels[1]}；按上或点击按钮判${labels[0]}`
+          : `回车判${labels[3]}；键盘快捷键或鼠标点击即可归类`;
+        el.trueShortcutHint.textContent = binaryMode ? "直接判定为真异纤" : "直接判定三个真异纤";
+        el.upMenuHint.textContent = binaryMode ? "直接选择真异纤" : "打开真异纤菜单";
+        el.menuSelectHint.textContent = binaryMode ? "当前模式无需上下选择" : "选择真异纤类别";
+        el.layoutToggle.disabled = binaryMode;
+        el.layoutReset.disabled = binaryMode;
+        if (!state.layoutEditing) {
+          el.layoutHint.textContent = binaryMode ? "012 模式使用固定的真假按钮布局" : "默认上面三块竖排，下面是假异纤和撤回";
+        }
         el.quickUndo.querySelector("kbd").textContent = undoShortcut;
         el.undoShortcutKey.textContent = undoShortcut;
-        el.popupList.innerHTML = [0, 1, 2].map(index =>
+        el.popupList.innerHTML = trueLabelIndexes(item).map(index =>
           `<button class="popup-option${index === state.menuIndex ? " selected" : ""}" data-index="${index}">${trueShortcuts[index]}&nbsp;&nbsp;${labels[index]}</button>`
         ).join("");
         [...el.popupList.querySelectorAll(".popup-option")].forEach(button => {
@@ -1775,9 +1857,9 @@
             : "等待选择图片目录";
           el.emptyState.querySelector("p").innerHTML = state.rootHandle
             ? (hasBatchImages
-              ? "数字目录中已经没有待分类图片。<br>可以查看统计并下载表格。"
-              : "请确认结构为：总目录 / 相机目录 / NG / 图片。")
-            : "工具只读取各相机目录里 NG 根目录中的图片，<br>不会读取 mark、src，也不会上传任何图片。";
+              ? "当前目录中已经没有待分类图片。<br>可以查看统计并下载表格。"
+              : "请确认结构为：总目录 / 相机 / NG / 0、1、2 / 图片，或总目录 / 相机 / NG / 图片。")
+            : "工具会自动识别 NG/0、1、2 或 NG 根目录图片，<br>不会读取 mark、src，也不会上传任何图片。";
           el.filenameBar.textContent = "—";
           el.statusLine.textContent = state.rootHandle
             ? (hasBatchImages ? "分类完成" : "未找到可处理图片")
@@ -1823,8 +1905,9 @@
 
       function moveMenu(direction) {
         if (!state.menuOpen) return;
-        const optionCount = 3;
-        state.menuIndex = (state.menuIndex + direction + optionCount) % optionCount;
+        const indexes = trueLabelIndexes(currentItem());
+        const currentPosition = Math.max(0, indexes.indexOf(state.menuIndex));
+        state.menuIndex = indexes[(currentPosition + direction + indexes.length) % indexes.length];
         updateClassLabels(currentItem());
       }
 
@@ -1894,6 +1977,7 @@
         const item = currentItem();
         if (!item || state.busy) return;
         const label = CONFIG[item.categoryCode].labels[labelIndex];
+        if (!label) return;
         const originalIndex = state.index;
         hideMenu();
         releasePreview();
@@ -1984,35 +2068,55 @@
 
       function openStats() {
         const rows = statRows();
-        el.statsBody.innerHTML = rows.map((row, rowIndex) => {
-          const total = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
-          const completed = total - row.unclassified;
-          const reviewAction = completed > 0
-            ? `<button class="detail-btn" data-row-index="${rowIndex}">审核图片</button>`
-            : "—";
-          return `<tr>
-            <td>${escapeHtml(row.cameraName)}</td><td>${total}</td>
-            <td>${row.counts[0]}</td><td>${percentage(row.counts[0], total)}</td>
-            <td>${row.counts[1]}</td><td>${percentage(row.counts[1], total)}</td>
-            <td>${row.counts[2]}</td><td>${percentage(row.counts[2], total)}</td>
-            <td>${row.counts[3]}</td><td>${percentage(row.counts[3], total)}</td>
-            <td>${row.unclassified}</td><td>${percentage(completed, total)}</td>
-            <td>${reviewAction}</td>
-          </tr>`;
-        }).join("");
+        if (state.mode === "numbered") {
+          el.statsHead.innerHTML = "<th>相机</th><th>类型</th><th>总数</th><th>真</th><th>占比</th><th>假</th><th>占比</th><th>未分类</th><th>完成率</th><th>图片审核</th>";
+          el.statsBody.innerHTML = rows.map((row, rowIndex) => {
+            const total = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
+            const completed = total - row.unclassified;
+            const reviewAction = completed > 0
+              ? `<button class="detail-btn" data-row-index="${rowIndex}">审核图片</button>`
+              : "—";
+            return `<tr>
+              <td>${escapeHtml(row.cameraName)}</td><td>${escapeHtml(row.categoryName)}</td><td>${total}</td>
+              <td>${row.counts[0]}</td><td>${percentage(row.counts[0], total)}</td>
+              <td>${row.counts[1]}</td><td>${percentage(row.counts[1], total)}</td>
+              <td>${row.unclassified}</td><td>${percentage(completed, total)}</td><td>${reviewAction}</td>
+            </tr>`;
+          }).join("");
+        } else {
+          el.statsHead.innerHTML = "<th>相机</th><th>总数</th><th>真地膜</th><th>占比</th><th>真彩色</th><th>占比</th><th>真黑色</th><th>占比</th><th>假异纤</th><th>占比</th><th>未分类</th><th>完成率</th><th>图片审核</th>";
+          el.statsBody.innerHTML = rows.map((row, rowIndex) => {
+            const total = row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
+            const completed = total - row.unclassified;
+            const reviewAction = completed > 0
+              ? `<button class="detail-btn" data-row-index="${rowIndex}">审核图片</button>`
+              : "—";
+            return `<tr>
+              <td>${escapeHtml(row.cameraName)}</td><td>${total}</td>
+              <td>${row.counts[0]}</td><td>${percentage(row.counts[0], total)}</td>
+              <td>${row.counts[1]}</td><td>${percentage(row.counts[1], total)}</td>
+              <td>${row.counts[2]}</td><td>${percentage(row.counts[2], total)}</td>
+              <td>${row.counts[3]}</td><td>${percentage(row.counts[3], total)}</td>
+              <td>${row.unclassified}</td><td>${percentage(completed, total)}</td><td>${reviewAction}</td>
+            </tr>`;
+          }).join("");
+        }
         [...el.statsBody.querySelectorAll(".detail-btn")].forEach(button => {
           button.addEventListener("click", () => openReview(rows[Number(button.dataset.rowIndex)]));
         });
         const total = totals();
         const completed = total.total - total.unclassified;
-        el.statsFoot.innerHTML = `<tr>
-          <td>全部相机</td><td>${total.total}</td>
-          <td>${total.counts[0]}</td><td>${percentage(total.counts[0], total.total)}</td>
-          <td>${total.counts[1]}</td><td>${percentage(total.counts[1], total.total)}</td>
-          <td>${total.counts[2]}</td><td>${percentage(total.counts[2], total.total)}</td>
-          <td>${total.counts[3]}</td><td>${percentage(total.counts[3], total.total)}</td>
-          <td>${total.unclassified}</td><td>${percentage(completed, total.total)}</td><td>—</td>
-        </tr>`;
+        el.statsFoot.innerHTML = state.mode === "numbered"
+          ? `<tr><td>全部相机</td><td>合计</td><td>${total.total}</td>
+              <td>${total.truth}</td><td>${percentage(total.truth, total.total)}</td>
+              <td>${total.falsehood}</td><td>${percentage(total.falsehood, total.total)}</td>
+              <td>${total.unclassified}</td><td>${percentage(completed, total.total)}</td><td>—</td></tr>`
+          : `<tr><td>全部相机</td><td>${total.total}</td>
+              <td>${total.counts[0]}</td><td>${percentage(total.counts[0], total.total)}</td>
+              <td>${total.counts[1]}</td><td>${percentage(total.counts[1], total.total)}</td>
+              <td>${total.counts[2]}</td><td>${percentage(total.counts[2], total.total)}</td>
+              <td>${total.counts[3]}</td><td>${percentage(total.counts[3], total.total)}</td>
+              <td>${total.unclassified}</td><td>${percentage(completed, total.total)}</td><td>—</td></tr>`;
         el.statsModal.classList.add("open");
         el.statsModal.setAttribute("aria-hidden", "false");
       }
@@ -2095,11 +2199,13 @@
       function updateReviewClassActions(detail) {
         const row = state.reviewRow;
         el.reviewClassButtons.forEach((button, index) => {
-          const label = row?.labels[index] || ["真地膜", "真彩色", "真黑色", "假异纤"][index];
+          const visible = Boolean(row && index < row.labels.length);
+          const label = visible ? row.labels[index] : "";
           const current = detail?.status === label;
           button.textContent = label;
+          button.hidden = !visible;
           button.classList.toggle("current", current);
-          button.disabled = state.busy || !detail || current;
+          button.disabled = state.busy || !detail || current || !visible;
         });
         el.reviewPath.innerHTML = detail && row
           ? `硬盘文件：<b>${escapeHtml(row.cameraName)}/ng/${escapeHtml(detail.status)}/</b>${escapeHtml(detail.currentName)}<br>点击上方分类会直接移动这个真实文件，可用于后续 AI 训练。`
@@ -2197,7 +2303,7 @@
         if (!row || !detail || state.busy) return;
         const oldLabelIndex = row.labels.indexOf(detail.status);
         const targetLabel = row.labels[labelIndex];
-        if (oldLabelIndex < 0 || detail.status === targetLabel) return;
+        if (oldLabelIndex < 0 || !targetLabel || detail.status === targetLabel) return;
 
         const oldLabel = detail.status;
         releaseReviewPreview();
@@ -2260,7 +2366,74 @@
         };
       }
 
-      function buildStatisticsWorkbook() {
+      function buildNumberedStatisticsWorkbook() {
+        const rows = statRows();
+        const total = totals();
+        const completed = total.total - total.unclassified;
+        const now = new Date();
+        const { date: dateLabel, stamp } = localDateParts(now);
+        const categoryRows = ["地膜", "彩色", "黑色"].map(categoryName => {
+          const result = { name: categoryName, total: 0, truth: 0, falsehood: 0, unclassified: 0 };
+          for (const row of rows) {
+            if (row.categoryName !== categoryName) continue;
+            result.total += row.unclassified + row.counts.reduce((sum, value) => sum + value, 0);
+            result.truth += row.counts[0];
+            result.falsehood += row.counts[1];
+            result.unclassified += row.unclassified;
+          }
+          return result;
+        });
+        const reportRows = [...categoryRows, {
+          name: "总体", total: total.total, truth: total.truth,
+          falsehood: total.falsehood, unclassified: total.unclassified
+        }];
+        const summaryHeaders = ["汇总范围", "总图片数", "真数量", "真占比", "假数量", "假占比", "未分类", "是否人工判断完毕"];
+        const statusOf = row => row.total ? (row.unclassified === 0 ? "是" : "否") : "无图片";
+        const blankCells = Array(summaryHeaders.length).fill(null).map(() => excelCell(""));
+        const xmlRows = [];
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="7" ss:StyleID="Title"><Data ss:Type="String">异纤图片分类汇总 · ${xmlEscape(dateLabel)}</Data></Cell>`], ' ss:AutoFitHeight="0" ss:Height="34"'));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="7" ss:StyleID="Subtitle"><Data ss:Type="String">012 分类目录模式；汇总范围为当前选择的整批图片目录</Data></Cell>`]));
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="7" ss:StyleID="Section"><Data ss:Type="String">本批概览</Data></Cell>`]));
+        const overviewRows = [
+          ["生成日期", dateLabel], ["总图片数", total.total], ["已判断图片", completed],
+          ["未判断图片", total.unclassified], ["是否人工判断完毕", statusOf(reportRows[reportRows.length - 1])]
+        ];
+        for (const [label, value] of overviewRows) {
+          const valueCell = typeof value === "number" ? excelCell(value, "Number") : excelCell(value);
+          xmlRows.push(excelRow([excelCell(label, "String", "Label"), valueCell, ...blankCells.slice(2)]));
+        }
+        xmlRows.push(excelRow([`<Cell ss:MergeAcross="7" ss:StyleID="Section"><Data ss:Type="String">分类汇总</Data></Cell>`]));
+        xmlRows.push(excelRow(summaryHeaders.map(value => excelCell(value, "String", "Header"))));
+        for (const row of reportRows) {
+          const denominator = row.total || 1;
+          xmlRows.push(excelRow([
+            excelCell(row.name), excelCell(row.total, "Number"),
+            excelCell(row.truth, "Number"), excelCell(row.truth / denominator, "Number", "Percent"),
+            excelCell(row.falsehood, "Number"), excelCell(row.falsehood / denominator, "Number", "Percent"),
+            excelCell(row.unclassified, "Number"), excelCell(statusOf(row))
+          ]));
+        }
+
+        const xml = `<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">
+  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>小伍工作室</Author><Created>${now.toISOString()}</Created></DocumentProperties>
+  <Styles>
+    <Style ss:ID="Default" ss:Name="Normal"><Font ss:FontName="Microsoft YaHei" ss:Size="11"/><Alignment ss:Vertical="Center"/></Style>
+    <Style ss:ID="Title"><Font ss:FontName="Microsoft YaHei" ss:Size="18" ss:Bold="1" ss:Color="#153944"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
+    <Style ss:ID="Subtitle"><Font ss:FontName="Microsoft YaHei" ss:Size="10" ss:Color="#5E7478"/></Style>
+    <Style ss:ID="Section"><Font ss:FontName="Microsoft YaHei" ss:Size="13" ss:Bold="1" ss:Color="#153944"/><Interior ss:Color="#DDECEB" ss:Pattern="Solid"/><Alignment ss:Horizontal="Left" ss:Vertical="Center"/></Style>
+    <Style ss:ID="Header"><Font ss:FontName="Microsoft YaHei" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#153944" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#5BC1BF"/></Borders></Style>
+    <Style ss:ID="Label"><Font ss:FontName="Microsoft YaHei" ss:Size="11" ss:Bold="1" ss:Color="#153944"/><Interior ss:Color="#EFF6F3" ss:Pattern="Solid"/></Style>
+    <Style ss:ID="Body"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
+    <Style ss:ID="Percent"><NumberFormat ss:Format="0.00%"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>
+  </Styles>
+  <Worksheet ss:Name="汇总表"><Table ss:ExpandedColumnCount="8" ss:ExpandedRowCount="${xmlRows.length}" x:FullColumns="1" x:FullRows="1"><Column ss:Width="125"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="85"/><Column ss:Width="90"/><Column ss:Width="85"/><Column ss:Width="90"/><Column ss:Width="135"/>${xmlRows.join("")}</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><FreezePanes/><FrozenNoSplit/><SplitHorizontal>10</SplitHorizontal><TopRowBottomPane>10</TopRowBottomPane><ActivePane>2</ActivePane><ProtectContents>False</ProtectContents></WorksheetOptions></Worksheet>
+</Workbook>`;
+
+        return { blob: new Blob(["\ufeff", xml], { type: "application/vnd.ms-excel;charset=utf-8" }), filename: `异纤挑图统计_${stamp}.xls` };
+      }
+
+      function buildDirectStatisticsWorkbook() {
         const total = totals();
         const completed = total.total - total.unclassified;
         const now = new Date();
@@ -2314,6 +2487,10 @@
         return { blob, filename: `异纤NG直分统计_${stamp}.xls` };
       }
 
+      function buildStatisticsWorkbook() {
+        return state.mode === "numbered" ? buildNumberedStatisticsWorkbook() : buildDirectStatisticsWorkbook();
+      }
+
       function downloadBlob(blob, filename) {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -2356,7 +2533,10 @@
         const now = new Date();
         const { stamp } = localDateParts(now);
         const zip = new JSZip();
-        for (const config of Object.values(CONFIG)) {
+        const archiveConfigs = state.mode === "numbered"
+          ? [CONFIG["0"], CONFIG["1"], CONFIG["2"]]
+          : [CONFIG.ng];
+        for (const config of archiveConfigs) {
           for (const label of config.labels) zip.folder(label);
         }
 
@@ -2519,7 +2699,9 @@
           event.preventDefault();
           return;
         }
-        classifyAt(Number(button.dataset.index));
+        const item = currentItem();
+        const labelIndex = item ? buttonLabelIndex(button, item) : -1;
+        if (labelIndex >= 0) classifyAt(labelIndex);
       }));
 
       el.resetZoom.addEventListener("click", event => {
@@ -2659,7 +2841,8 @@
         const shortcutIndex = !event.ctrlKey && !event.metaKey && !event.altKey
           ? trueShortcuts.findIndex(key => key === event.key.toUpperCase())
           : -1;
-        if (shortcutIndex >= 0 && !event.repeat) {
+        const item = currentItem();
+        if (shortcutIndex >= 0 && trueLabelIndexes(item).includes(shortcutIndex) && !event.repeat) {
           event.preventDefault();
           classifyAt(shortcutIndex);
           return;
@@ -2679,15 +2862,16 @@
           }
         } else if (event.key === "ArrowUp") {
           event.preventDefault();
-          if (state.menuOpen) moveMenu(-1);
+          if (state.mode === "numbered") classifyAt(0);
+          else if (state.menuOpen) moveMenu(-1);
           else showMenu(0);
         } else if (event.key === "ArrowDown") {
           event.preventDefault();
-          if (state.menuOpen) moveMenu(1);
+          if (state.mode !== "numbered" && state.menuOpen) moveMenu(1);
         } else if (event.key === "Enter" && !event.repeat) {
           event.preventDefault();
           if (state.menuOpen) classifyAt(state.menuIndex);
-          else classifyAt(3);
+          else classifyAt(falseLabelIndex(currentItem()));
         } else if (event.key === "Escape") {
           hideMenu();
         }
