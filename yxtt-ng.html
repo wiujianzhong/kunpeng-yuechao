@@ -306,13 +306,14 @@
     .side-panel h2 { margin: 0; font-size: 19px; }
     .side-panel > p { margin: 6px 0 18px; color: var(--muted); font-size: 12px; }
 
-    .class-actions { display: grid; gap: 9px; }
+    .class-actions { display: grid; gap: 7px; }
+    .true-class-actions { display: grid; gap: 6px; }
 
     .class-btn {
       display: grid;
       grid-template-columns: 34px 1fr auto;
       align-items: center;
-      min-height: 58px;
+      min-height: 38px;
       border: 1px solid var(--line);
       border-left-width: 3px;
       background: var(--panel-2);
@@ -322,11 +323,15 @@
       transition: transform .14s ease, background .14s ease;
     }
 
-    .class-btn:hover:not(:disabled) { background: #28515a; transform: translateX(-3px); }
+    .class-btn:hover:not(:disabled) { background: #28515a; transform: translateX(-2px); }
     .class-btn[data-index="0"] { border-left-color: var(--teal); }
     .class-btn[data-index="1"] { border-left-color: var(--amber); }
     .class-btn[data-index="2"], .class-btn[data-index="3"] { border-left-color: var(--danger); }
-    .undo-class-btn { border-left-color: var(--muted); }
+    .false-class-btn { min-height: 76px; border-left-width: 5px; background: #244a54; }
+    .false-class-btn:hover:not(:disabled) { background: #2a5b66; }
+    .false-class-btn strong { font-size: 20px; }
+    .undo-class-btn { min-height: 30px; border-left-color: var(--muted); grid-template-columns: 64px 1fr; }
+    .undo-class-btn strong { font-size: 12px; color: var(--muted); }
     .class-btn:disabled { opacity: .35; cursor: not-allowed; }
     .class-btn kbd { color: var(--muted); font-size: 13px; text-align: center; }
     .class-btn strong { font-size: 15px; }
@@ -532,6 +537,7 @@
     .settings-body > p { margin: 0 0 16px; color: var(--muted); font-size: 12px; line-height: 1.7; }
     .settings-grid { display: grid; gap: 10px; }
     .settings-row { display: grid; grid-template-columns: minmax(0, 1fr) 88px; gap: 10px; }
+    .settings-row.undo-setting-row { grid-template-columns: minmax(0, 1fr); }
     .settings-field { display: grid; gap: 6px; color: var(--muted); font-size: 12px; }
     .settings-field input { width: 100%; height: 40px; border: 1px solid var(--line); background: var(--ink-deep); color: var(--text); padding: 0 10px; font: inherit; }
     .settings-field.shortcut input { text-align: center; text-transform: uppercase; font-weight: 800; }
@@ -875,10 +881,12 @@
         <h2>判定操作</h2>
         <p>回车判假异纤；键盘快捷键或鼠标点击即可归类</p>
         <div class="class-actions" id="classActions">
-          <button class="class-btn" data-index="3" disabled><kbd>Enter</kbd><strong>—</strong></button>
-          <button class="class-btn" data-index="0" disabled><kbd>1</kbd><strong>—</strong></button>
-          <button class="class-btn" data-index="1" disabled><kbd>2</kbd><strong>—</strong></button>
-          <button class="class-btn" data-index="2" disabled><kbd>3</kbd><strong>—</strong></button>
+          <div class="true-class-actions">
+            <button class="class-btn" data-index="0" disabled><kbd>1</kbd><strong>—</strong></button>
+            <button class="class-btn" data-index="1" disabled><kbd>2</kbd><strong>—</strong></button>
+            <button class="class-btn" data-index="2" disabled><kbd>3</kbd><strong>—</strong></button>
+          </div>
+          <button class="class-btn false-class-btn" data-index="3" disabled><kbd>Enter</kbd><strong>—</strong></button>
           <button class="class-btn undo-class-btn" id="quickUndo" disabled><kbd>Ctrl+Z</kbd><strong>撤回上一张</strong></button>
         </div>
 
@@ -888,9 +896,9 @@
           <div class="key-row"><kbd>左键拖动</kbd><span>抓住图片移动</span></div>
           <div class="key-row"><kbd id="trueShortcutKeys">1 / 2 / 3</kbd><span>直接判定三个真异纤</span></div>
           <div class="key-row"><kbd>↑</kbd><span>打开真异纤菜单</span></div>
-          <div class="key-row"><kbd>↑ ↓</kbd><span>选择真地膜 / 彩色 / 黑色</span></div>
+          <div class="key-row"><kbd>↑ ↓</kbd><span>选择真异纤类别</span></div>
           <div class="key-row"><kbd>Enter</kbd><span>直接判假，或确认菜单选项</span></div>
-          <div class="key-row"><kbd>Ctrl+Z</kbd><span>撤销上一次</span></div>
+          <div class="key-row"><kbd id="undoShortcutKey">Ctrl+Z</kbd><span>撤销上一次</span></div>
         </div>
 
         <div class="safety-note">
@@ -943,7 +951,7 @@
         </div>
       </div>
       <div class="settings-body">
-        <p>可改三个真异纤的名称和单键快捷键。默认是 1、2、3；支持数字或英文字母，例如 A、S、D。</p>
+        <p>可改三个真异纤的名称和单键快捷键，并可设置撤回快捷键。撤回支持单键或组合键，例如 Ctrl+Z、Shift+.、0。</p>
         <div class="settings-grid">
           <div class="settings-row">
             <label class="settings-field">第 1 类名称<input id="settingName0" maxlength="30" autocomplete="off"></label>
@@ -956,6 +964,9 @@
           <div class="settings-row">
             <label class="settings-field">第 3 类名称<input id="settingName2" maxlength="30" autocomplete="off"></label>
             <label class="settings-field shortcut">快捷键<input id="settingKey2" maxlength="1" autocomplete="off"></label>
+          </div>
+          <div class="settings-row undo-setting-row">
+            <label class="settings-field">撤回快捷键（点击输入框后，直接按下想用的按键）<input id="settingUndoShortcut" readonly autocomplete="off" aria-label="撤回快捷键"></label>
           </div>
         </div>
         <p class="settings-note">名称会直接用于 NG 内的分类文件夹、统计表和训练 ZIP。为保证同一批数据一致，请在选择文件夹前完成设置；载入图片后本批设置锁定，如需更改请刷新页面再开始新批。</p>
@@ -1050,7 +1061,9 @@
         "ng": { name: "NG直分", labels: ["真地膜", "真彩色", "真黑色", "假异纤"] }
       };
       const SETTINGS_STORAGE_KEY = "xiaowu-fiber-ng-direct-settings-v1";
+      const DEFAULT_UNDO_SHORTCUT = "Ctrl+Z";
       let trueShortcuts = ["1", "2", "3"];
+      let undoShortcut = DEFAULT_UNDO_SHORTCUT;
       const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "bmp", "tif", "tiff", "webp"]);
       const collator = new Intl.Collator("zh-CN", { numeric: true, sensitivity: "base" });
 
@@ -1120,6 +1133,7 @@
         classButtons: [...document.querySelectorAll(".class-btn[data-index]")],
         quickUndo: document.querySelector("#quickUndo"),
         trueShortcutKeys: document.querySelector("#trueShortcutKeys"),
+        undoShortcutKey: document.querySelector("#undoShortcutKey"),
         classPopup: document.querySelector("#classPopup"),
         popupList: document.querySelector("#popupList"),
         busyText: document.querySelector("#busyText"),
@@ -1128,6 +1142,7 @@
         closeSettings: document.querySelector("#closeSettings"),
         settingNames: [0, 1, 2].map(index => document.querySelector(`#settingName${index}`)),
         settingKeys: [0, 1, 2].map(index => document.querySelector(`#settingKey${index}`)),
+        settingUndoShortcut: document.querySelector("#settingUndoShortcut"),
         statsModal: document.querySelector("#statsModal"),
         statsBody: document.querySelector("#statsBody"),
         statsFoot: document.querySelector("#statsFoot"),
@@ -1167,38 +1182,95 @@
         return /^[A-Z0-9]$/.test(key) ? key : "";
       }
 
-      function normalizeSettings(names, shortcuts) {
+      function shortcutKeyFromEvent(event) {
+        const code = event.code || "";
+        if (/^Key[A-Z]$/.test(code)) return code.slice(3);
+        if (/^Digit\d$/.test(code)) return code.slice(5);
+        if (/^Numpad\d$/.test(code)) return code.slice(6);
+        const codeKeys = {
+          Period: ".", NumpadDecimal: ".", Comma: ",", Slash: "/", NumpadDivide: "/",
+          Minus: "-", NumpadSubtract: "-", Equal: "=", NumpadAdd: "+", Semicolon: ";",
+          Quote: "'", BracketLeft: "[", BracketRight: "]", Backslash: "\\", Backquote: "`",
+          Space: "Space", Tab: "Tab", Backspace: "Backspace", Delete: "Delete", Escape: "Escape",
+          Home: "Home", End: "End", PageUp: "PageUp", PageDown: "PageDown",
+          ArrowUp: "ArrowUp", ArrowDown: "ArrowDown", ArrowLeft: "ArrowLeft", ArrowRight: "ArrowRight",
+          Enter: "Enter"
+        };
+        if (codeKeys[code]) return codeKeys[code];
+        if (/^F(?:[1-9]|1[0-2])$/.test(code)) return code;
+        const key = String(event.key || "");
+        if (!key || ["Control", "Shift", "Alt", "Meta"].includes(key)) return "";
+        return key.length === 1 ? key.toUpperCase() : key;
+      }
+
+      function shortcutFromEvent(event) {
+        const key = shortcutKeyFromEvent(event);
+        if (!key) return "";
+        const modifiers = [];
+        if (event.ctrlKey) modifiers.push("Ctrl");
+        if (event.altKey) modifiers.push("Alt");
+        if (event.shiftKey) modifiers.push("Shift");
+        if (event.metaKey) modifiers.push("Meta");
+        return [...modifiers, key].join("+");
+      }
+
+      function normalizeUndoShortcut(value) {
+        const parts = String(value || "").trim().replace(/\s+/g, "").split("+");
+        const rawKey = parts.pop();
+        if (!rawKey) return "";
+        const modifierMap = { CTRL: "Ctrl", CONTROL: "Ctrl", ALT: "Alt", SHIFT: "Shift", META: "Meta", CMD: "Meta", COMMAND: "Meta", "⌘": "Meta" };
+        const modifiers = parts.map(part => modifierMap[part.toUpperCase()]);
+        if (modifiers.some(modifier => !modifier) || new Set(modifiers).size !== modifiers.length) return "";
+        const keyMap = { SPACE: "Space", ESC: "Escape", ESCAPE: "Escape", TAB: "Tab", BACKSPACE: "Backspace", DELETE: "Delete", HOME: "Home", END: "End", PAGEUP: "PageUp", PAGEDOWN: "PageDown", ARROWUP: "ArrowUp", ARROWDOWN: "ArrowDown", ARROWLEFT: "ArrowLeft", ARROWRIGHT: "ArrowRight", ENTER: "Enter", ">": ".", "<": "," };
+        const upperKey = rawKey.toUpperCase();
+        const key = /^[A-Z0-9]$/.test(upperKey) || /^[.,/\-=;'\[\]\\`]$/.test(rawKey) || /^F(?:[1-9]|1[0-2])$/.test(upperKey)
+          ? (rawKey.length === 1 ? rawKey.toUpperCase() : upperKey)
+          : keyMap[upperKey];
+        if (!key) return "";
+        const orderedModifiers = ["Ctrl", "Alt", "Shift", "Meta"].filter(modifier => modifiers.includes(modifier));
+        return [...orderedModifiers, key].join("+");
+      }
+
+      function normalizeSettings(names, shortcuts, rawUndoShortcut = DEFAULT_UNDO_SHORTCUT) {
         const cleanedNames = names.map(value => String(value || "").trim());
         const cleanedShortcuts = shortcuts.map(normalizeShortcut);
+        const cleanedUndoShortcut = normalizeUndoShortcut(rawUndoShortcut);
         if (cleanedNames.some(name => !name || /[<>:"/\\|?*]/.test(name))) throw new Error("分类名称不能为空，也不能含有文件名禁用字符");
         if (new Set([...cleanedNames, "假异纤", "未分类"]).size !== 5) throw new Error("三个真异纤名称不能重复，也不能使用“假异纤”或“未分类”");
         if (cleanedShortcuts.some(key => !key)) throw new Error("快捷键只能是一个数字或英文字母");
         if (new Set(cleanedShortcuts).size !== cleanedShortcuts.length) throw new Error("三个快捷键不能重复");
-        return { names: cleanedNames, shortcuts: cleanedShortcuts };
+        if (!cleanedUndoShortcut) throw new Error("撤回快捷键无效，请按一个按键或组合键");
+        if (!cleanedUndoShortcut.includes("+") && cleanedShortcuts.includes(cleanedUndoShortcut)) throw new Error("撤回单键不能和真异纤快捷键重复");
+        if (!cleanedUndoShortcut.includes("+") && ["Enter", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Escape"].includes(cleanedUndoShortcut)) throw new Error("该撤回单键会占用图片操作，请换一个按键");
+        return { names: cleanedNames, shortcuts: cleanedShortcuts, undoShortcut: cleanedUndoShortcut };
       }
 
-      function applySettings(names, shortcuts) {
+      function applySettings(names, shortcuts, nextUndoShortcut = DEFAULT_UNDO_SHORTCUT) {
         CONFIG.ng.labels.splice(0, 3, ...names);
         trueShortcuts = [...shortcuts];
+        undoShortcut = nextUndoShortcut;
       }
 
       function restoreSettings() {
         try {
           const saved = JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY) || "null");
           if (!saved) return;
-          const settings = normalizeSettings(saved.names, saved.shortcuts);
-          applySettings(settings.names, settings.shortcuts);
+          const settings = normalizeSettings(saved.names, saved.shortcuts, saved.undoShortcut);
+          applySettings(settings.names, settings.shortcuts, settings.undoShortcut);
         } catch (_) { /* 设置无效时使用默认值 */ }
       }
 
       function fillSettingsForm() {
         CONFIG.ng.labels.slice(0, 3).forEach((name, index) => { el.settingNames[index].value = name; });
         trueShortcuts.forEach((key, index) => { el.settingKeys[index].value = key; });
+        el.settingUndoShortcut.value = undoShortcut;
       }
 
       function openSettings() {
         fillSettingsForm();
-        el.saveSettings.disabled = Boolean(state.rootHandle) || state.busy;
+        const locked = Boolean(state.rootHandle) || state.busy;
+        el.saveSettings.disabled = locked;
+        [...el.settingNames, ...el.settingKeys, el.settingUndoShortcut].forEach(input => { input.disabled = locked; });
         el.settingsModal.classList.add("open");
         el.settingsModal.setAttribute("aria-hidden", "false");
       }
@@ -1216,9 +1288,10 @@
         try {
           const settings = normalizeSettings(
             el.settingNames.map(input => input.value),
-            el.settingKeys.map(input => input.value)
+            el.settingKeys.map(input => input.value),
+            el.settingUndoShortcut.value
           );
-          applySettings(settings.names, settings.shortcuts);
+          applySettings(settings.names, settings.shortcuts, settings.undoShortcut);
           try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings)); } catch (_) { /* 浏览器仍可本次使用 */ }
           updateClassLabels(currentItem());
           closeSettings();
@@ -1531,6 +1604,8 @@
           button.disabled = !item || state.busy;
         });
         el.trueShortcutKeys.textContent = trueShortcuts.join(" / ");
+        el.quickUndo.querySelector("kbd").textContent = undoShortcut;
+        el.undoShortcutKey.textContent = undoShortcut;
         el.popupList.innerHTML = [0, 1, 2].map(index =>
           `<button class="popup-option${index === state.menuIndex ? " selected" : ""}" data-index="${index}">${trueShortcuts[index]}&nbsp;&nbsp;${labels[index]}</button>`
         ).join("");
@@ -2206,6 +2281,21 @@
       el.settingsBtn.addEventListener("click", openSettings);
       el.saveSettings.addEventListener("click", saveSettings);
       el.closeSettings.addEventListener("click", closeSettings);
+      el.settingUndoShortcut.addEventListener("keydown", event => {
+        if (event.key === "Tab") return;
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.key === "Escape") {
+          el.settingUndoShortcut.blur();
+          return;
+        }
+        const recorded = shortcutFromEvent(event);
+        if (!recorded) {
+          showToast("请按一个按键，或按住 Ctrl / Shift / Alt / ⌘ 再按键", true);
+          return;
+        }
+        el.settingUndoShortcut.value = recorded;
+      });
       el.undoBtn.addEventListener("click", undoLast);
       el.quickUndo.addEventListener("click", undoLast);
       el.statsBtn.addEventListener("click", openStats);
@@ -2397,6 +2487,12 @@
         }
         if (!state.rootHandle) return;
 
+        if (!event.repeat && shortcutFromEvent(event) === undoShortcut) {
+          event.preventDefault();
+          undoLast();
+          return;
+        }
+
         const shortcutIndex = !event.ctrlKey && !event.metaKey && !event.altKey
           ? trueShortcuts.findIndex(key => key === event.key.toUpperCase())
           : -1;
@@ -2431,9 +2527,6 @@
           else classifyAt(3);
         } else if (event.key === "Escape") {
           hideMenu();
-        } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
-          event.preventDefault();
-          undoLast();
         }
       });
 
