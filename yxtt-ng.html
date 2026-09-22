@@ -312,7 +312,9 @@
     .layout-hint { min-height: 18px; margin: 0 0 6px; color: var(--amber); font-size: 10px; }
 
     .class-actions {
-      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
       height: 236px;
       border: 1px solid transparent;
       transition: border-color .16s ease, background .16s ease;
@@ -321,17 +323,17 @@
     .class-actions.layout-editing {
       border-color: var(--amber);
       background-color: rgba(255, 174, 69, .035);
-      background-image: linear-gradient(rgba(255, 174, 69, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 174, 69, .08) 1px, transparent 1px);
-      background-size: 16px 16px;
+      background-image: repeating-linear-gradient(0deg, transparent 0 46px, rgba(255, 174, 69, .08) 46px 47px);
       touch-action: none;
     }
 
     .class-btn {
-      position: absolute;
+      position: relative;
       display: grid;
       grid-template-columns: 34px 1fr auto;
       align-items: center;
-      min-height: 38px;
+      min-height: 28px;
+      width: 100%;
       margin: 0;
       padding: 0 8px;
       border: 1px solid var(--line);
@@ -352,10 +354,10 @@
     .false-class-btn { border-left-width: 5px; background: #244a54; }
     .false-class-btn:hover:not(:disabled) { background: #2a5b66; }
     .false-class-btn strong { font-size: 20px; }
-    .undo-class-btn { min-height: 30px; border-left-color: var(--muted); grid-template-columns: 64px 1fr; }
+    .undo-class-btn { border-left-color: var(--muted); grid-template-columns: 64px 1fr auto; }
     .undo-class-btn strong { font-size: 12px; color: var(--muted); }
-    .class-actions.layout-editing .class-btn { cursor: move; outline: 1px dashed rgba(255, 174, 69, .55); opacity: 1; }
-    .resize-handle { display: none; width: 16px; height: 16px; color: var(--amber); cursor: nwse-resize; font-size: 15px; line-height: 14px; text-align: center; }
+    .class-actions.layout-editing .class-btn { outline: 1px dashed rgba(255, 174, 69, .55); opacity: 1; }
+    .resize-handle { display: none; width: 20px; height: 20px; color: var(--amber); cursor: ns-resize; font-size: 15px; line-height: 18px; text-align: center; }
     .class-actions.layout-editing .resize-handle { display: block; }
     .class-btn:disabled { opacity: .35; cursor: not-allowed; }
     .class-btn kbd { color: var(--muted); font-size: 13px; text-align: center; }
@@ -854,7 +856,6 @@
       <div class="top-actions">
         <button class="btn" id="settingsBtn">分类设置</button>
         <button class="btn" id="chooseAgain">选择文件夹</button>
-        <button class="btn" id="undoBtn" disabled>撤销上一次</button>
         <button class="btn primary" id="statsBtn" disabled>分类统计</button>
         <button class="btn" id="trainingZipBtn" title="汇总所有相机的4个分类并打包为ZIP" disabled>生成训练 ZIP</button>
       </div>
@@ -906,16 +907,16 @@
         <h2>判定操作</h2>
         <p>回车判假异纤；键盘快捷键或鼠标点击即可归类</p>
         <div class="layout-tools">
-          <button class="layout-tool-btn" id="layoutToggle" type="button">调整按钮位置和大小</button>
-          <button class="layout-tool-btn" id="layoutReset" type="button">恢复默认竖排</button>
+          <button class="layout-tool-btn" id="layoutToggle" type="button">调整按钮大小</button>
+          <button class="layout-tool-btn" id="layoutReset" type="button">恢复等高竖排</button>
         </div>
-        <div class="layout-hint" id="layoutHint">默认竖排；需要时可自由拖动调整</div>
+        <div class="layout-hint" id="layoutHint">五个按钮等高竖排并自动铺满</div>
         <div class="class-actions" id="classActions">
-          <button class="class-btn" data-index="0" data-layout-key="true0" disabled><kbd>1</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
-          <button class="class-btn" data-index="1" data-layout-key="true1" disabled><kbd>2</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
-          <button class="class-btn" data-index="2" data-layout-key="true2" disabled><kbd>3</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
-          <button class="class-btn false-class-btn" data-index="3" data-layout-key="false" disabled><kbd>Enter</kbd><strong>—</strong><span class="resize-handle">⌟</span></button>
-          <button class="class-btn undo-class-btn" id="quickUndo" data-layout-key="undo" disabled><kbd>Ctrl+Z</kbd><strong>撤回上一张</strong><span class="resize-handle">⌟</span></button>
+          <button class="class-btn" data-index="0" data-layout-key="true0" disabled><kbd>1</kbd><strong>—</strong><span class="resize-handle">↕</span></button>
+          <button class="class-btn" data-index="1" data-layout-key="true1" disabled><kbd>2</kbd><strong>—</strong><span class="resize-handle">↕</span></button>
+          <button class="class-btn" data-index="2" data-layout-key="true2" disabled><kbd>3</kbd><strong>—</strong><span class="resize-handle">↕</span></button>
+          <button class="class-btn false-class-btn" data-index="3" data-layout-key="false" disabled><kbd>Enter</kbd><strong>—</strong><span class="resize-handle">↕</span></button>
+          <button class="class-btn undo-class-btn" id="quickUndo" data-layout-key="undo" disabled><kbd>Ctrl+Z</kbd><strong>撤回上一张</strong><span class="resize-handle">↕</span></button>
         </div>
 
         <div class="key-guide">
@@ -1089,14 +1090,14 @@
         "ng": { name: "NG直分", labels: ["真地膜", "真彩色", "真黑色", "假异纤"] }
       };
       const SETTINGS_STORAGE_KEY = "xiaowu-fiber-ng-direct-settings-v1";
-      const BUTTON_LAYOUT_STORAGE_KEY = "xiaowu-fiber-ng-direct-button-layout-v1";
+      const BUTTON_LAYOUT_STORAGE_KEY = "xiaowu-fiber-ng-direct-button-layout-v2";
       const DEFAULT_UNDO_SHORTCUT = "Ctrl+Z";
       const DEFAULT_BUTTON_LAYOUT = {
-        true0: { x: 0, y: 0, w: 1, h: 38 },
-        true1: { x: 0, y: 44, w: 1, h: 38 },
-        true2: { x: 0, y: 88, w: 1, h: 38 },
-        false: { x: 0, y: 132, w: 1, h: 68 },
-        undo: { x: 0, y: 206, w: 1, h: 30 }
+        true0: 1,
+        true1: 1,
+        true2: 1,
+        false: 1,
+        undo: 1
       };
       let trueShortcuts = ["1", "2", "3"];
       let undoShortcut = DEFAULT_UNDO_SHORTCUT;
@@ -1151,7 +1152,6 @@
         chooseFolder: document.querySelector("#chooseFolder"),
         chooseAgain: document.querySelector("#chooseAgain"),
         settingsBtn: document.querySelector("#settingsBtn"),
-        undoBtn: document.querySelector("#undoBtn"),
         statsBtn: document.querySelector("#statsBtn"),
         trainingZipBtn: document.querySelector("#trainingZipBtn"),
         rootName: document.querySelector("#rootName"),
@@ -1345,33 +1345,24 @@
       }
 
       function applyButtonLayout(layout) {
-        controlButtons().forEach(button => {
-          const key = button.dataset.layoutKey;
-          const fallback = DEFAULT_BUTTON_LAYOUT[key];
-          const saved = layout?.[key] || fallback;
-          const widthRatio = Math.max(.24, Math.min(1, Number(saved.w) || fallback.w));
-          const leftRatio = Math.max(0, Math.min(1 - widthRatio, Number(saved.x) || 0));
-          const height = Math.max(28, Math.min(110, Number(saved.h) || fallback.h));
-          const top = Math.max(0, Math.min(el.classActions.clientHeight - height, Number(saved.y) || 0));
-          button.style.left = `${leftRatio * 100}%`;
-          button.style.top = `${top}px`;
-          button.style.width = `${widthRatio * 100}%`;
-          button.style.height = `${height}px`;
+        const buttons = controlButtons();
+        const rawSizes = buttons.map(button => Math.max(.2, Number(layout?.[button.dataset.layoutKey]) || 1));
+        const total = rawSizes.reduce((sum, value) => sum + value, 0);
+        buttons.forEach((button, index) => {
+          const ratio = rawSizes[index] / total;
+          button.style.removeProperty("left");
+          button.style.removeProperty("top");
+          button.style.removeProperty("width");
+          button.style.removeProperty("height");
+          button.style.flex = `${ratio} 1 0px`;
         });
       }
 
       function currentButtonLayout() {
-        const containerRect = el.classActions.getBoundingClientRect();
-        const containerWidth = Math.max(1, containerRect.width);
-        return Object.fromEntries(controlButtons().map(button => {
-          const rect = button.getBoundingClientRect();
-          return [button.dataset.layoutKey, {
-            x: Math.max(0, (rect.left - containerRect.left) / containerWidth),
-            y: Math.max(0, rect.top - containerRect.top),
-            w: Math.min(1, rect.width / containerWidth),
-            h: rect.height
-          }];
-        }));
+        const buttons = controlButtons();
+        const heights = buttons.map(button => button.getBoundingClientRect().height);
+        const total = Math.max(1, heights.reduce((sum, value) => sum + value, 0));
+        return Object.fromEntries(buttons.map((button, index) => [button.dataset.layoutKey, heights[index] / total]));
       }
 
       function saveButtonLayout() {
@@ -1393,8 +1384,8 @@
         state.layoutEditing = editing;
         state.layoutGesture = null;
         el.classActions.classList.toggle("layout-editing", editing);
-        el.layoutToggle.textContent = editing ? "完成调整" : "调整按钮位置和大小";
-        el.layoutHint.textContent = editing ? "拖动按钮换位置，拖右下角改变大小" : "默认竖排；需要时可自由拖动调整";
+        el.layoutToggle.textContent = editing ? "完成调整" : "调整按钮大小";
+        el.layoutHint.textContent = editing ? "上下拖动 ↕ 调整一项，其余按钮会自动补满" : "五个按钮竖排并自动铺满整个区域";
         if (editing) {
           controlButtons().forEach(button => { button.disabled = false; });
         } else {
@@ -1407,25 +1398,22 @@
       function resetButtonLayout() {
         applyButtonLayout(DEFAULT_BUTTON_LAYOUT);
         try { localStorage.removeItem(BUTTON_LAYOUT_STORAGE_KEY); } catch (_) { /* 本次仍可使用 */ }
-        showToast("判定按钮已恢复默认竖排");
+        showToast("判定按钮已恢复等高竖排并铺满区域");
       }
 
       function startLayoutGesture(event, button) {
-        if (!state.layoutEditing || event.button !== 0) return;
+        if (!state.layoutEditing || event.button !== 0 || !event.target.closest(".resize-handle")) return;
         event.preventDefault();
         event.stopPropagation();
-        const containerRect = el.classActions.getBoundingClientRect();
-        const buttonRect = button.getBoundingClientRect();
+        const buttons = controlButtons();
+        const heights = buttons.map(item => item.getBoundingClientRect().height);
         state.layoutGesture = {
           pointerId: event.pointerId,
           button,
-          mode: event.target.closest(".resize-handle") ? "resize" : "move",
-          startX: event.clientX,
+          index: buttons.indexOf(button),
           startY: event.clientY,
-          left: buttonRect.left - containerRect.left,
-          top: buttonRect.top - containerRect.top,
-          width: buttonRect.width,
-          height: buttonRect.height
+          heights,
+          totalHeight: heights.reduce((sum, value) => sum + value, 0)
         };
         if (button.setPointerCapture) button.setPointerCapture(event.pointerId);
       }
@@ -1434,21 +1422,22 @@
         const gesture = state.layoutGesture;
         if (!gesture || event.pointerId !== gesture.pointerId) return;
         event.preventDefault();
-        const dx = event.clientX - gesture.startX;
         const dy = event.clientY - gesture.startY;
-        const containerWidth = el.classActions.clientWidth;
-        const containerHeight = el.classActions.clientHeight;
-        if (gesture.mode === "move") {
-          const left = Math.max(0, Math.min(containerWidth - gesture.width, gesture.left + dx));
-          const top = Math.max(0, Math.min(containerHeight - gesture.height, gesture.top + dy));
-          gesture.button.style.left = `${left}px`;
-          gesture.button.style.top = `${top}px`;
-        } else {
-          const width = Math.max(80, Math.min(containerWidth - gesture.left, gesture.width + dx));
-          const height = Math.max(28, Math.min(containerHeight - gesture.top, gesture.height + dy));
-          gesture.button.style.width = `${width}px`;
-          gesture.button.style.height = `${height}px`;
-        }
+        const buttons = controlButtons();
+        const minimumHeight = 28;
+        const maximumHeight = gesture.totalHeight - minimumHeight * (buttons.length - 1);
+        const selectedHeight = Math.max(minimumHeight, Math.min(maximumHeight, gesture.heights[gesture.index] + dy));
+        const otherIndexes = buttons.map((_, index) => index).filter(index => index !== gesture.index);
+        const remainingHeight = gesture.totalHeight - selectedHeight;
+        const extraHeight = Math.max(0, remainingHeight - minimumHeight * otherIndexes.length);
+        const originalExtra = otherIndexes.map(index => Math.max(1, gesture.heights[index] - minimumHeight));
+        const extraTotal = originalExtra.reduce((sum, value) => sum + value, 0);
+        const nextHeights = [...gesture.heights];
+        nextHeights[gesture.index] = selectedHeight;
+        otherIndexes.forEach((index, order) => {
+          nextHeights[index] = minimumHeight + extraHeight * originalExtra[order] / extraTotal;
+        });
+        buttons.forEach((item, index) => { item.style.flex = `0 0 ${nextHeights[index]}px`; });
       }
 
       function finishLayoutGesture(event) {
@@ -1498,7 +1487,6 @@
         document.body.classList.toggle("busy", busy);
         el.busyText.textContent = message;
         el.classButtons.forEach(button => { button.disabled = busy || !currentItem(); });
-        el.undoBtn.disabled = busy || !state.history.length;
         el.chooseAgain.disabled = busy;
         el.statsBtn.disabled = busy || !state.rootHandle;
         el.trainingZipBtn.disabled = busy || !state.rootHandle;
@@ -1748,7 +1736,6 @@
         el.remainingMetric.textContent = summary.unclassified.toLocaleString("zh-CN");
         el.percentMetric.textContent = `${(percent * 100).toFixed(1)}%`;
         el.mainProgress.style.width = `${percent * 100}%`;
-        el.undoBtn.disabled = !state.history.length || state.busy;
         el.quickUndo.disabled = !state.history.length || state.busy;
         el.statsBtn.disabled = !state.rootHandle || state.busy;
       }
@@ -2456,7 +2443,6 @@
         }
         el.settingUndoShortcut.value = recorded;
       });
-      el.undoBtn.addEventListener("click", undoLast);
       el.quickUndo.addEventListener("click", event => {
         if (state.layoutEditing) {
           event.preventDefault();
