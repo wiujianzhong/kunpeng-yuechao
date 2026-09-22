@@ -323,9 +323,10 @@
     }
 
     .class-btn:hover:not(:disabled) { background: #28515a; transform: translateX(-3px); }
-    .class-btn:nth-child(1) { border-left-color: var(--teal); }
-    .class-btn:nth-child(2) { border-left-color: var(--amber); }
-    .class-btn:nth-child(3) { border-left-color: var(--danger); }
+    .class-btn[data-index="0"] { border-left-color: var(--teal); }
+    .class-btn[data-index="1"] { border-left-color: var(--amber); }
+    .class-btn[data-index="2"], .class-btn[data-index="3"] { border-left-color: var(--danger); }
+    .undo-class-btn { border-left-color: var(--muted); }
     .class-btn:disabled { opacity: .35; cursor: not-allowed; }
     .class-btn kbd { color: var(--muted); font-size: 13px; text-align: center; }
     .class-btn strong { font-size: 15px; }
@@ -525,6 +526,16 @@
     .stats-card .modal-head { position: static; flex: 0 0 auto; }
     .stats-card .table-wrap { flex: 1 1 auto; min-height: 0; overflow: auto; }
     .stats-card th { top: 0; }
+
+    .settings-card { width: min(680px, 100%); }
+    .settings-body { padding: 20px; }
+    .settings-body > p { margin: 0 0 16px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .settings-grid { display: grid; gap: 10px; }
+    .settings-row { display: grid; grid-template-columns: minmax(0, 1fr) 88px; gap: 10px; }
+    .settings-field { display: grid; gap: 6px; color: var(--muted); font-size: 12px; }
+    .settings-field input { width: 100%; height: 40px; border: 1px solid var(--line); background: var(--ink-deep); color: var(--text); padding: 0 10px; font: inherit; }
+    .settings-field.shortcut input { text-align: center; text-transform: uppercase; font-weight: 800; }
+    .settings-note { margin: 14px 0 0; color: var(--amber); font-size: 11px; line-height: 1.6; }
 
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
     th, td { padding: 11px 9px; border-bottom: 1px solid var(--line); text-align: center; white-space: nowrap; }
@@ -810,6 +821,7 @@
       </div>
 
       <div class="top-actions">
+        <button class="btn" id="settingsBtn">分类设置</button>
         <button class="btn" id="chooseAgain">选择文件夹</button>
         <button class="btn" id="undoBtn" disabled>撤销上一次</button>
         <button class="btn primary" id="statsBtn" disabled>分类统计</button>
@@ -861,17 +873,20 @@
 
       <aside class="side-panel">
         <h2>判定操作</h2>
-        <p>直接回车判“假异纤”；按 ↑ 打开真异纤菜单</p>
+        <p>回车判假异纤；键盘快捷键或鼠标点击即可归类</p>
         <div class="class-actions" id="classActions">
-          <button class="class-btn" data-index="0" disabled><kbd>真</kbd><strong>—</strong></button>
-          <button class="class-btn" data-index="1" disabled><kbd>真</kbd><strong>—</strong></button>
-          <button class="class-btn" data-index="2" disabled><kbd>真</kbd><strong>—</strong></button>
+          <button class="class-btn" data-index="3" disabled><kbd>Enter</kbd><strong>—</strong></button>
+          <button class="class-btn" data-index="0" disabled><kbd>1</kbd><strong>—</strong></button>
+          <button class="class-btn" data-index="1" disabled><kbd>2</kbd><strong>—</strong></button>
+          <button class="class-btn" data-index="2" disabled><kbd>3</kbd><strong>—</strong></button>
+          <button class="class-btn undo-class-btn" id="quickUndo" disabled><kbd>Ctrl+Z</kbd><strong>撤回上一张</strong></button>
         </div>
 
         <div class="key-guide">
           <div class="key-row"><kbd>← →</kbd><span>切换图片</span></div>
           <div class="key-row"><kbd>滚轮</kbd><span>放大 / 缩小图片</span></div>
           <div class="key-row"><kbd>左键拖动</kbd><span>抓住图片移动</span></div>
+          <div class="key-row"><kbd id="trueShortcutKeys">1 / 2 / 3</kbd><span>直接判定三个真异纤</span></div>
           <div class="key-row"><kbd>↑</kbd><span>打开真异纤菜单</span></div>
           <div class="key-row"><kbd>↑ ↓</kbd><span>选择真地膜 / 彩色 / 黑色</span></div>
           <div class="key-row"><kbd>Enter</kbd><span>直接判假，或确认菜单选项</span></div>
@@ -915,6 +930,36 @@
         <code>总目录 / 相机 / NG / 图片</code>
       </div>
       <div class="welcome-contact">小伍工作室 · 技术支持 <a href="tel:19009925522">19009925522</a></div>
+    </div>
+  </section>
+
+  <section class="modal" id="settingsModal" aria-hidden="true">
+    <div class="modal-card settings-card">
+      <div class="modal-head">
+        <h2>真异纤分类设置</h2>
+        <div class="modal-actions">
+          <button class="btn primary" id="saveSettings">保存设置</button>
+          <button class="btn" id="closeSettings">关闭</button>
+        </div>
+      </div>
+      <div class="settings-body">
+        <p>可改三个真异纤的名称和单键快捷键。默认是 1、2、3；支持数字或英文字母，例如 A、S、D。</p>
+        <div class="settings-grid">
+          <div class="settings-row">
+            <label class="settings-field">第 1 类名称<input id="settingName0" maxlength="30" autocomplete="off"></label>
+            <label class="settings-field shortcut">快捷键<input id="settingKey0" maxlength="1" autocomplete="off"></label>
+          </div>
+          <div class="settings-row">
+            <label class="settings-field">第 2 类名称<input id="settingName1" maxlength="30" autocomplete="off"></label>
+            <label class="settings-field shortcut">快捷键<input id="settingKey1" maxlength="1" autocomplete="off"></label>
+          </div>
+          <div class="settings-row">
+            <label class="settings-field">第 3 类名称<input id="settingName2" maxlength="30" autocomplete="off"></label>
+            <label class="settings-field shortcut">快捷键<input id="settingKey2" maxlength="1" autocomplete="off"></label>
+          </div>
+        </div>
+        <p class="settings-note">名称会直接用于 NG 内的分类文件夹、统计表和训练 ZIP。为保证同一批数据一致，请在选择文件夹前完成设置；载入图片后本批设置锁定，如需更改请刷新页面再开始新批。</p>
+      </div>
     </div>
   </section>
 
@@ -1004,6 +1049,8 @@
       const CONFIG = {
         "ng": { name: "NG直分", labels: ["真地膜", "真彩色", "真黑色", "假异纤"] }
       };
+      const SETTINGS_STORAGE_KEY = "xiaowu-fiber-ng-direct-settings-v1";
+      let trueShortcuts = ["1", "2", "3"];
       const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "bmp", "tif", "tiff", "webp"]);
       const collator = new Intl.Collator("zh-CN", { numeric: true, sensitivity: "base" });
 
@@ -1052,6 +1099,7 @@
         scanText: document.querySelector("#scanText"),
         chooseFolder: document.querySelector("#chooseFolder"),
         chooseAgain: document.querySelector("#chooseAgain"),
+        settingsBtn: document.querySelector("#settingsBtn"),
         undoBtn: document.querySelector("#undoBtn"),
         statsBtn: document.querySelector("#statsBtn"),
         trainingZipBtn: document.querySelector("#trainingZipBtn"),
@@ -1069,10 +1117,17 @@
         zoomValue: document.querySelector("#zoomValue"),
         emptyState: document.querySelector("#emptyState"),
         filenameBar: document.querySelector("#filenameBar"),
-        classButtons: [...document.querySelectorAll(".class-btn")],
+        classButtons: [...document.querySelectorAll(".class-btn[data-index]")],
+        quickUndo: document.querySelector("#quickUndo"),
+        trueShortcutKeys: document.querySelector("#trueShortcutKeys"),
         classPopup: document.querySelector("#classPopup"),
         popupList: document.querySelector("#popupList"),
         busyText: document.querySelector("#busyText"),
+        settingsModal: document.querySelector("#settingsModal"),
+        saveSettings: document.querySelector("#saveSettings"),
+        closeSettings: document.querySelector("#closeSettings"),
+        settingNames: [0, 1, 2].map(index => document.querySelector(`#settingName${index}`)),
+        settingKeys: [0, 1, 2].map(index => document.querySelector(`#settingKey${index}`)),
         statsModal: document.querySelector("#statsModal"),
         statsBody: document.querySelector("#statsBody"),
         statsFoot: document.querySelector("#statsFoot"),
@@ -1106,6 +1161,72 @@
 
       let toastTimer = 0;
       let categorySwitchTimer = 0;
+
+      function normalizeShortcut(value) {
+        const key = String(value || "").trim().slice(0, 1).toUpperCase();
+        return /^[A-Z0-9]$/.test(key) ? key : "";
+      }
+
+      function normalizeSettings(names, shortcuts) {
+        const cleanedNames = names.map(value => String(value || "").trim());
+        const cleanedShortcuts = shortcuts.map(normalizeShortcut);
+        if (cleanedNames.some(name => !name || /[<>:"/\\|?*]/.test(name))) throw new Error("分类名称不能为空，也不能含有文件名禁用字符");
+        if (new Set([...cleanedNames, "假异纤", "未分类"]).size !== 5) throw new Error("三个真异纤名称不能重复，也不能使用“假异纤”或“未分类”");
+        if (cleanedShortcuts.some(key => !key)) throw new Error("快捷键只能是一个数字或英文字母");
+        if (new Set(cleanedShortcuts).size !== cleanedShortcuts.length) throw new Error("三个快捷键不能重复");
+        return { names: cleanedNames, shortcuts: cleanedShortcuts };
+      }
+
+      function applySettings(names, shortcuts) {
+        CONFIG.ng.labels.splice(0, 3, ...names);
+        trueShortcuts = [...shortcuts];
+      }
+
+      function restoreSettings() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY) || "null");
+          if (!saved) return;
+          const settings = normalizeSettings(saved.names, saved.shortcuts);
+          applySettings(settings.names, settings.shortcuts);
+        } catch (_) { /* 设置无效时使用默认值 */ }
+      }
+
+      function fillSettingsForm() {
+        CONFIG.ng.labels.slice(0, 3).forEach((name, index) => { el.settingNames[index].value = name; });
+        trueShortcuts.forEach((key, index) => { el.settingKeys[index].value = key; });
+      }
+
+      function openSettings() {
+        fillSettingsForm();
+        el.saveSettings.disabled = Boolean(state.rootHandle) || state.busy;
+        el.settingsModal.classList.add("open");
+        el.settingsModal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeSettings() {
+        el.settingsModal.classList.remove("open");
+        el.settingsModal.setAttribute("aria-hidden", "true");
+      }
+
+      function saveSettings() {
+        if (state.rootHandle) {
+          showToast("本批图片已载入，分类设置已锁定；请刷新页面后再开始新批", true);
+          return;
+        }
+        try {
+          const settings = normalizeSettings(
+            el.settingNames.map(input => input.value),
+            el.settingKeys.map(input => input.value)
+          );
+          applySettings(settings.names, settings.shortcuts);
+          try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings)); } catch (_) { /* 浏览器仍可本次使用 */ }
+          updateClassLabels(currentItem());
+          closeSettings();
+          showToast("分类名称和快捷键已保存，将用于下一批图片");
+        } catch (error) {
+          showToast(error.message || "设置保存失败", true);
+        }
+      }
 
       function isImage(name) {
         if (!name || name.startsWith(".")) return false;
@@ -1150,6 +1271,8 @@
         el.chooseAgain.disabled = busy;
         el.statsBtn.disabled = busy || !state.rootHandle;
         el.trainingZipBtn.disabled = busy || !state.rootHandle;
+        el.settingsBtn.disabled = busy;
+        el.quickUndo.disabled = busy || !state.history.length;
         el.closeReview.disabled = busy;
         el.reviewZoomOut.disabled = busy;
         el.reviewZoomIn.disabled = busy;
@@ -1395,18 +1518,21 @@
         el.percentMetric.textContent = `${(percent * 100).toFixed(1)}%`;
         el.mainProgress.style.width = `${percent * 100}%`;
         el.undoBtn.disabled = !state.history.length || state.busy;
+        el.quickUndo.disabled = !state.history.length || state.busy;
         el.statsBtn.disabled = !state.rootHandle || state.busy;
       }
 
       function updateClassLabels(item) {
-        const labels = item ? CONFIG[item.categoryCode].labels : ["—", "—", "—", "—"];
+        const labels = item ? CONFIG[item.categoryCode].labels : CONFIG.ng.labels;
         el.classButtons.forEach(button => {
           const actualIndex = Number(button.dataset.index);
           button.querySelector("strong").textContent = labels[actualIndex];
+          button.querySelector("kbd").textContent = actualIndex === 3 ? "Enter" : trueShortcuts[actualIndex];
           button.disabled = !item || state.busy;
         });
+        el.trueShortcutKeys.textContent = trueShortcuts.join(" / ");
         el.popupList.innerHTML = [0, 1, 2].map(index =>
-          `<button class="popup-option${index === state.menuIndex ? " selected" : ""}" data-index="${index}">${index + 1}&nbsp;&nbsp;${labels[index]}</button>`
+          `<button class="popup-option${index === state.menuIndex ? " selected" : ""}" data-index="${index}">${trueShortcuts[index]}&nbsp;&nbsp;${labels[index]}</button>`
         ).join("");
         [...el.popupList.querySelectorAll(".popup-option")].forEach(button => {
           button.addEventListener("click", () => classifyAt(Number(button.dataset.index)));
@@ -2077,7 +2203,11 @@
 
       el.chooseFolder.addEventListener("click", chooseDirectory);
       el.chooseAgain.addEventListener("click", chooseDirectory);
+      el.settingsBtn.addEventListener("click", openSettings);
+      el.saveSettings.addEventListener("click", saveSettings);
+      el.closeSettings.addEventListener("click", closeSettings);
       el.undoBtn.addEventListener("click", undoLast);
+      el.quickUndo.addEventListener("click", undoLast);
       el.statsBtn.addEventListener("click", openStats);
       el.closeStats.addEventListener("click", closeStats);
       el.downloadStats.addEventListener("click", downloadStatistics);
@@ -2216,6 +2346,9 @@
       el.statsModal.addEventListener("click", event => {
         if (event.target === el.statsModal) closeStats();
       });
+      el.settingsModal.addEventListener("click", event => {
+        if (event.target === el.settingsModal) closeSettings();
+      });
       el.reviewModal.addEventListener("click", event => {
         if (event.target === el.reviewModal) closeReview();
       });
@@ -2247,6 +2380,10 @@
 
       document.addEventListener("keydown", event => {
         if (state.busy) return;
+        if (el.settingsModal.classList.contains("open")) {
+          if (event.key === "Escape") closeSettings();
+          return;
+        }
         if (el.reviewModal.classList.contains("open")) {
           if (["Escape", "ArrowLeft", "ArrowRight"].includes(event.key)) event.preventDefault();
           if (event.key === "Escape") closeReview();
@@ -2259,6 +2396,15 @@
           return;
         }
         if (!state.rootHandle) return;
+
+        const shortcutIndex = !event.ctrlKey && !event.metaKey && !event.altKey
+          ? trueShortcuts.findIndex(key => key === event.key.toUpperCase())
+          : -1;
+        if (shortcutIndex >= 0 && !event.repeat) {
+          event.preventDefault();
+          classifyAt(shortcutIndex);
+          return;
+        }
 
         if (event.key === "ArrowLeft") {
           event.preventDefault();
@@ -2296,6 +2442,9 @@
         event.preventDefault();
         event.returnValue = "";
       });
+
+      restoreSettings();
+      updateClassLabels(null);
 
       if (!("showDirectoryPicker" in window) || !window.isSecureContext) {
         el.chooseFolder.textContent = "请改用 Chrome / Edge 打开";
