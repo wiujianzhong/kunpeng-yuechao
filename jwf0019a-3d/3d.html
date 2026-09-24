@@ -16,9 +16,6 @@
       }
     });
   </script>
-  <link rel="modulepreload" href="./vendor/three/core/three.module.js">
-  <link rel="modulepreload" href="./vendor/three/examples/jsm/loaders/GLTFLoader.js">
-  <link rel="preload" href="./assets/models/JWF0019A-新主体对齐-720贴图-前罩底板削平-2026-07-25.glb?v=e5e75993-20260818" as="fetch" crossorigin fetchpriority="high">
   <script type="importmap">
     {
       "imports": {
@@ -54,6 +51,10 @@
           <button id="process-play" class="primary-demo-button" aria-pressed="false">一键循环整线演示</button>
           <button id="fault-play" class="fault-demo-button">播放堵花偏流</button>
         </div>
+        <fieldset class="equipment-visibility">
+          <legend>设备显示（播放中也可切换）</legend>
+          <label><input type="checkbox" id="only-jwf0019"> 仅显示 JWF0019A</label>
+        </fieldset>
         <div id="line-cycle-strip" class="line-cycle-strip" aria-label="整线循环流程">
           <span data-line-phase="feed">JWF1124送棉</span>
           <span data-line-phase="inspect">JWF0019A检测与喷杂</span>
@@ -306,7 +307,7 @@
     </div>
   </dialog>
 
-  <script type="module" src="./app.js?v=cross-platform-loading-20260818"></script>
+  <script type="module" src="./app.js?v=gray-visibility-20260924"></script>
   <script type="module" src="./knowledge-app.js?v=7-no-auto-popup"></script>
   <script src="./ui-access.js?v=1-calibration-lock"></script>
 </body>
