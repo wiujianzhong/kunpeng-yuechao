@@ -775,8 +775,8 @@ const modelLoadStatus = document.querySelector('#model-load-status');
 const modelStatusValue = document.querySelector('#model-status-value');
 const importedModelLoader = new GLTFLoader();
 importedModelLoader.setMeshoptDecoder(MeshoptDecoder);
-const CURRENT_MODEL_PATH = 'assets/models/JWF0019A-灰白优化-20260924.glb';
-const CURRENT_MODEL_VERSION = 'gray-motor-20260924';
+const CURRENT_MODEL_PATH = 'assets/models/JWF0019A-新主体对齐-720贴图-前罩底板削平-2026-07-25.glb';
+const CURRENT_MODEL_VERSION = 'before-thursday-local-20260927';
 const CURRENT_MODEL_ATTEMPTS_PER_SOURCE = 2;
 const currentModelSources = [...new Map([
   `./${CURRENT_MODEL_PATH}?v=${CURRENT_MODEL_VERSION}`,
@@ -801,26 +801,27 @@ function loadCurrentModel() {
     importedRootModel = importedRoot;
     importedRoot.name = 'JWF0019A外形清理校正版';
     completeModel.add(importedRoot);
-    // Blender优化主体已按工作台坐标导出，不能再次旋转和归一化。
-    importedRoot.rotation.y = 0;
+    importedRoot.rotation.y = -Math.PI / 2;
     importedRoot.updateMatrixWorld(true);
 
     const sourceBounds = new THREE.Box3().setFromObject(importedRoot);
     const sourceSize = sourceBounds.getSize(new THREE.Vector3());
-    const scale = 1;
+    const scale = 3.62 / sourceSize.y;
     importedRoot.scale.setScalar(scale);
     importedRoot.updateMatrixWorld(true);
 
     const scaledBounds = new THREE.Box3().setFromObject(importedRoot);
     const scaledCenter = scaledBounds.getCenter(new THREE.Vector3());
-    importedRoot.position.set(0, 0, 0);
+    importedRoot.position.x -= scaledCenter.x;
+    importedRoot.position.y -= scaledBounds.min.y;
+    importedRoot.position.z -= scaledCenter.z;
     importedRoot.updateMatrixWorld(true);
 
     // 圆盘保持与管口同轴，并按现场校对结果整体上提100毫米，消除悬空缝隙。
     const outletDisk = importedRoot.getObjectByName('第10轮_出口圆盘_连续低模');
     if (outletDisk) outletDisk.position.y += 0.10 / scale;
 
-    const removedOverlapTriangles = 0; // 优化源模型已完成穿模清理。
+    const removedOverlapTriangles = removeImportedOverlapInsideLowerFlowChannel(importedRoot);
     console.info(`主通道下半段穿模清理完成：删除${removedOverlapTriangles}个重叠三角面`);
 
     // 外加罩板和电柜门沿用母版机身白漆，避免前罩板比主机明显更白。
@@ -851,32 +852,8 @@ function loadCurrentModel() {
       );
       object.castShadow = false;
       object.receiveShadow = true;
-      const exteriorMaterials = Array.isArray(object.material) ? object.material : [object.material];
-      exteriorMaterials.forEach((material) => {
-        if (material.name === '电机独立灰色') return;
-        // Blender与网页的环境光不同，给漆面补足柔和反射底光，避免背光面发黑。
-        material.emissive?.setRGB(0.43, 0.48, 0.48);
-        material.emissiveIntensity = 0.24;
-        if (material.map) material.emissiveMap = material.map;
-      });
     });
-    // 旧面编号已失效；优化模型自带确认过的漆面，禁止再次覆盖旧编号。
-    machine.traverse((object) => {
-      if (!object.isMesh || object.userData.role !== 'shell') return;
-      for (let parent = object.parent; parent; parent = parent.parent) {
-        if (parent === factoryLine) return;
-      }
-      const list = Array.isArray(object.material) ? object.material : [object.material];
-      list.forEach((material) => {
-        if (!material?.color || material.map || material.transmission > 0) return;
-        const { r, g, b } = material.color;
-        if (Math.min(r, g, b) > 0.25 && Math.max(r, g, b) - Math.min(r, g, b) < 0.15) {
-          material.color.setRGB(0.43, 0.48, 0.48);
-          material.roughness = 0.72;
-          material.metalness = 0.12;
-        }
-      });
-    });
+    restoreShellSurfacePaints();
 
     if (gltf.animations.length) {
       modelAnimationMixer = new THREE.AnimationMixer(importedRoot);
@@ -894,7 +871,7 @@ function loadCurrentModel() {
     importedModelReady = true;
     completeModel.visible = true;
     if (layers.shell) layers.shell.visible = false;
-    modelLoadStatus.innerHTML = '<span class="dot ready"></span>灰白优化模型已加载';
+    modelLoadStatus.innerHTML = '<span class="dot ready"></span>外形清理校正版已加载 · 31252三角面';
     modelStatusValue.textContent = '旧灯与疙瘩已清除 · 圆盘管口已对中';
     updateExplode();
     applyMode(currentMode);
@@ -5925,6 +5902,7 @@ function updateFaultProcess(time, curve, width) {
   }
 
   faultImpurity.visible = cycleProgress < 0.985;
+  faultImpurity.userData.inDownstreamPipe = false;
   faultImpurity.rotation.y += 0.036;
   faultImpurity.rotation.z += 0.022;
   const impurityFadeStart = carriesMissedImpurityForward ? 0.975 : 0.92;
@@ -5958,6 +5936,7 @@ function updateFaultProcess(time, curve, width) {
     );
     faultForwardCottonPath.userData.sheetLane = actualLaneAtValve;
     faultImpurity.position.copy(downstreamCottonPoint(downstreamProgress, faultForwardCottonPath, time));
+    faultImpurity.userData.inDownstreamPipe = true;
     status = `${faultVariant.label}未被原阀位喷除，正沿后送风道继续进入FA151`;
   } else {
     faultImpurity.position.copy(lanePoint(curve, channelProgress, actualLane, width));
@@ -6844,7 +6823,11 @@ function animate(time = 0) {
     hiddenForFrame.push([object, object.visible]);
     object.visible = false;
   };
-  if (onlyJwf0019.checked) hideForFrame(factoryLine);
+  if (onlyJwf0019.checked) {
+    hideForFrame(factoryLine);
+    downstreamCottonTufts.forEach(hideForFrame);
+    if (faultImpurity.userData.inDownstreamPipe) hideForFrame(faultImpurity);
+  }
   renderer.render(scene, camera);
   hiddenForFrame.forEach(([object, visible]) => { object.visible = visible; });
   requestAnimationFrame(animate);
