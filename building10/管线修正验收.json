@@ -1,0 +1,258 @@
+{
+  "topology": [
+    {
+      "circuit": "G-L",
+      "devices": [
+        "K-01",
+        "K-02",
+        "K-03",
+        "K-04",
+        "L-01",
+        "L-02",
+        "L-03",
+        "L-04",
+        "L-05",
+        "L-06",
+        "L-07",
+        "L-08",
+        "L-09"
+      ],
+      "components": 1,
+      "unexplained_endpoints": 0,
+      "junctions": 11
+    },
+    {
+      "circuit": "G-P1",
+      "devices": [
+        "S-01",
+        "S-02",
+        "S-03"
+      ],
+      "components": 1,
+      "unexplained_endpoints": 0,
+      "junctions": 1
+    },
+    {
+      "circuit": "G-P2",
+      "devices": [
+        "S-04"
+      ],
+      "components": 1,
+      "unexplained_endpoints": 0,
+      "junctions": 0
+    },
+    {
+      "circuit": "G-PK",
+      "devices": [
+        "S-05",
+        "S-06",
+        "S-07"
+      ],
+      "components": 1,
+      "unexplained_endpoints": 0,
+      "junctions": 2
+    }
+  ],
+  "device_terminals": [
+    {
+      "device": "AL",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "K-01",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "K-02",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "K-03",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "K-04",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "L-01",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "L-02",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "L-03",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "L-04",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "L-05",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "L-06",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "L-07",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "L-08",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "L-09",
+      "circuit": "G-L",
+      "connected_ends": 1
+    },
+    {
+      "device": "AL",
+      "circuit": "G-P1",
+      "connected_ends": 1
+    },
+    {
+      "device": "S-01",
+      "circuit": "G-P1",
+      "connected_ends": 1
+    },
+    {
+      "device": "S-02",
+      "circuit": "G-P1",
+      "connected_ends": 1
+    },
+    {
+      "device": "S-03",
+      "circuit": "G-P1",
+      "connected_ends": 1
+    },
+    {
+      "device": "AL",
+      "circuit": "G-P2",
+      "connected_ends": 1
+    },
+    {
+      "device": "S-04",
+      "circuit": "G-P2",
+      "connected_ends": 1
+    },
+    {
+      "device": "AL",
+      "circuit": "G-PK",
+      "connected_ends": 1
+    },
+    {
+      "device": "S-05",
+      "circuit": "G-PK",
+      "connected_ends": 1
+    },
+    {
+      "device": "S-06",
+      "circuit": "G-PK",
+      "connected_ends": 1
+    },
+    {
+      "device": "S-07",
+      "circuit": "G-PK",
+      "connected_ends": 1
+    }
+  ],
+  "unexplained_endpoints": 0,
+  "unintended_pipe_collisions": [],
+  "minimum_non_joint_clearance_mm": 56.0,
+  "pipe_wall_collisions": [],
+  "pipe_slab_collisions": [],
+  "pipe_sleeve_collisions": [],
+  "pipe_device_collisions": [],
+  "pipe_junction_collisions": [],
+  "fixed_installation_heights_unchanged": true,
+  "wall_outline_unchanged": true,
+  "windows_unchanged": true,
+  "reserved_ports": [
+    {
+      "id": "R-DC",
+      "pipe_id": "D-C",
+      "point": [
+        6.813,
+        -0.28,
+        11.2
+      ],
+      "system": "drain",
+      "label": "厨房排水预留接口"
+    },
+    {
+      "id": "R-D1",
+      "pipe_id": "D-1",
+      "point": [
+        0.5,
+        -0.28,
+        6.55
+      ],
+      "system": "drain",
+      "label": "卫生间排水预留接口"
+    },
+    {
+      "id": "R-D2",
+      "pipe_id": "D-2",
+      "point": [
+        0.5,
+        -0.28,
+        5.75
+      ],
+      "system": "drain",
+      "label": "卫生间排水预留接口"
+    },
+    {
+      "id": "R-GK",
+      "pipe_id": "G-K",
+      "point": [
+        7.7,
+        1.0,
+        11.2
+      ],
+      "system": "water",
+      "label": "厨房给水预留接口"
+    },
+    {
+      "id": "R-GIN",
+      "pipe_id": "G-IN",
+      "point": [
+        9.7,
+        1.0,
+        9.15
+      ],
+      "system": "water",
+      "label": "入户给水接口"
+    },
+    {
+      "id": "R-GJ",
+      "pipe_id": "G-IN",
+      "point": [
+        8.3,
+        1.0,
+        9.35
+      ],
+      "system": "water",
+      "label": "图示给水预留接口"
+    }
+  ],
+  "passed": true
+}
