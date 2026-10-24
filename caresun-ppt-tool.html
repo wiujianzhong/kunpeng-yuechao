@@ -1812,25 +1812,23 @@ body > .container > .text-center:first-child h1::before {
             return Number(path.match(/slide(\d+)\.xml$/)?.[1] || 0);
         }
 
-        // 有原页需要保留时，让新PPT使用原PPT的画布尺寸；再把工具生成页等比放大，版式不会变小。
+        // 默认采用客户模板的宽屏画布；导入原页时沿用原画布，文字字号始终保持真实磅值。
         function configureGeneratedPPTXLayout(pptx, sourceSlideSize) {
-            if (!sourceSlideSize?.width || !sourceSlideSize?.height) {
-                pptx.layout = 'LAYOUT_16x9';
-                return { x: 1, y: 1 };
-            }
+            const width = sourceSlideSize?.width || 40 / 3;
+            const height = sourceSlideSize?.height || 7.5;
             pptx.defineLayout({
                 name: 'CARESUN_IMPORTED_LAYOUT',
-                width: sourceSlideSize.width,
-                height: sourceSlideSize.height
+                width,
+                height
             });
             pptx.layout = 'CARESUN_IMPORTED_LAYOUT';
             return {
-                x: sourceSlideSize.width / SLIDE_W,
-                y: sourceSlideSize.height / SLIDE_H
+                x: width / SLIDE_W,
+                y: height / SLIDE_H
             };
         }
 
-        // 工具生成页缩放到原PPT画布；原始文字/表格页完全不改，保持原来样式。
+        // 工具生成页适配目标画布，保留真实字号；导入的原始文字/表格页保持原样。
         async function scaleGeneratedPPTXSlides(outputZip, scale) {
             if (!scale || (Math.abs(scale.x - 1) < 0.0001 && Math.abs(scale.y - 1) < 0.0001)) return;
             const textScale = Math.min(scale.x, scale.y);
@@ -1846,9 +1844,6 @@ body > .container > .text-center:first-child h1::before {
                         if (xfrm) scalePPTXTransform(xfrm, scale);
                     });
                 }
-                getPPTXNodes(slideDoc, 'rPr').concat(getPPTXNodes(slideDoc, 'defRPr')).forEach(node => {
-                    scalePPTXAttribute(node, 'sz', textScale);
-                });
                 getPPTXNodes(slideDoc, 'ln').forEach(node => scalePPTXAttribute(node, 'w', textScale));
                 outputZip.file(slidePath, new XMLSerializer().serializeToString(slideDoc));
             }
@@ -1886,14 +1881,13 @@ body > .container > .text-center:first-child h1::before {
         }
 
         // 把原PPT的文字/表格页作为原生幻灯片合并进新PPT，保留表格、文字和排版。
-        async function appendPreservedPPTXSlides(generatedBlob, sourceFile, sourceSlides, insertAfterCover, generatedScale) {
+        async function appendPreservedPPTXSlides(generatedBlob, sourceFile, sourceSlides, insertAfterCover) {
             if (!sourceFile || sourceSlides.length === 0) return generatedBlob;
 
             const [outputZip, sourceZip] = await Promise.all([
                 JSZip.loadAsync(generatedBlob),
                 JSZip.loadAsync(sourceFile)
             ]);
-            await scaleGeneratedPPTXSlides(outputZip, generatedScale);
             const outputContentTypes = parsePPTXXml(await outputZip.file('[Content_Types].xml').async('text'));
             const sourceContentTypes = parsePPTXXml(await sourceZip.file('[Content_Types].xml').async('text'));
             const presentationDoc = parsePPTXXml(await outputZip.file('ppt/presentation.xml').async('text'));
@@ -1972,7 +1966,7 @@ body > .container > .text-center:first-child h1::before {
             const issueStartIndex = insertAfterCover ? 1 : 0;
             importedSlides.forEach(slide => {
                 if (!slideList) return;
-                const targetIndex = issueStartIndex + slide.afterIssueCount;
+                const targetIndex = Math.min(issueStartIndex + slide.afterIssueCount, existingSlides.length - 1);
                 slideList.insertBefore(slide.slideId, existingSlides[targetIndex] || null);
             });
 
@@ -2325,6 +2319,7 @@ body > .container > .text-center:first-child h1::before {
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '一分厂', '前纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">前纺</button>
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '一分厂', '细纱')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">细纱</button>
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '一分厂', '络筒')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">络筒</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '一分厂', '后纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">后纺</button>
                                         </div>
                                     </details>
                                     <details>
@@ -2333,6 +2328,7 @@ body > .container > .text-center:first-child h1::before {
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '二分厂', '前纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">前纺</button>
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '二分厂', '细纱')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">细纱</button>
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '二分厂', '络筒')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">络筒</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '二分厂', '后纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">后纺</button>
                                         </div>
                                     </details>
                                     <details>
@@ -2341,6 +2337,7 @@ body > .container > .text-center:first-child h1::before {
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '三分厂', '前纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">前纺</button>
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '三分厂', '细纱')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">细纱</button>
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '三分厂', '络筒')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">络筒</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '三分厂', '后纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">后纺</button>
                                         </div>
                                     </details>
                                     <details>
@@ -2349,6 +2346,7 @@ body > .container > .text-center:first-child h1::before {
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '四分厂', '前纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">前纺</button>
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '四分厂', '细纱')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">细纱</button>
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '四分厂', '络筒')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">络筒</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '四分厂', '后纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">后纺</button>
                                         </div>
                                     </details>
                                     <details>
@@ -2357,6 +2355,7 @@ body > .container > .text-center:first-child h1::before {
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '七分厂', '前纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">前纺</button>
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '七分厂', '细纱')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">细纱</button>
                                             <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '七分厂', '络筒')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">络筒</button>
+                                            <button type="button" onclick="selectIssueFactoryProcess(${issueId}, '七分厂', '后纺')" class="block w-full px-5 py-2 text-left text-sm hover:bg-blue-100">后纺</button>
                                         </div>
                                     </details>
                                     <div class="my-1 border-t border-gray-100"></div>
@@ -3317,14 +3316,19 @@ body > .container > .text-center:first-child h1::before {
                     }
                 }
                 
-                let pptBlob = await pptx.write({ outputType: 'blob' });
+                renderEndingSlide(pptx, pptx.addSlide());
+                const generatedZip = await JSZip.loadAsync(await pptx.write({ outputType: 'blob' }));
+                await scaleGeneratedPPTXSlides(generatedZip, generatedScale);
+                let pptBlob = await generatedZip.generateAsync({
+                    type: 'blob',
+                    mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                });
                 if (importedPPTX) {
                     pptBlob = await appendPreservedPPTXSlides(
                         pptBlob,
                         importedPPTX.file,
                         importedPPTX.preservedSlides,
-                        templateMode === 'company',
-                        generatedScale
+                        templateMode === 'company'
                     );
                 }
                 await savePPT(pptBlob, `${cleanBaseName}.pptx`);
@@ -3428,12 +3432,12 @@ body > .container > .text-center:first-child h1::before {
                 w: 1048165 / 1219200, h: 1050069 / 1219200
             });
             slide.addText(title, {
-                x: 0.53, y: 2.47, w: 6.45, h: 0.48,
-                fontFace: '汉仪旗黑',
-                fontSize: 30, color: '70AD47', bold: true,
+                x: 0.53, y: 1.95, w: 6.45, h: 1.05,
+                fontFace: '微软雅黑',
+                fontSize: 36, color: '70AD47', bold: true,
                 align: 'left',
                 valign: 'middle',
-                fit: 'shrink'
+                margin: 0
             });
         }
 
@@ -3517,6 +3521,50 @@ body > .container > .text-center:first-child h1::before {
             });
         }
 
+        function renderEndingSlide(pptx, slide) {
+            slide.background = { color: 'FFFFFF' };
+            slide.addImage({
+                data: CARESUN_BADGE_DATA,
+                x: 10969614 / 1219200, y: 202970 / 1219200,
+                w: 855350 / 1219200, h: 856904 / 1219200
+            });
+            slide.addShape(pptx.ShapeType.rect, {
+                x: 451478 / 1219200, y: 1064873 / 1219200,
+                w: 190566 / 1219200, h: 190566 / 1219200,
+                fill: { color: '70AD47' }, line: { color: '70AD47' }
+            });
+            slide.addShape(pptx.ShapeType.line, {
+                x: 617315 / 1219200, y: 1164991 / 1219200,
+                w: 11207649 / 1219200, h: 0,
+                line: { color: '70AD47', width: 0.9375 }
+            });
+            slide.addText('结束语', {
+                x: 0.75, y: 0.42, w: 2.8, h: 0.42,
+                fontFace: '微软雅黑', fontSize: 26, color: '70AD47', bold: true,
+                margin: 0, valign: 'middle'
+            });
+            const banner = '<svg xmlns="http://www.w3.org/2000/svg" width="905px" height="182px" viewBox="0 0 905 182"><defs><linearGradient id="g"><stop stop-color="#9FE256"/><stop offset="0.23" stop-color="#9CDE54"/><stop offset="0.45" stop-color="#8DC94D"/><stop offset="0.67" stop-color="#76A840"/><stop offset="0.89" stop-color="#5E8533"/><stop offset="1" stop-color="#52762D"/></linearGradient></defs><rect width="905" height="182" rx="15" fill="url(#g)"/><path d="M132 0H139L195 91L139 182H132L178 91Z" fill="#FFFFFF"/></svg>';
+            slide.addImage({
+                data: `data:image/svg+xml;base64,${btoa(banner)}`,
+                x: 195 / 128, y: 280 / 128, w: 905 / 128, h: 182 / 128
+            });
+            slide.addText('结', {
+                x: 1.8, y: 2.58, w: 0.62, h: 0.6,
+                fontFace: '微软雅黑', fontSize: 26, color: 'FFFFFF', bold: true,
+                margin: 0, align: 'center', valign: 'middle'
+            });
+            slide.addText('汇报完毕，谢谢大家。', {
+                x: 4, y: 2.58, w: 3, h: 0.6,
+                fontFace: '微软雅黑', fontSize: 26, color: 'FFFFFF', bold: true,
+                margin: 0, align: 'center', valign: 'middle'
+            });
+            slide.addShape(pptx.ShapeType.rect, {
+                x: -7396 / 1219200, y: 6655031 / 1219200,
+                w: 12199396 / 1219200, h: 202970 / 1219200,
+                fill: { color: '70AD47' }, line: { color: '70AD47' }
+            });
+        }
+
         function renderDefaultSlide(pptx, slide, data) {
             const processName = (data.processName || '').trim();
             const sharedDesc = getSharedPPTXDescription(data.leftDesc, data.rightDesc);
@@ -3529,7 +3577,7 @@ body > .container > .text-center:first-child h1::before {
                     fill: 'F0FDF4',
                     line: '70AD47',
                     textColor: '70AD47',
-                    textFontSize: 20
+                    textFontSize: 26
                 });
             }
 
@@ -3595,6 +3643,7 @@ body > .container > .text-center:first-child h1::before {
             }
             slide.addText(opt.title, {
                 x: opt.x + 0.18, y: opt.y + 0.08, w: opt.w - 0.36, h: opt.h - 0.14,
+                fontFace: '微软雅黑',
                 fontSize: textFontSize, color: opt.textColor, bold: true,
                 valign: 'middle',
                 align: 'center'
