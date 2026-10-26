@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#edf3f5">
+  <title>钢梯出图台 · 小伍工作室</title>
+  <style>/*__STYLE__*/</style>
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="#"><span class="brand-mark" aria-hidden="true">▱</span><span>小伍工作室 <i>／</i> 钢梯出图台</span></a>
+    <span class="header-note">设备检修直斜梯 · 全部尺寸以毫米计</span>
+    <button class="button subtle" id="save-html">保存整份方案</button>
+  </header>
+
+  <main class="workspace">
+    <aside class="parameters" aria-label="梯子参数">
+      <div class="panel-heading"><span class="eyebrow">现场只量这两项</span><h1>尺寸给准，<br>图纸自动算。</h1></div>
+      <form id="parameters-form" novalidate>
+        <div class="dimension-inputs">
+          <label class="major-input" for="height"><span><b>H</b> 地面 → 平台踩踏面</span><div><input id="height" name="height" type="number" inputmode="decimal" min="300" max="12000" value="2610" required><em class="main-unit">mm</em></div></label>
+          <label class="major-input" for="run"><span><b>L</b> 平台落地点 → 梯脚</span><div><input id="run" name="run" type="number" inputmode="decimal" min="200" max="15000" value="1600" required><em class="main-unit">mm</em></div></label>
+        </div>
+        <div class="unit-row"><span>L是水平距离</span><div role="group" aria-label="现场输入单位"><button type="button" class="unit-button active" data-unit="mm" aria-pressed="true">毫米</button><button type="button" class="unit-button" data-unit="m" aria-pressed="false">米</button></div></div>
+        <svg class="measure-guide" viewBox="0 0 280 153" role="img" aria-label="高度H从地面量到平台踩踏面，水平距离L从平台边缘垂直落地点量到梯脚">
+          <path d="M30 114H250M57 114L198 30H252" fill="none" stroke="#7893a2" stroke-width="3"/><path d="M198 30V114" fill="none" stroke="#adbfc9" stroke-dasharray="4 4"/>
+          <path d="M79 114H95L205 48H198Z" fill="#527d91"/><path d="M223 30V114M217 30H229M217 114H229M57 135H198M57 129V141M198 129V141" fill="none" stroke="#2a7768"/>
+          <g font-family="system-ui,sans-serif" font-size="12" fill="#46616f"><text x="233" y="77">H</text><text x="121" y="149">L</text><text x="200" y="21">平台踩踏面</text><text x="23" y="104">梯脚</text><text x="187" y="127">垂足</text></g>
+        </svg>
+        <button class="button primary" id="generate" type="submit">生成／更新图纸 <span aria-hidden="true">↗</span></button>
+        <p class="autosave-note" id="save-status">默认值已填好，修改后自动更新</p>
+        <details class="advanced" id="advanced">
+          <summary>调整默认参数 <span>踏板 · 材料 · 扶手</span></summary>
+          <div id="advanced-fields"></div>
+          <p class="field-note">扶手高沿用原图500；从踏板下坡前缘垂直量至扶手顶。折弯参数应以本厂试折为准。</p>
+          <button type="button" class="button subtle full" id="reset-materials">恢复材料默认值</button>
+        </details>
+      </form>
+      <p class="template-note">当前模板：窄踏板设备检修斜梯。图纸计算几何尺寸；平台和地面的固定方式需按现场确定。</p>
+    </aside>
+
+    <section class="design-area" aria-label="方案预览与图纸">
+      <div class="design-heading"><div><span class="eyebrow">同一套尺寸，同步出图</span><h2 id="scheme-title">2610 × 1600 <small>mm</small></h2></div><span class="live-state" id="live-state">方案已生成</span></div>
+      <div class="result-strip" aria-label="自动计算结果">
+        <div><span>实体踏板</span><strong id="stat-treads">—</strong></div><div><span>每步垂直高差</span><strong id="stat-rise">—</strong></div><div><span>主梁长点毛料</span><strong id="stat-length">—</strong></div><div><span>立柱／每侧</span><strong id="stat-posts">—</strong></div>
+      </div>
+      <div class="preview-card">
+        <nav class="view-tabs" aria-label="图纸类型" role="tablist"><button class="active" id="tab-3d" role="tab" aria-selected="true" aria-controls="panel-3d" data-tab="3d">3D视图</button><button id="tab-views" role="tab" aria-selected="false" aria-controls="panel-views" data-tab="views">三视图</button><button id="tab-cuts" role="tab" aria-selected="false" aria-controls="panel-cuts" data-tab="cuts">下料与组装</button></nav>
+        <section id="panel-3d" class="view-panel" role="tabpanel" aria-labelledby="tab-3d">
+          <div class="viewer-toolbar"><div class="camera-buttons" aria-label="模型视角"><button data-camera="iso" class="active">45°</button><button data-camera="side">侧面</button><button data-camera="front">正面</button><button data-camera="top">俯视</button></div><div class="viewer-switches"><button id="rotation" aria-pressed="true">暂停旋转</button><label><input id="labels" type="checkbox" checked> 显示标注</label></div></div>
+          <div id="model-host" class="model-host"><p id="model-loading">正在生成3D模型…</p></div>
+          <div class="viewer-caption"><span><i class="legend-beam"></i>主梁 <i class="legend-tread"></i>花纹板 <i class="legend-rail"></i>扶手</span><span>拖动旋转 · 双指／滚轮缩放</span></div>
+        </section>
+        <section id="panel-views" class="view-panel drawing-panel" role="tabpanel" aria-labelledby="tab-views" hidden><div class="drawing-topline"><p>正视 · 侧视 · 俯视，统一标注毫米</p><button class="button subtle" id="download-svg">保存三视图SVG</button></div><div id="three-view"></div></section>
+        <section id="panel-cuts" class="view-panel fabrication-panel" role="tabpanel" aria-labelledby="tab-cuts" hidden><div class="drawing-topline"><p>先看切口，再按编号下料和定位</p><button class="button subtle" id="download-csv">保存下料表</button></div><div id="fabrication-content"></div></section>
+      </div>
+      <div id="message-area" role="status" aria-live="polite"></div>
+      <div class="production-note" id="production-note"></div>
+      <div class="delivery-bar"><div><strong>把方案交给施工师傅</strong><span>三视图、切口图、材料表和安装定位可存图或打印</span></div><div>
+        <details class="image-export" id="image-export"><summary class="button secondary">导出图片 <span aria-hidden="true">⌃</span></summary><div class="image-export-menu" aria-label="选择导出图片">
+          <button id="download-model-png" data-image="model">当前3D视图 <small>PNG · 含标注</small></button>
+          <button id="download-views-png" data-image="views">三视图 <small>PNG · 高清</small></button>
+          <button id="download-cuts-png" data-image="cuts">主梁／扶手切口图 <small>PNG</small></button>
+          <button id="download-tread-png" data-image="tread">踏板折弯详图 <small>PNG</small></button>
+          <button id="download-materials-png" data-image="materials">下料清单 <small>PNG</small></button>
+          <button id="download-positions-png" data-image="positions">踏板／立柱定位表 <small>PNG</small></button>
+        </div></details>
+        <button class="button secondary" id="download-dxf">导出CAD平面图</button><button class="button primary" id="print">打印／存为PDF</button>
+      </div></div>
+      <p class="bottom-note">先试折1块踏板、试配1根立柱，再按定位图批量制作。基板厚不含花纹凸起。</p>
+    </section>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <section id="print-document" aria-label="打印图纸"></section>
+  <script id="bootstrap-params" type="application/json">{}</script>
+  <script>/*__APP__*/</script>
+</body>
+</html>
