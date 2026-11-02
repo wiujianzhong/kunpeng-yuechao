@@ -45,7 +45,7 @@
             }
         })();
     </script>
-    <script src="./vendor/pinyin-pro.js?v=3.18.6"></script>
+    <script src="./vendor/pinyin-pro.js?v=3.18.6" defer></script>
     <script src="./ppt-license.js?v=20260717-bilingual-ready-fix" defer></script>
     <script src="./vendor/tailwindcss-cdn.js" defer></script>
     <script src="./vendor/pptxgen.bundle.js" defer></script>
@@ -3964,7 +3964,7 @@ body > .container > .text-center:first-child h1::before {
     }
   </style>
   <script>
-    (() => {
+    document.addEventListener('DOMContentLoaded', () => {
         const LANGUAGE_KEY = 'jx_ppt_ui_language';
         window.pinyinPro?.customPinyin?.({
             '得培训': 'děi péi xùn'
@@ -4121,7 +4121,7 @@ body > .container > .text-center:first-child h1::before {
         });
         applyTree();
         observer.observe(document.body, { childList: true, subtree: true });
-    })();
+    }, { once: true });
   </script>
   <script defer src="https://xiaowustudio.cn/assets/analytics.js?v=20260710"></script>
 </body>
