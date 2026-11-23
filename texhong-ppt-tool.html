@@ -30,6 +30,7 @@
     <script src="./vendor/pinyin-pro.js?v=3.18.6" defer></script>
     <script src="./vendor/tailwindcss-cdn.js" defer></script>
     <script src="./vendor/pptxgen.bundle.js" defer></script>
+    <script src="./vendor/ppt-video-poster.js" defer></script>
     <script src="./vendor/jszip.min.js" defer></script>
     <style>
         body {
@@ -75,6 +76,11 @@
             display: flex;
             align-items: stretch;
             gap: 0.5rem;
+        }
+        [data-import-source-name] [readonly] {
+            background-color: #f8fafc;
+            color: #334155;
+            cursor: text;
         }
         .desc-merge-button {
             width: 56px;
@@ -419,7 +425,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         <a href="./texhong-ppt-web/terms.html">使用说明</a>
                         <a href="./texhong-ppt-web/privacy.html">隐私说明</a>
                         <button type="button" id="download-diagnostics" onclick="downloadRuntimeTrace()">下载闪退排查记录</button>
-                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R8</span></footer>
+                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R9</span></footer>
                     </div>
                 </details>
             </nav>
@@ -617,7 +623,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 仅记录步骤与图片规格，保留重开前的最后阶段；不记录照片、文件名或业务文字。
         const RUNTIME_TRACE_KEY = 'th_ppt_runtime_trace';
-        const RUNTIME_BUILD = '2026.11.23 R8';
+        const RUNTIME_BUILD = '2026.11.23 R9';
         let runtimeTrace = [];
         try {
             const previous = JSON.parse(localStorage.getItem(RUNTIME_TRACE_KEY) || '[]');
@@ -2489,9 +2495,9 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         async function compressImages(options = {}) {
-            const imageRefs = getUploadedImageRefs();
+            const imageRefs = getUploadedImageRefs(true);
             if (imageRefs.length === 0) {
-                if (!options.silent) alert('还没有可压缩的照片，请先上传图片。');
+                if (!options.silent) alert('没有可压缩的新增照片。');
                 return false;
             }
 
@@ -2529,12 +2535,13 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             }
         }
 
-        function getUploadedImageRefs() {
+        function getUploadedImageRefs(editableOnly = false) {
             const refs = [];
             document.querySelectorAll('[id^="issue-"]').forEach(issue => {
                 const issueId = issue.id.replace('issue-', '');
                 ['left', 'right'].forEach(type => {
                     const key = `${type}Image-${issueId}`;
+                    if (editableOnly && type === 'left' && issue.dataset.importSourceName) return;
                     if (window[key]) refs.push({ issueId, type, key });
                 });
             });
@@ -2585,6 +2592,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         function setIssueProcessValue(issueId, value, isFilled = false) {
+            if (isImportedIssue(issueId)) return;
             const input = document.getElementById(`process-${issueId}`);
             if (input) input.value = value || '';
             const picker = document.getElementById(`process-picker-${issueId}`);
@@ -2593,6 +2601,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         function fillProcessTitleDown(issueId) {
+            if (isImportedIssue(issueId)) return;
             const processName = document.getElementById(`process-${issueId}`)?.value.trim() || '';
             if (!processName) {
                 alert('请先输入或选择一个标题，再向下填充。');
@@ -2623,6 +2632,10 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             scheduleDraftSave();
         }
 
+        function isImportedIssue(issueId) {
+            return Boolean(document.getElementById(`issue-${issueId}`)?.dataset.importSourceName);
+        }
+
         // 添加空问题项
         function addEmptyIssue(restoredId = null, importSourceName = '') {
             const issueId = restoredId === null ? issueCount + 1 : Number(restoredId);
@@ -2636,7 +2649,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                             <span class="issue-page-label shrink-0 font-semibold text-gray-700">第 ${issueId} 页PPT</span>
                             <span class="truncate text-xs font-semibold text-red-500">点击图片可放大查看</span>
                         </div>
-                        <button onclick="removeIssue(${issueId})" class="text-red-500 hover:text-red-700 p-1">
+                        <button onclick="removeIssue(${issueId})" class="original-edit text-red-500 hover:text-red-700 p-1">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
@@ -2646,7 +2659,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                     <div class="mb-3">
                         <div class="flex w-full md:w-96">
                             <input id="process-${issueId}" placeholder="可直接输入工序或分厂" autocomplete="off" class="min-w-0 flex-1 px-2 py-2 text-sm border border-gray-200 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
-                            <details id="process-menu-${issueId}" class="relative">
+                            <details id="process-menu-${issueId}" class="original-edit relative">
                                 <summary id="process-picker-${issueId}" aria-label="选择工序或分厂" class="h-full w-16 px-1 py-2 text-sm border border-l-0 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white cursor-pointer select-none">选择</summary>
                                 <div class="absolute right-0 z-50 mt-1 w-36 max-h-80 overflow-y-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
                                     <details>
@@ -2705,7 +2718,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                                     <button type="button" onclick="selectIssueProcess(${issueId}, '安全检查')" class="block w-full px-3 py-2 text-left text-sm hover:bg-blue-50">安全检查</button>
                                 </div>
                             </details>
-                            <button type="button" onclick="fillProcessTitleDown(${issueId})" class="shrink-0 whitespace-nowrap px-2 py-2 text-xs border border-l-0 border-green-200 rounded-r-lg bg-green-50 text-green-700 hover:bg-green-100">向下填充该标题</button>
+                            <button type="button" onclick="fillProcessTitleDown(${issueId})" class="original-edit shrink-0 whitespace-nowrap px-2 py-2 text-xs border border-l-0 border-green-200 rounded-r-lg bg-green-50 text-green-700 hover:bg-green-100">向下填充该标题</button>
                         </div>
                     </div>
                     
@@ -2765,7 +2778,22 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             
             container.insertAdjacentHTML('beforeend', issueHtml);
             if (importSourceName) {
-                document.getElementById(`issue-${issueId}`).dataset.importSourceName = importSourceName;
+                const issue = document.getElementById(`issue-${issueId}`);
+                issue.dataset.importSourceName = importSourceName;
+                const process = document.getElementById(`process-${issueId}`);
+                process.readOnly = true;
+                process.placeholder = '原报告未填写工序';
+                process.setAttribute('aria-label', '原报告工序（只读）');
+                const description = document.getElementById(`leftDesc-${issueId}`);
+                description.readOnly = true;
+                description.placeholder = '原报告未填写问题描述';
+                description.setAttribute('aria-label', '原问题描述（只读）');
+                issue.querySelectorAll('.original-edit, .desc-merge-button, .drop-zone-left .preview-actions button').forEach(control => control.remove());
+                document.getElementById(`left-file-${issueId}`).disabled = true;
+                document.getElementById(`left-img-${issueId}`).draggable = false;
+                document.getElementById(`left-prompt-${issueId}`).textContent = '原问题照片';
+                issue.querySelector('.drop-zone-left .preview-status').textContent = '原问题照片（只读）';
+                document.getElementById(`rightDesc-${issueId}`).setAttribute('aria-label', '整改后说明');
                 const rightPrompt = document.getElementById(`right-prompt-${issueId}`);
                 rightPrompt.innerHTML = '<p class="text-xl font-bold text-green-600">整改后照片</p><p class="text-base font-medium text-slate-500 mt-2">点击这里拍照或选择照片</p><p class="mt-2 text-sm font-bold text-amber-600">💡 建议使用横屏照片</p>';
             }
@@ -2823,7 +2851,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         function setIssueDescriptionMerged(issueId, merged, sourcePrefix = 'left') {
             const key = String(issueId);
-            if (merged) {
+            if (merged && !isImportedIssue(issueId)) {
                 mergedDescriptionStates.set(key, true);
                 syncIssueDescriptions(issueId, sourcePrefix);
             } else {
@@ -2833,6 +2861,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         function mergeIssueDescriptions(issueId, sourcePrefix) {
+            if (isImportedIssue(issueId)) return;
             const source = document.getElementById(`${sourcePrefix}Desc-${issueId}`);
             const targetPrefix = sourcePrefix === 'left' ? 'right' : 'left';
             const target = document.getElementById(`${targetPrefix}Desc-${issueId}`);
@@ -2850,13 +2879,23 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             ['left', 'right'].forEach(type => {
                 const zone = document.getElementById(`${type}-zone-${issueId}`);
                 const input = document.getElementById(`${type}-file-${issueId}`);
+                zone.addEventListener('mouseenter', () => setPasteTarget(issueId, type));
+                zone.addEventListener('focus', () => setPasteTarget(issueId, type));
+                if (input.disabled) {
+                    // 原图仍可放大；阻止拖入文件时浏览器离开页面。
+                    zone.addEventListener('dragover', event => event.preventDefault());
+                    zone.addEventListener('drop', event => event.preventDefault());
+                    zone.addEventListener('keydown', event => {
+                        if (event.key === 'Enter' || event.key === ' ') openPhotoViewer(event, issueId, type);
+                    });
+                    return;
+                }
                 input.addEventListener('change', () => {
                     handleSingleUpload(issueId, type, input.files?.[0]);
                     input.value = '';
                 });
-                zone.addEventListener('mouseenter', () => setPasteTarget(issueId, type));
-                zone.addEventListener('focus', () => setPasteTarget(issueId, type));
-                zone.addEventListener('click', () => {
+                zone.addEventListener('click', event => {
+                    if (event.target.closest('input, video, button')) return;
                     setPasteTarget(issueId, type);
                     zone.focus();
                     openMobileFilePicker(issueId, type);
@@ -2877,7 +2916,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         function openMobileFilePicker(issueId, type) {
-            if (!isMobileUploadEnabled()) return;
+            if (!isMobileUploadEnabled() && !(type === 'right' && isImportedIssue(issueId))) return;
 
             const inputId = issueId === 'batch' || type === 'batch' ? 'batch-image' : `${type}-file-${issueId}`;
             const input = document.getElementById(inputId);
@@ -2891,6 +2930,10 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         function handleImagePaste(e) {
             const imageFile = getClipboardImageFile(e.clipboardData);
             if (!imageFile) return;
+            if (e.target.closest?.('[data-import-source-name] [readonly]')) {
+                e.preventDefault();
+                return;
+            }
 
             const target = getPasteTargetFromElement(e.target) || getActivePasteTarget();
             if (!target) return;
@@ -2968,6 +3011,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         function handleSingleUpload(issueId, type, file) {
+            if (type === 'left' && isImportedIssue(issueId)) return Promise.resolve();
             if (!file || !isImageOrVideoFile(file)) return Promise.resolve();
             return enqueueMediaTask(async () => {
                 if (!document.getElementById(`issue-${issueId}`)) return;
@@ -3082,6 +3126,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         function clearSingleImage(event, issueId, type) {
             event.preventDefault();
             event.stopPropagation();
+            if (type === 'left' && isImportedIssue(issueId)) return;
             clearIssueMedia(issueId, type);
             document.getElementById(`${type}-img-${issueId}`)?.removeAttribute('src');
             const video = document.getElementById(`${type}-video-${issueId}`);
@@ -3106,6 +3151,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         async function loadPhotoMarkup(issueId, type) {
+            if (type === 'left' && isImportedIssue(issueId)) return;
             setMediaProgress('正在打开照片标记…');
             const currentImage = window[`${type}Image-${issueId}`];
             if (!currentImage) {
@@ -3574,6 +3620,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 删除问题项
         function removeIssue(issueId) {
+            if (isImportedIssue(issueId)) return;
             traceRuntime('删除整改页');
             document.getElementById(`issue-${issueId}`)?.remove();
             mergedDescriptionStates.delete(String(issueId));
@@ -3586,6 +3633,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         function removeEmptyIssues() {
             document.querySelectorAll('[id^="issue-"]').forEach(issue => {
+                if (issue.dataset.importSourceName) return;
                 const issueId = issue.id.replace('issue-', '');
                 const processName = document.getElementById(`process-${issueId}`)?.value.trim();
                 const leftDesc = document.getElementById(`leftDesc-${issueId}`)?.value.trim();
@@ -3701,7 +3749,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             }
 
             const btn = document.getElementById('generate-btn');
-            const imageRefs = getUploadedImageRefs();
+            const imageRefs = getUploadedImageRefs(true);
             if (!MOBILE_IMAGE_MODE && imageRefs.length > 0 && confirm('是否先全局一键压缩所有照片？\n确定：压缩后生成\n取消：直接生成')) {
                 const compressed = await compressAllImages({
                     silent: true,
@@ -3759,7 +3807,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         const rightPptImage = await preparePPTImage(rightImg, imageFrameRatio, exportOptions, preparedImageCache);
 
                         const slide = addScaledPPTSlide(pptx, generatedScale, Boolean(exportOptions.bilingual));
-                        renderCompanySlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length }, templateAssets);
+                        await renderCompanySlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length }, templateAssets);
                         preparedImageCache.clear();
                         await yieldForMedia();
                     }
@@ -3901,7 +3949,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             drawTexhongFooter(pptx, slide);
         }
 
-        function renderCompanySlide(pptx, slide, data, assets) {
+        async function renderCompanySlide(pptx, slide, data, assets) {
             const processName = (data.processName || '').trim();
             const sharedDesc = getSharedPPTXDescription(data.leftDesc, data.rightDesc);
             const sharedPanelHeight = 4.1;
@@ -3925,7 +3973,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 });
             }
 
-            drawImagePanel(pptx, slide, {
+            await drawImagePanel(pptx, slide, {
                 label: sharedDesc ? '' : data.leftDesc || '',
                 img: data.leftImg,
                 video: data.leftVideo,
@@ -3940,7 +3988,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 hideLabel: sharedDesc,
                 reserveLabelSpace: sharedDesc
             });
-            drawImagePanel(pptx, slide, {
+            await drawImagePanel(pptx, slide, {
                 label: sharedDesc ? '' : data.rightDesc || '',
                 img: data.rightImg,
                 video: data.rightVideo,
@@ -4052,7 +4100,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             });
         }
 
-        function drawImagePanel(pptx, slide, opt) {
+        async function drawImagePanel(pptx, slide, opt) {
             const hideLabel = opt.hideLabel === true;
             const reserveLabelSpace = opt.reserveLabelSpace === true;
             const isOutlineLabel = opt.labelStyle === 'outline';
@@ -4136,6 +4184,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 slide.addMedia({
                     type: 'video',
                     data: normalizeMediaData(opt.video),
+                    cover: await window.makePPTVideoPoster?.(opt.video, imgW / imgH),
                     extn: getVideoExtension(opt.videoName, opt.video),
                     x: imgX, y: imgY, w: imgW, h: imgH
                 });
@@ -4318,8 +4367,11 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 // 替换上次导出加在末尾的标记，保留原题中的工序、批次及检查日期。
                 title = sourceName.replace(/(?:_整改后)?_\d{4}-\d{2}-\d{2}$/, '') || fallback;
             }
-            const hasAfterPhoto = importedIssues.some(issue => window['rightImage-' + issue.id.slice(6)]);
-            if (hasAfterPhoto && !title.endsWith('整改后')) title += '_整改后';
+            const hasAfterMedia = importedIssues.some(issue => {
+                const id = issue.id.slice(6);
+                return window['rightImage-' + id] || window['rightVideo-' + id];
+            });
+            if (hasAfterMedia && !title.endsWith('整改后')) title += '_整改后';
             return `${title}_${reportDate}`;
         }
 
