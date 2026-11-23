@@ -32,6 +32,7 @@
     <script src="./vendor/pptxgen.bundle.js?v=3.12.0-r9.1" defer></script>
     <script src="./vendor/ppt-video-poster.js" defer></script>
     <script src="./vendor/jszip.min.js" defer></script>
+    <script src="./vendor/ppt-import-workspace.js?v=10" defer></script>
     <style>
         body {
             background:
@@ -346,6 +347,26 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
     .workspace-actions summary, #clear-work { padding-inline: 8px; }
 }
 @media (display-mode: standalone) { .desktop-entry { display: none; } }
+.ppt-import-dialog {
+    position: fixed; inset: 0; z-index: 100020; width: 100%; height: 100%; max-width: none; max-height: none;
+    margin: 0; padding: 16px; border: 0; box-sizing: border-box; background: rgba(21,36,50,.52); color: #172536;
+}
+.ppt-import-dialog:not([open]) { display: none; }
+.ppt-import-dialog[open] { display: flex; align-items: center; justify-content: center; }
+.ppt-import-dialog::backdrop { background: transparent; }
+.ppt-import-card { width: 100%; max-width: 27rem; max-height: 100%; overflow: auto; overscroll-behavior: contain; padding: 22px; border-radius: 15px; background: white; box-shadow: 0 14px 54px rgba(12,31,46,.22); }
+.ppt-import-card h2 { margin: 0 0 12px; font-size: 21px; line-height: 1.35; font-weight: 700; }
+.ppt-import-card p { margin: 8px 0; color: #46596a; font-size: 14px; line-height: 1.55; }
+.ppt-import-card button { min-height: 44px; border-radius: 8px; font: inherit; font-weight: 600; cursor: pointer; }
+.ppt-import-card button:focus-visible { outline: 3px solid #357ba7; outline-offset: 2px; }
+.ppt-import-option { display: block; width: 100%; margin-top: 10px; padding: 10px 14px; border: 1px solid #bacbd7; background: white; text-align: start; }
+.ppt-import-option:first-of-type { border-color: #87a9bf; background: #eef6fb; }
+.ppt-import-option span { display: block; margin-top: 3px; color: #475e70; font-size: 13px; font-weight: 400; }
+.ppt-import-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.ppt-import-actions button { padding: 8px 14px; border: 1px solid #c2cdd6; background: white; }
+.ppt-import-actions .ppt-import-danger { background: #953d2a; border-color: #953d2a; color: white; }
+#pptx-replacement-file { font-weight: 650; overflow-wrap: anywhere; }
+@media (max-width: 420px) { .ppt-import-card { padding: 18px; } .ppt-import-actions button { flex: 1 1 auto; } }
 </style>
     <script defer src="./vendor/ppt-welcome.js" data-brand="texhong"></script>
 </head>
@@ -356,6 +377,26 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
     </style>
     <div class="javascript-disabled-tip"><p>请在当前浏览器的网站设置中允许 JavaScript，然后刷新本页，即可制作整改PPT。</p></div>
 </noscript>
+<dialog id="pptx-mode-dialog" class="ppt-import-dialog" role="dialog" aria-modal="true" aria-labelledby="pptx-mode-title" onkeydown="handlePPTXDialogKey(event)" onclick="if (event.target === this) closePPTXDialog(this)">
+    <div class="ppt-import-card">
+        <h2 id="pptx-mode-title">选择导入方式</h2>
+        <button type="button" id="pptx-mode-rectify" class="ppt-import-option" aria-label="补充整改结果" aria-describedby="pptx-rectify-help" data-initial-focus onclick="choosePPTXImportMode('rectify')">补充整改结果<span id="pptx-rectify-help">将原报告中的现场照片逐张作为检查照，再补上整改后的照片。</span></button>
+        <button type="button" id="pptx-mode-edit" class="ppt-import-option" aria-label="编辑原报告" aria-describedby="pptx-edit-help" onclick="choosePPTXImportMode('edit')">编辑原报告<span id="pptx-edit-help">保留原报告已有的左右照片和说明，继续修改。</span></button>
+        <div class="ppt-import-actions"><button type="button" onclick="closePPTXDialog(this.closest('dialog'))">取消</button></div>
+    </div>
+</dialog>
+<dialog id="pptx-replacement-dialog" class="ppt-import-dialog" role="dialog" aria-modal="true" aria-labelledby="pptx-replacement-title" aria-describedby="pptx-replacement-summary pptx-replacement-warning" onkeydown="handlePPTXDialogKey(event)" onclick="if (event.target === this) closePPTXDialog(this)">
+    <div class="ppt-import-card">
+        <h2 id="pptx-replacement-title">替换当前报告？</h2>
+        <p id="pptx-replacement-summary"></p>
+        <p>将以“<span id="pptx-replacement-mode"></span>”导入 <bdi id="pptx-replacement-file" translate="no"></bdi>。</p>
+        <p id="pptx-replacement-warning">确认后将清除当前报告的照片、视频、文字及本机草稿。</p>
+        <div class="ppt-import-actions">
+            <button type="button" id="pptx-keep-editing" data-initial-focus onclick="closePPTXDialog(this.closest('dialog'))">返回继续编辑</button>
+            <button type="button" id="pptx-confirm-replace" class="ppt-import-danger" onclick="closePPTXDialog(this.closest('dialog'), 'replace')">确认清除并导入</button>
+        </div>
+    </div>
+</dialog>
 <!-- ===== 照片全屏查看 ===== -->
 <div id="photo-viewer-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="查看完整照片" onclick="closePhotoViewer(event)">
     <button type="button" class="photo-viewer-close" aria-label="关闭完整照片">×</button>
@@ -425,7 +466,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         <a href="./texhong-ppt-web/terms.html">使用说明</a>
                         <a href="./texhong-ppt-web/privacy.html">隐私说明</a>
                         <button type="button" id="download-diagnostics" onclick="downloadRuntimeTrace()">下载闪退排查记录</button>
-                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R9.1</span></footer>
+                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R10</span></footer>
                     </div>
                 </details>
             </nav>
@@ -451,10 +492,10 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                     </div>
                 </div>
                 <input type="file" id="pptx-import" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" class="hidden">
-                <button type="button" id="import-pptx-btn" onclick="triggerPPTXImport()" class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-4 md:p-5 text-blue-700 hover:bg-blue-100 transition-all flex flex-col items-center justify-center min-h-[82px] md:min-h-[120px]">
+                <button type="button" id="import-pptx-btn" aria-haspopup="dialog" aria-controls="pptx-mode-dialog" onclick="triggerPPTXImport()" class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-4 md:p-5 text-blue-700 hover:bg-blue-100 transition-all flex flex-col items-center justify-center min-h-[82px] md:min-h-[120px]">
                     <span class="text-2xl md:text-3xl mb-1 md:mb-2" aria-hidden="true">📂</span>
                     <span class="text-sm font-semibold">导入PPT</span>
-                    <span class="hidden md:block text-xs font-normal text-blue-500 mt-1">拆解已有PPT继续整改</span>
+                    <span class="hidden md:block text-xs font-normal text-blue-500 mt-1">补充整改结果或编辑原报告</span>
                 </button>
                 <input type="file" id="pptx-text-extract" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" class="hidden">
                 <button type="button" id="extract-pptx-text-btn" onclick="triggerPPTXTextExtract()" class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-4 md:p-5 text-amber-700 hover:bg-amber-100 transition-all flex flex-col items-center justify-center min-h-[82px] md:min-h-[120px]">
@@ -623,7 +664,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 仅记录步骤与图片规格，保留重开前的最后阶段；不记录照片、文件名或业务文字。
         const RUNTIME_TRACE_KEY = 'th_ppt_runtime_trace';
-        const RUNTIME_BUILD = '2026.11.23 R9.1';
+        const RUNTIME_BUILD = '2026.11.23 R10';
         let runtimeTrace = [];
         try {
             const previous = JSON.parse(localStorage.getItem(RUNTIME_TRACE_KEY) || '[]');
@@ -676,9 +717,13 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 batchInput.value = '';
             });
             pptxInput.addEventListener('change', () => {
-                handlePPTXImport(pptxInput.files?.[0]);
+                const file = pptxInput.files?.[0];
+                const mode = pptxInput.dataset.mode;
                 pptxInput.value = '';
+                delete pptxInput.dataset.mode;
+                if (file && (mode === 'rectify' || mode === 'edit')) handlePPTXImport(file, mode);
             });
+            pptxInput.addEventListener('cancel', () => { delete pptxInput.dataset.mode; });
             pptxTextInput.addEventListener('change', () => {
                 handlePPTXTextExtract(pptxTextInput.files?.[0]);
                 pptxTextInput.value = '';
@@ -788,6 +833,11 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             if (el) el.textContent = message;
         }
 
+        function describeDraftPages(draft) {
+            const preserved = draft.source?.preservedSlides.length || 0;
+            return preserved ? `${draft.issues.length} 页可填写，另有 ${preserved} 页原样导出` : `${draft.issues.length} 页`;
+        }
+
         function formatDraftTime(time) {
             return new Date(time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
         }
@@ -799,7 +849,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 navigator.storage?.persist?.().catch(() => {});
                 traceRuntime('读取本机草稿');
                 const draft = await runDraftRequest(DRAFT_META_STORE, 'readonly', store => store.get(DRAFT_ID));
-                if (!draft?.issues?.length) {
+                if (!draft?.issues?.length && !draft?.source) {
                     addEmptyIssue();
                     updateDraftStatus('💾 自动草稿已开启：照片和描述会保存到本机');
                     return;
@@ -823,6 +873,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                     return {
                         id,
                         importSourceName: issue.dataset.importSourceName || '',
+                        editSourceName: issue.dataset.editSourceName || '',
                         processName: document.getElementById(`process-${id}`)?.value || '',
                         leftDesc: document.getElementById(`leftDesc-${id}`)?.value || '',
                         rightDesc: document.getElementById(`rightDesc-${id}`)?.value || '',
@@ -832,7 +883,8 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                     };
                 })
                 .filter(item => item.processName || item.leftDesc || item.rightDesc || item.leftKind || item.rightKind);
-            return { id: DRAFT_ID, savedAt: Date.now(), issues };
+            const source = importedPPTX ? { name: importedPPTX.file.name, mode: importedPPTX.mode, preservedSlides: importedPPTX.preservedSlides, slideSize: importedPPTX.slideSize } : null;
+            return { id: DRAFT_ID, savedAt: Date.now(), issues, source };
         }
 
         function scheduleDraftSave(delay = 450) {
@@ -845,7 +897,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             if (!draftAvailable || isRestoringDraft) return;
             const draft = collectDraftState();
             try {
-                if (draft.issues.length === 0) {
+                if (draft.issues.length === 0 && !draft.source) {
                     await runDraftRequest(DRAFT_META_STORE, 'readwrite', store => store.delete(DRAFT_ID));
                     updateDraftStatus('💾 自动草稿已开启：照片和描述会保存到本机');
                     return;
@@ -853,7 +905,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 await runDraftRequest(DRAFT_META_STORE, 'readwrite', store => store.put(draft));
                 updateDraftStatus(unsavedMediaKeys.size
                     ? `⚠️ 有 ${unsavedMediaKeys.size} 张照片未能保存到本机，请先生成PPT备份`
-                    : `💾 草稿已保存 ${formatDraftTime(draft.savedAt)} · ${draft.issues.length} 页`);
+                    : `💾 草稿已保存 ${formatDraftTime(draft.savedAt)} · ${describeDraftPages(draft)}`);
             } catch (error) {
                 console.warn('草稿保存失败', error);
                 updateDraftStatus('⚠️ 草稿保存失败，请尽快生成PPT备份');
@@ -867,16 +919,25 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                     return;
                 } catch (error) {
                     // 部分 WebKit 临时窗口允许写数据库，但拒绝直接写 Blob。
-                    if (error.name !== 'UnknownError' || !/preparing Blob\/File data/i.test(error.message)) throw error;
+                    if (!isDraftBlobStorageError(error)) throw error;
                 }
             }
+            const packed = await packDraftMediaRecord(record);
+            await runDraftRequest(DRAFT_MEDIA_STORE, 'readwrite', store => store.put(packed));
+            draftBlobsNeedBuffers = true;
+        }
+
+        function isDraftBlobStorageError(error) {
+            return error.name === 'DataCloneError' || (error.name === 'UnknownError' && /preparing Blob\/File data/i.test(error.message));
+        }
+
+        async function packDraftMediaRecord(record) {
             const packed = { ...record };
             for (const field of DRAFT_BLOB_FIELDS) {
                 const blob = record[field];
                 if (blob instanceof Blob) packed[field] = { bytes: await blob.arrayBuffer(), type: blob.type };
             }
-            await runDraftRequest(DRAFT_MEDIA_STORE, 'readwrite', store => store.put(packed));
-            draftBlobsNeedBuffers = true;
+            return packed;
         }
 
         function unpackDraftBlob(value) {
@@ -926,14 +987,14 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             return mediaSourceToBlob(source);
         }
 
-        async function applyMediaRecord(issueId, type, record, persisted) {
+        async function applyMediaRecord(issueId, type, record, persisted, videoData) {
             const key = getDraftMediaKey(issueId, type);
             savedPhotoMarkups.delete(key);
             delete window[`${type}Image-${issueId}`];
             delete window[`${type}Video-${issueId}`];
             delete window[`${type}VideoName-${issueId}`];
             if (record.kind === 'video') {
-                const data = await readDraftBlob(record.blob);
+                const data = videoData || await readDraftBlob(record.blob);
                 window[`${type}Video-${issueId}`] = data;
                 window[`${type}VideoName-${issueId}`] = record.name;
                 updateImagePreview(issueId, type, data, 'video');
@@ -956,9 +1017,15 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             isRestoringDraft = true;
             let failedPhotos = 0;
             try {
+                if (draft.source) {
+                    const record = await runDraftRequest(DRAFT_MEDIA_STORE, 'readonly', store => store.get(IMPORTED_SOURCE_KEY));
+                    const file = unpackDraftBlob(record?.blob);
+                    if (!file) throw new Error('本机草稿缺少原报告文件');
+                    importedPPTX = { file: new File([file], draft.source.name), mode: draft.source.mode, slideSize: draft.source.slideSize, preservedSlides: draft.source.preservedSlides };
+                }
                 for (const [index, item] of draft.issues.entries()) {
                     setMediaProgress(`正在恢复草稿 ${index + 1}/${draft.issues.length} 页…`);
-                    const issueId = addEmptyIssue(item.id, item.importSourceName);
+                    const issueId = addEmptyIssue(item.id, item.importSourceName, item.editSourceName);
                     document.getElementById(`process-${issueId}`).value = item.processName || '';
                     document.getElementById(`leftDesc-${issueId}`).value = item.leftDesc || '';
                     document.getElementById(`rightDesc-${issueId}`).value = item.rightDesc || '';
@@ -1001,10 +1068,11 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         await yieldForMedia();
                     }
                 }
+                renumberIssues();
                 refreshBatchImagesFromIssues();
                 updateDraftStatus(failedPhotos
                     ? `⚠️ 已恢复草稿，有 ${failedPhotos} 张照片无法读取，请重新选择`
-                    : `💾 已恢复 ${draft.issues.length} 页本机草稿 · 保存于 ${formatDraftTime(draft.savedAt)}`);
+                    : `💾 已恢复本机草稿 · ${describeDraftPages(draft)} · 保存于 ${formatDraftTime(draft.savedAt)}`);
             } finally {
                 isRestoringDraft = false;
             }
@@ -1050,6 +1118,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         async function clearAllWork() {
+            if (isRestoringDraft) return;
             if (!confirm('确定清空本次所有照片、描述和本机草稿吗？此操作不能恢复。')) return;
             traceRuntime('清空内容');
             clearTimeout(draftSaveTimer);
@@ -1069,11 +1138,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             importedPPTX = null;
             activePasteTarget = null;
             defaultProcessTitle = '';
-            extractedPPTXTextRows = [];
-            extractedPPTXTextSourceName = '';
-            document.getElementById('pptx-text-result').classList.add('hidden');
-            document.getElementById('pptx-text-result-count').textContent = '';
-            document.getElementById('pptx-text-result-body').innerHTML = '';
+            clearExtractedPPTXText();
             batchImages.length = 0;
             document.getElementById('batch-prompt').classList.remove('hidden');
             document.getElementById('batch-uploaded').classList.add('hidden');
@@ -1119,11 +1184,92 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 打开PPTX选择框
         function triggerPPTXImport() {
-            if (!window.JSZip) {
+            if (!window.JSZip || typeof handlePPTXImport !== 'function') {
                 alert('PPT拆解组件加载失败，请检查网络后刷新页面。');
                 return;
             }
-            document.getElementById('pptx-import')?.click();
+            delete document.getElementById('pptx-import').dataset.mode;
+            showPPTXDialog(document.getElementById('pptx-mode-dialog'));
+        }
+
+        function choosePPTXImportMode(mode) {
+            const input = document.getElementById('pptx-import');
+            input.dataset.mode = mode;
+            input.value = '';
+            closePPTXDialog(document.getElementById('pptx-mode-dialog'));
+            input.click();
+        }
+
+        function showPPTXDialog(dialog) {
+            if (dialog.hasAttribute('open')) return;
+            dialog.returnValue = '';
+            if (typeof dialog.showModal === 'function') dialog.showModal();
+            else dialog.setAttribute('open', '');
+            dialog.querySelector('[data-initial-focus]').focus();
+        }
+
+        function closePPTXDialog(dialog, result = '') {
+            if (!dialog.hasAttribute('open')) return;
+            if (typeof dialog.close === 'function') dialog.close(result);
+            else {
+                dialog.returnValue = result;
+                dialog.removeAttribute('open');
+                dialog.dispatchEvent(new Event('close'));
+                document.getElementById('import-pptx-btn').focus();
+            }
+        }
+
+        function handlePPTXDialogKey(event) {
+            const dialog = event.currentTarget;
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                event.stopPropagation();
+                closePPTXDialog(dialog);
+            } else if (event.key === 'Tab' && typeof dialog.showModal !== 'function') {
+                const buttons = dialog.querySelectorAll('button');
+                const first = buttons[0], last = buttons[buttons.length - 1];
+                if (event.shiftKey ? event.target === first : event.target === last) {
+                    event.preventDefault();
+                    (event.shiftKey ? last : first).focus();
+                }
+            }
+        }
+
+        function confirmPPTXReplacement(summary, fileName, mode) {
+            const dialog = document.getElementById('pptx-replacement-dialog');
+            if (dialog.hasAttribute('open')) return Promise.resolve(false);
+            const counts = [];
+            if (summary.issues) counts.push(`${summary.issues} 个问题`);
+            if (summary.photos) counts.push(`${summary.photos} 张照片`);
+            if (summary.videos) counts.push(`${summary.videos} 个视频`);
+            if (summary.extracted) counts.push(`${summary.extracted} 条已提取的文字`);
+            if (summary.preserved) counts.push(`${summary.preserved} 页原样保留的内容`);
+            document.getElementById('pptx-replacement-summary').textContent = counts.length
+                ? `当前报告包含 ${counts.join('、')}。${summary.issues && !summary.photos && !summary.videos ? '问题项中尚无照片或视频。' : ''}`
+                : '当前报告已有编辑内容。';
+            document.getElementById('pptx-replacement-mode').textContent = mode === 'edit' ? '编辑原报告' : '补充整改结果';
+            document.getElementById('pptx-replacement-file').textContent = fileName;
+            return new Promise(resolve => {
+                dialog.addEventListener('close', () => {
+                    const replace = dialog.returnValue === 'replace';
+                    resolve(replace);
+                    if (!replace) requestAnimationFrame(() => {
+                        const entry = document.getElementById('import-pptx-btn');
+                        const target = entry.disabled ? document.querySelector('#workspace-header h1') : entry;
+                        if (target !== entry) target.tabIndex = -1;
+                        target.focus({ preventScroll: true });
+                    });
+                }, { once: true });
+                showPPTXDialog(dialog);
+            });
+        }
+
+        function clearExtractedPPTXText() {
+            extractedPPTXTextRows = [];
+            extractedPPTXTextSourceName = '';
+            document.getElementById('pptx-text-result').classList.add('hidden');
+            document.getElementById('pptx-text-result-count').textContent = '';
+            document.getElementById('pptx-text-result-body').innerHTML = '';
         }
 
         function triggerPPTXTextExtract() {
@@ -1399,73 +1545,14 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             }[char]));
         }
 
-        // 拆解完成后写入现有问题列表
-        function handlePPTXImport(file) {
-            return enqueueMediaTask(() => importPPTXFile(file));
-        }
-
-        async function importPPTXFile(file) {
-            if (!file) return;
-            if (!/\.pptx$/i.test(file.name || '')) {
-                alert('请选择PPTX文件');
-                return;
-            }
-
-            const btn = document.getElementById('import-pptx-btn');
-            const oldText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '正在拆解...';
-
-            try {
-                const importResult = await extractIssuesFromPPTX(file);
-                const { items, preservedSlides, slideSize } = importResult;
-                if (items.length === 0) {
-                    alert('未找到可拆解的现场照片，已跳过封面和模板装饰。');
-                    return;
-                }
-
-                importedPPTX = preservedSlides.length > 0
-                    ? { file, preservedSlides, slideSize }
-                    : null;
-
-                removeEmptyIssues();
-                for (const item of items) {
-                    const issueId = addEmptyIssue(null, file.name);
-                    await setIssueMedia(issueId, 'left', 'image', item.image);
-                    document.getElementById(`leftDesc-${issueId}`).value = item.title || '';
-                    // 导入PPT后，右边描述默认填"已整改"
-                    const rightDesc = document.getElementById(`rightDesc-${issueId}`);
-                    if (rightDesc) rightDesc.value = '已整改';
-                    // 如果从PPT中提取到了工序，自动填入下拉框
-                    if (item.processName) {
-                        const processEl = document.getElementById(`process-${issueId}`);
-                        if (processEl) {
-                            processEl.value = item.processName;
-                        }
-                    }
-                    item.image = null;
-                    await saveLocalDraft();
-                    await yieldForMedia();
-                }
-                refreshBatchImagesFromIssues();
-                renumberIssues();
-                const preservedText = preservedSlides.length > 0 ? `，已保留${preservedSlides.length}页原始内容` : '';
-                alert(`拆解完成，共生成${items.length}页${preservedText}`);
-            } catch (error) {
-                console.error(error);
-                const message = error?.message === '请选择PPTX文件'
-                    ? '请选择PPTX文件'
-                    : '文件解析失败，请确认是有效的PPTX文件';
-                alert(message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = oldText;
-            }
-        }
-
         // 读取PPTX压缩包并逐页提取图片
-        async function extractIssuesFromPPTX(file) {
-            const zip = await JSZip.loadAsync(file);
+        async function extractIssuesFromPPTX(file, mode = 'rectify') {
+            let zip;
+            try {
+                zip = await JSZip.loadAsync(file);
+            } catch (_) {
+                throw new Error('无法打开PPTX压缩包，请确认文件完整');
+            }
             const contentFile = zip.file('[Content_Types].xml');
             const contentText = contentFile ? await contentFile.async('text') : '';
             if (!contentText.includes('presentationml.presentation')) {
@@ -1473,32 +1560,61 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             }
 
             const [slidePaths, slideSize, toolReport] = await Promise.all([
-                getPPTXSlidePaths(zip),
+                getPPTXSlidePaths(zip, true),
                 getPPTXSlideSize(zip),
                 isGeneratedPPTXReport(zip)
             ]);
             const items = [];
+            const rows = [];
             const preservedSlides = [];
+            const checkedParts = new Set();
             for (const [slideIndex, slidePath] of slidePaths.entries()) {
-                try {
-                    const result = await extractItemsFromPPTXSlide(zip, slidePath, slideSize, slideIndex === 0, toolReport);
-                    items.push(...result.items);
-                    // 业务原页按实际位置插回，第一页也可能是表格或说明。
-                    if (result.shouldPreserve) {
-                        preservedSlides.push({
-                            sourceSlidePath: slidePath,
-                            afterIssueCount: items.length
-                        });
-                    }
-                } catch (error) {
-                    console.warn(`跳过无法拆解的页面：${slidePath}`, error);
+                const result = await extractItemsFromPPTXSlide(zip, slidePath, slideSize, slideIndex === 0, toolReport, mode);
+                items.push(...result.items);
+                if (mode === 'edit') rows.push(...(result.rows || []));
+                else rows.push(...result.items.map(item => ({
+                    processName: item.processName, left: { image: item.image, title: item.title },
+                    right: null, descMerged: false
+                })));
+                if (result.shouldPreserve) {
+                    await checkPPTXPreservedParts(zip, slidePath, checkedParts);
+                    preservedSlides.push({ sourceSlidePath: slidePath, afterIssueCount: rows.length });
                 }
             }
             return {
                 items,
+                rows,
                 preservedSlides,
                 slideSize
             };
+        }
+
+        async function checkPPTXPreservedParts(zip, path, checked) {
+            if (checked.has(path)) return;
+            const part = zip.file(path);
+            if (!part) throw new Error(`缺少原PPT组件：${path}`);
+            checked.add(path);
+            const relFile = zip.file(getPPTXPartRelationshipsPath(path));
+            const ids = new Set();
+            const children = relFile ? parsePPTXRels(await relFile.async('text'), getPPTXPartDirectory(path), ids) : {};
+            // 单个部件验证完成就释放解压数据，避免大视频或母版图册同时驻留。
+            try {
+                if (/\.xml$/i.test(path)) checkPPTXRelationshipRefs(parsePPTXXml(await part.async('text')), ids, path);
+                else await part.async('uint8array');
+            } catch (error) {
+                throw new Error(`无法读取原PPT组件：${path}（${error.message}）`);
+            }
+            for (const child of Object.values(children)) await checkPPTXPreservedParts(zip, child, checked);
+        }
+
+        function checkPPTXRelationshipRefs(doc, ids, path) {
+            for (const node of doc.getElementsByTagName('*')) {
+                for (const attr of node.attributes) {
+                    if (attr.value && attr.namespaceURI?.endsWith('/relationships') && !ids.has(attr.value)) {
+                        throw new Error(`原PPT缺少关系：${path}（${attr.value}）`);
+                    }
+                }
+            }
         }
 
         // 读取原PPT画布尺寸。保留原页时，新PPT也使用同一画布，避免表格被裁切或放大。
@@ -1513,9 +1629,30 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         // 按PPT内部顺序拿到每一页路径
-        async function getPPTXSlidePaths(zip) {
+        async function getPPTXSlidePaths(zip, validate = false) {
             const presentationFile = zip.file('ppt/presentation.xml');
             const relsFile = zip.file('ppt/_rels/presentation.xml.rels');
+
+            if (validate) {
+                if (!presentationFile || !relsFile) throw new Error('缺少原PPT的演示文稿或页面关系文件');
+                const doc = parsePPTXXml(await presentationFile.async('text'));
+                const rels = parsePPTXXml(await relsFile.async('text'));
+                if (doc.documentElement.localName !== 'presentation' || rels.documentElement.localName !== 'Relationships') {
+                    throw new Error('原PPT页面清单格式错误');
+                }
+                const slideList = Array.from(doc.documentElement.children).find(node => node.localName === 'sldIdLst');
+                const slideRels = new Map(getPPTXNodes(rels, 'Relationship').map(rel => [rel.getAttribute('Id'), rel]));
+                return Array.from(slideList?.children || []).filter(node => node.localName === 'sldId').map((node, index) => {
+                    const rel = slideRels.get(getPPTXRelationshipId(node));
+                    const target = rel?.getAttribute('Target');
+                    if (!target || !rel.getAttribute('Type')?.endsWith('/slide') || rel.getAttribute('TargetMode')?.toLowerCase() === 'external') {
+                        throw new Error(`第${index + 1}页的PPT页面关系无效`);
+                    }
+                    const path = resolvePPTXPath('ppt/', target);
+                    if (!zip.file(path)) throw new Error(`找不到第${index + 1}页的PPT页面：${path}`);
+                    return path;
+                });
+            }
 
             if (presentationFile && relsFile) {
                 const presentationDoc = parsePPTXXml(await presentationFile.async('text'));
@@ -1532,23 +1669,30 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         // 从单页中按图片X坐标拆成多个问题页
-        async function extractItemsFromPPTXSlide(zip, slidePath, slideSize, isFirstSlide = false, toolReport = false) {
+        async function extractItemsFromPPTXSlide(zip, slidePath, slideSize, isFirstSlide = false, toolReport = false, mode = 'rectify') {
             const slideFile = zip.file(slidePath);
-            if (!slideFile) return { items: [], shouldPreserve: false };
+            if (!slideFile) throw new Error(`缺少原PPT页面：${slidePath}`);
 
             const slideDoc = parsePPTXXml(await slideFile.async('text'));
+            if (slideDoc.documentElement.localName !== 'sld') throw new Error(`原PPT页面格式错误：${slidePath}`);
             const slideDir = slidePath.slice(0, slidePath.lastIndexOf('/') + 1);
             const slideName = slidePath.slice(slidePath.lastIndexOf('/') + 1);
             const relsPath = `${slideDir}_rels/${slideName}.rels`;
             const relsFile = zip.file(relsPath);
-            const rels = relsFile ? parsePPTXRels(await relsFile.async('text'), slideDir) : {};
-            const texts = collectPPTXTextBoxes(slideDoc, toolReport && !Object.values(rels).some(path => path.startsWith('ppt/imported/')));
+            const ids = new Set();
+            const rels = relsFile ? parsePPTXRels(await relsFile.async('text'), slideDir, ids) : {};
+            checkPPTXRelationshipRefs(slideDoc, ids, slidePath);
+            const toolPage = toolReport && !Object.values(rels).some(path => path.startsWith('ppt/imported/'));
+            const texts = collectPPTXTextBoxes(slideDoc, toolPage);
             // 表格页沿用原版式。图表、SmartArt 或嵌入对象与现场照片混排时，两者都保留。
             if (getPPTXNodes(slideDoc, 'tbl').length) return { items: [], shouldPreserve: true };
             const hasNativeObject = ['graphicFrame', 'oleObj', 'contentPart', 'ink']
                 .some(tag => getPPTXNodes(slideDoc, tag).length);
+            const editing = mode === 'edit';
+            if (editing && (hasNativeObject || getPPTXNodes(slideDoc, 'grpSp').length
+                || await hasPPTXSpeakerNotes(zip, rels))) return { items: [], shouldPreserve: true };
             const { pictures, removedArtwork, hasCoverArtwork, hasOriginalMedia, hasFullPageImage } =
-                await collectPPTXIssuePictures(zip, slideDoc, rels, slideSize, true);
+                await collectPPTXIssuePictures(zip, slideDoc, rels, slideSize, true, editing);
 
             // 提取顶部工序文字（位于所有图片上方的文本）
             const minImageY = pictures.length > 0 ? Math.min(...pictures.map(p => p.y)) : Infinity;
@@ -1565,27 +1709,91 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             const sharedText = orderedPictures.length === 2 && directTexts.every(text => !text)
                 ? findPPTXSharedDescriptionText(orderedPictures, texts)
                 : null;
-            const items = orderedPictures.map((pic, index) => {
+            const items = orderedPictures.flatMap((pic, index) => {
+                if (!pic.image) return [];
                 const text = directTexts[index] || singleText || sharedText;
-                return { image: pic.image, title: text?.text || '', processName };
+                return [{ image: pic.image, title: text?.text || '', processName }];
             });
             const keepOriginal = hasNativeObject || hasOriginalMedia;
-            if (items.length || keepOriginal) return { items, shouldPreserve: keepOriginal };
+            if (!editing && (items.length || keepOriginal)) return { items, shouldPreserve: keepOriginal };
+            if (editing && (keepOriginal || hasFullPageImage && pictures.length)) return { items: [], shouldPreserve: true };
 
             const hasBusinessDrawing = ['cxnSp', 'audioFile', 'videoFile'].some(tag => getPPTXNodes(slideDoc, tag).length)
                 || getPPTXNodes(slideDoc, 'sp').some(shape => !isPPTXTemplateOrTextShape(shape, slideSize));
-            if (hasBusinessDrawing) return { items, shouldPreserve: true };
+            if (hasBusinessDrawing && !editing) return { items, shouldPreserve: true };
             const coverNotes = /^(?:汇报人|报告人|汇报单位|汇报日期|报告日期|日期)[：:]|^(?:20\d{2}[-./年])?\d{1,2}[-./月]\d{1,2}日?(?:\s.*)?$/;
             const mainTexts = texts.filter(({ text }) => !coverNotes.test(text));
             const hasCoverTitle = mainTexts.length === 1 && mainTexts[0].text.length <= 60
                 && (((hasFullPageImage && removedArtwork || hasCoverArtwork) && !/[。；]/.test(mainTexts[0].text))
                     || /(?:汇报|报告|工作总结|问题汇总|检查汇总|整改汇总|周报|月报)(?:[（(].*?[）)])?$/.test(mainTexts[0].text)
                     || getPPTXNodes(slideDoc, 'ph').some(ph => ph.getAttribute('type') === 'ctrTitle'));
-            if (isFirstSlide && hasCoverTitle) return { items, shouldPreserve: false };
-            if (hasFullPageImage) return { items, shouldPreserve: true };
+            if (isFirstSlide && hasCoverTitle && !pictures.length) return { items: [], shouldPreserve: false };
+            if (hasFullPageImage) return { items: [], shouldPreserve: true };
             const onlyPlaceholders = texts.every(({ text }) =>
                 /^(?:图片|整改前(?:照片)?|整改后(?:照片)?|已整改|结束语|Thank you|结|汇报完毕[，,]?谢谢大家[。！!]?)$/.test(text));
-            return { items, shouldPreserve: !(removedArtwork && onlyPlaceholders) && (!isFirstSlide || texts.length > 0) };
+            if (!editing) return { items, shouldPreserve: texts.length > 0 && !(removedArtwork && onlyPlaceholders) };
+            if (!pictures.length && removedArtwork && onlyPlaceholders
+                && !texts.some(t => t.text === '已整改')) return { items: [], shouldPreserve: false };
+            const row = getPPTXEditRow(pictures, texts, slideSize, toolPage);
+            const complexShapes = getPPTXNodes(slideDoc, 'cxnSp').length
+                || getPPTXNodes(slideDoc, 'sp').some(shape => !isPPTXTemplateOrTextShape(shape, slideSize)
+                    && !getPPTXFirstNode(shape, 'txBody'));
+            if (!row || complexShapes) return { items: [], shouldPreserve: row === null || complexShapes };
+            return { items, rows: [row], shouldPreserve: false };
+        }
+
+        async function hasPPTXSpeakerNotes(zip, rels) {
+            const path = Object.values(rels).find(path => /\/notesSlides\/[^/]+\.xml$/i.test(path));
+            if (!path) return false;
+            const part = zip.file(path);
+            if (!part) throw new Error(`缺少原PPT备注：${path}`);
+            const notes = parsePPTXXml(await part.async('text'));
+            return getPPTXNodes(notes, 'sp').some(shape => {
+                const role = getPPTXFirstNode(shape, 'ph')?.getAttribute('type');
+                return !['sldImg', 'sldNum', 'hdr', 'ftr', 'dt'].includes(role)
+                    && getPPTXNodes(shape, 't').some(node => node.textContent.trim());
+            }) || getPPTXNodes(notes, 'pic').length > 0;
+        }
+
+        // 单页最多承载左右两个独立位置。不能对应的叠图、组图按完整原页保留。
+        function getPPTXEditRow(pictures, texts, slideSize, toolPage) {
+            if (pictures.length > 2) return null;
+            const width = slideSize?.width || SLIDE_W, height = slideSize?.height || SLIDE_H;
+            const sideFor = box => box.x + box.w / 2 > width * 0.52 ? 'right' : 'left';
+            const row = { processName: '', left: null, right: null, descMerged: false };
+            for (const pic of pictures) {
+                const side = sideFor(pic);
+                if (row[side]) return null;
+                row[side] = pic.video ? { image: null, video: pic.video, name: pic.name, title: '' } : { image: pic.image, title: '' };
+            }
+            if (pictures.length === 2) {
+                const [a, b] = pictures;
+                if (Math.min(a.y + a.h, b.y + b.h) <= Math.max(a.y, b.y)) return null;
+            }
+
+            const ordered = texts.filter(t => !toolPage || !(t.text === '图片' && t.cy > height * 0.24 && t.cy < height * 0.62))
+                .sort((a, b) => a.y - b.y || a.x - b.x);
+            const first = ordered[0];
+            const topLimit = pictures.length ? Math.min(...pictures.map(pic => pic.y)) : height * 0.25;
+            const header = ordered.find(t => t.titlePlaceholder)
+                || (first && first.cy < topLimit && (!ordered[1] || ordered[1].y >= first.cy) ? first : null);
+            row.processName = header?.text || '';
+            const body = ordered.filter(t => t !== header);
+            const shared = pictures.length === 2 ? findPPTXSharedDescriptionText(pictures, body) : null;
+            for (const t of body) {
+                const across = t.w >= width * 0.65 && Math.abs(t.cx - width / 2) <= width * 0.13;
+                const centeredCaption = shared === t || toolPage && across && t.cy > height * 0.60;
+                if (centeredCaption && body.length !== 1) return null;
+                const matched = pictures.find(pic => findPPTXDescriptionText(pic, body) === t)
+                    || (across && pictures.length === 1 && findPPTXSinglePictureDescriptionText(pictures[0], body) === t ? pictures[0] : null);
+                const side = matched ? sideFor(matched) : sideFor(t);
+                row.descMerged = Boolean(centeredCaption);
+                for (const key of centeredCaption ? ['left', 'right'] : [side]) {
+                    if (!row[key]) row[key] = { image: null, title: '' };
+                    row[key].title = row[key].title ? row[key].title + '\n' + t.text : t.text;
+                }
+            }
+            return row.processName || row.left || row.right ? row : undefined;
         }
 
         // 只把模板的标题线、页脚、空照片框和空说明框作为装饰。其他形状保留原页。
@@ -1641,11 +1849,21 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         // 拆解问题和提取文字使用同一批现场照片，先剔除品牌图再配对左右描述。
-        async function collectPPTXIssuePictures(zip, slideDoc, rels, slideSize, includeImages) {
+        async function collectPPTXIssuePictures(zip, slideDoc, rels, slideSize, includeImages, editMedia = false) {
             const pictures = [];
             let removedArtwork = false, hasCoverArtwork = false, hasOriginalMedia = false, hasFullPageImage = false;
             for (const pic of getPPTXNodes(slideDoc, 'pic')) {
                 if (['videoFile', 'audioFile', 'media'].some(tag => getPPTXNodes(pic, tag).length)) {
+                    if (editMedia) {
+                        const videoFile = getPPTXFirstNode(pic, 'videoFile');
+                        const path = rels[getPPTXRelationshipId(getPPTXFirstNode(pic, 'media'))] || rels[getPPTXRelationshipId(videoFile)];
+                        const ext = path?.split('.').pop()?.toLowerCase();
+                        const mime = { mp4: 'video/mp4', m4v: 'video/x-m4v', mov: 'video/quicktime', webm: 'video/webm', avi: 'video/x-msvideo', wmv: 'video/x-ms-wmv' }[ext];
+                        if (videoFile && mime && zip.file(path)) {
+                            pictures.push({ ...parsePPTXXfrm(pic), video: new Blob([await zip.file(path).async('uint8array')], { type: mime }), name: path.split('/').pop() });
+                            continue;
+                        }
+                    }
                     hasOriginalMedia = true;
                     continue;
                 }
@@ -1653,6 +1871,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 const mediaFile = mediaPath && zip.file(mediaPath);
                 const mime = mediaPath && getPPTXImageMime(mediaPath);
                 const box = parsePPTXXfrm(pic);
+                if (includeImages && mediaPath && !mediaFile) throw new Error(`缺少原PPT图片：${mediaPath}`);
                 if (!isPPTXBoxOnSlide(box, slideSize) || (box.w < 1 && box.h < 1)) continue;
                 if (!mediaFile || !mime) {
                     hasOriginalMedia = true;
@@ -1689,8 +1908,11 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         hasOriginalMedia = true;
                         continue;
                     }
-                    pictures.push(includeImages ? { ...box, image: await resizeDecodedImage(decoded, PPT_IMPORT_MAX_EDGE, UPLOAD_QUALITY) } : box);
+                    if (!includeImages) pictures.push(box);
+                    else pictures.push({ ...box, image: editMedia && ['image/jpeg', 'image/png'].includes(mime)
+                        ? blob : await resizeDecodedImage(decoded, PPT_IMPORT_MAX_EDGE, UPLOAD_QUALITY) });
                 } catch (error) {
+                    if (includeImages) throw new Error(`无法读取原PPT图片：${mediaPath}`);
                     hasOriginalMedia = true;
                     console.warn(`跳过无法读取的图片：${mediaPath}`, error);
                 } finally {
@@ -1860,6 +2082,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         ...box,
                         cx: box.x + box.w / 2,
                         cy: box.y + box.h / 2,
+                        titlePlaceholder: ['title', 'ctrTitle'].includes(getPPTXFirstNode(shape, 'ph')?.getAttribute('type')),
                         text
                     };
                 })
@@ -1941,13 +2164,14 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         // 解析rels里的rId到文件路径映射
-        function parsePPTXRels(xmlText, baseDir) {
+        function parsePPTXRels(xmlText, baseDir, ids = null) {
             const doc = parsePPTXXml(xmlText);
             const rels = {};
             getPPTXNodes(doc, 'Relationship').forEach(rel => {
                 const id = rel.getAttribute('Id');
                 const target = rel.getAttribute('Target');
-                if (id && target && !/^https?:\/\//i.test(target)) {
+                if (id) ids?.add(id);
+                if (id && target && rel.getAttribute('TargetMode')?.toLowerCase() !== 'external' && !/^https?:\/\//i.test(target)) {
                     rels[id] = resolvePPTXPath(baseDir, target);
                 }
             });
@@ -1992,8 +2216,9 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             if (!node) return '';
             return node.getAttribute('r:embed')
                 || node.getAttribute('r:id')
+                || node.getAttribute('r:link')
                 || Array.from(node.attributes || [])
-                    .find(attr => attr.localName === 'embed' || attr.localName === 'id')?.value
+                    .find(attr => attr.namespaceURI?.endsWith('/relationships') && ['embed', 'id', 'link'].includes(attr.localName))?.value
                 || '';
         }
 
@@ -2143,12 +2368,14 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             let nextRelationshipNumber = getPPTXNextRelationshipNumber(presentationRelsDoc);
             let nextSlideId = Math.max(255, ...getPPTXNodes(presentationDoc, 'sldId').map(node => Number(node.getAttribute('id')) || 0)) + 1;
 
-            const copyPart = async (sourcePath, outputPath = '') => {
+            const notesMaster = getPPTXNodes(presentationRelsDoc, 'Relationship').find(rel => rel.getAttribute('Type')?.endsWith('/notesMaster'));
+            const slideTargets = new Map(sourceSlides.map(slide => [slide.sourceSlidePath, `ppt/slides/slide${nextSlideNumber++}.xml`]));
+            const copyPart = async sourcePath => {
                 if (sourcePartMap.has(sourcePath)) return sourcePartMap.get(sourcePath);
                 const sourcePart = sourceZip.file(sourcePath);
                 if (!sourcePart) throw new Error(`缺少原PPT组件：${sourcePath}`);
 
-                const targetPath = outputPath || `ppt/imported/${sourcePath.replace(/^ppt\//, '')}`;
+                const targetPath = slideTargets.get(sourcePath) || `ppt/imported/${sourcePath.replace(/^ppt\//, '')}`;
                 sourcePartMap.set(sourcePath, targetPath);
                 outputZip.file(targetPath, await sourcePart.async('uint8array'));
                 ensurePPTXContentType(outputContentTypes, sourceContentTypes, sourcePath, targetPath);
@@ -2160,17 +2387,13 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 const relsDoc = parsePPTXXml(await sourceRelsFile.async('text'));
                 for (const rel of getPPTXNodes(relsDoc, 'Relationship')) {
                     if (rel.getAttribute('TargetMode') === 'External') continue;
-                    const type = rel.getAttribute('Type') || '';
-                    // 备注页不影响页面内容，避免把无关备注也带入。
-                    if (type.endsWith('/notesSlide')) {
-                        rel.remove();
-                        continue;
-                    }
                     const target = rel.getAttribute('Target');
                     if (!target) continue;
                     const sourceTargetPath = resolvePPTXPath(getPPTXPartDirectory(sourcePath), target);
                     if (!sourceZip.file(sourceTargetPath)) continue;
-                    const outputTargetPath = await copyPart(sourceTargetPath);
+                    const outputTargetPath = notesMaster && rel.getAttribute('Type')?.endsWith('/notesMaster')
+                        ? resolvePPTXPath('ppt/', notesMaster.getAttribute('Target'))
+                        : await copyPart(sourceTargetPath);
                     rel.setAttribute('Target', getPPTXRelativePath(getPPTXPartDirectory(targetPath), outputTargetPath));
                 }
                 outputZip.file(getPPTXPartRelationshipsPath(targetPath), new XMLSerializer().serializeToString(relsDoc));
@@ -2180,8 +2403,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             const importedSlides = [];
             for (const sourceSlide of sourceSlides) {
                 const sourceSlidePath = sourceSlide.sourceSlidePath;
-                const outputSlidePath = `ppt/slides/slide${nextSlideNumber++}.xml`;
-                await copyPart(sourceSlidePath, outputSlidePath);
+                const outputSlidePath = await copyPart(sourceSlidePath);
                 const relationshipId = `rId${nextRelationshipNumber++}`;
                 addPPTXRelationship(presentationRelsDoc, relationshipId,
                     'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide',
@@ -2195,6 +2417,16 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             const masterList = getPPTXFirstNode(presentationDoc, 'sldMasterIdLst');
             let nextMasterId = Math.max(2147483647, ...getPPTXNodes(presentationDoc, 'sldMasterId').map(node => Number(node.getAttribute('id')) || 0)) + 1;
             for (const [sourcePath, outputPath] of sourcePartMap) {
+                if (/^ppt\/notesMasters\/[^/]+\.xml$/.test(sourcePath) && !getPPTXFirstNode(presentationDoc, 'notesMasterIdLst')) {
+                    const rid = `rId${nextRelationshipNumber++}`;
+                    const ns = presentationDoc.documentElement.namespaceURI;
+                    const list = presentationDoc.createElementNS(ns, 'p:notesMasterIdLst');
+                    const node = presentationDoc.createElementNS(ns, 'p:notesMasterId');
+                    node.setAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'r:id', rid);
+                    list.appendChild(node);
+                    presentationDoc.documentElement.insertBefore(list, masterList?.nextSibling || getPPTXFirstNode(presentationDoc, 'sldIdLst'));
+                    addPPTXRelationship(presentationRelsDoc, rid, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster', getPPTXRelativePath('ppt/', outputPath));
+                }
                 if (!/^ppt\/slideMasters\/[^/]+\.xml$/.test(sourcePath)) continue;
                 const relationshipId = `rId${nextRelationshipNumber++}`;
                 addPPTXRelationship(presentationRelsDoc, relationshipId,
@@ -2637,7 +2869,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         // 添加空问题项
-        function addEmptyIssue(restoredId = null, importSourceName = '') {
+        function addEmptyIssue(restoredId = null, importSourceName = '', editSourceName = '') {
             const issueId = restoredId === null ? issueCount + 1 : Number(restoredId);
             issueCount = Math.max(issueCount, issueId);
             const container = document.getElementById('issues-container');
@@ -2777,6 +3009,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             `;
             
             container.insertAdjacentHTML('beforeend', issueHtml);
+            if (editSourceName) document.getElementById(`issue-${issueId}`).dataset.editSourceName = editSourceName;
             if (importSourceName) {
                 const issue = document.getElementById(`issue-${issueId}`);
                 issue.dataset.importSourceName = importSourceName;
@@ -2810,7 +3043,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 document.getElementById(`${prefix}-${issueId}`)?.addEventListener('input', () => handleIssueDescriptionInput(issueId, prefix));
             });
             updateIssueDescriptionMergeButtons(issueId);
-            renumberIssues();
+            if (!isRestoringDraft) renumberIssues();
             return issueId;
         }
 
@@ -3743,7 +3976,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         async function generatePPTReady() {
             const issues = Array.from(document.querySelectorAll('[id^="issue-"]'));
-            if (issues.length === 0) {
+            if (issues.length === 0 && !importedPPTX?.preservedSlides.length) {
                 alert('请先上传图片，或点击“添加整改页”。');
                 return;
             }
@@ -4358,14 +4591,16 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 })
                 .find(Boolean);
             const importedIssues = issues.filter(issue => issue.dataset.importSourceName);
-            const sources = new Set(importedIssues.map(issue => issue.dataset.importSourceName));
+            const sources = new Set(issues.map(issue => issue.dataset.importSourceName || issue.dataset.editSourceName).filter(Boolean));
             if (importedPPTX?.file?.name) sources.add(importedPPTX.file.name);
             const fallback = processName ? `${processName}问题整改汇总` : '问题整改汇总';
             let title = fallback;
             if (sources.size === 1) {
                 const sourceName = cleanFileName([...sources][0]);
                 // 替换上次导出加在末尾的标记，保留原题中的工序、批次及检查日期。
-                title = sourceName.replace(/(?:_整改后)?_\d{4}-\d{2}-\d{2}$/, '') || fallback;
+                const editing = issues.some(issue => issue.dataset.editSourceName) || importedPPTX?.mode === 'edit';
+                const dateSuffix = editing ? /_\d{4}-\d{2}-\d{2}$/ : /(?:_整改后)?_\d{4}-\d{2}-\d{2}$/;
+                title = sourceName.replace(dateSuffix, '') || fallback;
             }
             const hasAfterMedia = importedIssues.some(issue => {
                 const id = issue.id.slice(6);
@@ -4509,7 +4744,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         const languageButtons = document.querySelectorAll('[data-language-toggle]');
-        const skippedLanguageNodes = 'script, style, noscript, [data-language-toggle]';
+        const skippedLanguageNodes = 'script, style, noscript, [data-language-toggle], #pptx-replacement-file';
         function applyTree(root = document.body) {
             if ((root.nodeType === Node.ELEMENT_NODE ? root : root.parentElement)?.closest(skippedLanguageNodes)) return;
             applying = true;
