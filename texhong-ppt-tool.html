@@ -419,7 +419,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         <a href="./texhong-ppt-web/terms.html">使用说明</a>
                         <a href="./texhong-ppt-web/privacy.html">隐私说明</a>
                         <button type="button" id="download-diagnostics" onclick="downloadRuntimeTrace()">下载闪退排查记录</button>
-                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R7</span></footer>
+                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R8</span></footer>
                     </div>
                 </details>
             </nav>
@@ -532,7 +532,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 <div class="flex gap-2">
                     <input id="ppt-file-name" type="text" class="min-w-0 flex-1 px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
                 </div>
-                <p class="text-xs text-gray-400 mt-2">封面文字会同步这里填写的文件名称</p>
+                <p class="text-xs text-gray-400 mt-2">默认文件名含生成日期，可自行修改。封面日期单独显示。</p>
                 <div class="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
                     <label class="flex items-start gap-3 text-sm text-emerald-900">
                         <input id="ppt-bilingual-mode" type="checkbox" class="mt-0.5 h-4 w-4 accent-emerald-600">
@@ -617,7 +617,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 仅记录步骤与图片规格，保留重开前的最后阶段；不记录照片、文件名或业务文字。
         const RUNTIME_TRACE_KEY = 'th_ppt_runtime_trace';
-        const RUNTIME_BUILD = '2026.11.23 R7';
+        const RUNTIME_BUILD = '2026.11.23 R8';
         let runtimeTrace = [];
         try {
             const previous = JSON.parse(localStorage.getItem(RUNTIME_TRACE_KEY) || '[]');
@@ -816,6 +816,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                     const rightKind = window[`rightVideo-${id}`] ? 'video' : window[`rightImage-${id}`] ? 'image' : draftPendingMedia.get(rightKey)?.kind;
                     return {
                         id,
+                        importSourceName: issue.dataset.importSourceName || '',
                         processName: document.getElementById(`process-${id}`)?.value || '',
                         leftDesc: document.getElementById(`leftDesc-${id}`)?.value || '',
                         rightDesc: document.getElementById(`rightDesc-${id}`)?.value || '',
@@ -951,7 +952,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             try {
                 for (const [index, item] of draft.issues.entries()) {
                     setMediaProgress(`正在恢复草稿 ${index + 1}/${draft.issues.length} 页…`);
-                    const issueId = addEmptyIssue(item.id);
+                    const issueId = addEmptyIssue(item.id, item.importSourceName);
                     document.getElementById(`process-${issueId}`).value = item.processName || '';
                     document.getElementById(`leftDesc-${issueId}`).value = item.leftDesc || '';
                     document.getElementById(`rightDesc-${issueId}`).value = item.rightDesc || '';
@@ -1423,12 +1424,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
                 removeEmptyIssues();
                 for (const item of items) {
-                    const issueId = addEmptyIssue();
-                    // 导入拆解后，右边占位改为"整改后"提示
-                    const rightPrompt = document.getElementById(`right-prompt-${issueId}`);
-                    if (rightPrompt) {
-                        rightPrompt.innerHTML = '<p class="text-xl font-bold text-green-600">整改后照片</p><p class="text-base font-medium text-slate-500 mt-2">点击这里拍照或选择照片</p><p class="mt-2 text-sm font-bold text-amber-600">💡 建议使用横屏照片</p>';
-                    }
+                    const issueId = addEmptyIssue(null, file.name);
                     await setIssueMedia(issueId, 'left', 'image', item.image);
                     document.getElementById(`leftDesc-${issueId}`).value = item.title || '';
                     // 导入PPT后，右边描述默认填"已整改"
@@ -2628,7 +2624,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         // 添加空问题项
-        function addEmptyIssue(restoredId = null) {
+        function addEmptyIssue(restoredId = null, importSourceName = '') {
             const issueId = restoredId === null ? issueCount + 1 : Number(restoredId);
             issueCount = Math.max(issueCount, issueId);
             const container = document.getElementById('issues-container');
@@ -2768,6 +2764,11 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             `;
             
             container.insertAdjacentHTML('beforeend', issueHtml);
+            if (importSourceName) {
+                document.getElementById(`issue-${issueId}`).dataset.importSourceName = importSourceName;
+                const rightPrompt = document.getElementById(`right-prompt-${issueId}`);
+                rightPrompt.innerHTML = '<p class="text-xl font-bold text-green-600">整改后照片</p><p class="text-base font-medium text-slate-500 mt-2">点击这里拍照或选择照片</p><p class="mt-2 text-sm font-bold text-amber-600">💡 建议使用横屏照片</p>';
+            }
             setupSingleDragDrop(issueId);
             if (restoredId === null && defaultProcessTitle) {
                 setIssueProcessValue(issueId, defaultProcessTitle, true);
@@ -3710,9 +3711,14 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 if (!compressed) return;
             }
 
-            const exportOptions = await openFileNameDialog(buildDefaultFileName(issues));
+            const reportDate = formatToday();
+            const exportOptions = await openFileNameDialog(buildDefaultFileName(issues, reportDate));
             if (!exportOptions) return;
             const cleanBaseName = cleanFileName(exportOptions.fileName);
+            const dateSuffix = '_' + reportDate;
+            const coverTitle = cleanBaseName.endsWith(dateSuffix)
+                ? cleanBaseName.slice(0, -dateSuffix.length) || cleanBaseName
+                : cleanBaseName;
 
             btn.disabled = true;
             btn.innerHTML = '<svg class="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 正在生成PPT...';
@@ -3733,7 +3739,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                     const preparedImageCache = new Map();
                     const coverSlide = addScaledPPTSlide(pptx, generatedScale);
                     const templateAssets = await loadTexhongTemplateAssets();
-                    renderCompanyCoverSlide(pptx, coverSlide, cleanBaseName, templateAssets);
+                    renderCompanyCoverSlide(pptx, coverSlide, coverTitle, templateAssets, reportDate);
                     let pageNum = 0;
 
                     for (const issue of issues) {
@@ -3867,7 +3873,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             return texhongTemplateAssetsPromise;
         }
 
-        function renderCompanyCoverSlide(pptx, slide, title, assets) {
+        function renderCompanyCoverSlide(pptx, slide, title, assets, reportDate) {
             slide.background = { color: 'FFFFFF' };
             slide.addImage({
                 data: assets.header,
@@ -3885,6 +3891,13 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 valign: 'middle',
                 fit: 'shrink'
             });
+            if (reportDate) {
+                slide.addText(reportDate, {
+                    objectName: '生成日期', x: 0.72, y: 5.68, w: 2.6, h: 0.4,
+                    fontFace: '微软雅黑', fontSize: 16, color: '000000', margin: 0,
+                    align: 'left', valign: 'middle'
+                });
+            }
             drawTexhongFooter(pptx, slide);
         }
 
@@ -4198,6 +4211,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 const modal = document.getElementById('file-name-modal');
                 const panel = document.getElementById('file-name-panel');
                 const input = document.getElementById('ppt-file-name');
+                input.defaultValue = defaultName;
                 input.value = defaultName;
                 document.getElementById('ppt-image-fit-mode').value = 'balanced';
                 document.getElementById('ppt-image-distortion').value = '45';
@@ -4217,7 +4231,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         function confirmFileNameDialog() {
             const input = document.getElementById('ppt-file-name');
-            const fileName = cleanFileName(input.value || '问题整改汇总');
+            const fileName = cleanFileName(input.value.trim() || input.defaultValue);
             const imageFitMode = document.getElementById('ppt-image-fit-mode').value;
             const imageDistortion = Number(document.getElementById('ppt-image-distortion').value);
             const bilingual = document.getElementById('ppt-bilingual-mode').checked;
@@ -4287,14 +4301,26 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             return removeFileNameBrackets(safeName) || '问题整改汇总';
         }
 
-        function buildDefaultFileName(issues) {
+        function buildDefaultFileName(issues, reportDate = formatToday()) {
             const processName = issues
                 .map(issue => {
                     const issueId = issue.id.replace('issue-', '');
                     return document.getElementById(`process-${issueId}`)?.value.trim() || '';
                 })
                 .find(Boolean);
-            return processName ? `${processName}问题整改汇总` : '问题整改汇总';
+            const importedIssues = issues.filter(issue => issue.dataset.importSourceName);
+            const sources = new Set(importedIssues.map(issue => issue.dataset.importSourceName));
+            if (importedPPTX?.file?.name) sources.add(importedPPTX.file.name);
+            const fallback = processName ? `${processName}问题整改汇总` : '问题整改汇总';
+            let title = fallback;
+            if (sources.size === 1) {
+                const sourceName = cleanFileName([...sources][0]);
+                // 替换上次导出加在末尾的标记，保留原题中的工序、批次及检查日期。
+                title = sourceName.replace(/(?:_整改后)?_\d{4}-\d{2}-\d{2}$/, '') || fallback;
+            }
+            const hasAfterPhoto = importedIssues.some(issue => window['rightImage-' + issue.id.slice(6)]);
+            if (hasAfterPhoto && !title.endsWith('整改后')) title += '_整改后';
+            return `${title}_${reportDate}`;
         }
 
         function formatTodayCompact() {
@@ -4374,7 +4400,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             '↑ 回到顶部': '↑ ئۈستىگە قايتىش',
             '命名PPT': 'PPT غا نام بېرىش',
             '文件名称': 'ھۆججەت نامى',
-            '封面文字会同步这里填写的文件名称': 'مۇقاۋا تېكىستى بۇ يەردىكى ھۆججەت نامى بىلەن ماسلىشىدۇ',
+            '默认文件名含生成日期，可自行修改。封面日期单独显示。': 'سۈكۈتتىكى ھۆججەت نامىدا بۈگۈنكى چېسلا بار. نامنى ئۆزگەرتەلەيسىز. چېسلا مۇقاۋىدا ئايرىم كۆرسىتىلىدۇ.',
             '照片呈现（仅影响这次导出）': 'رەسىم كۆرسىتىش (پەقەت بۇ قېتىمقى چىقىرىشقا تەسىر قىلىدۇ)',
             '完整不变形': 'تولۇق، شەكلى ئۆزگەرمەيدۇ',
             '适中调整': 'ئوتتۇراھال تەڭشەش',
