@@ -170,11 +170,6 @@
             border: 1px solid #dbe3ea;
             background: #fff;
         }
-        .template-card input:checked + div {
-            border-color: #16a34a;
-            background: #f0fdf4;
-            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
-        }
         .mobile-upload-note {
             display: none;
         }
@@ -342,12 +337,6 @@
 .activation-policy-links { margin-top: 12px; font-size: 0.72rem; color: #64748b; }
 .activation-policy-links a { color: #15803d; text-decoration: none; }
 .activation-policy-links a:hover { text-decoration: underline; }
-body > .container > .text-center:first-child h1 img { display: none !important; }
-body > .container > .text-center:first-child h1::before {
-    content: '嘉'; display: inline-flex; align-items: center; justify-content: center;
-    width: 34px; height: 34px; margin-right: 7px; border-radius: 9px;
-    background: #16a34a; color: #fff; font-size: 18px; vertical-align: middle;
-}
 .machine-code-box {
     background: #f1f5f9; border: 1px solid #e2e8f0;
     border-radius: 10px; padding: 12px; margin-bottom: 16px;
@@ -395,15 +384,44 @@ body > .container > .text-center:first-child h1::before {
 html[lang="zh-CN"] .title-tool-name { white-space: nowrap; }
 html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 .activation-card, #file-name-panel { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); overflow-y: auto; }
-@media (max-width: 767px) {
-    body > .container { padding-top: 3.25rem; }
-    body > .container h1 { text-wrap: balance; }
+#workspace-header {
+    position: relative; display: flex; align-items: center; flex-wrap: wrap;
+    justify-content: space-between; gap: 10px 16px; margin-bottom: 16px;
+}
+.workspace-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.workspace-brand img { flex: none; width: 46px; height: auto; }
+.workspace-brand h1 { min-width: 0; color: #16291e; font-size: clamp(20px, 3vw, 28px); font-weight: 700; line-height: 1.25; }
+.workspace-owner { display: block; margin-bottom: 3px; font-size: 13px; font-weight: 600; color: #427253; }
+.workspace-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.workspace-actions .desktop-entry { margin: 0; }
+.workspace-actions summary {
+    display: block; width: auto; min-height: 38px; padding: 8px 12px; border: 1px solid #cddbd2;
+    border-radius: 8px; background: #fff; color: #36543f; font-size: 14px; font-weight: 600; cursor: pointer; list-style: none;
+}
+.workspace-actions summary::-webkit-details-marker { display: none; }
+#tool-more > summary::after { content: ''; display: inline-block; width: 7px; height: 7px; margin: 0 1px 3px 9px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+.workspace-actions details[open] > summary { background: #edf6ef; border-color: #95baa1; }
+.workspace-panel {
+    position: absolute; z-index: 40; inset-inline-end: 0; top: calc(100% + 6px);
+    width: 22rem; max-width: 100%; padding: 12px; border: 1px solid #d5e1d8; border-radius: 10px;
+    background: #fff; color: #344c3b; box-shadow: 0 8px 25px rgba(31, 56, 39, .13);
+}
+#tool-more .workspace-panel { width: 17rem; padding: 6px; }
+#tool-more .workspace-panel > :is(a,button) { display: block; width: 100%; padding: 9px 12px; border-radius: 6px; text-align: start; font-size: 14px; }
+#tool-more .workspace-panel > :is(a,button):hover { background: #f1f6f2; }
+#tool-more #clear-work { color: #92402d; }
+#tool-more footer { margin: 5px 6px 0; padding: 8px 6px; border-top: 1px solid #e4ece6; color: #58695e; font-size: 12px; }
+#app-build { display: block; }
+@media (max-width: 540px) {
+    #workspace-header { margin-bottom: 12px; }
+    .workspace-brand img { width: 39px; }
+    .workspace-actions { margin-inline-start: auto; }
+    .workspace-actions summary { min-height: 40px; }
 }
 @media (display-mode: standalone) { .desktop-entry { display: none; } }
 </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-<button type="button" id="language-toggle" class="language-toggle" aria-label="切换为拼音">拼音</button>
 <noscript>
     <style>
         .javascript-disabled-tip { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 24px; background: #fff; color: #1e293b; text-align: center; font: 16px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
@@ -431,7 +449,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         <button id="activation-btn" onclick="tryActivate()">验证并进入工具</button>
         <div id="activation-error"></div>
         <p class="activation-footer" id="activation-footer-text">已有管理员授权码，请在上方输入并验证</p>
-        <p class="activation-policy-links"><a href="./privacy.html">隐私说明</a> · <a href="./terms.html">使用说明</a></p>
+        <p class="activation-policy-links"><a href="./privacy.html">隐私说明</a> · <a href="./terms.html">使用说明</a> · <button type="button" id="activation-language-toggle" data-language-toggle>切换为拼音</button></p>
         <details class="desktop-entry"><summary>添加到桌面</summary><p></p><button type="button" hidden>安装嘉新PPT</button></details>
     </div>
 </div>
@@ -486,47 +504,29 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
     </div>
 </div>
     <div class="container mx-auto px-4 py-6 max-w-5xl">
-        <!-- 标题 -->
-        <div class="text-center mb-6">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2"><img src="./jiaxin-ppt-web/brand.jpg" style="width:34px;height:34px;vertical-align:middle;display:inline-block;margin-right:6px;border-radius:5px;" alt="Caresun"> <span class="title-tool-name">嘉新集团</span><wbr><span class="title-tool-name">问题整改</span><wbr><span class="title-tool-name">PPT生成工具</span></h1>
-            <p class="text-gray-500 text-sm">纯前端本地处理 | 批量上传 | 自动排版 | 手机电脑通用</p>
-            <p id="app-build" class="mt-2 text-xs text-emerald-700">2026.11.23 R4</p>
-            <p class="mt-2 inline-flex items-center justify-center rounded-full border border-green-200 bg-green-50 px-4 py-1 text-sm font-semibold text-green-700">
-                嘉新内部定制工具 · 小伍工作室提供技术支持
-            </p>
-            <p class="mx-auto mt-2 max-w-2xl text-xs leading-5 text-slate-500">本工具不是嘉新集团官网，不提供在线支付；上传资料仅在当前设备本地处理。<a href="./privacy.html" class="text-emerald-700 hover:underline">隐私说明</a> · <a href="./terms.html" class="text-emerald-700 hover:underline">使用说明</a></p>
-            <details class="desktop-entry"><summary>添加到桌面</summary><p></p><button type="button" hidden>安装嘉新PPT</button></details>
-        </div>
-
-        <div class="mb-4 flex justify-center">
-            <button type="button" onclick="clearAllWork()" class="rounded-lg border border-emerald-300 bg-white px-5 py-2 text-sm font-semibold text-emerald-700 shadow hover:bg-emerald-100">清空全部内容</button>
-        </div>
-
-        <!-- 模板选择 -->
-        <div class="bg-white rounded-lg shadow p-4 md:p-5 mb-6">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-700">模板选择</h2>
-                    <p class="text-sm text-gray-400 mt-1">生成时会弹出命名窗口，支持的浏览器会优先保存到桌面</p>
-                </div>
-                <div class="grid grid-cols-2 gap-3 md:w-[420px]">
-                    <label class="template-card cursor-pointer">
-                        <input type="radio" name="template-mode" value="company" checked class="hidden">
-                        <div class="border border-gray-200 rounded-lg px-4 py-3 transition-all">
-                            <div class="font-semibold text-gray-700">公司模板</div>
-                            <div class="text-xs text-gray-400 mt-1">嵌入嘉新模板视觉</div>
-                        </div>
-                    </label>
-                    <label class="template-card cursor-pointer">
-                        <input type="radio" name="template-mode" value="default" class="hidden">
-                        <div class="border border-gray-200 rounded-lg px-4 py-3 transition-all">
-                            <div class="font-semibold text-gray-700">默认模板</div>
-                            <div class="text-xs text-gray-400 mt-1">新版清爽对比版式</div>
-                        </div>
-                    </label>
-                </div>
+        <header id="workspace-header">
+            <div class="workspace-brand">
+                <img src="./jiaxin-ppt-web/brand.jpg" width="48" height="48" alt="">
+                <h1><span class="workspace-owner">嘉新集团</span><span class="title-tool-name">问题整改</span><wbr><span class="title-tool-name">PPT生成工具</span></h1>
             </div>
-        </div>
+            <nav class="workspace-actions" aria-label="工具操作">
+                <details id="tool-install" class="desktop-entry">
+                    <summary>添加到桌面</summary>
+                    <div class="workspace-panel"><p></p><button type="button" hidden>安装嘉新PPT</button></div>
+                </details>
+                <details id="tool-more">
+                    <summary>更多</summary>
+                    <div class="workspace-panel">
+                        <button type="button" id="language-toggle" data-language-toggle>切换为拼音</button>
+                        <a href="./terms.html">使用说明</a>
+                        <a href="./privacy.html">隐私说明</a>
+                        <button type="button" id="download-diagnostics" onclick="downloadRuntimeTrace()">下载闪退排查记录</button>
+                        <button type="button" id="clear-work" onclick="clearAllWork()">清空全部内容</button>
+                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R5</span></footer>
+                    </div>
+                </details>
+            </nav>
+        </header>
 
         <!-- 资料导入区 -->
         <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
@@ -594,11 +594,6 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         </div>
 
         <div id="photo-pager-bottom" hidden class="mb-4"></div>
-        <details class="mb-4 text-sm text-slate-600">
-            <summary class="cursor-pointer">闪退排查记录</summary>
-            <p class="my-2">若再次闪退，重新打开后下载此记录发给技术支持。记录仅包含运行步骤、图片规格与设备信息。</p>
-            <button type="button" onclick="downloadRuntimeTrace()" class="rounded border border-slate-300 bg-white px-3 py-2">下载排查记录</button>
-        </details>
         <!-- 操作按钮区 -->
         <div id="draft-status-bar" class="mb-4 flex flex-col gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 sm:flex-row sm:items-center sm:justify-between">
             <span id="draft-status">💾 正在开启本机自动草稿保存…</span>
@@ -723,7 +718,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 仅记录步骤与图片规格，保留重开前的最后阶段；不记录照片、文件名或业务文字。
         const RUNTIME_TRACE_KEY = 'jx_ppt_runtime_trace';
-        const RUNTIME_BUILD = '2026.11.23 R4';
+        const RUNTIME_BUILD = '2026.11.23 R5';
         let runtimeTrace = [];
         try {
             const previous = JSON.parse(localStorage.getItem(RUNTIME_TRACE_KEY) || '[]');
@@ -3752,15 +3747,10 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                     pptx.subject = '问题整改';
                     pptx.company = 'Caresun International Group Limited';
 
-                    const templateMode = document.querySelector('input[name="template-mode"]:checked')?.value || 'company';
-                    const imageFrameRatio = templateMode === 'company'
-                        ? 4.15 / (4.1 - 0.62 - 0.14)
-                        : 4.15 / (4.52 - 0.62 - 0.14);
+                    const imageFrameRatio = 4.15 / (4.1 - 0.62 - 0.14);
                     const preparedImageCache = new Map();
-                    if (templateMode === 'company') {
-                        const coverSlide = addScaledPPTSlide(pptx, generatedScale);
-                        renderCompanyCoverSlide(pptx, coverSlide, cleanBaseName, await loadCompanyCover());
-                    }
+                    const coverSlide = addScaledPPTSlide(pptx, generatedScale);
+                    renderCompanyCoverSlide(pptx, coverSlide, cleanBaseName, await loadCompanyCover());
                     let pageNum = 0;
 
                     for (const issue of issues) {
@@ -3780,11 +3770,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         const rightPptImage = await preparePPTImage(rightImg, imageFrameRatio, exportOptions, preparedImageCache);
 
                         const slide = addScaledPPTSlide(pptx, generatedScale);
-                        if (templateMode === 'company') {
-                            renderCompanySlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
-                        } else {
-                            renderDefaultSlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
-                        }
+                        renderCompanySlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
                         preparedImageCache.clear();
                         await yieldForMedia();
                     }
@@ -3799,7 +3785,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                             pptBlob,
                             importedPPTX.file,
                             importedPPTX.preservedSlides,
-                            templateMode === 'company'
+                            true
                         );
                     }
                     traceRuntime('准备下载PPT', { bytes: pptBlob.size });
@@ -4442,22 +4428,10 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
     </script>
   <style>
-    .language-toggle {
-        position: fixed; top: calc(env(safe-area-inset-top, 0px) + 14px); right: calc(env(safe-area-inset-right, 0px) + 14px); z-index: 100001;
-        min-width: 88px; min-height: 40px; padding: 8px 14px;
-        border: 1px solid rgba(22, 163, 74, 0.38); border-radius: 999px;
-        background: rgba(255, 255, 255, 0.96); color: #15803d;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
-        font: 700 14px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft Uighur", sans-serif;
-        cursor: pointer; backdrop-filter: blur(8px); direction: ltr;
-    }
-    .language-toggle:focus-visible { outline: 3px solid rgba(34, 197, 94, 0.35); outline-offset: 2px; }
+    [data-language-toggle]:focus-visible, .workspace-actions summary:focus-visible { outline: 3px solid #4b8965; outline-offset: 2px; }
     html[lang="zh-Latn"] input,
     html[lang="zh-Latn"] textarea,
     html[lang="zh-Latn"] select { direction: auto; text-align: start; }
-    @media (max-width: 640px) {
-        .language-toggle { top: calc(env(safe-area-inset-top, 0px) + 10px); right: calc(env(safe-area-inset-right, 0px) + 10px); min-width: 78px; min-height: 36px; padding: 7px 11px; font-size: 13px; }
-    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -4564,7 +4538,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         function applyElement(element) {
-            if (!(element instanceof Element) || element.id === 'language-toggle') return;
+            if (!(element instanceof Element) || element.hasAttribute('data-language-toggle')) return;
             const attributes = ['placeholder', 'title', 'aria-label'];
             let originals = attributeOriginals.get(element);
             attributes.forEach(name => {
@@ -4583,7 +4557,8 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             });
         }
 
-        const skippedLanguageNodes = 'script, style, noscript, #language-toggle';
+        const languageButtons = document.querySelectorAll('[data-language-toggle]');
+        const skippedLanguageNodes = 'script, style, noscript, [data-language-toggle]';
         function applyTree(root = document.body) {
             if ((root.nodeType === Node.ELEMENT_NODE ? root : root.parentElement)?.closest(skippedLanguageNodes)) return;
             applying = true;
@@ -4603,20 +4578,18 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             document.documentElement.lang = language === 'py' ? 'zh-Latn' : 'zh-CN';
             document.documentElement.dir = 'ltr';
             document.title = language === 'py' ? translatedText('嘉新集团问题整改PPT生成工具') : '嘉新集团问题整改PPT生成工具';
-            const toggle = document.getElementById('language-toggle');
-            if (toggle) {
-                const toggleText = language === 'py' ? '中文' : '拼音';
+            languageButtons.forEach(toggle => {
+                const toggleText = language === 'py' ? '切换为中文' : '切换为拼音';
                 if (toggle.textContent !== toggleText) toggle.textContent = toggleText;
-                toggle.setAttribute('aria-label', language === 'py' ? '切换为中文' : '切换为拼音');
-            }
+            });
             applying = false;
         }
 
-        document.getElementById('language-toggle')?.addEventListener('click', () => {
+        languageButtons.forEach(toggle => toggle.addEventListener('click', () => {
             language = language === 'zh' ? 'py' : 'zh';
             localStorage.setItem(LANGUAGE_KEY, language);
             applyTree();
-        });
+        }));
 
         const observer = new MutationObserver(records => {
             if (applying) return;
@@ -4628,6 +4601,18 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
   </script>
   <script>
     (() => {
+        const menus = document.querySelectorAll('.workspace-actions > details');
+        document.addEventListener('click', event => {
+            menus.forEach(menu => { if (menu.open && !menu.contains(event.target)) menu.open = false; });
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Escape') return;
+            menus.forEach(menu => {
+                if (!menu.open) return;
+                menu.open = false;
+                menu.querySelector('summary').focus();
+            });
+        });
         const entries = document.querySelectorAll('.desktop-entry');
         const ua = navigator.userAgent || '';
         const embedded = /MicroMessenger|wxwork|\bQQ\//i.test(ua);
