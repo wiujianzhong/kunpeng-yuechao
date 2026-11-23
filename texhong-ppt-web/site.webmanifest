@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "lang": "zh-CN",
+  "name": "天虹集团问题整改PPT生成工具",
+  "short_name": "天虹PPT",
+  "start_url": "../",
+  "scope": "../",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#b45a0b",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

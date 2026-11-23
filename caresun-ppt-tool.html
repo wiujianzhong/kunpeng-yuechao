@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="嘉新集团内部问题整改PPT排版工具，图片与文字仅在当前浏览器本地处理，不上传业务资料。">
+    <meta name="description" content="上传现场照片或导入已有PPT，用嘉新模板生成问题整改PPT。图片与文字均在当前设备处理。">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="theme-color" content="#16a34a">
     <meta property="og:title" content="嘉新集团问题整改PPT生成工具">
-    <meta property="og:description" content="嘉新内部定制效率工具，由小伍工作室提供技术支持。">
+    <meta property="og:description" content="用嘉新模板整理现场照片与整改说明，直接生成PPT。">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://jx.xiaowustudio.cn/">
     <link rel="canonical" href="https://jx.xiaowustudio.cn/">
@@ -21,37 +21,13 @@
     <title>嘉新集团问题整改PPT生成工具</title>
     <script>
         (() => {
-            const legacyHost = 'jiaxin-ppt.xiaowustudio.cn';
             const canonicalHost = 'jx.xiaowustudio.cn';
-            const isLegacyHost = location.hostname === legacyHost;
-            if (isLegacyHost) {
-                const records = [
-                    ['jx_ppt_activation', 'jx_ppt_activation_jx', 400 * 24 * 60 * 60],
-                    ['jx_ppt_offline_grace', 'jx_ppt_offline_grace_jx', 30 * 24 * 60 * 60],
-                    ['jx_ppt_installation_id', 'jx_ppt_installation_id_jx', 400 * 24 * 60 * 60],
-                    ['jx_ppt_trial', 'jx_ppt_trial_jx', 7 * 24 * 60 * 60]
-                ];
-                const migration = {};
-                records.forEach(([storageKey, cookieKey, maxAge]) => {
-                    try {
-                        const value = localStorage.getItem(storageKey);
-                        if (!value) return;
-                        migration[storageKey] = value;
-                        document.cookie = `${encodeURIComponent(cookieKey)}=${encodeURIComponent(value)}; max-age=${maxAge}; path=/; Domain=.xiaowustudio.cn; Secure; SameSite=Lax`;
-                    } catch (_) {}
-                });
-                if (Object.keys(migration).length) {
-                    window.name = `jx-ppt-migrate:${encodeURIComponent(JSON.stringify(migration))}`;
-                }
-            }
-            if (isLegacyHost || (location.hostname === canonicalHost && location.protocol === 'http:')) {
-                const targetHost = isLegacyHost ? canonicalHost : location.hostname;
-                location.replace(`https://${targetHost}${location.pathname}${location.search}${location.hash}`);
+            if (location.hostname === 'jiaxin-ppt.xiaowustudio.cn' || (location.hostname === canonicalHost && location.protocol === 'http:')) {
+                location.replace(`https://${canonicalHost}${location.pathname}${location.search}${location.hash}`);
             }
         })();
     </script>
     <script src="./vendor/pinyin-pro.js?v=3.18.6" defer></script>
-    <script src="./ppt-license.js?v=20260717-bilingual-ready-fix" defer></script>
     <script src="./vendor/tailwindcss-cdn.js" defer></script>
     <script src="./vendor/pptxgen.bundle.js" defer></script>
     <script src="./vendor/jszip.min.js" defer></script>
@@ -311,79 +287,14 @@
         }
     </style>
 
-<!-- ===== 激活弹窗样式 ===== -->
 <style>
-#activation-overlay {
-    position: fixed; inset: 0; z-index: 99999;
-    background: rgba(0,0,0,0.55);
-    display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(3px);
-}
-#activation-overlay.hidden { display: none; }
-.activation-card {
-    background: #fff; border-radius: 16px; padding: 32px 28px;
-    max-width: 420px; width: 90%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
-}
-.activation-card h2 { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
-.activation-card .subtitle { font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px; }
-.activation-card .logo-area { margin-bottom: 14px; }
-.activation-card .logo-area img { display: block; width: 48px; height: auto; margin: 0 auto; }
-.activation-trust-note {
-    margin: 0 0 16px; padding: 10px 12px; border-radius: 10px;
-    background: #f8fafc; color: #475569; font-size: 0.75rem; line-height: 1.6;
-    text-align: left;
-}
-.activation-policy-links { margin-top: 12px; font-size: 0.72rem; color: #64748b; }
-.activation-policy-links a { color: #15803d; text-decoration: none; }
-.activation-policy-links a:hover { text-decoration: underline; }
-.machine-code-box {
-    background: #f1f5f9; border: 1px solid #e2e8f0;
-    border-radius: 10px; padding: 12px; margin-bottom: 16px;
-}
-.machine-code-box .label { font-size: 0.75rem; color: #64748b; margin-bottom: 6px; }
-.machine-code-box .code {
-    font-family: 'Courier New', monospace; font-size: 1rem;
-    font-weight: 700; color: #0f172a; letter-spacing: 1px; word-break: break-all;
-}
-.machine-code-copy-btn {
-    margin-top: 8px; font-size: 0.75rem; color: #3b82f6;
-    cursor: pointer; border: 1px solid #bfdbfe; border-radius: 6px;
-    padding: 4px 12px; background: #eff6ff; transition: all 0.2s;
-}
-.machine-code-copy-btn:hover { background: #dbeafe; }
-#activation-input {
-    width: 100%; padding: 12px 14px;
-    border: 1.5px solid #e2e8f0; border-radius: 10px;
-    font-size: 0.9rem; outline: none; transition: border-color 0.2s;
-    box-sizing: border-box; margin-bottom: 12px; text-align: center;
-}
-#activation-input:focus { border-color: #16a34a; }
-#activation-btn {
-    width: 100%; padding: 12px; background: #16a34a; color: #fff;
-    border: none; border-radius: 10px; font-size: 1rem;
-    font-weight: 600; cursor: pointer; transition: background 0.2s;
-}
-#activation-btn:hover { background: #15803d; }
-#trial-section { margin-bottom: 14px; }
-#trial-btn {
-    width: 100%; padding: 12px; background: #eff6ff; color: #1d4ed8;
-    border: 1px solid #bfdbfe; border-radius: 10px; font-size: 1rem;
-    font-weight: 700; cursor: pointer; transition: background 0.2s;
-}
-#trial-btn:hover { background: #dbeafe; }
-#activation-error {
-    color: #dc2626; font-size: 0.8rem; margin-top: 10px; display: none;
-}
-#activation-error.visible { display: block; }
-.activation-footer { font-size: 0.7rem; color: #94a3b8; margin-top: 16px; }
 .desktop-entry { margin: 8px auto 0; max-width: 32rem; text-align: center; color: #166534; font-size: 0.875rem; }
 .desktop-entry summary { width: fit-content; max-width: 100%; margin: auto; padding: 8px 14px; cursor: pointer; font-weight: 600; }
 .desktop-entry p { margin: 4px auto 8px; text-align: start; line-height: 1.6; color: #334155; }
 .desktop-entry a[download] { color: #166534; text-decoration: underline; }
 html[lang="zh-CN"] .title-tool-name { white-space: nowrap; }
 html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
-.activation-card, #file-name-panel { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); overflow-y: auto; }
+#file-name-panel { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); overflow-y: auto; }
 #workspace-header {
     position: relative; display: flex; align-items: center; flex-wrap: wrap;
     justify-content: space-between; gap: 10px 16px; margin-bottom: 16px;
@@ -430,39 +341,15 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 }
 @media (display-mode: standalone) { .desktop-entry { display: none; } }
 </style>
+    <script defer src="./vendor/ppt-welcome.js" data-brand="caresun"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
 <noscript>
     <style>
         .javascript-disabled-tip { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 24px; background: #fff; color: #1e293b; text-align: center; font: 16px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
     </style>
-    <div class="javascript-disabled-tip"><p>请在当前浏览器的网站设置中允许 JavaScript，然后刷新本页，即可生成机器码并使用工具。</p></div>
+    <div class="javascript-disabled-tip"><p>请在当前浏览器的网站设置中允许 JavaScript，然后刷新本页，即可制作整改PPT。</p></div>
 </noscript>
-<!-- ===== 激活弹窗 ===== -->
-<div id="activation-overlay" class="hidden">
-    <div class="activation-card">
-        <div class="logo-area">
-            <img src="./jiaxin-ppt-web/brand.jpg" alt="嘉新集团">
-        </div>
-        <h2>嘉新内部工具授权</h2>
-        <p class="subtitle">由小伍工作室提供技术支持</p>
-        <p class="activation-trust-note">本工具用于嘉新内部问题整改材料排版，不是嘉新集团官网，不提供在线支付。上传的图片、文字和PPT仅在当前浏览器本地处理，不上传业务资料。</p>
-        <div id="trial-section" style="display: none;">
-            <button id="trial-btn" onclick="startFreeTrial()">🎉 免费体验7天</button>
-        </div>
-        <div class="machine-code-box">
-            <div class="label">📱 您的设备机器码</div>
-            <div class="code" id="machine-code-display">——</div>
-            <button class="machine-code-copy-btn" onclick="copyMachineCode()">📋 复制</button>
-        </div>
-        <input id="activation-input" type="text" placeholder="请输入管理员给的激活码" autocomplete="off">
-        <button id="activation-btn" onclick="tryActivate()">验证并进入工具</button>
-        <div id="activation-error"></div>
-        <p class="activation-footer" id="activation-footer-text">已有管理员授权码，请在上方输入并验证</p>
-        <p class="activation-policy-links"><a href="./privacy.html">隐私说明</a> · <a href="./terms.html">使用说明</a> · <button type="button" id="activation-language-toggle" data-language-toggle>切换为拼音</button></p>
-        <details class="desktop-entry"><summary>添加桌面指南</summary><p></p><a download="嘉新整改PPT.url" hidden>下载桌面快捷方式</a></details>
-    </div>
-</div>
 <!-- ===== 照片全屏查看 ===== -->
 <div id="photo-viewer-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="查看完整照片" onclick="closePhotoViewer(event)">
     <button type="button" class="photo-viewer-close" aria-label="关闭完整照片">×</button>
@@ -529,10 +416,10 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                     <summary>更多</summary>
                     <div class="workspace-panel">
                         <button type="button" id="language-toggle" data-language-toggle>切换为拼音</button>
-                        <a href="./terms.html">使用说明</a>
-                        <a href="./privacy.html">隐私说明</a>
+                        <a href="./jiaxin-ppt-web/terms.html">使用说明</a>
+                        <a href="./jiaxin-ppt-web/privacy.html">隐私说明</a>
                         <button type="button" id="download-diagnostics" onclick="downloadRuntimeTrace()">下载闪退排查记录</button>
-                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R6</span></footer>
+                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R7</span></footer>
                     </div>
                 </details>
             </nav>
@@ -651,7 +538,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         <input id="ppt-bilingual-mode" type="checkbox" class="mt-0.5 h-4 w-4 accent-emerald-600">
                         <span>
                             <strong>生成中文＋拼音双语PPT</strong>
-                            <small id="ppt-bilingual-tip" class="mt-1 block text-xs text-emerald-700">仅嘉新正式付费客户可用</small>
+                            <small class="mt-1 block text-xs text-emerald-700">在工序标题和问题描述下方显示拼音</small>
                         </span>
                     </label>
                 </div>
@@ -728,7 +615,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 仅记录步骤与图片规格，保留重开前的最后阶段；不记录照片、文件名或业务文字。
         const RUNTIME_TRACE_KEY = 'jx_ppt_runtime_trace';
-        const RUNTIME_BUILD = '2026.11.23 R6';
+        const RUNTIME_BUILD = '2026.11.23 R7';
         let runtimeTrace = [];
         try {
             const previous = JSON.parse(localStorage.getItem(RUNTIME_TRACE_KEY) || '[]');
@@ -1433,14 +1320,15 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 throw new Error('请选择PPTX文件');
             }
 
-            const [slidePaths, slideSize] = await Promise.all([
+            const [slidePaths, slideSize, toolReport] = await Promise.all([
                 getPPTXSlidePaths(zip),
-                getPPTXSlideSize(zip)
+                getPPTXSlideSize(zip),
+                isGeneratedPPTXReport(zip)
             ]);
             const rows = [];
             for (const [slideIndex, slidePath] of slidePaths.entries()) {
                 try {
-                    rows.push(...await extractPPTXDescriptionRowsFromSlide(zip, slidePath, slideIndex + 1, slideSize));
+                    rows.push(...await extractPPTXDescriptionRowsFromSlide(zip, slidePath, slideIndex + 1, slideSize, toolReport));
                 } catch (error) {
                     console.warn(`跳过无法提取文字的页面：${slidePath}`, error);
                 }
@@ -1448,7 +1336,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             return rows.map((row, index) => ({ no: index + 1, ...row }));
         }
 
-        async function extractPPTXDescriptionRowsFromSlide(zip, slidePath, page, slideSize) {
+        async function extractPPTXDescriptionRowsFromSlide(zip, slidePath, page, slideSize, toolReport = false) {
             const slideFile = zip.file(slidePath);
             if (!slideFile) return [];
 
@@ -1458,7 +1346,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             const relsPath = `${slideDir}_rels/${slideName}.rels`;
             const relsFile = zip.file(relsPath);
             const rels = relsFile ? parsePPTXRels(await relsFile.async('text'), slideDir) : {};
-            const texts = collectPPTXTextBoxes(slideDoc);
+            const texts = collectPPTXTextBoxes(slideDoc, toolReport && !Object.values(rels).some(path => path.startsWith('ppt/imported/')));
             const { pictures } = await collectPPTXIssuePictures(zip, slideDoc, rels, slideSize, false);
 
             const orderedPictures = pictures.sort((a, b) => a.x - b.x);
@@ -1580,15 +1468,16 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 throw new Error('请选择PPTX文件');
             }
 
-            const [slidePaths, slideSize] = await Promise.all([
+            const [slidePaths, slideSize, toolReport] = await Promise.all([
                 getPPTXSlidePaths(zip),
-                getPPTXSlideSize(zip)
+                getPPTXSlideSize(zip),
+                isGeneratedPPTXReport(zip)
             ]);
             const items = [];
             const preservedSlides = [];
             for (const [slideIndex, slidePath] of slidePaths.entries()) {
                 try {
-                    const result = await extractItemsFromPPTXSlide(zip, slidePath, slideSize, slideIndex === 0);
+                    const result = await extractItemsFromPPTXSlide(zip, slidePath, slideSize, slideIndex === 0, toolReport);
                     items.push(...result.items);
                     // 业务原页按实际位置插回，第一页也可能是表格或说明。
                     if (result.shouldPreserve) {
@@ -1639,7 +1528,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         // 从单页中按图片X坐标拆成多个问题页
-        async function extractItemsFromPPTXSlide(zip, slidePath, slideSize, isFirstSlide = false) {
+        async function extractItemsFromPPTXSlide(zip, slidePath, slideSize, isFirstSlide = false, toolReport = false) {
             const slideFile = zip.file(slidePath);
             if (!slideFile) return { items: [], shouldPreserve: false };
 
@@ -1649,12 +1538,12 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             const relsPath = `${slideDir}_rels/${slideName}.rels`;
             const relsFile = zip.file(relsPath);
             const rels = relsFile ? parsePPTXRels(await relsFile.async('text'), slideDir) : {};
-            const texts = collectPPTXTextBoxes(slideDoc);
+            const texts = collectPPTXTextBoxes(slideDoc, toolReport && !Object.values(rels).some(path => path.startsWith('ppt/imported/')));
             // 表格页沿用原版式。图表、SmartArt 或嵌入对象与现场照片混排时，两者都保留。
             if (getPPTXNodes(slideDoc, 'tbl').length) return { items: [], shouldPreserve: true };
             const hasNativeObject = ['graphicFrame', 'oleObj', 'contentPart', 'ink']
                 .some(tag => getPPTXNodes(slideDoc, tag).length);
-            const { pictures, removedArtwork, hasOriginalMedia, hasFullPageImage } =
+            const { pictures, removedArtwork, hasCoverArtwork, hasOriginalMedia, hasFullPageImage } =
                 await collectPPTXIssuePictures(zip, slideDoc, rels, slideSize, true);
 
             // 提取顶部工序文字（位于所有图片上方的文本）
@@ -1685,13 +1574,13 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             const coverNotes = /^(?:汇报人|报告人|汇报单位|汇报日期|报告日期|日期)[：:]|^(?:20\d{2}[-./年])?\d{1,2}[-./月]\d{1,2}日?(?:\s.*)?$/;
             const mainTexts = texts.filter(({ text }) => !coverNotes.test(text));
             const hasCoverTitle = mainTexts.length === 1 && mainTexts[0].text.length <= 60
-                && ((hasFullPageImage && removedArtwork && !/[。；]/.test(mainTexts[0].text))
+                && (((hasFullPageImage && removedArtwork || hasCoverArtwork) && !/[。；]/.test(mainTexts[0].text))
                     || /(?:汇报|报告|工作总结|问题汇总|检查汇总|整改汇总|周报|月报)(?:[（(].*?[）)])?$/.test(mainTexts[0].text)
                     || getPPTXNodes(slideDoc, 'ph').some(ph => ph.getAttribute('type') === 'ctrTitle'));
             if (isFirstSlide && hasCoverTitle) return { items, shouldPreserve: false };
             if (hasFullPageImage) return { items, shouldPreserve: true };
             const onlyPlaceholders = texts.every(({ text }) =>
-                /^(?:图片|整改前(?:照片)?|整改后(?:照片)?|已整改|结束语|结|汇报完毕[，,]?谢谢大家[。！!]?)$/.test(text));
+                /^(?:图片|整改前(?:照片)?|整改后(?:照片)?|已整改|结束语|Thank you|结|汇报完毕[，,]?谢谢大家[。！!]?)$/.test(text));
             return { items, shouldPreserve: !(removedArtwork && onlyPlaceholders) && (!isFirstSlide || texts.length > 0) };
         }
 
@@ -1706,15 +1595,51 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             const frames = [
                 [0.037, 0.155, 0.016, 0.028], [0.051, 0.17, 0.92, 0], [0, 0.97, 1, 0.03],
                 [0.07, 0.21, 0.415, 0.594], [0.505, 0.21, 0.415, 0.594],
-                [0.07, 0.829, 0.415, 0.11], [0.505, 0.829, 0.415, 0.11]
+                [0.07, 0.829, 0.415, 0.11], [0.505, 0.829, 0.415, 0.11],
+                [0.035, 0.816, 0.93, 0.003], [0.07, 0.197, 0.415, 0.451], [0.505, 0.197, 0.415, 0.451],
+                [0.07, 0.661, 0.415, 0.083], [0.505, 0.661, 0.415, 0.083]
             ];
             return frames.some(frame => frame.every((value, i) => Math.abs(value - normalized[i]) < 0.008));
+        }
+
+        // 用原始模板素材或已审核的历史装饰图的字节摘要识别，不依赖文件名与照片摆放位置。
+        const knownArtworkHashes = new Map([
+            [504, ['template', 'ee48de92f52ebc1fcfbae25eeb1b96526d9f15767927d2243f26a8600c4093b9', 0x8768cc27]],
+            [3009, ['template', 'c60713771f5efdfb2361467642ddb2c95bcc61be3c7f5b92a43da56ff3ba390a', 0x8c9ddda5]],
+            [5167, ['template', '99cf6380bb4a67a1f48a9776e443bef8168b4ad80f9464a693572db6f0c068ee', 0xb48e8ecd]],
+            [8999, ['template', '301666c3ec7089858c619ab597d4449bedb72b80711ada2234a02dcfb4716748', 0x3c692d95]],
+            [10730, ['template', '68099954511031f71ed58cc73f05677a26a60b208297e5166f380e82a47f392e', 0xf02ea250]],
+            [22509, ['template', '5cdea7c18ad9c8eab0775824c058e9af458577861531de1247b0ed0df1645d02', 0x683734c7]],
+            [22544, ['template', '8d1b1ad49519eff28b6b160a3b0b2232153726287477dbec95162ef258fe32e4', 0x00898340]],
+            [23075, ['template', '54d09712683d87bc4d429845b220e8ce5ed94481280723861e138876fe2ed60d', 0xaf3573a1]],
+            [23973, ['template', '91670b603c488efd41255e746ae0b3001d215455d74c85d36a45ad093c98ef34', 0x14073207]],
+            [26080, ['cover', '2e8cfbe4dc2c16428ab41a0988b3ae3c67acda92cf09bab2ff48b23ff39a0383', 0xa7157625]],
+            [52368, ['template', 'ee0b498e828c7acf8f560a43441ff0b2f678898b0ed2e7a7ebb05d2308300e22', 0x1d3f7ad8]],
+            [63619, ['template', 'b7558e1d16c7b7bcf783a07ffc6e55492b4ab45296df294a4c1b5d330754c9f7', 0x842a5aaf]],
+            [66055, ['template', '17e783f577b54bb460fce467e53fe7b562dbd4dfd6ee93379293acd8678ae694', 0xf0656d70]],
+            [69939, ['template', 'e6955ea07bdf95c96af055471fb8a8515fa5c137602c82157ccdfbe9dbb436e3', 0xb5606421]],
+            [73152, ['template', '5c5ac98f11618070cf94e88bcb0c091776cf1b0cc328f2f7972328e91d6bd570', 0xf9cde469]],
+            [168722, ['template', '73b7732e6b98f23c92345a524d6a7d9c136bc61779610929e856fb205d3621ca', 0x05bc36a9]],
+            [966640, ['cover', '6e43bd30b167c3a2d7bc25a17106c62a3d55ddf1a041333b7e57066e324fe4b5', 0xfc968f6c]]
+        ]);
+        async function matchKnownArtwork(bytes) {
+            const known = knownArtworkHashes.get(bytes.length);
+            if (!known) return null;
+            if (window.crypto?.subtle) {
+                const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+                const hex = Array.from(digest, byte => byte.toString(16).padStart(2, '0')).join('');
+                return hex === known[1] ? known[0] : null;
+            }
+            // 旧内核没有 Web Crypto 时，使用已校验过的长度与 FNV-1a 指纹。
+            let hash = 0x811c9dc5;
+            for (const value of bytes) hash = Math.imul(hash ^ value, 0x01000193);
+            return (hash >>> 0) === known[2] ? known[0] : null;
         }
 
         // 拆解问题和提取文字使用同一批现场照片，先剔除品牌图再配对左右描述。
         async function collectPPTXIssuePictures(zip, slideDoc, rels, slideSize, includeImages) {
             const pictures = [];
-            let removedArtwork = false, hasOriginalMedia = false, hasFullPageImage = false;
+            let removedArtwork = false, hasCoverArtwork = false, hasOriginalMedia = false, hasFullPageImage = false;
             for (const pic of getPPTXNodes(slideDoc, 'pic')) {
                 if (['videoFile', 'audioFile', 'media'].some(tag => getPPTXNodes(pic, tag).length)) {
                     hasOriginalMedia = true;
@@ -1736,9 +1661,23 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 }
                 let decoded;
                 try {
-                    const blob = new Blob([await mediaFile.async('uint8array')], { type: mime });
+                    const bytes = await mediaFile.async('uint8array');
+                    let knownArtwork = await matchKnownArtwork(bytes);
+                    if (!knownArtwork) {
+                        const svgId = getPPTXRelationshipId(getPPTXFirstNode(pic, 'svgBlip'));
+                        const svgFile = svgId && rels[svgId] && zip.file(rels[svgId]);
+                        if (svgFile) knownArtwork = await matchKnownArtwork(await svgFile.async('uint8array'));
+                    }
+                    if (knownArtwork) {
+                        removedArtwork = true;
+                        if (knownArtwork === 'cover') hasCoverArtwork = true;
+                        continue;
+                    }
+                    const blob = new Blob([bytes], { type: mime });
                     decoded = await loadProcessingImage(blob, includeImages ? PPT_IMPORT_MAX_EDGE : 160);
-                    if (await isPPTXTemplateArtwork(decoded)) {
+                    const artwork = await matchPPTXTemplateArtwork(decoded);
+                    if (artwork) {
+                        if (artwork === 'cover') hasCoverArtwork = true;
                         removedArtwork = true;
                         continue;
                     }
@@ -1754,16 +1693,12 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                     decoded?.release();
                 }
             }
-            return { pictures, removedArtwork, hasOriginalMedia, hasFullPageImage };
+            return { pictures, removedArtwork, hasCoverArtwork, hasOriginalMedia, hasFullPageImage };
         }
 
-        // 用嘉新模板原图生成微缩样本。旧工具曾把字标、徽标、结束横幅裁进问题框，
-        // 因此也比对两种问题框的居中裁剪和适中调整；图片位置、文件名不参与判断。
+        // 两品牌共用一张按需加载的模板特征表，兼容缩放、重压缩和旧版裁图。
         let pptxArtworkSamples;
-        function samplePPTXArtwork(image, width, height, cropRatio, adjustment = 0) {
-            let sw = width, sh = height;
-            if (cropRatio && width / height > cropRatio) sw = Math.min(width, height * cropRatio * (1 + adjustment));
-            else if (cropRatio) sh = Math.min(height, width / cropRatio * (1 + adjustment));
+        function samplePPTXArtwork(image, width, height) {
             const canvas = document.createElement('canvas');
             canvas.width = 120;
             canvas.height = 90;
@@ -1771,7 +1706,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             ctx.imageSmoothingQuality = 'high';
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(image, (width - sw) / 2, (height - sh) / 2, sw, sh, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image, 0, 0, width, height, 0, 0, canvas.width, canvas.height);
             // 固定做 5×5 区域平均，避免不同浏览器的缩略算法造成字标识别偏差。
             const data = ctx.getImageData(0, 0, 120, 90).data;
             const sums = new Uint16Array(24 * 18 * 4);
@@ -1788,40 +1723,39 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         async function buildPPTXArtworkSamples() {
+            const image = new Image();
+            await new Promise((resolve, reject) => {
+                image.onload = resolve;
+                image.onerror = reject;
+                image.src = './vendor/ppt-artwork-signatures.png';
+            });
+            const canvas = document.createElement('canvas');
+            canvas.width = image.naturalWidth;
+            canvas.height = image.naturalHeight;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(image, 0, 0);
+            // 行序为嘉新字标、徽标、完整标志、结束横幅和天虹透明标志、旧标志、页眉、封面。
+            // 最后两行是嘉新旧方标、嘉新封面。每列是原图、缩放图或历史问题框的居中裁剪。
+            const kinds = ['template', 'template', 'template', 'banner', 'template', 'template', 'header', 'cover', 'template', 'cover'];
             const samples = [];
-            for (const src of [COMPANY_WORDMARK_DATA, CARESUN_BADGE_DATA, CARESUN_LOGO_DATA, COMPANY_END_BANNER_DATA]) {
-                const image = new Image();
-                await new Promise((resolve, reject) => {
-                    image.onload = resolve;
-                    image.onerror = reject;
-                    image.src = src;
-                });
-                // 先栅格化再缩小，避免各浏览器在极低分辨率下直接绘制矢量字标时出现锯齿。
-                const bitmap = document.createElement('canvas');
-                const scale = 800 / Math.max(image.naturalWidth, image.naturalHeight);
-                bitmap.width = Math.round(image.naturalWidth * scale);
-                bitmap.height = Math.round(image.naturalHeight * scale);
-                bitmap.getContext('2d').drawImage(image, 0, 0, bitmap.width, bitmap.height);
-                const ratios = [0, 4.15 / 3.34, 4.15 / 3.76];
-                for (const ratio of ratios) {
-                    for (const adjustment of ratio ? [0, 0.2, 0.35, 0.45, 0.5] : [0]) {
-                        const pixels = samplePPTXArtwork(bitmap, bitmap.width, bitmap.height, ratio, adjustment);
-                        // 渐变横幅使用更严的色差，防止把绿色墙面等低纹理现场照片误判。
-                        const tolerance = src === COMPANY_END_BANNER_DATA ? 3 : 12;
-                        samples.push({ pixels, maxError: 24 * 18 * 3 * tolerance ** 2 });
-                    }
+            kinds.forEach((kind, row) => {
+                const tolerance = kind === 'banner' ? 3 : kind === 'cover' ? 5 : 12;
+                for (let x = 0; x < canvas.width; x += 24) {
+                    const pixels = ctx.getImageData(x, row * 18, 24, 18).data;
+                    samples.push({ kind, pixels, maxError: 24 * 18 * 3 * tolerance ** 2 });
                 }
-                bitmap.width = bitmap.height = 1;
-            }
+            });
+            canvas.width = canvas.height = 1;
             return samples;
         }
 
-        async function isPPTXTemplateArtwork(decoded) {
+        async function matchPPTXTemplateArtwork(decoded) {
             try {
-                if (!pptxArtworkSamples) pptxArtworkSamples = buildPPTXArtworkSamples();
+                if (!pptxArtworkSamples) pptxArtworkSamples = buildPPTXArtworkSamples().catch(() => []);
                 const samples = await pptxArtworkSamples;
+                if (!samples.length) return null;
                 const actual = samplePPTXArtwork(decoded.image, decoded.width, decoded.height);
-                return samples.some(({ pixels, maxError }) => {
+                return samples.find(({ pixels, maxError }) => {
                     let squaredError = 0;
                     for (let i = 0; i < actual.length; i++) {
                         if (i % 4 === 3) continue;
@@ -1829,7 +1763,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         if (squaredError > maxError) return false;
                     }
                     return true;
-                });
+                })?.kind;
             } catch (_) {
                 return false;
             }
@@ -1876,17 +1810,45 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         // 收集有实际文字内容的文本框
-        function collectPPTXTextBoxes(slideDoc) {
+        async function isGeneratedPPTXReport(zip) {
+            const core = zip.file('docProps/core.xml'), app = zip.file('docProps/app.xml');
+            if (!core || !app) return false;
+            try {
+                const properties = parsePPTXXml(await core.async('text'));
+                const company = getPPTXFirstNode(parsePPTXXml(await app.async('text')), 'Company')?.textContent;
+                return getPPTXFirstNode(properties, 'creator')?.textContent === '小伍工作室'
+                    && getPPTXFirstNode(properties, 'subject')?.textContent === '问题整改'
+                    && ['Caresun International Group Limited', 'Texhong Textile Group Limited'].includes(company);
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function getPPTXEditableText(shape, txBody, toolReport) {
+            const lines = getPPTXNodes(txBody, 'p').map(p => Array.from(p.children).map(run =>
+                run.localName === 'br' ? '\n' : getPPTXNodes(run, 't').map(node => node.textContent || '').join('')
+            ).join(''));
+            const text = lines.join('\n').trim();
+            const name = getPPTXFirstNode(shape, 'cNvPr')?.getAttribute('name') || '';
+            if (lines.length < 2 || !window.pinyinPro?.pinyin || !toolReport
+                || (name !== '整改工具中拼' && !/^Text \d+$/.test(name))) return text;
+            const normalize = value => value.normalize('NFC').replace(/\s+/g, ' ').trim();
+            for (let split = 1; split < lines.length; split++) {
+                const original = lines.slice(0, split).join('\n').trim();
+                const trailing = lines.slice(split).join(' ');
+                if (!/[\u3400-\u9fff]/.test(original) || /[\u3400-\u9fff]/.test(trailing)) continue;
+                if (normalize(window.pinyinPro.pinyin(original, { toneType: 'symbol' })) === normalize(trailing)) return original;
+            }
+            return text;
+        }
+
+        function collectPPTXTextBoxes(slideDoc, toolReport = false) {
             return getPPTXNodes(slideDoc, 'sp')
                 .map(shape => {
                     const txBody = getPPTXFirstNode(shape, 'txBody');
                     if (!txBody) return null;
-                    const text = getPPTXNodes(txBody, 't')
-                        .map(node => node.textContent || '')
-                        .join('')
-                        .replace(/\s+/g, ' ')
-                        .trim();
-                    if (!text) return null;
+                    const text = getPPTXEditableText(shape, txBody, toolReport);
+                    if (!text || /^www\.texhong\.com$/i.test(text)) return null;
                     const box = parsePPTXXfrm(shape);
                     return {
                         ...box,
@@ -2073,7 +2035,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         // 在创建元素时适配坐标，避免生成完再解包、缩放和重新打包整个PPT。
-        function addScaledPPTSlide(pptx, scale) {
+        function addScaledPPTSlide(pptx, scale, bilingual) {
             // 极小正线宽在PPT中舍入为0，兼容组件把数值0当成未设置的行为。
             const slide = pptx.addSlide();
             const scaleOptions = options => {
@@ -2090,9 +2052,17 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             }
             for (const method of ['addShape', 'addText']) {
                 const original = slide[method].bind(slide);
-                slide[method] = (content, options) => original(content, scaleOptions(
-                    method === 'addText' && !options.line ? { ...options, line: { width: 0.000001 } } : options
-                ));
+                slide[method] = (content, options) => {
+                    const scaled = scaleOptions(options);
+                    if (method === 'addText') {
+                        if (!options.line) scaled.line = { width: 0.000001 };
+                        if (bilingual !== undefined) {
+                            scaled.objectName = bilingual && typeof content === 'string' && content.includes('\n')
+                                ? '整改工具中拼' : '整改工具原文';
+                        }
+                    }
+                    return original(content, scaled);
+                };
             }
             return slide;
         }
@@ -3681,8 +3651,6 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 生成PPT
         async function translatePPTTexts(issues) {
-            const auth = await window.__pptLicense?.getTranslationAuth?.();
-            if (!auth) throw new Error('中文＋拼音双语功能仅限嘉新正式付费客户使用');
             if (!window.pinyinPro?.pinyin) throw new Error('拼音组件加载失败，请刷新页面后重试');
             const texts = [];
             issues.forEach(issue => {
@@ -3706,7 +3674,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         function bilingualPPTText(text, translations) {
             const chinese = String(text || '').trim();
             const pinyinText = translations.get(chinese) || '';
-            return chinese && pinyinText ? `${chinese}\n${pinyinText}` : chinese;
+            return /[\u3400-\u9fff]/.test(chinese) && pinyinText && pinyinText !== chinese ? `${chinese}\n${pinyinText}` : chinese;
         }
 
         async function generatePPT() {
@@ -3779,7 +3747,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         const leftPptImage = await preparePPTImage(leftImg, imageFrameRatio, exportOptions, preparedImageCache);
                         const rightPptImage = await preparePPTImage(rightImg, imageFrameRatio, exportOptions, preparedImageCache);
 
-                        const slide = addScaledPPTSlide(pptx, generatedScale);
+                        const slide = addScaledPPTSlide(pptx, generatedScale, Boolean(exportOptions.bilingual));
                         renderCompanySlide(pptx, slide, { processName, leftImg: leftPptImage, leftDesc, rightImg: rightPptImage, rightDesc, leftVideo, rightVideo, leftVideoName, rightVideoName, pageNum, total: issues.length });
                         preparedImageCache.clear();
                         await yieldForMedia();
@@ -4311,7 +4279,6 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         async function openFileNameDialog(defaultName) {
-            await window.__pptLicense?.whenReady?.();
             return new Promise(resolve => {
                 pendingFileNameResolve = resolve;
                 const modal = document.getElementById('file-name-modal');
@@ -4320,14 +4287,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 input.value = defaultName;
                 document.getElementById('ppt-image-fit-mode').value = 'balanced';
                 document.getElementById('ppt-image-distortion').value = '45';
-                const bilingual = document.getElementById('ppt-bilingual-mode');
-                const bilingualTip = document.getElementById('ppt-bilingual-tip');
-                const paid = window.__pptLicense?.isPaid?.() === true;
-                bilingual.checked = false;
-                bilingual.disabled = !paid;
-                bilingualTip.textContent = paid
-                    ? '启用后，小标题和问题描述将同时保留中文与拼音'
-                    : '7天免费体验不可用，仅嘉新正式付费客户可用';
+                document.getElementById('ppt-bilingual-mode').checked = false;
                 syncPPTImageFitControls();
                 panel.style.transform = '';
                 panel.dataset.x = '0';
@@ -4346,8 +4306,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             const fileName = cleanFileName(input.value || '问题整改汇总');
             const imageFitMode = document.getElementById('ppt-image-fit-mode').value;
             const imageDistortion = Number(document.getElementById('ppt-image-distortion').value);
-            const bilingual = document.getElementById('ppt-bilingual-mode').checked
-                && !document.getElementById('ppt-bilingual-mode').disabled;
+            const bilingual = document.getElementById('ppt-bilingual-mode').checked;
             closeFileNameDialog({ fileName, imageFitMode, imageDistortion, bilingual });
         }
 
@@ -4451,14 +4410,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         });
         const translations = {
             '嘉新集团问题整改PPT生成工具': 'جياشىن گۇرۇھى مەسىلە تۈزىتىش PPT ھاسىل قىلىش قورالى',
-            '嘉新内部工具授权': 'جياشىن ئىچكى قورال ئىجازىتى',
             '由小伍工作室提供技术支持': 'شياۋۇ ستۇدىيەسى تېخنىكىلىق قوللايدۇ',
-            '本工具用于嘉新内部问题整改材料排版，不是嘉新集团官网，不提供在线支付。上传的图片、文字和PPT仅在当前浏览器本地处理，不上传业务资料。': 'بۇ قورال جياشىننىڭ ئىچكى مەسىلە تۈزىتىش ماتېرىياللىرىنى رەتلەشكە ئىشلىتىلىدۇ، جياشىن گۇرۇھىنىڭ رەسمىي تور بېكىتى ئەمەس ۋە توردا پۇل تۆلەش مۇلازىمىتى بىلەن تەمىنلىمەيدۇ. يۈكلەنگەن رەسىم، تېكىست ۋە PPT پەقەت نۆۋەتتىكى توركۆرگۈچتە بىر تەرەپ قىلىنىدۇ، خىزمەت ماتېرىياللىرى يوللانمايدۇ.',
-            '🎉 免费体验7天': '🎉 7 كۈن ھەقسىز سىناش',
-            '📱 您的设备机器码': '📱 ئۈسكۈنىڭىزنىڭ كودى',
-            '📋 复制': '📋 كۆچۈرۈش',
-            '验证并进入工具': 'دەلىللەپ قورالغا كىرىش',
-            '已有管理员授权码，请在上方输入并验证': 'باشقۇرغۇچى ئىجازەت كودى بولسا، ئۈستىگە كىرگۈزۈپ دەلىللەڭ',
             '隐私说明': 'مەخپىيەتلىك چۈشەندۈرۈشى',
             '使用说明': 'ئىشلىتىش قوللانمىسى',
             '再次点击即可返回': 'قايتىش ئۈچۈن يەنە بىر قېتىم چېكىڭ',
@@ -4477,8 +4429,6 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             '取消': 'بىكار قىلىش',
             '确认编辑': 'تەھرىرنى جەزملەش',
             '纯前端本地处理 | 批量上传 | 自动排版 | 手机电脑通用': 'يەرلىك بىر تەرەپ قىلىش | تۈركۈملەپ يۈكلەش | ئاپتوماتىك رەتلەش | تېلېفون ۋە كومپيۇتېرغا ماس',
-            '嘉新内部定制工具 · 小伍工作室提供技术支持': 'جياشىن ئىچكى مەخسۇس قورالى · شياۋۇ ستۇدىيەسى تېخنىكىلىق قوللايدۇ',
-            '本工具不是嘉新集团官网，不提供在线支付；上传资料仅在当前设备本地处理。': 'بۇ قورال جياشىن گۇرۇھىنىڭ رەسمىي تور بېكىتى ئەمەس، توردا پۇل تۆلەش مۇلازىمىتى يوق؛ يۈكلەنگەن ماتېرىياللار پەقەت نۆۋەتتىكى ئۈسكۈنىدە بىر تەرەپ قىلىنىدۇ.',
             '推荐使用：电脑 Chrome/Edge、苹果 Safari、安卓 Chrome 或较新的系统浏览器。微信、QQ 内置浏览器可能无法下载PPT，请点右上角“在浏览器打开”。': 'تەۋسىيە: كومپيۇتېردا Chrome/Edge، ئايفوندا Safari، ئاندىرويىدتا Chrome ياكى يېڭى سىستېما توركۆرگۈچىنى ئىشلىتىڭ. ئۈندىدار ياكى QQ ئىچكى توركۆرگۈچى PPT نى چۈشۈرەلمەسلىكى مۇمكىن، ئوڭ ئۈستىدىكى «توركۆرگۈچتە ئېچىش»نى چېكىڭ.',
             '清空全部内容': 'بارلىق مەزمۇننى تازىلاش',
             '模板选择': 'قېلىپ تاللاش',
@@ -4517,7 +4467,6 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             '变形量': 'شەكىل ئۆزگىرىش دەرىجىسى',
             '视频保持原样；工具内的图片预览和原图不会改变。': 'سىن ئەسلى ھالىتىدە قالىدۇ؛ قورالدىكى رەسىم ئالدىن كۆرۈش ۋە ئەسلى رەسىم ئۆزگەرمەيدۇ.',
             '保存到桌面': 'ئۈستەل يۈزىگە ساقلاش',
-            '请输入管理员给的激活码': 'باشقۇرغۇچى بەرگەن ئىجازەت كودىنى كىرگۈزۈڭ',
             '查看完整照片': 'تولۇق رەسىمنى كۆرۈش',
             '关闭完整照片': 'تولۇق رەسىمنى تاقاش',
             '标记颜色': 'بەلگە رەڭگى',
