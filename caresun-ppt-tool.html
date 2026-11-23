@@ -380,7 +380,7 @@
 .desktop-entry { margin: 8px auto 0; max-width: 32rem; text-align: center; color: #166534; font-size: 0.875rem; }
 .desktop-entry summary { width: fit-content; max-width: 100%; margin: auto; padding: 8px 14px; cursor: pointer; font-weight: 600; }
 .desktop-entry p { margin: 4px auto 8px; text-align: start; line-height: 1.6; color: #334155; }
-.desktop-entry button { padding: 8px 16px; background: #166534; border-radius: 8px; color: #fff; }
+.desktop-entry a[download] { color: #166534; text-decoration: underline; }
 html[lang="zh-CN"] .title-tool-name { white-space: nowrap; }
 html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 .activation-card, #file-name-panel { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); overflow-y: auto; }
@@ -409,14 +409,24 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 #tool-more .workspace-panel { width: 17rem; padding: 6px; }
 #tool-more .workspace-panel > :is(a,button) { display: block; width: 100%; padding: 9px 12px; border-radius: 6px; text-align: start; font-size: 14px; }
 #tool-more .workspace-panel > :is(a,button):hover { background: #f1f6f2; }
-#tool-more #clear-work { color: #92402d; }
+#clear-work {
+    min-height: 48px; padding: 8px 17px; border: 1.5px solid #b85f47; border-radius: 8px;
+    background: #fff4ef; color: #8d301c; font-size: 16px; font-weight: 700; line-height: 1.3;
+}
+#clear-work:hover { background: #ffe6dc; }
+#clear-work:focus-visible { outline: 3px solid #a64d32; outline-offset: 2px; }
 #tool-more footer { margin: 5px 6px 0; padding: 8px 6px; border-top: 1px solid #e4ece6; color: #58695e; font-size: 12px; }
 #app-build { display: block; }
 @media (max-width: 540px) {
     #workspace-header { margin-bottom: 12px; }
     .workspace-brand img { width: 39px; }
-    .workspace-actions { margin-inline-start: auto; }
+    .workspace-actions { width: 100%; }
+    #clear-work { margin-inline-end: auto; padding-inline: 12px; }
     .workspace-actions summary { min-height: 40px; }
+}
+@media (max-width: 359px) {
+    .workspace-actions { gap: 4px; }
+    .workspace-actions summary, #clear-work { padding-inline: 8px; }
 }
 @media (display-mode: standalone) { .desktop-entry { display: none; } }
 </style>
@@ -450,7 +460,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         <div id="activation-error"></div>
         <p class="activation-footer" id="activation-footer-text">已有管理员授权码，请在上方输入并验证</p>
         <p class="activation-policy-links"><a href="./privacy.html">隐私说明</a> · <a href="./terms.html">使用说明</a> · <button type="button" id="activation-language-toggle" data-language-toggle>切换为拼音</button></p>
-        <details class="desktop-entry"><summary>添加到桌面</summary><p></p><button type="button" hidden>安装嘉新PPT</button></details>
+        <details class="desktop-entry"><summary>添加桌面指南</summary><p></p><a download="嘉新整改PPT.url" hidden>下载桌面快捷方式</a></details>
     </div>
 </div>
 <!-- ===== 照片全屏查看 ===== -->
@@ -510,9 +520,10 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 <h1><span class="workspace-owner">嘉新集团</span><span class="title-tool-name">问题整改</span><wbr><span class="title-tool-name">PPT生成工具</span></h1>
             </div>
             <nav class="workspace-actions" aria-label="工具操作">
+                <button type="button" id="clear-work" onclick="clearAllWork()">清空全部内容</button>
                 <details id="tool-install" class="desktop-entry">
-                    <summary>添加到桌面</summary>
-                    <div class="workspace-panel"><p></p><button type="button" hidden>安装嘉新PPT</button></div>
+                    <summary>添加桌面指南</summary>
+                    <div class="workspace-panel"><p></p><a download="嘉新整改PPT.url" hidden>下载桌面快捷方式</a></div>
                 </details>
                 <details id="tool-more">
                     <summary>更多</summary>
@@ -521,8 +532,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         <a href="./terms.html">使用说明</a>
                         <a href="./privacy.html">隐私说明</a>
                         <button type="button" id="download-diagnostics" onclick="downloadRuntimeTrace()">下载闪退排查记录</button>
-                        <button type="button" id="clear-work" onclick="clearAllWork()">清空全部内容</button>
-                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R5</span></footer>
+                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R6</span></footer>
                     </div>
                 </details>
             </nav>
@@ -540,7 +550,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         </svg>
                         <p class="text-sm font-semibold text-gray-700">上传照片</p>
                         <p class="desktop-upload-note text-xs text-gray-400 mt-1">拖拽、粘贴或点击批量导入</p>
-                        <p class="mobile-upload-note text-xs text-gray-400 mt-1">从相册批量选择</p>
+                        <p class="mobile-upload-note text-xs text-gray-400 mt-1">可多选</p>
                     </div>
                     <div id="batch-uploaded" class="hidden">
                         <p class="text-sm text-green-600 font-semibold">已上传 <span id="batch-count">0</span> 张</p>
@@ -718,7 +728,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 仅记录步骤与图片规格，保留重开前的最后阶段；不记录照片、文件名或业务文字。
         const RUNTIME_TRACE_KEY = 'jx_ppt_runtime_trace';
-        const RUNTIME_BUILD = '2026.11.23 R5';
+        const RUNTIME_BUILD = '2026.11.23 R6';
         let runtimeTrace = [];
         try {
             const previous = JSON.parse(localStorage.getItem(RUNTIME_TRACE_KEY) || '[]');
@@ -4615,55 +4625,95 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         });
         const entries = document.querySelectorAll('.desktop-entry');
         const ua = navigator.userAgent || '';
-        const embedded = /MicroMessenger|wxwork|\bQQ\//i.test(ua);
-        const huaweiBrowser = /HarmonyOS|OpenHarmony|ArkWeb|HuaweiBrowser/i.test(ua);
+        const wechat = /MicroMessenger|wxwork/i.test(ua);
+        const qqChat = /\bQQ\/[\d.]+|V1_(?:AND|IPH)_SQ_/i.test(ua);
+        const qqBrowser = /(?:MQQ|QQ)Browser/i.test(ua);
+        const ucBrowser = /UCBrowser|UCWEB/i.test(ua);
+        const harmony = /HarmonyOS|OpenHarmony|ArkWeb|HuaweiBrowser/i.test(ua);
+        const android = /Android/i.test(ua);
+        const windows = /Windows NT/i.test(ua);
         const ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        const chromeAndroid = '安卓推荐 Chrome。点右上角「⋮」→「安装并创建快捷方式」（部分版本叫「添加到主屏幕」），再选「安装」或「创建快捷方式」。';
+        const recommended = ios ? 'Safari' : harmony ? '华为浏览器' : windows ? 'Edge' : 'Chrome';
+        const vendorBrowser = /MiuiBrowser|XiaoMiBrowser|HeyTapBrowser|OppoBrowser|VivoBrowser|SamsungBrowser|(?:Huawei|HONOR)Browser|Version\/4\.0/i.test(ua);
         let guide;
-        if (embedded) {
-            const browser = ios ? 'Safari' : huaweiBrowser ? '华为浏览器' : /Android/i.test(ua) ? 'Chrome' : '系统浏览器';
-            guide = '点右上角菜单，选「在浏览器打开」，用' + browser + '打开本页后再添加到桌面。';
-        } else if (huaweiBrowser) {
+        if (wechat || qqChat) {
+            guide = '当前在' + (wechat ? '微信' : '手机 QQ') + '内。点右上角菜单，选「在浏览器打开」，用' + recommended + '打开本页后再添加到桌面。';
+        } else if (qqBrowser || ucBrowser) {
+            guide = (qqBrowser ? 'QQ 浏览器' : 'UC 浏览器') + '的菜单若有「添加到桌面」或「创建快捷方式」，选择后确认。没有该选项时，建议用' + recommended + '打开本页。';
+        } else if (harmony) {
             guide = '鸿蒙推荐华为浏览器。打开网页菜单「∷」，选「添加至桌面」并确认。鸿蒙 5 以下在菜单中选「添加至」→「桌面」。';
         } else if (ios) {
             guide = '用 Safari 打开本页，点「共享」→「添加到主屏幕」→「添加」。';
-        } else if (/Android/i.test(ua)) {
-            guide = chromeAndroid;
-        } else if (/Edg\//.test(ua) || (/Windows/i.test(ua) && !/Chrome\//.test(ua))) {
+        } else if (android && (vendorBrowser || /EdgA|OPR\/|Firefox\//i.test(ua) || !/Chrome\//.test(ua))) {
+            guide = '查看当前浏览器菜单，如有「添加到桌面」或「创建快捷方式」，选择后确认。没有该选项时，安卓推荐用 Chrome 打开本页。';
+        } else if (android) {
+            guide = '安卓推荐 Chrome。点右上角「⋮」→「安装并创建快捷方式」（部分版本叫「添加到主屏幕」），再选「安装」或「创建快捷方式」。';
+        } else if (/Edg\//.test(ua)) {
             guide = '用 Edge 打开本页，点右上角「…」→「更多工具」→「应用」→「将此站点安装为应用」。安装后可在 edge://apps 的应用详情中创建桌面快捷方式。';
         } else if (/Chrome\//.test(ua)) {
             guide = '在 Chrome 右上角「⋮」菜单中，选「投放、保存和分享」→「将网页安装为应用」或「创建快捷方式」。';
+        } else if (/Macintosh/.test(ua) && /Safari\//.test(ua)) {
+            guide = '在 macOS 14 或更高版本的 Safari 中，点「文件」→「添加到程序坞」→「添加」。';
+        } else if (windows) {
+            guide = 'Windows 推荐 Edge，可在「更多工具」→「应用」中将此页安装为应用。';
         } else {
-            guide = '在浏览器菜单中选择「安装应用」或「创建快捷方式」。Windows 推荐使用 Edge，Mac 可使用 Chrome。';
+            guide = '查看浏览器菜单，如有「安装应用」或「创建快捷方式」，选择后确认。';
         }
         if (navigator.standalone || matchMedia('(display-mode: standalone)').matches || /JiaxinPptAndroid/.test(ua)) {
             entries.forEach(entry => { entry.hidden = true; });
             return;
         }
-        let installEvent;
-        const setInstallEvent = event => {
-            installEvent = event;
-            entries.forEach(entry => { entry.querySelector('button').hidden = !event; });
+        let webInstall = location.protocol === 'https:' && window.isSecureContext && window.top === window && typeof navigator.install === 'function';
+        let installEvent, installing = false;
+        const updateInstallLabels = () => {
+            entries.forEach(entry => {
+                entry.querySelector('summary').textContent = webInstall || installEvent ? '添加到桌面' : '添加桌面指南';
+            });
         };
+        const hideInstalledEntries = () => entries.forEach(entry => { entry.hidden = true; });
         entries.forEach(entry => {
-            entry.querySelector('p').textContent = guide;
-            entry.open = embedded;
-            entry.querySelector('button').addEventListener('click', async () => {
-                if (!installEvent) return;
-                const event = installEvent;
-                setInstallEvent(null);
-                try { await event.prompt(); } catch (_) { /* 仍可使用浏览器菜单添加 */ }
+            entry.querySelector('p').textContent = guide + (windows ? '也可下载下方快捷方式，保存到桌面，或从下载目录移到桌面。' : '');
+            if (windows) {
+                const shortcut = entry.querySelector('a[download]');
+                const target = location.hostname === 'wiujianzhong.github.io'
+                    ? 'https://wiujianzhong.github.io/kunpeng-yuechao/caresun-ppt-tool.html' : 'https://jx.xiaowustudio.cn/';
+                shortcut.href = 'data:application/octet-stream,' + encodeURIComponent('[InternetShortcut]\r\nURL=' + target + '\r\n');
+                shortcut.hidden = false;
+            }
+            entry.querySelector('summary').addEventListener('click', async click => {
+                if (!webInstall && !installEvent && !installing) return;
+                click.preventDefault();
+                if (installing) return;
+                installing = true;
+                entry.open = false;
+                try {
+                    if (webInstall) {
+                        await navigator.install();
+                        hideInstalledEntries();
+                    } else {
+                        const event = installEvent;
+                        installEvent = null;
+                        const choice = await event.prompt() || await event.userChoice;
+                        if (choice?.outcome === 'accepted') hideInstalledEntries();
+                        if (choice?.outcome === 'dismissed') entry.open = true;
+                    }
+                } catch (error) {
+                    if (error?.name !== 'AbortError') webInstall = false;
+                    entry.open = true;
+                } finally {
+                    installing = false;
+                    updateInstallLabels();
+                }
             });
         });
+        updateInstallLabels();
         window.addEventListener('beforeinstallprompt', event => {
-            if (embedded) return;
+            if (typeof event.prompt !== 'function') return;
             event.preventDefault();
-            setInstallEvent(event);
+            installEvent = event;
+            updateInstallLabels();
         });
-        window.addEventListener('appinstalled', () => {
-            setInstallEvent(null);
-            entries.forEach(entry => { entry.hidden = true; });
-        });
+        window.addEventListener('appinstalled', hideInstalledEntries);
     })();
   </script>
   <script async src="https://xiaowustudio.cn/assets/analytics.js?v=20260710"></script>
