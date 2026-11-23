@@ -29,7 +29,7 @@
     </script>
     <script src="./vendor/pinyin-pro.js?v=3.18.6" defer></script>
     <script src="./vendor/tailwindcss-cdn.js" defer></script>
-    <script src="./vendor/pptxgen.bundle.js" defer></script>
+    <script src="./vendor/pptxgen.bundle.js?v=3.12.0-r9.1" defer></script>
     <script src="./vendor/ppt-video-poster.js" defer></script>
     <script src="./vendor/jszip.min.js" defer></script>
     <style>
@@ -425,7 +425,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         <a href="./jiaxin-ppt-web/terms.html">使用说明</a>
                         <a href="./jiaxin-ppt-web/privacy.html">隐私说明</a>
                         <button type="button" id="download-diagnostics" onclick="downloadRuntimeTrace()">下载闪退排查记录</button>
-                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R9</span></footer>
+                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R9.1</span></footer>
                     </div>
                 </details>
             </nav>
@@ -621,7 +621,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 仅记录步骤与图片规格，保留重开前的最后阶段；不记录照片、文件名或业务文字。
         const RUNTIME_TRACE_KEY = 'jx_ppt_runtime_trace';
-        const RUNTIME_BUILD = '2026.11.23 R9';
+        const RUNTIME_BUILD = '2026.11.23 R9.1';
         let runtimeTrace = [];
         try {
             const previous = JSON.parse(localStorage.getItem(RUNTIME_TRACE_KEY) || '[]');
