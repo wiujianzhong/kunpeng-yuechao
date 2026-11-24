@@ -33,6 +33,7 @@
     <script src="./vendor/ppt-video-poster.js" defer></script>
     <script src="./vendor/jszip.min.js" defer></script>
     <script src="./vendor/ppt-import-workspace.js?v=10" defer></script>
+    <script src="./vendor/ppt-studio-ad.js?v=10.1" defer></script>
     <style>
         body {
             background:
@@ -380,8 +381,8 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 <dialog id="pptx-mode-dialog" class="ppt-import-dialog" role="dialog" aria-modal="true" aria-labelledby="pptx-mode-title" onkeydown="handlePPTXDialogKey(event)" onclick="if (event.target === this) closePPTXDialog(this)">
     <div class="ppt-import-card">
         <h2 id="pptx-mode-title">选择导入方式</h2>
-        <button type="button" id="pptx-mode-rectify" class="ppt-import-option" aria-label="补充整改结果" aria-describedby="pptx-rectify-help" data-initial-focus onclick="choosePPTXImportMode('rectify')">补充整改结果<span id="pptx-rectify-help">将原报告中的现场照片逐张作为检查照，再补上整改后的照片。</span></button>
-        <button type="button" id="pptx-mode-edit" class="ppt-import-option" aria-label="编辑原报告" aria-describedby="pptx-edit-help" onclick="choosePPTXImportMode('edit')">编辑原报告<span id="pptx-edit-help">保留原报告已有的左右照片和说明，继续修改。</span></button>
+        <button type="button" id="pptx-mode-rectify" class="ppt-import-option" aria-label="整改" aria-describedby="pptx-rectify-help" data-initial-focus onclick="choosePPTXImportMode('rectify')">整改<span id="pptx-rectify-help">查看原问题，补上整改后的照片和说明。</span></button>
+        <button type="button" id="pptx-mode-edit" class="ppt-import-option" aria-label="继续编辑" aria-describedby="pptx-edit-help" onclick="choosePPTXImportMode('edit')">继续编辑<span id="pptx-edit-help">接着改原报告里的照片、标题和说明。</span></button>
         <div class="ppt-import-actions"><button type="button" onclick="closePPTXDialog(this.closest('dialog'))">取消</button></div>
     </div>
 </dialog>
@@ -466,7 +467,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         <a href="./jiaxin-ppt-web/terms.html">使用说明</a>
                         <a href="./jiaxin-ppt-web/privacy.html">隐私说明</a>
                         <button type="button" id="download-diagnostics" onclick="downloadRuntimeTrace()">下载闪退排查记录</button>
-                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.23 R10</span></footer>
+                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.24 R10.1</span></footer>
                     </div>
                 </details>
             </nav>
@@ -495,7 +496,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 <button type="button" id="import-pptx-btn" aria-haspopup="dialog" aria-controls="pptx-mode-dialog" onclick="triggerPPTXImport()" class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-4 md:p-5 text-blue-700 hover:bg-blue-100 transition-all flex flex-col items-center justify-center min-h-[82px] md:min-h-[120px]">
                     <span class="text-2xl md:text-3xl mb-1 md:mb-2" aria-hidden="true">📂</span>
                     <span class="text-sm font-semibold">导入PPT</span>
-                    <span class="hidden md:block text-xs font-normal text-blue-500 mt-1">补充整改结果或编辑原报告</span>
+                    <span class="hidden md:block text-xs font-normal text-blue-500 mt-1">整改或继续编辑</span>
                 </button>
                 <input type="file" id="pptx-text-extract" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" class="hidden">
                 <button type="button" id="extract-pptx-text-btn" onclick="triggerPPTXTextExtract()" class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-4 md:p-5 text-amber-700 hover:bg-amber-100 transition-all flex flex-col items-center justify-center min-h-[82px] md:min-h-[120px]">
@@ -662,7 +663,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 仅记录步骤与图片规格，保留重开前的最后阶段；不记录照片、文件名或业务文字。
         const RUNTIME_TRACE_KEY = 'jx_ppt_runtime_trace';
-        const RUNTIME_BUILD = '2026.11.23 R10';
+        const RUNTIME_BUILD = '2026.11.24 R10.1';
         let runtimeTrace = [];
         try {
             const previous = JSON.parse(localStorage.getItem(RUNTIME_TRACE_KEY) || '[]');
@@ -1245,7 +1246,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             document.getElementById('pptx-replacement-summary').textContent = counts.length
                 ? `当前报告包含 ${counts.join('、')}。${summary.issues && !summary.photos && !summary.videos ? '问题项中尚无照片或视频。' : ''}`
                 : '当前报告已有编辑内容。';
-            document.getElementById('pptx-replacement-mode').textContent = mode === 'edit' ? '编辑原报告' : '补充整改结果';
+            document.getElementById('pptx-replacement-mode').textContent = mode === 'edit' ? '继续编辑' : '整改';
             document.getElementById('pptx-replacement-file').textContent = fileName;
             return new Promise(resolve => {
                 dialog.addEventListener('close', () => {
@@ -3989,6 +3990,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             }
 
             const reportDate = formatToday();
+            window.pptStudioAd?.prepare();
             const exportOptions = await openFileNameDialog(buildDefaultFileName(issues, reportDate));
             if (!exportOptions) return;
             const cleanBaseName = cleanFileName(exportOptions.fileName);
@@ -4000,7 +4002,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
             btn.disabled = true;
             btn.innerHTML = '<svg class="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 正在生成PPT...';
 
-            await enqueueMediaTask(async () => {
+            const exportTask = enqueueMediaTask(async () => {
                 try {
                     setMediaProgress('正在准备PPT…');
                     const translations = exportOptions.bilingual
@@ -4053,11 +4055,13 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                             true
                         );
                     }
+                    window.pptStudioAd?.hide();
                     traceRuntime('准备下载PPT', { bytes: pptBlob.size });
                     await savePPT(pptBlob, `${cleanBaseName}.pptx`);
                     traceRuntime('PPT已交给系统保存');
 
                 } catch (error) {
+                    window.pptStudioAd?.hide();
                     traceRuntime('生成或保存PPT失败', { type: error?.name || '未知' });
                     console.error(error);
                     if (error?.name !== 'AbortError') {
@@ -4066,6 +4070,8 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                 }
 
             });
+            window.pptStudioAd?.show();
+            await exportTask;
             btn.disabled = false;
             btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> 一键生成PPT';
         }
