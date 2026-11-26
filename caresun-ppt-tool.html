@@ -33,7 +33,7 @@
     <script src="./vendor/ppt-video-poster.js" defer></script>
     <script src="./vendor/jszip.min.js" defer></script>
     <script src="./vendor/ppt-import-workspace.js?v=10" defer></script>
-    <script src="./vendor/ppt-studio-ad.js?v=10.1" defer></script>
+    <script src="./vendor/ppt-studio-ad.js?v=10.2" defer></script>
     <style>
         body {
             background:
@@ -467,7 +467,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                         <a href="./jiaxin-ppt-web/terms.html">使用说明</a>
                         <a href="./jiaxin-ppt-web/privacy.html">隐私说明</a>
                         <button type="button" id="download-diagnostics" onclick="downloadRuntimeTrace()">下载闪退排查记录</button>
-                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.24 R10.1</span></footer>
+                        <footer>小伍工作室提供技术支持<span id="app-build">2026.11.26 R10.2</span></footer>
                     </div>
                 </details>
             </nav>
@@ -663,7 +663,7 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
 
         // 仅记录步骤与图片规格，保留重开前的最后阶段；不记录照片、文件名或业务文字。
         const RUNTIME_TRACE_KEY = 'jx_ppt_runtime_trace';
-        const RUNTIME_BUILD = '2026.11.24 R10.1';
+        const RUNTIME_BUILD = '2026.11.26 R10.2';
         let runtimeTrace = [];
         try {
             const previous = JSON.parse(localStorage.getItem(RUNTIME_TRACE_KEY) || '[]');
@@ -4055,6 +4055,8 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
                             true
                         );
                     }
+                    setMediaProgress('PPT 已准备好，即将保存…');
+                    await window.pptStudioAd?.waitUntilSkippable?.();
                     window.pptStudioAd?.hide();
                     traceRuntime('准备下载PPT', { bytes: pptBlob.size });
                     await savePPT(pptBlob, `${cleanBaseName}.pptx`);
@@ -4542,25 +4544,62 @@ html[lang="zh-Latn"] .title-tool-name::before { content: ' '; }
         }
 
         async function savePPT(blob, fileName) {
-
-            // 方案一：iOS/移动端用 Web Share API 分享文件（支持桌面快捷方式打开的独立模式）
+            const download = () => {
+                downloadBlob(blob, fileName);
+                alert(`已生成：${fileName}，请到下载目录查看（苹果手机在「文件」App → 下载项）`);
+            };
             if (navigator.share && isMobileUploadEnabled()) {
                 try {
                     const file = new File([blob], fileName, {
                         type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
                     });
-                    await navigator.share({ files: [file] });
-                    alert(`已生成：${fileName}`);
-                    return;
-                } catch (e) {
-                    if (e?.name === 'AbortError') throw e;
-                    console.warn('分享失败，改用浏览器下载。', e);
+                    const data = { files: [file] };
+                    const active = navigator.userActivation?.isActive;
+                    if (navigator.canShare ? navigator.canShare(data) : active) {
+                        const share = async () => {
+                            await navigator.share(data);
+                            alert(`已生成：${fileName}`);
+                        };
+                        if (active) await share();
+                        else await chooseMobilePPTSave(share, download);
+                        return;
+                    }
+                } catch (error) {
+                    if (error?.name === 'AbortError') throw error;
+                    console.warn('分享失败，改用浏览器下载。', error);
                 }
             }
+            download();
+        }
 
-            // 方案二：普通浏览器下载（桌面/安卓/苹果正常浏览器）
-            downloadBlob(blob, fileName);
-            alert(`已生成：${fileName}，请到下载目录查看（苹果手机在「文件」App → 下载项）`);
+        // 手机分享文件需要新的点按，直接使用已经生成的文件。
+        async function chooseMobilePPTSave(share, download) {
+            const message = document.getElementById('media-progress-text');
+            const hint = message.nextElementSibling;
+            const actions = document.createElement('div');
+            actions.className = 'mt-3 flex flex-wrap justify-center gap-2';
+            actions.innerHTML = `<button type="button" class="rounded-lg bg-green-600 px-4 py-3 text-white">保存或分享PPT</button>
+                <button type="button" class="rounded-lg border px-4 py-3">直接下载</button>
+                <button type="button" class="px-3 py-3 text-gray-500">取消</button>`;
+            setMediaProgress('PPT 已生成，请选择保存方式');
+            hint.hidden = true;
+            message.parentElement.appendChild(actions);
+            const [shareButton, downloadButton, cancelButton] = actions.children;
+            try {
+                await new Promise((resolve, reject) => {
+                    const choose = action => {
+                        for (const button of actions.children) button.disabled = true;
+                        try { resolve(action()); } catch (error) { reject(error); }
+                    };
+                    shareButton.onclick = () => choose(share);
+                    downloadButton.onclick = () => choose(download);
+                    cancelButton.onclick = () => reject(new DOMException('已取消保存', 'AbortError'));
+                    if (!document.hidden) shareButton.focus();
+                });
+            } finally {
+                actions.remove();
+                hint.hidden = false;
+            }
         }
 
         function downloadBlob(blob, fileName) {
